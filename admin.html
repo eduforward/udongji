@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="./udongji-nav.js?v=4"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
+    html { color-scheme: light; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+    a { color: var(--blue); } a:hover { color: var(--blue-d); }
+    button, input { font-family: inherit; }
+    :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 20px 20px 60px; }
+    .bar { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--red); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+    .brand b { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; display: block; line-height: 1.2; }
+    .brand small { font-size: 11.5px; color: var(--text-3); font-weight: 500; }
+    .search { flex: 1 1 220px; min-width: 0; font: inherit; font-size: 13.5px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
+    .btn { font: inherit; font-size: 13px; font-weight: 700; padding: 8px 13px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .btn:hover { background: var(--card-2); color: var(--text); }
+    .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; } .btn.primary:hover { background: var(--blue-d); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .cnt { font-size: 12.5px; color: var(--text-3); margin-left: auto; white-space: nowrap; } .cnt.err { color: var(--red); font-weight: 600; }
+    .tw { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: auto; }
+    table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 900px; font-size: 13.5px; }
+    thead th { position: sticky; top: 0; background: var(--card-2); text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line-2); vertical-align: top; }
+    tbody tr:hover td { background: var(--card-2); }
+    td.when { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--text-2); }
+    td.who { font-weight: 700; white-space: nowrap; }
+    td.store b { font-weight: 700; display: block; } td.store span { color: var(--text-3); font-size: 12.5px; }
+    .pill { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--red-2); color: var(--red); white-space: nowrap; }
+    .pill.ok { background: var(--green-2); color: var(--green); }
+    details summary { cursor: pointer; color: var(--blue); font-size: 12.5px; font-weight: 600; list-style: none; }
+    details pre { margin-top: 6px; font-size: 12px; white-space: pre-wrap; color: var(--text-2); background: var(--card-2); padding: 8px 10px; border-radius: 8px; max-width: 520px; }
+    .empty { padding: 60px 20px; text-align: center; color: var(--text-3); }
+    .gate { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 40px 20px; text-align: center; color: var(--text-2); }
+    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: all .2s; pointer-events: none; z-index: 30; }
+    .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</helmet>
+<udongji-nav current="admin"></udongji-nav>
+<div class="page">
+  <div class="bar">
+    <div class="brand"><span class="mark">!</span><div><b>슈퍼관리자 · 삭제 로그</b><small>누가 · 언제 · 무엇을 삭제했는지 영구 기록 (지울 수 없음)</small></div></div>
+    <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 · 삭제한 사람 검색" value="{{ query }}" onInput="{{ onQuery }}">
+    <a class="btn" href="index.html#admin">계정 설정</a>
+    <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
+    <span class="cnt {{ cntCls }}">{{ cntText }}</span>
+  </div>
+  <sc-if value="{{ denied }}" hint-placeholder-val="{{ false }}"><div class="gate">이 화면은 슈퍼관리자만 볼 수 있어요.</div></sc-if>
+  <sc-if value="{{ ok }}" hint-placeholder-val="{{ true }}">
+  <div class="tw">
+    <table>
+      <thead><tr><th>삭제 시각</th><th>삭제한 사람</th><th>매장 · 고객</th><th>상태</th><th>원본</th><th></th></tr></thead>
+      <tbody>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+          <tr>
+            <td class="when">{{ r.when }}</td>
+            <td class="who">{{ r.who }}</td>
+            <td class="store"><b>{{ r.store }}</b><span>{{ r.sub }}</span></td>
+            <td><span class="pill {{ r.stCls }}">{{ r.st }}</span></td>
+            <td><details><summary>전체 데이터 보기</summary><pre>{{ r.json }}</pre></details></td>
+            <td><button type="button" class="btn primary" onClick="{{ r.restore }}" disabled="{{ r.restored }}">{{ r.btn }}</button></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}"><div class="empty">{{ emptyMsg }}</div></sc-if>
+  </div>
+  </sc-if>
+  <div class="{{ toastCls }}">{{ toastMsg }}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { lib: null, logs: [], loading: true, err: '', query: '', ok: false, denied: false, toast: '', toastOn: false, busy: false };
+  async componentDidMount() {
+    try {
+      const lib = await import('./udongji-fb.js?v=3'); await lib.init();
+      if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
+      const ok = await lib.isAdmin(lib.userEmail());
+      this.setState({ lib, ok, denied: !ok, loading: ok }, () => { if (ok) this.load(); });
+    } catch (e) { location.replace('index.html#login'); }
+  }
+  async load() {
+    const lib = this.state.lib; if (!lib) return;
+    this.setState({ loading: true });
+    try { const logs = await lib.listDeleted(); this.setState({ logs, loading: false, err: '' }); }
+    catch (e) { this.setState({ loading: false, err: e.message }); }
+  }
+  toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
+  renderVals() {
+    const { lib, logs, loading, err, query, ok, denied, toast, toastOn, busy } = this.state;
+    const q = query.trim().toLowerCase();
+    const fmt = iso => { if (!iso) return ''; const d = new Date(iso); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); };
+    const list = logs.filter(L => !q || [L.store, L.customer, L.phone, L.deletedBy].some(x => String(x || '').toLowerCase().includes(q)));
+    const rows = list.map(L => { const restored = !!L.restoredAt; return {
+      when: fmt(L.deletedAt), who: L.deletedBy || '?', store: L.store || '(매장명 없음)', sub: [L.customer, lib ? lib.fmtPhone(L.phone) : L.phone].filter(Boolean).join(' · '),
+      st: restored ? '복구됨 ' + fmt(L.restoredAt) + ' · ' + (L.restoredBy || '') : '삭제됨', stCls: restored ? 'ok' : '', restored: restored || busy, btn: restored ? '복구 완료' : '복구',
+      json: JSON.stringify(Object.fromEntries(Object.entries(L.data || {}).filter(([k, v]) => v !== '' && v != null)), null, 1).replace(/[{}"]/g, ''),
+      restore: async () => { if (!lib || !confirm('"' + (L.store || L.customer) + '" 기록을 고객 목록으로 복구할까요?')) return; this.setState({ busy: true }); try { await lib.restoreDeleted(L.logId); this.toast('복구했어요'); await this.load(); } catch (e) { this.toast('복구 실패: ' + e.message); } this.setState({ busy: false }); }
+    }; });
+    return {
+      query, onQuery: e => this.setState({ query: e.target.value }), reload: () => this.load(), ok, denied,
+      cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : rows.length + '건',
+      rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '로그를 읽지 못했어요. Firestore 규칙(deleted)을 배포했는지 확인하세요.' : '삭제된 기록이 없어요.',
+      toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
+    };
+  }
+}
+</script>
+</body>
+</html>

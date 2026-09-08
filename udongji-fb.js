@@ -194,12 +194,14 @@ function cleanIn(d) { const o = {}; Object.keys(d || {}).forEach(k => { if (k[0]
 export async function findRowById(id) { await init(); need(); const { fs } = _mods; const s = await fs.getDoc(fs.doc(_db, COL, id)); return s.exists() ? id : null; }
 export async function appendRecord(d, id) {
   await init(); need(); const { fs } = _mods; const now = new Date().toISOString();
+  const nm = await myName(); if (nm) d = Object.assign({}, d, { '상담자': nm });
   const ref = id ? fs.doc(_db, COL, id) : fs.doc(fs.collection(_db, COL));
   await fs.setDoc(ref, Object.assign(cleanIn(d), { _createdAt: now, _updatedAt: now, _createdBy: userEmail() }), { merge: true });
   return ref.id;
 }
 export async function updateRecord(id, d) {
   await init(); need(); const { fs } = _mods;
+  const nm = await myName(); if (nm) d = Object.assign({}, d, { '상담자': nm });
   const ref = fs.doc(_db, COL, id); const cur = await fs.getDoc(ref); const keep = cur.exists() ? cur.data() : {};
   const patch = cleanIn(d);
   // 계약 진행 열은 상담 폼이 덮어쓰지 않도록 보존
@@ -208,10 +210,22 @@ export async function updateRecord(id, d) {
 }
 export async function updateCells(id, obj) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, COL, id), Object.assign(cleanIn(obj), { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true }); }
 export async function setCell(id, k, v) { return updateCells(id, { [k]: v }); }
+// 삭제: 원본을 deleted/{id}에 그대로 보관(누가·언제) 후 customers에서 제거. 첨부 파일은 복구를 위해 남긴다.
 export async function deleteRow(id) {
-  await init(); need(); const { fs, st } = _mods;
-  try { const list = await st.listAll(st.ref(_st, 'docs/' + id)); await Promise.all(list.items.map(it => st.deleteObject(it).catch(() => {}))); } catch (e) {}
-  await fs.deleteDoc(fs.doc(_db, COL, id));
+  await init(); need(); const { fs } = _mods;
+  const ref = fs.doc(_db, COL, id); const cur = await fs.getDoc(ref); const data = cur.exists() ? cur.data() : {};
+  const now = new Date().toISOString();
+  await fs.setDoc(fs.doc(_db, 'deleted', id + '_' + now.replace(/[:.]/g, '')), { recordId: id, data, deletedAt: now, deletedBy: userEmail(), store: String(data['매장명'] || ''), customer: String(data['고객명'] || ''), phone: String(data['연락처'] || ''), ua: navigator.userAgent.slice(0, 200) });
+  await fs.deleteDoc(ref);
+}
+// ── 삭제 로그 (Firestore: deleted/{logId}) — 슈퍼관리자만 조회·복구, 삭제 불가 ──
+export async function listDeleted() { await init(); need(); const { fs } = _mods; const s = await fs.getDocs(fs.query(fs.collection(_db, 'deleted'), fs.orderBy('deletedAt', 'desc'))); return s.docs.map(d => Object.assign({ logId: d.id }, d.data())); }
+export async function restoreDeleted(logId) {
+  await init(); need(); const { fs } = _mods;
+  const s = await fs.getDoc(fs.doc(_db, 'deleted', logId)); if (!s.exists()) throw new Error('로그를 찾을 수 없어요');
+  const L = s.data(); const now = new Date().toISOString();
+  await fs.setDoc(fs.doc(_db, COL, L.recordId), Object.assign({}, L.data, { _updatedAt: now, _updatedBy: userEmail(), _restoredAt: now, _restoredBy: userEmail() }), { merge: true });
+  await fs.setDoc(fs.doc(_db, 'deleted', logId), { restoredAt: now, restoredBy: userEmail() }, { merge: true });
 }
 // ── 관리자 (Firestore: admins/{email}) ──
 export async function listAdmins() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'admins')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '' })); } catch (e) { return []; } }
@@ -223,6 +237,9 @@ export async function listUsers() { await init(); if (!_user) return []; const {
 export async function addUser(email, by, name) { const e = String(email || '').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('이메일 형식이 아니에요'); await init(); need(); await _mods.fs.setDoc(_mods.fs.doc(_db, 'users', e), { at: todayStr(), by: by || '', name: name || '' }, { merge: true }); }
 export async function removeUser(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) throw new Error('기본 관리자는 제거할 수 없어요'); await init(); need(); await _mods.fs.deleteDoc(_mods.fs.doc(_db, 'users', e)); }
 export async function isAllowed(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) return true; await init(); const { fs } = _mods; try { return (await fs.getDoc(fs.doc(_db, 'users', e))).exists(); } catch (er) { return false; } }
+// 로그인 계정의 등록 이름(상담자) — 슈퍼관리자가 사용자 관리에서 지정. 본인은 바꿀 수 없다.
+let _myName = null;
+export async function myName() { if (_myName !== null) return _myName; await init(); if (!_user) return ''; const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'users', userEmail().toLowerCase())); _myName = s.exists() ? String(s.data().name || '') : ''; } catch (e) { _myName = ''; } return _myName; }
 
 // ── 파일 (Storage: docs/{recordId}/{name}) ──
 export async function ensureCustomerFolder(label, recordId) { return recordId || safeName(label); }
