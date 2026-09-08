@@ -216,7 +216,16 @@ class Component extends DCLogic {
       saveCfg: () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); this.setState({ cfg: c, msg: '설정을 저장했어요.' + (lib.isSignedIn() ? '' : ' 이제 구글 계정으로 로그인하세요.'), msgCls: 'ok' }); },
       signIn: async () => { if (!lib) return; lib.setCfg(this.state.cfg); this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); if (!this.state.cfg.sheetId) { this.setState({ signedIn: true, email: tok.email, busy: false, msg: '로그인됐어요. 이제 "새 시트 만들기"를 누르거나 기존 시트 URL을 넣고 설정 저장하세요.', msgCls: 'ok' }); return; } this.setState({ signedIn: true, email: tok.email, msg: '로그인됐어요. 시트를 읽어옵니다…', msgCls: 'ok', busy: false }); await this.load(); this.setState({ msg: '연결됐어요. 시트에서 ' + this.state.records.length + '건을 읽었어요.', msgCls: 'ok' }); } catch (e) { this.setState({ busy: false, msg: '로그인 실패: ' + e.message + (/(origin|redirect|invalid_client|idpiframe)/i.test(e.message) ? ' — 클라이언트 ID와 승인된 JavaScript 원본(' + location.origin + ')을 확인하세요.' : ''), msgCls: 'err' }); } },
       signOut: async () => { if (!lib) return; await lib.signOut(); this.setState({ signedIn: false, email: '', msg: '로그아웃했어요.', msgCls: '' }); this.load(); },
-      test: async () => { if (!lib) return; try { const h = await lib.getHeader(); this.setState({ msg: '연결 정상 · 탭 "' + cfg.tab + '" 헤더 ' + h.length + '열 (' + h.slice(0, 5).join(', ') + '…)', msgCls: 'ok' }); this.load(); } catch (e) { this.setState({ msg: '연결 실패: ' + e.message, msgCls: 'err', signedIn: lib.isSignedIn() }); } }
+      test: async () => {
+        if (!lib) return; lib.setCfg(this.state.cfg);
+        try {
+          const tabs = await lib.listTabs();
+          if (!tabs.includes(this.state.cfg.tab)) { this.setState({ msg: '시트는 열리는데 "' + this.state.cfg.tab + '" 탭이 없어요. 이 시트의 탭: ' + tabs.join(', ') + ' — 탭 이름을 그중 하나로 바꾸고 설정 저장하세요.', msgCls: 'err' }); return; }
+          const r = await lib.initHeaderIfEmpty();
+          this.setState({ msg: r.created ? '연결 정상 · 빈 시트라서 헤더 ' + r.header.length + '열을 첫 행에 채웠어요. 이제 상담자들에게 편집 권한을 공유하면 끝.' : '연결 정상 · 탭 "' + this.state.cfg.tab + '" 헤더 ' + r.header.length + '열 (' + r.header.slice(0, 5).join(', ') + '…)', msgCls: 'ok', cfg: lib.getCfg() });
+          this.load();
+        } catch (e) { this.setState({ msg: '연결 실패: ' + e.message, msgCls: 'err', signedIn: lib.isSignedIn() }); }
+      }
     };
   }
 }

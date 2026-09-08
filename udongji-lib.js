@@ -122,6 +122,16 @@ async function api(path, opt = {}) {
 }
 function colLetter(n) { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
 export async function getHeader() { const cfg = getCfg(); const res = await api('/values/' + q(cfg.tab + '!1:1')); return ((res.values || [[]])[0] || []).map(h => String(h)); }
+// 헤더가 비어 있으면 전체 열 이름으로 첫 행을 채운다. 이미 있으면 건드리지 않고 반환.
+export async function initHeaderIfEmpty() {
+  const cfg = getCfg(); const h = await getHeader();
+  if (h.some(x => x.trim())) return { created: false, header: h };
+  const header = COLS.map(c => c.name).concat([ID_COL, REG_COL]);
+  await api('/values/' + q(cfg.tab + '!1:1') + '?valueInputOption=RAW', { method: 'PUT', body: JSON.stringify({ range: cfg.tab + '!1:1', majorDimension: 'ROWS', values: [header] }) });
+  try { const meta = await api('?fields=sheets.properties'); const sh = (meta.sheets || []).find(s => s.properties && s.properties.title === cfg.tab); if (sh) await api(':batchUpdate', { method: 'POST', body: JSON.stringify({ requests: [{ updateSheetProperties: { properties: { sheetId: sh.properties.sheetId, gridProperties: { frozenRowCount: 1, frozenColumnCount: 2 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' } }, { repeatCell: { range: { sheetId: sh.properties.sheetId, startRowIndex: 0, endRowIndex: 1 }, cell: { userEnteredFormat: { textFormat: { bold: true }, backgroundColor: { red: 0.93, green: 0.95, blue: 1 } } }, fields: 'userEnteredFormat(textFormat,backgroundColor)' } }] }) }); } catch (e) {}
+  return { created: true, header };
+}
+export async function listTabs() { const meta = await api('?fields=sheets.properties.title'); return (meta.sheets || []).map(s => s.properties.title); }
 export async function ensureColumns(header, names) {
   const cfg = getCfg(); const missing = names.filter(n => !header.some(h => norm(h) === norm(n))); if (!missing.length) return header;
   const next = header.concat(missing);
