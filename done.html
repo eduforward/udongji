@@ -63,10 +63,10 @@
     </div>
 
     <div class="acts">
-      <a class="act primary" href="consult.html?new=1"><b>새 상담 시작</b><small>이 상담은 시트에 저장됐어요. 다음 고객 통화로.</small></a>
+      <a class="act primary" href="consult.html"><b>새 상담 시작</b><small>이 상담은 시트에 저장됐어요. 다음 고객 통화로.</small></a>
       <a class="act" href="{{ regHref }}"><b>등록 업무로 →</b><small>페이앤 입력폼에 붙일 정보 보기</small></a>
       <a class="act" href="customers.html"><b>고객 목록</b><small>전체 상담 표 · 수정 · 삭제</small></a>
-      <a class="act" href="consult.html"><b>← 이 상담 수정</b><small>스크립트로 돌아가 값 고치기</small></a>
+      <a class="act" href="index.html"><b>홈으로</b><small>업무 선택 화면</small></a>
     </div>
 
     <div class="tbox">
@@ -126,7 +126,7 @@ class Component extends DCLogic {
       hasRec: true, noRec: false,
       ckCls: sync === 'ok' ? 'ok' : sync === 'bad' ? 'bad' : 'wait', ckIcon: sync === 'ok' ? '✓' : sync === 'bad' ? '!' : '…',
       title: sync === 'ok' ? '상담 기록이 시트에 저장됐어요' : sync === 'bad' ? '시트 저장에 실패했어요' : '시트에 저장하는 중…',
-      sub: sync === 'ok' ? '고객 목록 시트 ' + (row ? row + '행' : '') + '에 들어갔어요. 아래 안내 문자를 고객에게 보내고 다음 상담으로 넘어가세요.' : sync === 'bad' ? err + ' — 이 기기에 보관돼 있으니 로그인 후 등록 업무에서 "시트로 전송"을 누르면 됩니다.' : '잠시만요.',
+      sub: sync === 'ok' ? '고객 목록 시트 ' + (row ? row + '행' : '') + '에 들어갔어요. 아래 안내 문자를 고객에게 보내고 다음 상담으로 넘어가세요. 값을 고쳐야 하면 고객 목록에서 수정하세요.' : sync === 'bad' ? err + ' — 이 기기에 보관돼 있으니 로그인 후 등록 업무에서 "시트로 전송"을 누르면 됩니다.' : '잠시만요.',
       subCls: sync === 'bad' ? 'bad' : '',
       store: V('매장명') || '(매장명 없음)', who: (V('고객명') || '고객') + ' · ' + V('연락처'), mode: V('매장 구분') || res, agent: V('상담자') || '—',
       statusTag: V('상태') || res, statusCls: go ? (V('상태') === '재연락 예정' ? 'amber' : 'ok') : '',

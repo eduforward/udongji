@@ -706,6 +706,9 @@ class Component extends DCLogic {
       var i = list.findIndex(function(x){ return x.id === S._id; });
       if(i >= 0){ rec.registered = !!list[i].registered; rec.registeredAt = list[i].registeredAt; rec.sheetRow = list[i].sheetRow || null; list[i] = rec; } else list.unshift(rec);
       try { localStorage.setItem(RKEY, JSON.stringify(list)); localStorage.setItem('udongji-last-done', JSON.stringify(rec)); } catch(e){}
+      // 폼 초기화 (상담자는 유지) — 다음 상담은 빈 상태에서 시작
+      var agent = S['상담자'] || '';
+      S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent;
       save();
       location.href = 'done.html';
     }
