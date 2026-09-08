@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=8"></script>
+  <script src="./udongji-nav.js?v=9"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -226,7 +226,7 @@
     }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="31"></udongji-nav>
+<udongji-nav current="consult" page-v="32"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="목차">
     <div class="logo"><div class="mark">우</div><div><span class="name">상담 업무</span><span class="sub">스크립트 v4</span></div></div>
@@ -408,7 +408,6 @@
 
       <h3 class="sub">접수에 들어가는 정보 — 통화에서 받기</h3>
       <div class="say"><span class="who">상담원</span>접수에 들어가는 것 몇 개만 더 여쭐게요. 주로 파시는 게 뭐예요? 한 줄로요.<br><span class="rec" data-col="판매 물품" data-val=""></span></div>
-      <div class="say"><span class="who">상담원</span>이메일 하나 알려주세요. 접수랑 자료 보내드리는 데 써요.<br><span class="rec" data-col="이메일" data-val=""></span></div>
       <div class="say"><span class="who">상담원</span>네이버 아이디도요. 대표님 개인 명의 계정이어야 해요, 매장 공용 계정은 안 되고요.<br><span class="rec" data-col="네이버 ID" data-val=""></span></div>
       <ul class="branch">
         <li><span class="if">신규 · 개인</span><span class="arrow">→</span><span class="q">"성함 영문으로는 어떻게 쓰세요? 여권에 있는 대로요."</span> <span class="rec" data-col="영문 성함" data-val=""></span></li>
@@ -421,7 +420,7 @@
     <section class="step gated" id="s7" data-screen-label="7 우동지 솔루션">
       <div class="step-h"><div class="no">7</div><div class="t">우동지 솔루션 + 정보 수신 동의 <small>커넥트 얘기가 정리된 뒤에. 팔지 말고 챙겨드리는 톤.</small></div></div>
       <div class="say"><span class="who">상담원</span>그리고 저희 우동지는 원래 네이버 플레이스 쪽 하는 팀이에요. 커넥트 설치하시는 분들께는 플레이스 리뷰 늘리는 가이드랑 플레이스 최적화 가이드, 강의 영상, 사장님 커뮤니티를 무료로 드리고 있어요. 30일 프로그램인데 커넥트 리뷰 기능이랑 같이 쓰시면 효과가 커서요.</div>
-      <div class="say"><span class="who">상담원</span>혹시 플레이스는 개설돼 있으세요? 리뷰는 몇 개 정도 있어요?<br><span class="rec" data-col="기타 상담 내용" data-val=""></span></div>
+      <div class="say"><span class="who">상담원</span>자료와 뉴스레터는 이메일로 드릴 거라, 자주 보시는 이메일 하나 알려주세요.<br><span class="rec" data-col="이메일" data-val=""></span></div>
       <div class="say"><span class="who">상담원</span>그리고 30일 뉴스레터가 하나 있어요. 사장님들 바쁘시니까 하루에 딱 하나씩, '오늘 플레이스에서 이거 하나만 바꿔보세요' 하는 걸 메일로 보내드리는 거예요. 30일이면 플레이스가 한 바퀴 정리돼요. 아까 알려주신 메일로 보내드릴게요.</div>
       <div class="say consent"><span class="who">동의 문장</span>자료랑 뉴스레터 보내드리려면 정보 수신 동의가 필요해요. 광고 뿌리는 건 아니고, 저희 솔루션 자료랑 30일 뉴스레터, 프로그램 안내용이에요. 성함, 연락처, 이메일, 매장명만 쓰고 카톡이랑 메일로 가요. 언제든 '그만 보내주세요' 하시면 바로 중단되고요. 동의하시겠어요?</div>
       <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="우동지 수신 동의" data-val="O"></span></div>
@@ -551,7 +550,7 @@ class Component extends DCLogic {
     window.addEventListener('pagehide', function(){ stPut(JSON.stringify(S)); });
     document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') stPut(JSON.stringify(S)); });
 
-    var REQ_ALL = ['상담자','고객명','연락처','매장명','매장 구분','업종','인터넷 회선(랜선) 보유','랜선 직접 준비 안내','대형/개인/법인','단독/공동','사업자번호','개인정보 제3자 제공 동의','안내한 상품 구성','기기 색상','상태'];
+    var REQ_ALL = ['상담자','고객명','연락처','이메일','매장명','매장 구분','업종','인터넷 회선(랜선) 보유','랜선 직접 준비 안내','대형/개인/법인','단독/공동','사업자번호','개인정보 제3자 제공 동의','안내한 상품 구성','기기 색상','상태'];
     var REQ_NEW = ['오픈 예정일','사업자등록증 발급'];
     var REQ_OLD = ['현재 단말기·POS','약정 잔여 개월'];
     function reqList(){
