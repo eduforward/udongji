@@ -186,7 +186,7 @@
       <div class="vhead"><span>{{ viewer.title }}</span><label class="btn up" onClick="{{ stop }}">{{ viewer.upLabel }}<input type="file" multiple accept="image/*,.pdf,.heic,.heif" onChange="{{ viewer.upload }}"></label><button type="button" class="x" onClick="{{ closeViewer }}" aria-label="닫기">×</button></div>
       <div class="vbody">
         <sc-for list="{{ viewer.files }}" as="f" hint-placeholder-count="0">
-          <img class="vimg" src="{{ f.url }}" alt="{{ f.name }}" onClick="{{ stop }}">
+          <div onClick="{{ stop }}">{{ f.img }}</div>
           <div class="vcap" onClick="{{ stop }}"><span>{{ f.name }}</span><a href="{{ f.url }}" target="_blank" rel="noopener">원본 열기</a><button type="button" onClick="{{ f.remove }}">삭제</button></div>
         </sc-for>
       </div>
@@ -296,7 +296,7 @@ class Component extends DCLogic {
       }; });
       const got = req.filter(x => chk[x.id]).length; docSummary = got + ' / ' + req.length + ' 받음';
       const vx = req.find(x => x.id === this.state.viewDoc);
-      if (vx) { const mine = fl.filter(f => f.doc === vx.id); viewer = { title: label + ' · ' + vx.name + ' (' + mine.length + '장)', upLabel: busyUp ? '업로드 중…' : '+ 추가 업로드', upload: upload(vx), files: mine.map(f => ({ name: f.name, url: f.url, remove: removeFile(f) })) }; }
+      if (vx) { const mine = fl.filter(f => f.doc === vx.id); viewer = { title: label + ' · ' + vx.name + ' (' + mine.length + '장)', upLabel: busyUp ? '업로드 중…' : '+ 추가 업로드', upload: upload(vx), files: mine.map(f => ({ name: f.name, url: f.url, img: React.createElement('img', { className: 'vimg', src: f.url, alt: f.name, loading: 'lazy' }), remove: removeFile(f) })) }; }
     }
     const setF = f => () => this.setState({ filter: f });
     return {
