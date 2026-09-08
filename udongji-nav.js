@@ -1,6 +1,8 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v29 · 2026-09-08';
+  const VERSION = 'v30 · 2026-09-08';
+  // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
+  const PAGE_V = 30;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -30,6 +32,8 @@
   `;
   class UNav extends HTMLElement {
     connectedCallback() {
+      const pv = parseInt(this.getAttribute('page-v') || '0', 10);
+      if (pv && pv < PAGE_V) { try { const k = 'udongji-reload-' + PAGE_V; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, '1'); fetch(location.href, { cache: 'reload' }).catch(() => {}).then(() => location.reload()); return; } } catch (e) {} }
       const cur = this.getAttribute('current') || '';
       const root = this.attachShadow({ mode: 'open' });
       const href = p => isDeploy ? p.dep : p.file;
