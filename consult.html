@@ -446,7 +446,7 @@
     <div class="pscrim" id="pause" hidden>
       <div class="pmodal" role="dialog" aria-labelledby="pause-h">
         <h3 id="pause-h">일시 종료 · 재연락 시기</h3>
-        <p>고객이 바뻐서 끊었을 때. 지금까지 입력한 내용은 그대로 저장되고, 재연락 목록에 올라가요.</p>
+        <p>고객이 바빠서 끊었을 때. 지금까지 입력한 내용은 그대로 저장되고, 재연락 목록에 올라가요.</p>
         <div class="miss" id="pause-miss"></div>
         <div class="opt"><button type="button" id="pause-tbd">미정</button><button type="button" id="pause-sched" class="on">일시 지정</button></div>
         <div class="dt" id="pause-dt"><input type="date" id="pause-date"><input type="time" id="pause-time" step="600"></div>
@@ -710,7 +710,7 @@ class Component extends DCLogic {
     function setPauseMode(m){ pauseMode = m; $('pause-tbd').classList.toggle('on', m === 'tbd'); $('pause-sched').classList.toggle('on', m === 'sched'); $('pause-dt').hidden = m !== 'sched'; }
     function openPause(){
       var need = ['고객명','연락처'].filter(function(k){ return !(S[k]||'').trim(); });
-      if(need.length){ var fc = $('fillcount'); fc.textContent = '일시 종료하려맨 ' + need.join(', ') + '는 있어야 해요'; fc.classList.add('bad'); jumpTo(need[0]); return; }
+      if(need.length){ var fc = $('fillcount'); fc.textContent = '일시 종료하려면 ' + need.join(', ') + '는 있어야 해요'; fc.classList.add('bad'); jumpTo(need[0]); return; }
       var prev = (S['다음 액션 · 일시']||'').trim(), m = /(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}:\d{2}))?/.exec(prev);
       if(prev === '미정') setPauseMode('tbd'); else { setPauseMode('sched'); if(m){ $('pause-date').value = m[1]+'-'+m[2]+'-'+m[3]; $('pause-time').value = m[4] || ''; } else { var t = new Date(Date.now() + 86400000); $('pause-date').value = t.toISOString().slice(0,10); $('pause-time').value = ''; } }
       $('pause-memo').value = S['특이사항'] || ''; $('pause-miss').textContent = '';
