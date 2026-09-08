@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F2F4F8; --card: #FFFFFF; --card-2: #F6F8FC; --line: #E4E8F0; --line-2: #EEF1F6;
+      --text: #171C2B; --text-2: #58627A; --text-3: #8C95A8;
+      --blue: #3D5AF1; --blue-d: #2E48D6; --blue-2: #EEF1FE; --blue-3: #D6DDFC;
+      --green: #1E9E66; --green-2: #E5F6EE; --green-3: #BFE6D2;
+      --red: #D93A4A; --red-2: #FDECEE; --red-3: #F5BDC4;
+      --amber: #B7791F; --amber-2: #FFF5E0;
+      --form: var(--red); --form-2: var(--red-2); --form-3: var(--red-3);
+      --shadow: 0 1px 2px rgba(20,27,45,.04), 0 6px 20px rgba(20,27,45,.05);
+      --shadow-lg: 0 8px 30px rgba(20,27,45,.16);
+      --r: 14px; --r-s: 9px; --r-xs: 7px;
+      --sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+    html { color-scheme: light; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+    a { color: var(--blue); } a:hover { color: var(--blue-d); }
+    button, input, select, textarea { font-family: inherit; }
+    :focus { outline: none; }
+    :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+    .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px 96px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; }
+    @media (max-width: 880px) { .page { grid-template-columns: 1fr; padding: 16px 12px 72px; } }
+
+    /* 사이드바 */
+    nav.toc { position: sticky; top: 20px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px 10px 12px; }
+    nav.toc .logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 14px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+    nav.toc a.home { color: var(--text-3); font-size: 12.5px; }
+    nav.toc a.home .n { background: transparent; color: var(--text-3); }
+    nav.toc a.gs { display: block; font-size: 11.5px; font-weight: 600; padding: 5px 10px; margin: 0 0 4px; border-radius: 7px; }
+    nav.toc a.gs::before { content: "● "; font-size: 8px; vertical-align: 1px; }
+    nav.toc a.gs.off { color: var(--text-3); background: var(--card-2); }
+    nav.toc a.gs.warn { color: var(--amber); background: var(--amber-2); }
+    nav.toc a.gs.on { color: var(--green); background: var(--green-2); }
+    nav.toc .logo .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; letter-spacing: 0; }
+    nav.toc .logo .name { font-weight: 800; font-size: 16px; color: var(--text); letter-spacing: -0.02em; line-height: 1.2; display: block; }
+    nav.toc .logo .sub { font-size: 11px; color: var(--text-3); display: block; font-weight: 500; }
+    nav.toc .k { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); padding: 8px 10px 4px; }
+    nav.toc a { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-2); font-size: 13.5px; font-weight: 500; padding: 7px 10px; border-radius: var(--r-s); transition: background .15s, color .15s; }
+    nav.toc a:hover { background: var(--card-2); color: var(--text); }
+    nav.toc a.active { background: var(--blue-2); color: var(--blue); font-weight: 600; }
+    nav.toc a .n { width: 22px; height: 22px; border-radius: 7px; background: var(--card-2); color: var(--text-2); font-size: 11.5px; font-weight: 700; display: grid; place-items: center; flex: 0 0 auto; font-variant-numeric: tabular-nums; transition: background .15s, color .15s; }
+    nav.toc a.active .n { background: var(--blue); color: #fff; }
+    nav.toc a.q .n { background: var(--amber-2); color: var(--amber); }
+    nav.toc a .t { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    nav.toc a .prog { flex: 0 0 auto; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+    nav.toc a .prog:empty { display: none; }
+    nav.toc a .prog.todo { background: var(--form-2); color: var(--form); }
+    nav.toc a .prog.done { background: var(--green-2); color: var(--green); }
+    nav.toc a .prog.skip { background: var(--card-2); color: var(--text-3); font-weight: 600; }
+    nav.toc a.active .prog.todo { background: #fff; }
+    nav.toc a.active .prog.done { background: #fff; }
+    nav.toc .tot { margin: 10px 10px 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--text-3); font-weight: 600; font-variant-numeric: tabular-nums; }
+    nav.toc .tot .bar { height: 4px; background: var(--line-2); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    nav.toc .tot .bar i { display: block; height: 100%; width: 0; background: var(--green); border-radius: 2px; transition: width .25s; }
+    nav.toc .tot.bad .bar i { background: var(--form); }
+    @media (max-width: 880px) { nav.toc .tot { flex-basis: 100%; } }
+    @media (max-width: 880px) { nav.toc { position: static; display: flex; flex-wrap: wrap; gap: 2px; padding: 12px; } nav.toc .logo { flex-basis: 100%; padding-bottom: 10px; } nav.toc .k { display: none; } nav.toc a { padding: 6px 8px; } }
+
+    /* 헤더 */
+    header.doc { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 26px 28px; display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+    header.doc h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+    header.doc .kicker { font-size: 12px; color: var(--text-3); font-weight: 600; margin-bottom: 8px; letter-spacing: -0.005em; }
+    header.doc p { font-size: 14px; color: var(--text-2); margin-top: 10px; max-width: 62ch; text-wrap: pretty; }
+    header.doc p b { color: var(--text); font-weight: 600; }
+    .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .pills .rec.agent { margin: 0 6px 0 0; }
+    .pills .rec.agent input { min-width: 110px; }
+    .pill { font-size: 12px; font-weight: 600; padding: 6px 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); white-space: nowrap; }
+    .pill.blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+    /* 섹션 */
+    section.step { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 22px 28px 26px; margin-top: 14px; scroll-margin-top: 20px; transition: opacity .2s; }
+    .step-h { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+    .step-h .no { width: 34px; height: 34px; border-radius: 10px; background: var(--blue-2); color: var(--blue); font-weight: 800; font-size: 14px; display: grid; place-items: center; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+    .step-h .t { font-size: 17.5px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.3; padding-top: 5px; }
+    .step-h .t small { display: block; font-size: 13px; font-weight: 400; color: var(--text-2); margin-top: 4px; line-height: 1.55; letter-spacing: -0.01em; }
+
+    h3.sub { font-size: 14.5px; font-weight: 700; margin: 24px 0 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; letter-spacing: -0.02em; }
+    h3.sub .circ { width: 22px; height: 22px; border-radius: 50%; background: var(--text); color: #fff; font-size: 11px; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+    section.step { counter-reset: sub; }
+    h3.sub .circ::before { counter-increment: sub; content: counter(sub); }
+
+    /* 말하기 블록 */
+    .say { background: var(--card); border: 1px solid var(--blue-3); border-radius: 12px; padding: 14px 18px 14px 22px; margin: 12px 0; font-size: 17px; font-weight: 500; line-height: 1.7; color: var(--text); position: relative; letter-spacing: -0.012em; text-wrap: pretty; }
+    .say::before { content: ""; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 3px 3px 0; background: var(--blue); }
+    .say .who { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); display: block; margin-bottom: 4px; }
+    .say.consent { background: var(--blue-2); border-color: var(--blue-3); font-weight: 600; }
+    .say.consent .who::after { content: " · 그대로 읽기"; color: var(--text-2); text-transform: none; letter-spacing: 0; font-weight: 600; }
+    .q { font-weight: 600; color: var(--text); background: var(--blue-2); border-radius: 5px; padding: 1px 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+    .say .note { font-size: 12.5px; }
+
+
+    /* 분기 */
+    .branch { list-style: none; margin: 8px 0 8px 12px; padding-left: 16px; border-left: 2px solid var(--line); }
+    .branch > li { position: relative; padding: 5px 0 5px 6px; font-size: 13.5px; line-height: 1.65; color: var(--text-2); }
+    .branch .if { font-weight: 600; color: var(--text); background: var(--card-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 8px; font-size: 12.5px; white-space: nowrap; }
+    .branch .arrow { color: var(--text-3); margin: 0 6px; }
+    .branch .say { margin: 8px 0 4px; font-size: 16px; }
+    .branch ul.branch { margin-top: 4px; }
+
+    .note { font-size: 12.5px; color: var(--text-3); padding: 6px 0; line-height: 1.55; }
+    .note b { color: var(--text-2); font-weight: 600; }
+    .warn { font-size: 13.5px; color: #B12A39; background: var(--red-2); border-radius: var(--r-s); padding: 10px 14px; margin: 10px 0; font-weight: 500; line-height: 1.6; }
+    .dotline { display: flex; gap: 10px; align-items: center; font-size: 14px; margin: 8px 0; padding: 9px 12px; border-radius: var(--r-s); background: var(--card-2); flex-wrap: wrap; }
+    .dot { width: 18px; height: 18px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; }
+    .dot.g { background: var(--green-2); } .dot.g::after { content: "✓"; color: var(--green); font-size: 11px; font-weight: 800; }
+    .dot.y { background: var(--amber-2); } .dot.y::after { content: "?"; color: var(--amber); font-size: 11px; font-weight: 800; }
+
+    /* 표 */
+    .tscroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; margin-top: 10px; }
+    table.qa { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table.qa th { text-align: left; padding: 10px 14px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); background: var(--card-2); border-bottom: 1px solid var(--line); }
+    table.qa td { padding: 11px 14px; font-size: 14.5px; border-bottom: 1px solid var(--line-2); vertical-align: top; line-height: 1.6; }
+    table.qa tr:last-child td { border-bottom: none; }
+    table.qa td:first-child { font-weight: 600; width: 30%; color: var(--text-2); font-size: 13.5px; }
+    table.qa td.say-cell { font-weight: 500; color: var(--text); }
+    table.qa td.mono { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--blue); }
+
+    footer.doc { margin-top: 20px; font-size: 12.5px; color: var(--text-3); text-align: center; }
+
+    /* 입력칸 */
+    .rec { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 3px 4px 3px 9px; border-radius: var(--r-s); background: var(--form-2); color: var(--form); margin: 3px 6px 3px 0; vertical-align: middle; white-space: nowrap; font-weight: 700; letter-spacing: -0.01em; transition: background .15s, border-color .15s; }
+    .rec.missing { outline: 2px solid var(--form); outline-offset: 2px; }
+    .rec input, .rec select { font: inherit; font-size: 13.5px; font-weight: 500; color: var(--text); background: var(--card); border: 1px solid var(--form-3); border-radius: var(--r-xs); padding: 4px 8px; min-width: 120px; height: 30px; letter-spacing: -0.01em; }
+    .rec select { padding-right: 6px; }
+    .rec input.wide { min-width: 240px; }
+    .rec input:focus-visible, .rec select:focus-visible { outline: 2px solid var(--form); outline-offset: 1px; border-color: var(--form); }
+    .rec input::placeholder { color: var(--text-3); font-weight: 400; }
+    .rec button.tog { font: inherit; font-size: 13px; font-weight: 700; height: 30px; padding: 0 12px; border-radius: var(--r-xs); border: 1px solid var(--form-3); background: var(--card); color: var(--form); cursor: pointer; transition: background .15s, color .15s; }
+    .rec button.tog:hover { background: var(--form-2); }
+    .rec button.tog.on { background: var(--green); color: #fff; border-color: var(--green); }
+    .rec button.tog.map { color: #03C75A; border-color: #B9EBCD; background: #fff; font-weight: 800; }
+    .rec button.tog.map:hover { background: #E9F9EF; }
+    .rec.filled button.tog.map { border-color: #B9EBCD; }
+    .rec.filled { background: var(--green-2); color: var(--green); }
+    .rec.filled input, .rec.filled select { border-color: var(--green-3); }
+    .rec.filled input:focus-visible, .rec.filled select:focus-visible { outline-color: var(--green); border-color: var(--green); }
+    .say .rec { margin-top: 8px; font-weight: 600; }
+    section.basic .fgrid { display: flex; flex-wrap: wrap; gap: 6px 10px; padding-top: 12px; }
+    section.basic .rec input { min-width: 170px; }
+
+    /* 필수 */
+    .rec.req { border: 1px solid var(--form); box-shadow: 0 0 0 3px rgba(217,58,74,.12); padding-left: 5px; }
+    .rec.req::before { content: "필수"; font-size: 10px; font-weight: 800; color: #fff; background: var(--form); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
+    .rec.req.filled { border-color: var(--green); box-shadow: none; }
+    .rec.req.filled::before { content: "완료"; background: var(--green); }
+
+    /* 신규/기존 건너뛰기 */
+    .skip { display: none !important; }
+    ul.branch:not(:has(> li:not(.skip))) { display: none; }
+    .gated:not(.open), .gated-go:not(.open) { display: none; }
+    ul.result-branch:not(.picked) { display: none; }
+    li[data-result].off { display: none; }
+    ul.issue-branch:not(.picked) { display: none; }
+    li[data-issue].off { display: none; }
+    li[data-issue].pick > .if { background: var(--blue); color: #fff; border-color: var(--blue); }
+    li[data-result].pick > .if { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .modetag { display: none; }
+    .modetag.on { display: inline-flex; }
+
+    /* 하단 바 */
+    .donebar { position: sticky; bottom: 14px; margin-top: 20px; background: rgba(255,255,255,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-lg); padding: 10px 12px 10px 16px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; z-index: 5; }
+    .donebar-note { font-size: 13px; color: var(--text-3); margin-right: auto; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .donebar-note.bad { color: var(--form); font-weight: 600; }
+    .donebar-note.save { margin-right: 4px; color: var(--green); font-weight: 600; }
+    .donebar-note.save::before { content: "● "; font-size: 9px; vertical-align: 1px; }
+    .donebar-note.save.bad { color: var(--form); }
+    .donebar-note.save:empty { display: none; }
+    .btn { font: inherit; font-size: 14px; font-weight: 700; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; letter-spacing: -0.01em; transition: background .15s, border-color .15s; }
+    .btn:hover { background: var(--blue-d); border-color: var(--blue-d); }
+    .btn.ghost { background: var(--card); color: var(--text-2); border-color: var(--line); }
+    .btn.ghost:hover { background: var(--card-2); color: var(--text); }
+
+    /* 결과 오버레이 */
+    .overlay { position: fixed; inset: 0; background: rgba(23,28,43,.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 20; overflow: auto; padding: 28px 16px; }
+    .overlay[hidden] { display: none; }
+    .ov-card { max-width: 920px; margin: 0 auto; background: var(--card); border-radius: 18px; box-shadow: var(--shadow-lg); padding: 26px 28px 30px; }
+    .ov-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 8px; }
+    .ov-head .kicker { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+    .ov-head h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+    .ov-head p { font-size: 14px; color: var(--text-2); margin-top: 8px; max-width: 58ch; }
+    .ov-head p b { color: var(--text); font-weight: 600; }
+    .ov-row { margin-top: 20px; }
+    .ov-label { font-size: 13px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .ov-label .muted { font-weight: 500; color: var(--text-3); }
+    .overlay textarea { width: 100%; font: 13px/1.55 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--card-2); color: var(--text); resize: vertical; white-space: pre; overflow-x: auto; }
+    .overlay textarea#sms { font: 14.5px/1.65 var(--sans); white-space: pre-wrap; background: var(--card); border-color: var(--blue-3); letter-spacing: -0.01em; }
+    .ov-actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+    .copied { font-size: 13px; color: var(--green); font-weight: 600; }
+    table.chk td:first-child { color: var(--text-2); font-weight: 500; font-size: 13px; width: 40%; }
+    table.chk td.empty { color: var(--text-3); }
+    .missing-panel { background: var(--form-2); border: 1px solid var(--form-3); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
+    .missing-panel b { color: #B12A39; display: block; margin-bottom: 8px; font-size: 14.5px; }
+    .missing-panel .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .missing-panel button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--form-3); background: var(--card); color: var(--form); cursor: pointer; }
+    .missing-panel button:hover { background: var(--form); color: #fff; border-color: var(--form); }
+
+    @media print {
+      body { background: #fff; font-size: 12px; }
+      .page { grid-template-columns: 1fr; padding: 0; }
+      nav.toc, .donebar, .overlay { display: none !important; }
+      section.step, header.doc { box-shadow: none; border: 1px solid var(--line); }
+      section.step, .say { break-inside: avoid; }
+      .rec input, .rec select { border: none; background: transparent; }
+    }
+  </style>
+</helmet>
+<div class="page">
+  <nav class="toc" aria-label="목차">
+    <a class="logo" href="index.html" style="text-decoration:none;padding:4px 8px 14px;border-radius:0" title="홈으로"><div class="mark">우</div><div><span class="name">우동지</span><span class="sub">상담 업무 · v4</span></div></a>
+    <a href="index.html" class="home"><span class="n">←</span><span class="t">홈</span></a>
+    <a href="index.html#gsheet" class="gs off" id="gs-status">시트 미연결</a>
+    <div class="k">단계</div>
+    <a href="#basic"><span class="n">✎</span><span class="t">기본정보</span></a>
+    <a href="#s0"><span class="n">0</span><span class="t">본론 전환</span></a>
+    <a href="#sm"><span class="n">1</span><span class="t">매장 구분</span></a>
+    <a href="#s1"><span class="n">2</span><span class="t">사전 확인</span></a>
+    <a href="#s2"><span class="n">2</span><span class="t">동의 → 밴 조회</span></a>
+    <a href="#s3"><span class="n">3</span><span class="t">구성 잡기</span></a>
+    <a href="#s4"><span class="n">4</span><span class="t">설치 관문</span></a>
+    <a href="#s5"><span class="n">5</span><span class="t">제3자 제공 동의</span></a>
+    <a href="#s6"><span class="n">6</span><span class="t">서류 안내</span></a>
+    <a href="#s7"><span class="n">7</span><span class="t">우동지 솔루션</span></a>
+    <a href="#s8"><span class="n">8</span><span class="t">마무리</span></a>
+    <a href="#s9"><span class="n">9</span><span class="t">자주 나오는 반응</span></a>
+    <div class="tot" id="tot"><span id="tot-text"></span><div class="bar"><i id="tot-bar"></i></div></div>
+  </nav>
+
+  <main>
+    <header class="doc">
+      <div>
+        <div class="kicker">우동지 × Npay 커넥트 · 인바운드 / 아웃바운드 공통 · 우리 소개는 항상 "우동지"</div>
+        <h1>상담 대응 스크립트</h1>
+        <p>인사·아이스브레이킹이 끝난 시점부터. 말은 짧게, 하나 묻고 하나 적기. 빨간 입력칸이 고객 목록 시트에 들어갈 값, <b>필수</b> 표시는 반드시. 다 채우고 <b>작성 완료</b>를 누르면 복사용으로 나온다.</p>
+      </div>
+      <div class="pills"><span class="rec agent" data-col="상담자" data-val=""></span><span class="pill">v4 · 2026-09</span><span class="pill">동의는 유선 녹취</span><span class="pill blue">기록 = 고객 목록 시트</span><span class="pill modetag" id="modetag"></span></div>
+    </header>
+
+    <section class="step basic" id="basic" data-screen-label="기본정보">
+      <div class="step-h"><div class="no">✎</div><div class="t">기본정보 <small>통화 시작하면서 먼저 적기. 나머지는 대화 흐름 안의 빨간 칸에.</small></div></div>
+      <div class="fgrid">
+        <span class="rec" data-col="고객명" data-val=""></span>
+        <span class="rec" data-col="연락처" data-val=""></span>
+        <span class="rec" data-col="매장명" data-val=""></span>
+        <span class="rec" data-col="매장 주소" data-val=""></span>
+        <span class="rec" data-col="상담일" data-val=""></span>
+      </div>
+    </section>
+
+    <section class="step" id="s0" data-screen-label="0 본론 전환">
+      <div class="step-h"><div class="no">0</div><div class="t">본론 전환</div></div>
+      <div class="say"><span class="who">상담원</span>네, 그럼 매장 상황 몇 가지만 여쭤보고 거기에 맞는 구성으로 안내드릴게요. 한 5분이면 돼요.</div>
+      <p class="note">아웃바운드(문의 남긴 분께 우리가 거는 전화)일 때는 앞에 한 줄 더.</p>
+      <div class="say"><span class="who">상담원 · 아웃바운드</span>우동지 광고 보시고 커넥트 상담 남겨주셔서 연락드렸어요. 지금 잠깐 통화 괜찮으세요?</div>
+      <div class="say"><span class="who">상담 결과</span>진행 · 불가 · 거부 중 하나로.<br><span class="rec" data-col="상담 결과" data-val=""></span></div>
+      <ul class="branch result-branch">
+        <li data-result="상담 진행"><span class="if">상담 진행</span><span class="arrow">→</span>아래 매장 구분으로 이어서</li>
+        <li data-result="상담 불가"><span class="if">상담 불가 · 지금 통화 어려움</span><span class="arrow">→</span><div class="say">언제가 편하세요? 그때 다시 연락드릴게요.<br><span class="rec" data-col="상태" data-val="재연락 예정"></span><span class="rec" data-col="다음 액션·일시" data-val=""></span></div><span class="note">고객명·연락처·콜백 시간만 채우고 작성 완료.</span></li>
+        <li data-result="상담 거부"><span class="if">상담 거부</span><span class="arrow">→</span><div class="say">네, 알겠습니다. 시간 내주셔서 감사해요.<br><span class="rec" data-col="상태" data-val="종료"></span><span class="rec" data-col="특이사항" data-val=""></span></div><span class="note">바로 작성 완료.</span></li>
+      </ul>
+    </section>
+
+    <section class="step gated-go" id="sm" data-screen-label="매장 구분">
+      <div class="step-h"><div class="no">1</div><div class="t">매장 구분 <small>여기서 고르는 대로 아래 폼이 신규용 / 기존용으로 열린다.</small></div></div>
+      <div class="say"><span class="who">상담원</span>매장은 새로 오픈하시는 거예요, 아니면 지금 운영 중이세요?<br><span class="rec" data-col="매장 구분" data-val=""></span></div>
+    </section>
+
+    <section class="step gated" id="s1" data-screen-label="사전 확인">
+      <div class="step-h"><div class="no">2</div><div class="t">사전 확인 <small>구성 설명 들어가기 전. 여기서 걸리면 뒤에 설명 다 해봤자 소모.</small></div></div>
+      <h3 class="sub"><span class="circ"></span> 업종</h3>
+      <div class="say"><span class="who">상담원</span>혹시 업종이 어떻게 되시나요?<span class="note"> 통화 전에 네이버 지도로 봐뒀으면 <span class="q">"○○ 카페 하시는 거 맞으시죠?"</span>로 확인만.</span><br><span class="rec" data-col="업종" data-val=""></span></div>
+      <h3 class="sub" data-only="신규 오픈"><span class="circ"></span> 오픈 일정·사업자등록증</h3>
+      <ul class="branch">
+        <li data-only="신규 오픈"><span class="if">신규</span><span class="arrow">→</span><span class="q">"오픈은 언제쯤이세요? 사업자등록증은 나오셨고요?"</span> <span class="rec" data-col="오픈 예정일" data-val=""></span><span class="rec" data-col="사업자등록증 발급" data-val=""></span>
+          <ul class="branch issue-branch">
+            <li data-issue="발급 완료"><span class="if">이번 달 안 + 발급 완료</span><span class="arrow">→</span>계속 진행</li>
+            <li data-issue="발급 예정"><span class="if">몇 달 뒤 / 미발급</span><span class="arrow">→</span>
+              <div class="say">카드사 심사가 사업자등록증 나오고 인테리어 마무리된 뒤에 들어가서요. 그 시점 맞춰서 제가 다시 연락드릴게요. 언제쯤이 좋을까요?</div>
+              <span class="rec" data-col="상태" data-val="재연락 예정"></span><span class="rec" data-col="다음 액션·일시" data-val=""></span> → 마무리로 (우동지 솔루션은 안내)</li>
+          </ul>
+        </li>
+      </ul>
+      <h3 class="sub" data-only="기존 운영"><span class="circ"></span> 지금 쓰는 단말기·포스</h3>
+      <div class="say"><span class="who">상담원</span>지금은 홀 위주세요, 배달도 같이 하세요?<br><span class="rec" data-col="현재 운영 방식" data-val=""></span></div>
+      <div class="say"><span class="who">상담원</span>카드 단말기나 포스는 어디 거 쓰세요? 약정은 남으셨어요?<br><span class="rec" data-col="현재 단말기·POS" data-val=""></span><span class="rec" data-col="약정 잔여 개월" data-val=""></span><span class="rec" data-col="월 납부금" data-val=""></span></div>
+      <ul class="branch">
+        <li><span class="if">모른다</span><span class="arrow">→</span><div class="say">괜찮아요. 기존 대리점에 한 번 물어보시면 잔여 개월이랑 위약금 나와요. 그건 나중에 알려주셔도 되고, 오늘은 견적부터 봐드릴게요.</div></li>
+        <li><span class="if">위약금 있다</span><span class="arrow">→</span><div class="say">위약금은 저희가 대신 내드리진 못해요. 대신 남은 위약금이랑 저희 월 비용 합친 게 지금 내시는 것보다 적으면 바꾸시는 게 맞고, 아니면 만료 시점에 다시 연락드리는 게 나아요.</div><span class="note">무리하게 해지 유도 금지.</span></li>
+      </ul>
+
+      <h3 class="sub"><span class="circ"></span> 인터넷·랜선</h3>
+      <div class="say"><span class="who">상담원</span>매장에 인터넷은 들어와 있으세요?<br><span class="rec" data-col="인터넷 회선(랜선) 보유" data-val=""></span><span class="rec" data-col="인터넷 변경·신규 필요" data-val=""></span></div>
+      <ul class="branch">
+        <li><span class="if">있다</span><span class="arrow">→</span><span class="q">"카운터에, 그러니까 단말기 놓으실 자리에 랜선 꽂는 데가 나와 있나요?"</span>
+          <ul class="branch">
+            <li><span class="if">나와 있다</span><span class="arrow">→</span>O</li>
+            <li><span class="if">안 나와 있다</span><span class="arrow">→</span><div class="say">커넥트만 쓰시면 와이파이로 돼요. 포스나 프린터도 같이 하시면 선을 끌어와야 하는데, 인테리어 타공은 가능하세요?</div><span class="rec" data-col="인테리어 타공" data-val=""></span></li>
+          </ul>
+        </li>
+        <li><span class="if">없다 / 바꿔야 한다</span><span class="arrow">→</span><div class="say">인터넷은 꼭 필요해서요. 신규 오픈이시면 인터넷 신청이랑 같이 일정 잡는 게 제일 깔끔해요. 원하시면 저희 쪽에서 인터넷 상담도 연결해드릴 수 있는데, 그러려면 주소랑 편한 일정 알려주세요.</div><span class="rec" data-col="인터넷 상담 요청 일정" data-val=""></span> <span class="note" style="display:inline">주소는 위 기본정보 칸에</span></li>
+      </ul>
+
+      <h3 class="sub"><span class="circ"></span> 연매출 3억</h3>
+      <div class="say"><span class="who">상담원</span>혹시 연매출이 3억 넘으세요? 3억 기준으로 프로모션 조건이 달라져서 여쭤봐요.<br><span class="rec" data-col="대형/개인/법인" data-val=""></span></div>
+      <ul class="branch">
+        <li><span class="if">이하</span><span class="arrow">→</span>0원 프로모션 안내 가능</li>
+        <li><span class="if">초과</span><span class="arrow">→</span><div class="say">그러면 무료 프로모션은 법적으로 적용이 안 되고, 중고 장비 기준 월 비용으로 안내드려야 해요. 그래도 괜찮으세요?</div></li>
+        <li><span class="if">모름</span><span class="arrow">→</span>일단 3억 이하로 안내하되 <span class="q">"사업자번호로 조회해보고 다르면 다시 말씀드릴게요"</span></li>
+      </ul>
+
+      <h3 class="sub"><span class="circ"></span> 지금 쓰는 프로그램</h3>
+      <div class="say"><span class="who">상담원</span>예약이나 배달, 고객관리 프로그램 쓰시는 거 있으세요? 배민·쿠팡이츠, 네이버 예약, 미용실이면 핸드SOS 같은 거요.<br><span class="rec" data-col="POS 프로그램" data-val=""></span><span class="rec" data-col="배달 필요 여부" data-val=""></span><span class="rec" data-col="기타 상담 내용" data-val=""></span></div>
+      <ul class="branch">
+        <li><span class="if">배달</span><span class="arrow">→</span><div class="say">배달 주문을 포스 매출이랑 합쳐서 보고 싶으세요, 아니면 배달앱은 지금처럼 따로 두셔도 돼요?</div><span class="note">합친다 = 매출연동 → 오케이포스 확정 / 따로 = 위젯만</span></li>
+        <li><span class="if">치과·학원·핸드SOS 등</span><span class="arrow">→</span><div class="say">그 프로그램이랑 연동되는지는 제가 확인하고 알려드려야 해요. 오늘은 나머지 먼저 보고요.</div><span class="rec" data-col="특이사항" data-val=""></span></li>
+      </ul>
+    </section>
+
+    <section class="step gated" id="s2" data-only="기존 운영" data-screen-label="2 기존 동의·밴 조회">
+      <div class="step-h"><div class="no">2</div><div class="t">제3자 제공 동의 → 사업자번호 → 밴 조회 <small>밴 등록 상태에 따라 진행 자체가 갈리니 구성 설명 전에 조회를 걸어놓는다.</small></div></div>
+      <div class="say"><span class="who">상담원</span>기존 매장은 지금 등록돼 있는 밴사 상태를 먼저 조회해야 진행이 되는지 알 수 있어요. 그래서 동의 하나만 먼저 받을게요.</div>
+      <div class="say consent"><span class="who">동의 문장</span>대표님 성함, 연락처, 이메일, 사업자번호, 매장 정보, 그리고 접수 서류인 사업자등록증·신분증·통장 사본·매장 사진을 저희 제휴사인 페이앤스토어랑 가맹 등록하는 밴사, NICE·KIS에 전달합니다. 카드 가맹 심사랑 밴 등록 조회, 장비 설치에만 쓰이고, 계약 안 하시면 상담 끝나고 파기돼요. 동의 안 하셔도 되는데 그러면 커넥트 진행은 어렵고요. 동의하시겠어요?</div>
+      <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="개인정보 제3자 제공 동의" data-val="O"></span></div>
+      <div class="say"><span class="who">상담원</span>사업자번호 불러주시겠어요? 개인사업자세요, 법인이세요? 혼자 명의세요, 공동대표세요?<br><span class="rec" data-col="사업자번호" data-val=""></span><span class="rec" data-col="대형/개인/법인" data-val=""></span><span class="rec" data-col="단독/공동" data-val=""></span></div>
+      <div class="say"><span class="who">상담원</span>조회는 보통 하루 정도 걸려요. 결과 나오면 제가 바로 연락드릴게요. 그동안 구성은 미리 봐드릴게요.</div>
+      <p class="note">사업자번호는 통화 끝나고 페이앤 관리자에게 보낸다. 작성 완료 화면에서 접수 양식을 복사해 보내면서 <b>관리자 전달</b>을 체크.</p>
+    </section>
+
+    <section class="step gated" id="s3" data-screen-label="3 구성 잡기">
+      <div class="step-h"><div class="no">3</div><div class="t">구성 잡기</div></div>
+
+      <h3 class="sub">POS 필요 여부</h3>
+      <div class="say"><span class="who">상담원</span>카드결제만 받으시면 돼요, 아니면 메뉴·주문·매출 관리하는 포스도 필요하세요?<br><span class="rec" data-col="POS 프로그램" data-val=""></span></div>
+      <ul class="branch">
+        <li><span class="if">결제만</span><span class="arrow">→</span><div class="say">그럼 커넥트에 카드단말기 하나 붙이는 구성이에요. 3억 이하면 지금 월 0원이고요.</div>→ 설치 관문으로</li>
+        <li><span class="if">포스 필요</span><span class="arrow">→</span>아래 세 개만 더</li>
+      </ul>
+      <div class="say"><span class="who">상담원</span>선불이세요, 후불이세요?<span class="note"> 후불이면 태블릿 불가 → 윈도우 포스</span></div>
+      <div class="say"><span class="who">상담원</span>카운터 자리는 좀 넓어요? PC포스 놓을 공간이 되는지요.<span class="note"> 협소하면 태블릿</span></div>
+      <div class="say"><span class="who">상담원</span>지금 갖고 계신 태블릿이나 포스기 있으세요? 있으면 어떤 거예요?<br><span class="rec" data-col="기존 장비 모델명" data-val=""></span></div>
+      <ul class="branch">
+        <li><span class="if">아이패드</span><span class="arrow">→</span><div class="say">아이패드는 저희 앱이 안 올라가서요. 안드로이드 태블릿이나 윈도우 포스로 가야 해요.</div></li>
+        <li><span class="if">안드로이드 태블릿(14 이상·10인치 이상) / 윈도우 포스기(10 이상)</span><span class="arrow">→</span>보유 세트로 안내</li>
+        <li><span class="if">모델을 모른다 + 살려서 쓰고 싶다</span><span class="arrow">→</span><div class="say">기기 뒷면 라벨 사진 한 장만 통화 끝나고 카톡으로 보내주시면 제가 확인할게요.</div><span class="note">사진 수취는 통화 후 시트에서 체크.</span></li>
+      </ul>
+
+      <h3 class="sub">음식점이면 추가로</h3>
+      <div class="say"><span class="who">상담원</span>주방에 주문서 프린터 필요하세요? 주방까지 랜선이 가나요?<span class="note"> 안 가면 무선 프린터, 간섭 점검</span></div>
+      <div class="say"><span class="who">상담원</span>현금도 받으시면 금전함도 넣어드릴까요?</div>
+
+      <h3 class="sub">구성 안내</h3>
+      <div class="say"><span class="who">상담원</span>그럼 정리하면 커넥트 + ○○ + CAT단말기 구성이고, 월 ○○원이에요. 밴사는 NICE로 잡을게요. NICE면 커넥트를 키오스크처럼 쓰는 기능도 되고요.<br><span class="rec" data-col="안내한 상품 구성" data-val=""></span><span class="rec" data-col="월 이용요금" data-val=""></span><span class="rec" data-col="VAN" data-val=""></span></div>
+      <div class="warn">가격은 반드시 최신 렌탈표로. 안 맞는 조합(배달 매출연동 + 네이버 예약, 후불 + 태블릿 등)이 나오면 <span class="q">"이 둘은 한 대로는 안 돼서요, 어느 게 더 중요하세요?"</span> 하고 점주가 고르게.</div>
+    </section>
+
+    <section class="step gated" id="s4" data-screen-label="4 설치 관문">
+      <div class="step-h"><div class="no">4</div><div class="t">설치 관문 <small>랜선 직접 준비 안내 · 기기 색상 · 특이사항</small></div></div>
+      <div class="say"><span class="who">상담원</span>설치는 기본이 자가설치예요. 택배로 받으시면 꽂기만 하면 되는데, 랜선 케이블은 직접 준비해주셔야 해요. 다이소나 인터넷에서 몇 천 원이에요.<br><span class="rec" data-col="랜선 직접 준비 안내" data-val="O"></span></div>
+      <div class="say"><span class="who">상담원</span>기기 색상은 블랙이랑 화이트 중에 뭐로 드릴까요?<br><span class="rec" data-col="기기 색상" data-val=""></span></div>
+      <div class="warn">커넥트·금전함·유선프린터 색상. 여기서 정확히 적기 — 잘못 가면 재발송 비용.</div>
+      <p class="note">기존 포스에 연동해야 하면:</p>
+      <div class="say"><span class="who">상담원</span>지금 쓰시는 포스에 연동해야 해서 이건 기사님이 방문하실 거예요. 제가 그렇게 접수해둘게요.<br><span class="rec" data-col="특이사항" data-val="기존 포스 연동 필요"></span></div>
+    </section>
+
+    <section class="step gated" id="s5" data-only="신규 오픈" data-screen-label="5 신규 동의">
+      <div class="step-h"><div class="no">5</div><div class="t">제3자 제공 동의 <small>구성·설치 안내가 끝난 뒤 받는다.</small></div></div>
+      <div class="say"><span class="who">상담원</span>진행하려면 동의 하나 받을게요.</div>
+      <div class="say consent"><span class="who">동의 문장</span>대표님 성함, 연락처, 이메일, 사업자번호, 매장 정보, 그리고 접수 서류인 사업자등록증·신분증·통장 사본·매장 사진을 저희 제휴사인 페이앤스토어랑 가맹 등록하는 밴사, NICE·KIS에 전달합니다. 카드 가맹 심사랑 밴 등록, 장비 설치에만 쓰이고, 계약 안 하시면 상담 끝나고 파기돼요. 동의 안 하셔도 되는데 그러면 커넥트 진행은 어렵고요. 동의하시겠어요?</div>
+      <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="개인정보 제3자 제공 동의" data-val="O"></span></div>
+      <div class="say"><span class="who">상담원</span>사업자번호 불러주시겠어요? 개인사업자세요, 법인이세요? 혼자 명의세요, 공동대표세요?<br><span class="rec" data-col="사업자번호" data-val=""></span><span class="rec" data-col="대형/개인/법인" data-val=""></span><span class="rec" data-col="단독/공동" data-val=""></span></div>
+      <p class="note">녹취 파일이 동의 증빙. 통화 끝나고 시트에 O 체크하고 녹취 보관.</p>
+    </section>
+
+    <section class="step gated" id="s6" data-screen-label="6 서류·접수">
+      <div class="step-h"><div class="no">6</div><div class="t">서류 안내 <small>1차 통화에서는 안내만. 서류는 통화 뒤 카톡으로 받고, 수취·접수 체크는 엑셀 시트에서 한다. 점주에게 페이앤 링크는 보내지 않는다.</small></div></div>
+
+      <div class="say"><span class="who">상담원</span>서류는 통화 끝나고 카톡으로 저한테 보내주시면 제가 접수까지 다 넣어드릴게요. 휴대폰으로 찍으신 걸로 돼요. 준비하실 게 몇 개 있어요.</div>
+      <div class="say"><span class="who">상담원 · 준비물</span>사업자등록증 최근 발급본이요, 가리는 데 없이요. 대표님 신분증은 주민등록증이나 운전면허증만 돼요, 여권은 안 되고요. 정산받으실 통장 사본, 모바일 캡처도 돼요. 음식점이시면 영업신고증도요. 매장 사진은 간판 나오는 바깥 사진 두 장, 안쪽 전체 사진 두 장이요.</div>
+      <ul class="branch">
+        <li><span class="if">간판이 없다</span><span class="arrow">→</span><span class="q">"그러면 건물 바깥 사진 한 장, 입구에서 안이 보이게 한 장, 도로명주소 표지판 한 장, 안쪽 전체 두 장이요."</span></li>
+        <li><span class="if">법인</span><span class="arrow">→</span><span class="q">"법인은 등기부등본이랑 인감증명서 3개월 이내 것, 주주명부, 소유지배자 확인서가 더 들어가요. 통장은 예금주가 법인명이랑 같아야 하고요. 사용인감 쓰시면 사용인감계도요."</span></li>
+        <li><span class="if">공동대표</span><span class="arrow">→</span><span class="q">"공동대표님은 가입 동의·위임장이랑 결제계좌 동의서, 신분증, 연락처가 다 들어가요. 서식은 제가 같이 보내드릴게요."</span></li>
+        <li><span class="if">개명 이력 / 외국인 대표</span><span class="arrow">→</span>개명은 3개월 이내 주민등록초본(뒷자리 포함), 외국인은 외국인등록증·영주증 앞뒷면 컬러</li>
+        <li><span class="if">기존 · 장비 살릴 때만</span><span class="arrow">→</span><span class="q">"지금 쓰시는 포스기랑 프린터 사진도요. 뒷면 모델명 보이게요."</span></li>
+      </ul>
+
+      <h3 class="sub">접수에 들어가는 정보 — 통화에서 받기</h3>
+      <div class="say"><span class="who">상담원</span>접수에 들어가는 것 몇 개만 더 여쭐게요. 주로 파시는 게 뭐예요? 한 줄로요.<br><span class="rec" data-col="판매 물품" data-val=""></span></div>
+      <div class="say"><span class="who">상담원</span>이메일 하나 알려주세요. 접수랑 자료 보내드리는 데 써요.<br><span class="rec" data-col="이메일" data-val=""></span></div>
+      <div class="say"><span class="who">상담원</span>네이버 아이디도요. 대표님 개인 명의 계정이어야 해요, 매장 공용 계정은 안 되고요.<br><span class="rec" data-col="네이버 ID" data-val=""></span></div>
+      <ul class="branch">
+        <li><span class="if">신규 · 개인</span><span class="arrow">→</span><span class="q">"성함 영문으로는 어떻게 쓰세요? 여권에 있는 대로요."</span> <span class="rec" data-col="영문 성함" data-val=""></span></li>
+        <li><span class="if">네이버 아이디가 없다</span><span class="arrow">→</span><span class="q">"하나 만드셔야 해요. 커넥트가 네이버 리뷰·적립이랑 붙는 거라서요. 만드시면 카톡으로 알려주세요."</span></li>
+      </ul>
+
+      <div class="say"><span class="who">상담원</span>접수 넣으면 페이앤에서 전자계약서가 카톡으로 갈 거예요. 거기 서명하시면 끝이에요. 공동대표시면 두 분 다 서명하셔야 하고요.</div>
+    </section>
+
+    <section class="step gated" id="s7" data-screen-label="7 우동지 솔루션">
+      <div class="step-h"><div class="no">7</div><div class="t">우동지 솔루션 + 정보 수신 동의 <small>커넥트 얘기가 정리된 뒤에. 팔지 말고 챙겨드리는 톤.</small></div></div>
+      <div class="say"><span class="who">상담원</span>그리고 저희 우동지는 원래 네이버 플레이스 쪽 하는 팀이에요. 커넥트 설치하시는 분들께는 플레이스 리뷰 늘리는 가이드랑 플레이스 최적화 가이드, 강의 영상, 사장님 커뮤니티를 무료로 드리고 있어요. 30일 프로그램인데 커넥트 리뷰 기능이랑 같이 쓰시면 효과가 커서요.</div>
+      <div class="say"><span class="who">상담원</span>혹시 플레이스는 개설돼 있으세요? 리뷰는 몇 개 정도 있어요?<br><span class="rec" data-col="기타 상담 내용" data-val=""></span></div>
+      <div class="say"><span class="who">상담원</span>그리고 30일 뉴스레터가 하나 있어요. 사장님들 바쁘시니까 하루에 딱 하나씩, '오늘 플레이스에서 이거 하나만 바꿔보세요' 하는 걸 메일로 보내드리는 거예요. 30일이면 플레이스가 한 바퀴 정리돼요. 아까 알려주신 메일로 보내드릴게요.</div>
+      <div class="say consent"><span class="who">동의 문장</span>자료랑 뉴스레터 보내드리려면 정보 수신 동의가 필요해요. 광고 뿌리는 건 아니고, 저희 솔루션 자료랑 30일 뉴스레터, 프로그램 안내용이에요. 성함, 연락처, 이메일, 매장명만 쓰고 카톡이랑 메일로 가요. 언제든 '그만 보내주세요' 하시면 바로 중단되고요. 동의하시겠어요?</div>
+      <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="우동지 수신 동의" data-val="O"></span></div>
+      <p class="note">페이앤 동의와 별개라 <span class="q">"동의하시겠어요?"</span>를 따로 묻고 따로 답을 받는다. <span class="q">"다 동의하시죠?"</span>로 뭉뚱그리지 않기. 이 동의는 페이앤에 넘기지 않는다.</p>
+    </section>
+
+    <section class="step gated" id="s8" data-screen-label="8 마무리">
+      <div class="step-h"><div class="no">8</div><div class="t">마무리 <small>복창 한 번, 다음 액션은 세 갈래 중 하나로.</small></div></div>
+      <div class="say"><span class="who">상담원</span>정리할게요. ○○ 구성에 월 ○○원, 색상은 블랙, 밴은 NICE. 사진 보내주시면 제가 접수 넣고요.</div>
+      <ul class="branch">
+        <li><span class="if">바로 진행</span><span class="arrow">→</span><span class="q">"사진 오는 대로 접수 넣고, 전자계약서 가면 문자 드릴게요."</span> <span class="rec" data-col="상태" data-val="서류 발송"></span></li>
+        <li><span class="if">기존 · 밴 조회 대기</span><span class="arrow">→</span><span class="q">"조회 결과 나오면 내일 이 시간쯤 다시 전화드릴게요."</span> <span class="rec" data-col="상태" data-val="밴 조회 대기"></span></li>
+        <li><span class="if">보류 · 재연락</span><span class="arrow">→</span><span class="q">"그럼 ○월 ○일쯤 다시 연락드릴게요. 그 전에 궁금한 거 있으면 이 번호로 카톡 주세요."</span> <span class="rec" data-col="상태" data-val="재연락 예정"></span></li>
+      </ul>
+      <div class="say"><span class="who">상담원</span>오늘 말씀 감사해요. 우동지 자료는 오늘 저녁에 카톡으로 먼저 보내드리고, 뉴스레터는 내일부터 메일로 갈 거예요.</div>
+    </section>
+
+    <section class="step gated" id="s9" data-screen-label="9 자주 나오는 반응">
+      <div class="step-h"><div class="no">9</div><div class="t">자주 나오는 반응 <small>한 줄 응대</small></div></div>
+      <div class="tscroll"><table class="qa">
+        <thead><tr><th>점주</th><th>응대</th></tr></thead>
+        <tbody>
+          <tr><td>"이미 쓰는 포스 있어서 괜찮아요"</td><td class="say-cell">지금 포스는 그대로 두셔도 돼요. 커넥트는 결제 옆에 붙어서 네이버 리뷰랑 적립을 자동으로 돌리는 기기라 바꾸실 게 없어요.</td></tr>
+          <tr><td>"월 비용이 부담돼요"</td><td class="say-cell">결제만 필요하시면 지금 월 0원 구성이 있어요. 부담 없이 써보시고 나중에 포스 붙이셔도 돼요.</td></tr>
+          <tr><td>"리뷰까진 필요 없어요"</td><td class="say-cell">리뷰 자체보다, 결제 끝나고 3초 만에 리뷰가 쌓이면 플레이스 노출이 올라가요. 그게 재방문으로 이어지는 거라 같이 챙겨드리는 거예요.</td></tr>
+          <tr><td>"나중에 생각해볼게요"</td><td class="say-cell">천천히 보셔도 돼요. 다만 프로모션 가격이 시점마다 바뀌어서, 언제쯤 다시 연락드리면 될까요? → 날짜 받기</td></tr>
+          <tr><td>"사업자번호는 왜 필요해요?"</td><td class="say-cell">소상공인 조회랑 밴 등록 상태 확인용이에요. 그게 돼야 무료 조건 적용이 되는지 알 수 있어서요.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <footer class="doc">우동지 상담 스크립트 v4 · 가격·정책은 2026-07 페이앤 렌탈표 기준. 확인 안 된 조건은 임의로 약속하지 않기.</footer>
+    <div class="donebar"><button type="button" class="btn ghost" id="btn-reset">새 상담</button><span class="donebar-note" id="fillcount"></span><span class="donebar-note save" id="savenote"></span><button type="button" class="btn" id="btn-done">작성 완료</button></div>
+  </main>
+
+  <div class="overlay" id="overlay" hidden>
+    <div class="ov-card">
+      <div class="missing-panel" id="missing" hidden></div>
+      <div class="ov-head">
+        <div><div class="kicker">작성 완료</div><h2>엑셀에 붙여넣기</h2><p class="copied" id="arch-note" style="margin-top:6px"></p><p>고객 목록 시트에서 빈 줄의 <b>B열(고객명)</b>을 클릭하고 붙여넣으면 열 순서대로 들어가요. A열 고객번호는 시트에서 이어서 적으세요.</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><a class="btn ghost" href="register.html" style="text-decoration:none">등록 업무로 →</a><button type="button" class="btn ghost" id="btn-back">← 돌아가기</button></div>
+      </div>
+      <div class="ov-row">
+        <div class="ov-label">고객 목록 시트 한 줄 <span class="muted">(탭 구분, B열부터)</span></div>
+        <textarea id="tsv" readonly rows="3"></textarea>
+        <div class="ov-actions"><button type="button" class="btn" id="btn-copy-tsv">복사</button><span class="copied" id="copied-tsv"></span></div>
+      </div>
+      <div class="ov-row">
+        <div class="ov-label">고객 안내 문자 <span class="muted" id="sms-kind"></span></div>
+        <textarea id="sms" rows="12" spellcheck="false"></textarea>
+        <div class="ov-actions"><button type="button" class="btn" id="btn-copy-sms">복사</button><span class="copied" id="copied-sms"></span><span class="note" style="display:inline;margin-left:auto">보내기 전에 ○○ 자리만 확인. 직접 고쳐서 복사해도 돼요.</span></div>
+      </div>
+      <div class="ov-row">
+        <div class="ov-label">페이앤 관리자 전달용 접수 양식</div>
+        <textarea id="payn" readonly rows="12"></textarea>
+        <div class="ov-actions"><button type="button" class="btn" id="btn-copy-payn">복사</button><span class="copied" id="copied-payn"></span><span class="rec" data-col="관리자 전달" data-val="O" style="margin-left:auto"></span><span class="note" style="display:inline">이 양식을 관리자에게 보냈으면 체크 — 시트 열에 같이 들어감</span></div>
+      </div>
+      <div class="ov-row">
+        <div class="ov-label">확인용</div>
+        <div class="tscroll"><table class="qa chk"><thead><tr><th>열</th><th>값</th></tr></thead><tbody id="chk"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+  componentDidMount() {
+    var o = document.getElementById('overlay'); if (o) o.hidden = true;
+    var m = document.getElementById('missing'); if (m) m.hidden = true;
+    import('./udongji-lib.js').then(mod => { this.lib = mod; this.boot(); }, () => this.boot());
+  }
+  boot() {
+    var page = document.querySelector('.page'); if (!page || page.dataset.booted) return; page.dataset.booted = '1';
+    var LIB = this.lib || null;
+    var COLS = [{"g":"식별","name":"고객번호","opts":null},{"g":"식별","name":"고객명","opts":null},{"g":"고객 기본정보","name":"연락처","opts":null},{"g":"고객 기본정보","name":"이메일","opts":null},{"g":"고객 기본정보","name":"영문 성함","opts":null},{"g":"고객 기본정보","name":"매장명","opts":null},{"g":"고객 기본정보","name":"매장 주소","opts":null},{"g":"고객 기본정보","name":"업종","opts":null},{"g":"고객 기본정보","name":"판매 물품","opts":null},{"g":"고객 기본정보","name":"매장 구분","opts":["신규 오픈","기존 운영"]},{"g":"고객 기본정보","name":"상담일","opts":null},{"g":"고객 기본정보","name":"상담자","opts":null},{"g":"공통","name":"인터넷 회선(랜선) 보유","opts":["O","X"]},{"g":"공통","name":"랜선 직접 준비 안내","opts":["O","X"]},{"g":"공통","name":"인터넷 변경/신규 필요","opts":["필요","불필요"]},{"g":"공통","name":"인터넷 상담 요청 일정","opts":null},{"g":"공통","name":"인테리어 타공","opts":["O","X","해당없음"]},{"g":"공통","name":"사업자번호","opts":null},{"g":"공통","name":"대형/개인/법인","opts":["대형","개인","법인"]},{"g":"공통","name":"단독/공동","opts":["단독","공동"]},{"g":"공통","name":"배달 필요 여부","opts":["없음","위젯만","매출연동"]},{"g":"공통","name":"POS 프로그램","opts":["사용 안 함","페이앤","오케이","기타"]},{"g":"공통","name":"안내한 상품 구성","opts":null},{"g":"공통","name":"월 이용요금","opts":null},{"g":"공통","name":"VAN","opts":["NICE","KIS"]},{"g":"공통","name":"기기 색상","opts":["블랙","화이트"]},{"g":"공통","name":"특이사항","opts":null},{"g":"공통","name":"기타 상담 내용","opts":null},{"g":"공통","name":"개인정보 제3자 제공 동의","opts":["O","X"]},{"g":"공통","name":"우동지 수신 동의","opts":["O","X"]},{"g":"공통","name":"네이버 ID","opts":null},{"g":"공통","name":"서류 분류","opts":["신규·개인·단독","신규·개인·공동","신규·법인·단독","신규·법인·공동","기존·개인·단독","기존·개인·공동","기존·법인·단독","기존·법인·공동"]},{"g":"공통","name":"서류 수취 완료","opts":["O","X"]},{"g":"공통","name":"링크 접수 완료","opts":["O","X"]},{"g":"신규 오픈","name":"오픈 예정일","opts":null},{"g":"신규 오픈","name":"사업자등록증 발급","opts":["발급 완료","발급 예정"]},{"g":"기존 운영","name":"현재 운영 방식","opts":null},{"g":"기존 운영","name":"현재 단말기·POS","opts":null},{"g":"기존 운영","name":"기존 장비 모델명","opts":null},{"g":"기존 운영","name":"장비 사진","opts":["O","X"]},{"g":"기존 운영","name":"약정 잔여 개월","opts":null},{"g":"기존 운영","name":"월 납부금","opts":null},{"g":"기존 운영","name":"VAN 유실적 — NICE","opts":["무실적","유실적","모름"]},{"g":"기존 운영","name":"VAN 유실적 — KIS","opts":["무실적","유실적","모름"]},{"g":"기존 운영","name":"관리자 전달","opts":["O","X"]},{"g":"진행","name":"상담 결과","opts":["상담 진행","상담 불가","상담 거부"]},{"g":"진행","name":"상태","opts":["상담 중","서류 발송","밴 조회 대기","서명 완료","재연락 예정","보류","종료"]},{"g":"진행","name":"다음 액션 · 일시","opts":null}];
+    var KEY = 'udongji-script-draft-v1';
+    var S = {};
+    var $ = function(id){ return document.getElementById(id); };
+    function norm(x){ return String(x).replace(/\s+/g,'').replace(/\//g,'·'); }
+    var byNorm = {}; COLS.forEach(function(c){ byNorm[norm(c.name)] = c; });
+    function colOf(name){ return byNorm[norm(name)] || null; }
+    // 저장: localStorage → sessionStorage → 쿠키 순으로 전부 시도, 읽을 때는 있는 것 중 첫 번째
+    function stPut(json){
+      var ok = false;
+      try { localStorage.setItem(KEY, json); ok = true; } catch(e){}
+      try { sessionStorage.setItem(KEY, json); ok = true; } catch(e){}
+      try { document.cookie = KEY + '=' + encodeURIComponent(json) + '; max-age=2592000; path=/; SameSite=Lax'; ok = true; } catch(e){}
+      return ok;
+    }
+    function stGet(){
+      var v = null;
+      try { v = localStorage.getItem(KEY); } catch(e){}
+      if(!v) try { v = sessionStorage.getItem(KEY); } catch(e){}
+      if(!v) try { var m = document.cookie.match(new RegExp('(?:^|; )' + KEY + '=([^;]*)')); if(m) v = decodeURIComponent(m[1]); } catch(e){}
+      return v;
+    }
+    var savedAt = null, saveTimer = null;
+    function save(){
+      var ok = stPut(JSON.stringify(S));
+      savedAt = ok ? new Date() : null;
+      clearTimeout(saveTimer); saveTimer = setTimeout(showSaved, 50);
+    }
+    function showSaved(){
+      var el = $('savenote'); if(!el) return;
+      if(savedAt){ el.textContent = '자동 저장 ' + String(savedAt.getHours()).padStart(2,'0') + ':' + String(savedAt.getMinutes()).padStart(2,'0'); el.classList.remove('bad'); }
+      else { el.textContent = '저장 불가 — 브라우저 저장소가 막혀 있어요'; el.classList.add('bad'); }
+    }
+    function today(){ var t=new Date(); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
+    try { var d = stGet(); if(d) S = JSON.parse(d) || {}; } catch(e){}
+    if(!S['상담일']) S['상담일'] = today();
+    var hasDraft = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && (S[k]||'').toString().trim(); });
+    window.addEventListener('beforeunload', function(){ stPut(JSON.stringify(S)); });
+    window.addEventListener('pagehide', function(){ stPut(JSON.stringify(S)); });
+    document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') stPut(JSON.stringify(S)); });
+
+    var REQ_ALL = ['상담자','고객명','연락처','매장명','매장 구분','업종','인터넷 회선(랜선) 보유','랜선 직접 준비 안내','대형/개인/법인','단독/공동','사업자번호','개인정보 제3자 제공 동의','안내한 상품 구성','기기 색상','상태'];
+    var REQ_NEW = ['오픈 예정일','사업자등록증 발급'];
+    var REQ_OLD = ['현재 단말기·POS','약정 잔여 개월'];
+    function reqList(){
+      var r = S['상담 결과'] || '';
+      if(r === '상담 거부') return ['상담자','고객명','연락처','상담 결과','상태'];
+      if(r === '상담 불가') return ['상담자','고객명','연락처','상담 결과','상태','다음 액션 · 일시'];
+      if(S['상태']==='재연락 예정' || S['상태']==='보류' || S['상태']==='종료') return ['상담자','고객명','연락처','상담 결과','상태','다음 액션 · 일시'];
+      if(S['매장 구분']==='신규 오픈' && S['사업자등록증 발급']==='발급 예정') return ['상담자','고객명','연락처','상담 결과','매장 구분','업종','오픈 예정일','사업자등록증 발급','상태','다음 액션 · 일시'];
+      var m = S['매장 구분']; return ['상담 결과'].concat(REQ_ALL, m==='신규 오픈'?REQ_NEW: m==='기존 운영'?REQ_OLD:[]);
+    }
+    function isReq(key){ return reqList().indexOf(key) !== -1; }
+    $('overlay').hidden = true; $('missing').hidden = true;
+    var fields = [];
+    document.querySelectorAll('.rec[data-col]').forEach(function(el){
+      var name = el.getAttribute('data-col'), preset = el.getAttribute('data-val') || '';
+      var col = colOf(name); var key = col ? col.name : name;
+      el.textContent = ''; var lab = document.createElement('span'); lab.textContent = key; el.appendChild(lab);
+      var ctrl;
+      if(preset){
+        ctrl = document.createElement('button'); ctrl.type='button'; ctrl.className='tog'; ctrl.textContent = preset;
+        ctrl.addEventListener('click', function(){ S[key] = (S[key] === preset) ? '' : preset; render(); save(); if(!$('overlay').hidden){ $('tsv').value = buildTSV(); } });
+      } else if(col && col.opts){
+        ctrl = document.createElement('select');
+        var o0 = document.createElement('option'); o0.value=''; o0.textContent='선택'; ctrl.appendChild(o0);
+        col.opts.forEach(function(v){ var o=document.createElement('option'); o.value=v; o.textContent=v; ctrl.appendChild(o); });
+        ctrl.addEventListener('change', function(){ S[key] = ctrl.value; render(); save(); });
+      } else {
+        ctrl = document.createElement('input'); ctrl.type='text'; ctrl.placeholder='입력';
+        if(/기타 상담 내용|특이사항|안내한 상품 구성|매장 주소|이메일|기존 장비 모델명|현재 단말기/.test(key)) ctrl.className='wide';
+        ctrl.addEventListener('input', function(){ S[key] = ctrl.value; render(true); save(); });
+        if(key==='연락처' || key==='사업자번호') ctrl.addEventListener('blur', function(){ var f = key==='연락처' ? fmtPhone(ctrl.value) : fmtBiz(ctrl.value); S[key] = f; render(); save(); });
+      }
+      el.appendChild(ctrl);
+      if(key === '매장명'){
+        var mapBtn = document.createElement('button'); mapBtn.type='button'; mapBtn.className='tog map'; mapBtn.textContent='지도'; mapBtn.title='네이버 지도에서 매장명 검색 (새 탭)';
+        mapBtn.addEventListener('click', function(){
+          var q = (S['매장명']||'').trim(); if(!q){ ctrl.focus(); return; }
+          var addr = (S['매장 주소']||'').trim();
+          window.open('https://map.naver.com/p/search/' + encodeURIComponent(addr ? addr + ' ' + q : q), '_blank', 'noopener');
+        });
+        el.appendChild(mapBtn);
+      }
+      fields.push({el:el, key:key, preset:preset, ctrl:ctrl});
+    });
+
+    function applyMode(){
+      var r = S['상담 결과'] || '', go = r === '상담 진행';
+      document.querySelectorAll('li[data-result]').forEach(function(li){
+        var v = li.getAttribute('data-result');
+        li.classList.toggle('off', !!r && r !== v);
+        li.classList.toggle('pick', !!r && r === v);
+      });
+      document.querySelectorAll('.result-branch').forEach(function(ul){ ul.classList.toggle('picked', !!r); });
+      var iss = S['사업자등록증 발급'] || '';
+      document.querySelectorAll('.issue-branch').forEach(function(ul){ ul.classList.toggle('picked', !!iss); });
+      document.querySelectorAll('li[data-issue]').forEach(function(li){ var v = li.getAttribute('data-issue'); li.classList.toggle('off', !!iss && iss !== v); li.classList.toggle('pick', !!iss && iss === v); });
+      document.querySelectorAll('.gated-go').forEach(function(el){ el.classList.toggle('open', go); });
+      var m = go ? (S['매장 구분'] || '') : '';
+      document.querySelectorAll('[data-only]').forEach(function(el){
+        var only = el.getAttribute('data-only');
+        el.classList.toggle('skip', !!m && m !== only);
+        el.classList.toggle('now', !!m && m === only);
+      });
+      document.querySelectorAll('.gated').forEach(function(el){ el.classList.toggle('open', !!m); });
+      var tag = $('modetag'); if(tag){ tag.textContent = m ? m + ' 폼' : ''; tag.classList.toggle('on', !!m); }
+      // 보이는 단계만 0부터 다시 번호 매기기 (목차 포함)
+      var n = 0;
+      ['s0','sm','s1','s2','s3','s4','s5','s6','s7','s8','s9'].forEach(function(id){
+        var sec = $(id); if(!sec) return;
+        var hidden = sec.classList.contains('skip') || ((sec.classList.contains('gated') || sec.classList.contains('gated-go')) && !sec.classList.contains('open'));
+        if(hidden) return;
+        var no = sec.querySelector('.step-h .no'); if(no) no.textContent = n;
+        var link = document.querySelector('nav.toc a[href="#'+id+'"] .n'); if(link) link.textContent = n;
+        n++;
+      });
+    }
+    function render(skipInputs){
+      applyMode();
+      var filled = 0, seen = {};
+      fields.forEach(function(f){
+        var v = S[f.key] || '';
+        if(f.preset){ f.ctrl.classList.toggle('on', v === f.preset); }
+        else if(f.ctrl.tagName === 'SELECT'){ f.ctrl.value = v; }
+        else if(!skipInputs && document.activeElement !== f.ctrl){ f.ctrl.value = v; }
+        f.el.classList.toggle('filled', !!v);
+        if(v && !seen[f.key]){ seen[f.key]=1; filled++; }
+      });
+      var req = reqList(), miss = req.filter(function(k){ return !(S[k]||'').toString().trim(); });
+      fields.forEach(function(f){ f.el.classList.toggle('req', isReq(f.key)); if(f.el.classList.contains('missing') && miss.indexOf(f.key)===-1) f.el.classList.remove('missing'); });
+      var fc = $('fillcount');
+      fc.textContent = filled + '개 입력 · 필수 ' + (req.length - miss.length) + '/' + req.length;
+      fc.classList.toggle('bad', miss.length > 0);
+      navProgress(req, miss);
+      if(typeof spyQ === 'function') spyQ();
+    }
+    function navProgress(req, miss){
+      navLinks.forEach(function(a){
+        var sec = document.querySelector(a.getAttribute('href')), p = a.querySelector('.prog');
+        if(!sec){ p.textContent=''; return; }
+        var hidden = sec.classList.contains('skip') || ((sec.classList.contains('gated') || sec.classList.contains('gated-go')) && !sec.classList.contains('open'));
+        a.style.display = hidden ? 'none' : '';
+        if(hidden){ p.textContent=''; return; }
+        var keys = {}, n = 0, left = 0;
+        fields.forEach(function(f){
+          if(!sec.contains(f.el) || f.el.closest('.skip, li.off, .result-branch:not(.picked), .issue-branch:not(.picked)') || keys[f.key] || req.indexOf(f.key) === -1) return;
+          keys[f.key] = 1; n++; if(miss.indexOf(f.key) !== -1) left++;
+        });
+        if(!n){ p.textContent=''; p.className='prog'; return; }
+        if(left){ p.textContent = left + '개 남음'; p.className = 'prog todo'; }
+        else { p.textContent = '완료'; p.className = 'prog done'; }
+      });
+      var tot = $('tot'); if(tot){
+        var done = req.length - miss.length;
+        $('tot-text').textContent = '필수 ' + done + ' / ' + req.length + (miss.length ? ' · ' + miss.length + '개 남음' : ' · 모두 완료');
+        $('tot-bar').style.width = (req.length ? Math.round(done / req.length * 100) : 0) + '%';
+        tot.classList.toggle('bad', miss.length > 0 && done === 0);
+      }
+    }
+    var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
+    navLinks.forEach(function(a){ if(!a.querySelector('.prog')){ var p = document.createElement('span'); p.className = 'prog'; a.appendChild(p); } });
+    render();
+    if(LIB){ buildTSV = function(){ return LIB.buildTSV(S); }; buildPayn = function(){ return LIB.buildPayn(S); }; buildSMS = function(){ return LIB.buildSMS(S); }; }
+    // 시트 연결 상태 표시 + 미전송 건 자동 전송
+    function gsStatus(){ var el = $('gs-status'); if(!el) return; if(!LIB || !LIB.isConfigured()){ el.textContent = '시트 미연결'; el.className = 'gs off'; return; } if(!LIB.isSignedIn()){ el.textContent = '시트 로그인 필요'; el.className = 'gs warn'; return; } var pend = loadRecords().filter(function(r){ return r.synced === false; }).length; el.textContent = '시트 연결됨 · ' + (LIB.userEmail() || '') + (pend ? ' · 미전송 ' + pend : ''); el.className = 'gs on'; }
+    gsStatus();
+    function syncPending(){ if(!LIB || !LIB.isConfigured() || !LIB.isSignedIn()) return; var list = loadRecords(); var pend = list.filter(function(r){ return r.synced === false; }); (function next(i){ if(i >= pend.length){ gsStatus(); return; } pushRecord(pend[i]).then(function(){ next(i+1); }, function(){ next(i+1); }); })(0); }
+    function pushRecord(rec){
+      if(!LIB || !LIB.isConfigured() || !LIB.isSignedIn()) return Promise.reject(new Error('not_connected'));
+      var p = rec.sheetRow ? LIB.updateRecord(rec.sheetRow, rec.data, rec.id).then(function(){ return rec.sheetRow; }) : LIB.findRowById(rec.id).then(function(row){ return row ? LIB.updateRecord(row, rec.data, rec.id).then(function(){ return row; }) : LIB.appendRecord(rec.data, rec.id); });
+      return p.then(function(row){ var list = loadRecords(); var i = list.findIndex(function(x){ return x.id === rec.id; }); if(i >= 0){ list[i].synced = true; list[i].sheetRow = row || list[i].sheetRow || null; try { localStorage.setItem(RKEY, JSON.stringify(list)); } catch(e){} } return row; });
+    }
+    setTimeout(syncPending, 300);
+    if(hasDraft){ savedAt = new Date(); var sn = $('savenote'); if(sn) sn.textContent = '이전 상담 내용 불러왔어요'; }
+
+    function fmtPhone(v){ var d = String(v).replace(/\D/g,''); if(d.length===11) return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3'); if(d.length===10) return d.slice(0,2)==='02' ? d.replace(/(\d{2})(\d{4})(\d{4})/,'$1-$2-$3') : d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3'); if(d.length===9 && d.slice(0,2)==='02') return d.replace(/(\d{2})(\d{3})(\d{4})/,'$1-$2-$3'); return String(v).trim(); }
+    function fmtBiz(v){ var d = String(v).replace(/\D/g,''); return d.length===10 ? d.replace(/(\d{3})(\d{2})(\d{5})/,'$1-$2-$3') : String(v).trim(); }
+    function val(k){ var v = (S[k] || '').toString().replace(/[\t\r\n]+/g,' ').trim(); if(k==='연락처') return fmtPhone(v); if(k==='사업자번호') return fmtBiz(v); return v; }
+    function buildTSV(){ return COLS.slice(1).map(function(c){ return val(c.name); }).join('\t'); }
+    function buildPayn(){
+      var isNew = val('매장 구분') === '신규 오픈';
+      var L = [];
+      var r = val('상담 결과');
+      if(r && r !== '상담 진행'){
+        return ['['+r+'] '+(val('매장명')||val('고객명')), '· 대표 / 연락처 : '+val('고객명')+' / '+val('연락처'), '· 상태 : '+val('상태'), r==='상담 불가' ? '· 다음 연락 : '+val('다음 액션 · 일시') : '· 메모 : '+val('특이사항')].join('\n');
+      }
+      L.push('['+(isNew?'신규 매장':'기존 운영 매장')+' 상담 접수] '+val('매장명')+(val('매장 주소')?' ('+val('매장 주소')+')':''));
+      L.push('· 대표 / 연락처 : '+val('고객명')+' / '+val('연락처'));
+      L.push('· 업종 : '+val('업종')+(val('판매 물품')?' — '+val('판매 물품'):''));
+      L.push(isNew ? '· 오픈 예정일 : '+val('오픈 예정일')+(val('사업자등록증 발급')?' ('+val('사업자등록증 발급')+')':'') : '· 현재 운영 방식 : '+val('현재 운영 방식'));
+      L.push('· 인터넷 회선(랜선) 보유 여부 : '+val('인터넷 회선(랜선) 보유')+(val('인터넷 변경/신규 필요')?' / 변경·신규 '+val('인터넷 변경/신규 필요'):''));
+      L.push('· 커넥트 설치 시 랜선 직접 준비 안내 여부 : '+val('랜선 직접 준비 안내'));
+      L.push('· 사업자번호 : '+val('사업자번호'));
+      L.push('· 대형 / 개인 / 법인 / 단독 / 공동 : '+[val('대형/개인/법인'), val('단독/공동')].filter(Boolean).join(' / '));
+      L.push('· 안내한 상품 구성 및 월 이용요금 : '+val('안내한 상품 구성')+(val('월 이용요금')?' / 월 '+val('월 이용요금')+'원':''));
+      L.push('· POS 프로그램 사용 여부 : '+val('POS 프로그램')+(!isNew && val('현재 단말기·POS') ? ' (현재 '+val('현재 단말기·POS')+')' : ''));
+      L.push('· VAN : '+val('VAN'));
+      L.push('· 배달 필요 여부 : '+val('배달 필요 여부'));
+      if(val('인터넷 상담 요청 일정') || val('매장 주소')) L.push('· 인터넷 상담 : '+val('매장 주소')+' / '+val('인터넷 상담 요청 일정'));
+      L.push('· 인테리어 타공 : '+val('인테리어 타공'));
+      L.push('· 기기 색상 : '+val('기기 색상'));
+      if(!isNew){ L.push('· VAN 전산 유실적 : NICE '+val('VAN 유실적 — NICE')+' / KIS '+val('VAN 유실적 — KIS')); L.push('· 기존 약정 : 잔여 '+val('약정 잔여 개월')+'개월 / 월 '+val('월 납부금')+'원'); }
+      L.push('· 특이사항 : '+val('특이사항'));
+      L.push('· 기타 상담 내용 : '+val('기타 상담 내용'));
+      L.push('· 서류 : 통화 후 카톡 수취 예정' + (val('서류 분류') ? ' / '+val('서류 분류') : ''));
+      return L.join('\n');
+    }
+    function buildSMS(){
+      var name = val('고객명') ? val('고객명') + ' 대표님' : '대표님';
+      var agent = val('상담자') || '담당자';
+      var head = '[우동지] ' + name + ', 우동지 ' + agent + '입니다.';
+      var tail = '\n\n궁금한 점은 이 번호로 카톡 주시면 바로 답드릴게요.\n감사합니다.';
+      var r = val('상담 결과');
+      if(r === '상담 거부'){
+        return { kind: '상담 거부 · 마무리 인사', text: head + '\n오늘 시간 내주셔서 감사합니다.\n나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.' + tail };
+      }
+      if(r === '상담 불가' || val('상태') === '재연락 예정'){
+        var when = val('다음 액션 · 일시') || '○월 ○일';
+        return { kind: '재연락 안내', text: head + '\n오늘 통화 감사합니다. 말씀해주신 대로 ' + when + '에 다시 연락드리겠습니다.\n그 전에 준비되시면 미리 보내주셔도 좋아요.' + tail };
+      }
+      var isNew = val('매장 구분') === '신규 오픈';
+      var corp = val('대형/개인/법인') === '법인';
+      var joint = val('단독/공동') === '공동';
+      var food = /음식|식당|카페|주점|치킨|피자|분식|베이커리|제과|호프|술/.test(val('업종'));
+      var docs = [];
+      docs.push('1. 사업자등록증 (최근 발급본, 가리는 곳 없이)');
+      docs.push('2. 대표님 신분증 (주민등록증 또는 운전면허증 — 여권 불가)');
+      docs.push('3. 정산받으실 통장 사본 (모바일 캡처 가능' + (corp ? ', 예금주 = 법인명' : '') + ')');
+      var n = 4;
+      if(food) docs.push((n++) + '. 영업신고증');
+      docs.push((n++) + '. 매장 사진 — 간판 나오는 바깥 사진 2장, 안쪽 전체 사진 2장\n   (간판이 없으면: 건물 바깥 1장, 입구에서 안이 보이게 1장, 도로명주소 표지판 1장, 안쪽 전체 2장)');
+      if(corp) docs.push((n++) + '. 법인: 등기부등본, 인감증명서(3개월 이내), 주주명부, 소유지배자 확인서' + '\n   (사용인감 쓰시면 사용인감계도)');
+      if(joint) docs.push((n++) + '. 공동대표: 가입 동의·위임장, 결제계좌 동의서, 공동대표님 신분증·연락처\n   (서식은 따로 보내드릴게요)');
+      var extra = [];
+      if(!val('네이버 ID')) extra.push('네이버 아이디 (대표님 개인 명의 계정)');
+      if(isNew && !corp && !val('영문 성함')) extra.push('성함 영문 표기 (여권 기준)');
+      if(!val('이메일')) extra.push('이메일 주소');
+      var body = head + '\n오늘 통화 감사합니다. 안내드린 대로 아래 서류를 이 번호로 카톡/문자로 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 사진으로 충분합니다.\n\n' + docs.join('\n');
+      if(extra.length) body += '\n\n함께 알려주세요:\n- ' + extra.join('\n- ');
+      var summary = [];
+      if(val('안내한 상품 구성')) summary.push('구성: ' + val('안내한 상품 구성') + (val('월 이용요금') ? ' / 월 ' + val('월 이용요금') + '원' : ''));
+      if(val('기기 색상')) summary.push('기기 색상: ' + val('기기 색상'));
+      if(val('VAN')) summary.push('밴사: ' + val('VAN'));
+      if(summary.length) body += '\n\n오늘 정리된 내용\n- ' + summary.join('\n- ');
+      if(val('랜선 직접 준비 안내') === 'O') body += '\n\n설치는 택배 자가설치가 기본이며, 랜선 케이블은 직접 준비해주셔야 합니다 (다이소·온라인 몇 천 원).';
+      body += '\n\n서류 접수 후 페이앤에서 전자계약서가 카톡으로 발송되며, 서명하시면 완료됩니다.' + (joint ? ' 공동대표님도 함께 서명하셔야 합니다.' : '');
+      if(val('상태') === '밴 조회 대기') body += '\n\n밴 등록 조회 결과는 나오는 대로 바로 연락드리겠습니다.';
+      body += tail;
+      return { kind: (isNew ? '신규 오픈' : '기존 운영') + ' · 서류 안내', text: body };
+    }
+    // 작성 완료 → 등록 업무 목록에 보관
+    var RKEY = 'udongji-records-v1';
+    function loadRecords(){ try { return JSON.parse(localStorage.getItem(RKEY) || '[]') || []; } catch(e){ return []; } }
+    function archive(tsv, payn, sms){
+      if(!S._id) S._id = 'r' + Date.now().toString(36);
+      var list = loadRecords(), data = {}; Object.keys(S).forEach(function(k){ if(k[0] !== '_') data[k] = S[k]; });
+      var rec = { id: S._id, savedAt: new Date().toISOString(), data: data, tsv: tsv, payn: payn, sms: sms, registered: false, synced: false, sheetRow: null };
+      var i = list.findIndex(function(x){ return x.id === S._id; });
+      if(i >= 0){ rec.registered = !!list[i].registered; rec.registeredAt = list[i].registeredAt; rec.sheetRow = list[i].sheetRow || null; list[i] = rec; } else list.unshift(rec);
+      try { localStorage.setItem(RKEY, JSON.stringify(list)); } catch(e){}
+      save();
+      var n = $('arch-note'); if(!n) return;
+      var connected = LIB && LIB.isConfigured() && LIB.isSignedIn();
+      if(!connected){ n.textContent = (i >= 0 ? '기존 건을 갱신했어요.' : '이 기기에 저장됐어요.') + ' 구글 시트에는 아직 안 갔어요 — 홈에서 구글 로그인하면 자동 전송돼요.'; n.style.color = 'var(--amber)'; gsStatus(); return; }
+      n.textContent = '구글 시트로 전송 중…'; n.style.color = '';
+      pushRecord(rec).then(function(row){ n.textContent = (rec.sheetRow || i >= 0 ? '구글 시트의 기존 행을 갱신했어요' : '구글 시트에 행이 추가됐어요') + (row ? ' (' + row + '행)' : '') + '. 등록 업무에서 바로 볼 수 있어요.'; n.style.color = ''; gsStatus(); }, function(err){ n.textContent = '시트 전송 실패: ' + (err && err.message || err) + ' — 기기에 보관했고, 다음에 로그인하면 다시 보내요.'; n.style.color = 'var(--red)'; gsStatus(); });
+    }
+    function esc(x){ return String(x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+    function scrollToEl(el){ var r = el.getBoundingClientRect(); window.scrollTo({ top: window.scrollY + r.top - window.innerHeight/2 + r.height/2, behavior: 'smooth' }); }
+    function isVisible(el){ return !!(el.offsetParent) && !el.closest('.skip, li.off, .result-branch:not(.picked), .issue-branch:not(.picked), .gated:not(.open), .gated-go:not(.open)'); }
+    function jumpTo(key){
+      var cands = fields.filter(function(x){ return x.key === key; });
+      var f = cands.filter(function(x){ return isVisible(x.el); })[0] || cands[0]; if(!f) return;
+      $('overlay').hidden = true;
+      scrollToEl(f.el); f.el.classList.add('missing');
+      var c = f.ctrl; setTimeout(function(){ try { c.focus({preventScroll:true}); } catch(e){} }, 350);
+    }
+    function chkRows(showReq){ return COLS.map(function(c){ var v = val(c.name); return '<tr><td>'+esc(c.name)+(showReq && isReq(c.name)?' <span style="color:var(--form)">*</span>':'')+'</td><td'+(v?'':' class="empty"')+'>'+(v?esc(v):'—')+'</td></tr>'; }).join(''); }
+    $('btn-done').addEventListener('click', function(){
+      var miss = reqList().filter(function(k){ return !(S[k]||'').toString().trim(); });
+      var mp = $('missing');
+      fields.forEach(function(f){ f.el.classList.toggle('missing', miss.indexOf(f.key) !== -1 && isVisible(f.el)); });
+      // 화면에 안 보이는 칸만 남은 필수가 있으면 안내
+      var unreachable = miss.filter(function(k){ return !fields.some(function(f){ return f.key === k && isVisible(f.el); }); });
+      if(miss.length){
+        $('overlay').hidden = true; mp.hidden = true;
+        // 화면 순서상 가장 위에 있는 빈 필수 칸으로 이동
+        var first = null, top = Infinity;
+        fields.forEach(function(f){
+          if(miss.indexOf(f.key) === -1 || !isVisible(f.el)) return;
+          var y = f.el.getBoundingClientRect().top + window.scrollY;
+          if(y < top){ top = y; first = f; }
+        });
+        if(first){ scrollToEl(first.el); setTimeout(function(){ try { first.ctrl.focus({preventScroll:true}); } catch(e){} }, 350); }
+        var fc = $('fillcount'); fc.textContent = '필수 ' + miss.length + '개 남음 — ' + miss.join(', ') + (unreachable.length ? ' (안 보이는 칸: ' + unreachable.join(', ') + ' — 위 선택 확인)' : ''); fc.classList.add('bad');
+        return;
+      }
+      mp.hidden = true;
+      $('tsv').value = buildTSV();
+      $('payn').value = buildPayn();
+      var sms = buildSMS(); $('sms').value = sms.text; $('sms-kind').textContent = '(' + sms.kind + ')';
+      archive($('tsv').value, $('payn').value, sms.text);
+      $('chk').innerHTML = chkRows(false);
+      $('overlay').hidden = false; window.scrollTo(0,0);
+    });
+    $('btn-back').addEventListener('click', function(){ $('overlay').hidden = true; });
+    $('btn-reset').addEventListener('click', function(){
+      var has = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && (S[k]||'').toString().trim(); });
+      if(has && !window.confirm('지금 입력한 내용을 모두 지우고 새 상담을 시작할까요?\n(복사 안 했으면 먼저 작성 완료 → 복사)')) return;
+      var agent = S['상담자'] || '';
+      S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent;
+      var an = $('arch-note'); if(an) an.textContent = '';
+      fields.forEach(function(f){ if(f.ctrl.tagName==='INPUT' && f.key !== '상담자') f.ctrl.value=''; });
+      render(); save(); window.scrollTo(0,0);
+    });
+    function copyFrom(id, msgId){
+      var ta = $(id), msg = $(msgId);
+      function ok(){ msg.textContent = '복사됨'; setTimeout(function(){ msg.textContent=''; }, 1800); }
+      function legacy(){
+        var ro = ta.readOnly; ta.readOnly = false;
+        ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+        var done = false; try { done = document.execCommand('copy'); } catch(e){}
+        ta.readOnly = ro; ta.setSelectionRange(0, 0); ta.blur();
+        if(done) ok(); else { ta.focus(); ta.select(); msg.textContent = '직접 복사(Ctrl+C)'; }
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(ok, legacy); } else legacy();
+    }
+    $('btn-copy-tsv').addEventListener('click', function(){ copyFrom('tsv','copied-tsv'); });
+    $('btn-copy-payn').addEventListener('click', function(){ copyFrom('payn','copied-payn'); });
+    $('btn-copy-sms').addEventListener('click', function(){ copyFrom('sms','copied-sms'); });
+
+    // 목차 현재 위치 표시
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
+    var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+    function spy(){
+      var line = window.innerHeight * 0.35, cur = -1, best = Infinity;
+      secs.forEach(function(s, i){
+        if(!s || !s.offsetParent) return;
+        var r = s.getBoundingClientRect();
+        if(r.top <= line && r.bottom > line){ cur = i; best = -1; return; }
+        if(best !== -1){ var d = r.top > line ? r.top - line : line - r.bottom; if(d < best){ best = d; cur = i; } }
+      });
+      // 페이지 끝에 닿았으면 마지막 보이는 섹션
+      if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2){ for(var k = secs.length - 1; k >= 0; k--){ if(secs[k] && secs[k].offsetParent){ cur = k; break; } } }
+      links.forEach(function(a, i){ a.classList.toggle('active', i === cur); });
+    }
+    var spyRaf = null; function spyQ(){ if(spyRaf) return; spyRaf = requestAnimationFrame(function(){ spyRaf = null; spy(); }); }
+    window.addEventListener('scroll', spyQ, { passive: true });
+    document.addEventListener('scroll', spyQ, { passive: true, capture: true });
+    window.addEventListener('resize', spyQ);
+    requestAnimationFrame(spy); setTimeout(spy, 400); window.addEventListener('load', spy);
+  }
+}
+</script>
+</body>
+</html>

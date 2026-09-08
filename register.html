@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
+    html { color-scheme: light; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+    a { color: var(--blue); } a:hover { color: var(--blue-d); }
+    button { font-family: inherit; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .page { max-width: 1280px; margin: 0 auto; padding: 24px 24px 80px; display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 20px; align-items: start; }
+    @media (max-width: 900px) { .page { grid-template-columns: 1fr; padding: 14px 12px 60px; } }
+    .side { position: sticky; top: 16px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); display: flex; flex-direction: column; max-height: calc(100vh - 32px); }
+    @media (max-width: 900px) { .side { position: static; max-height: none; } }
+    .side .head { padding: 16px 16px 12px; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); margin-bottom: 10px; }
+    .brand .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--green); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+    .brand b { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; display: block; line-height: 1.2; }
+    .brand small { font-size: 11.5px; color: var(--text-3); font-weight: 500; }
+    .brand .home { margin-left: auto; font-size: 12.5px; color: var(--text-3); font-weight: 600; }
+    .gs { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: 7px; margin-bottom: 10px; text-decoration: none; }
+    .gs::before { content: "● "; font-size: 8px; }
+    .gs.off { color: var(--text-3); background: var(--card-2); } .gs.warn { color: var(--amber); background: var(--amber-2); } .gs.on { color: var(--green); background: var(--green-2); } .gs.err { color: var(--red); background: var(--red-2); }
+    .gs .lk { margin-left: auto; font-weight: 700; text-decoration: underline; color: inherit; background: none; border: 0; font-size: 11.5px; padding: 0; }
+    .seg { display: flex; background: var(--card-2); border-radius: 9px; padding: 3px; gap: 2px; }
+    .seg button { flex: 1; border: 0; background: transparent; font-size: 12.5px; font-weight: 600; color: var(--text-2); padding: 6px 4px; border-radius: 7px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .seg button.on { background: var(--card); color: var(--text); box-shadow: 0 1px 2px rgba(20,27,45,.08); }
+    .search { margin-top: 8px; width: 100%; font: inherit; font-size: 13.5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
+    .search::placeholder { color: var(--text-3); }
+    .list { overflow: auto; padding: 6px; }
+    .item { width: 100%; text-align: left; border: 0; background: transparent; padding: 10px 10px; border-radius: 10px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 2px 10px; color: var(--text); }
+    .item:hover { background: var(--card-2); }
+    .item.on { background: var(--blue-2); }
+    .item b { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item .m { grid-column: 1; font-size: 12.5px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item .d { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; line-height: 1.4; white-space: pre-line; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: var(--red); }
+    .dot.ok { background: var(--green); } .dot.gray { background: var(--text-3); } .dot.amber { background: var(--amber); }
+    .none { padding: 24px 16px; color: var(--text-3); font-size: 13.5px; text-align: center; }
+    .main { min-width: 0; }
+    .hero { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 22px 26px; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    .hero h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+    .hero .sub { font-size: 13.5px; color: var(--text-2); margin-top: 4px; }
+    .hero .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .btn { font: inherit; font-size: 13.5px; font-weight: 700; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--blue); background: var(--blue); color: #fff; letter-spacing: -0.01em; text-decoration: none; }
+    .btn:hover { background: var(--blue-d); border-color: var(--blue-d); color: #fff; }
+    .btn.ghost { background: var(--card); color: var(--text-2); border-color: var(--line); }
+    .btn.ghost:hover { background: var(--card-2); color: var(--text); }
+    .btn.ok { background: var(--green); border-color: var(--green); }
+    .btn.ok:hover { background: #17855A; border-color: #17855A; }
+    .btn.amber { background: var(--amber); border-color: var(--amber); }
+    .btn.danger { background: var(--card); color: var(--red); border-color: var(--line); }
+    .btn.danger:hover { background: var(--red-2); }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; width: 100%; }
+    .pill { font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 7px; background: var(--card-2); color: var(--text-2); border: 1px solid var(--line); white-space: nowrap; flex: 0 0 auto; }
+    .pill.blue { background: var(--blue-2); color: var(--blue); border-color: transparent; }
+    .pill.ok { background: var(--green-2); color: var(--green); border-color: transparent; }
+    .pill.hot { background: var(--red-2); color: var(--red); border-color: transparent; }
+    .pill.amber { background: var(--amber-2); color: var(--amber); border-color: transparent; }
+    .group { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); margin-top: 14px; padding: 6px 0 4px; }
+    .group h2 { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); padding: 12px 22px 6px; }
+    .frow { display: grid; grid-template-columns: 190px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 9px 22px; border-top: 1px solid var(--line-2); }
+    @media (max-width: 640px) { .frow { grid-template-columns: minmax(0,1fr) auto; } .frow .k { grid-column: 1 / -1; padding-bottom: 0; } }
+    .frow .k { font-size: 13px; color: var(--text-2); font-weight: 500; }
+    .frow .v { font-size: 14.5px; font-weight: 600; word-break: break-all; cursor: pointer; padding: 4px 8px; margin: -4px -8px; border-radius: 7px; }
+    .frow .v:hover { background: var(--blue-2); }
+    .frow.empty .v { color: var(--text-3); font-weight: 400; cursor: default; }
+    .frow.empty .v:hover { background: transparent; }
+    .frow.copied .v { background: var(--green-2); color: var(--green); }
+    .cp { font: inherit; font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 7px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); }
+    .cp:hover { border-color: var(--blue-3); color: var(--blue); background: var(--blue-2); }
+    .frow.empty .cp { visibility: hidden; }
+    .frow.copied .cp { background: var(--green); border-color: var(--green); color: #fff; }
+    .texts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 14px; }
+    .tbox { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px 18px 14px; }
+    .tbox h3 { font-size: 13.5px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .tbox h3 .cp { margin-left: auto; }
+    .tbox textarea { width: 100%; font: 13px/1.55 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--card-2); color: var(--text); resize: vertical; white-space: pre; overflow-x: auto; min-height: 150px; }
+    .tbox textarea.sms { font: 14px/1.6 var(--sans); white-space: pre-wrap; background: var(--card); }
+    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 30; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .blank { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 60px 24px; text-align: center; color: var(--text-3); font-size: 14.5px; }
+    .blank a { font-weight: 700; }
+  </style>
+</helmet>
+<div class="page">
+  <aside class="side">
+    <div class="head">
+      <a class="brand" href="index.html"><div class="mark">우</div><div><b>등록 업무</b><small>상담 기록 → 페이앤 입력</small></div><span class="home">← 홈</span></a>
+      <div class="gs {{ gsCls }}">{{ gsText }}<sc-if value="{{ gsNeedLogin }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ signIn }}">로그인</button></sc-if><sc-if value="{{ gsOn }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ reload }}">새로고침</button></sc-if><sc-if value="{{ gsOff }}" hint-placeholder-val="{{ true }}"><a class="lk" href="index.html#gsheet">설정</a></sc-if></div>
+      <div class="seg">
+        <button type="button" class="{{ segPendingCls }}" onClick="{{ setPending }}">미등록 {{ pendingCount }}</button>
+        <button type="button" class="{{ segDoneCls }}" onClick="{{ setDone }}">등록 완료 {{ doneCount }}</button>
+        <button type="button" class="{{ segAllCls }}" onClick="{{ setAll }}">전체 {{ totalCount }}</button>
+      </div>
+      <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 검색" value="{{ query }}" onInput="{{ onQuery }}">
+    </div>
+    <div class="list">
+      <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
+        <button type="button" class="{{ it.cls }}" onClick="{{ it.select }}"><b><span class="dot {{ it.dot }}"></span>{{ it.store }}</b><span class="m">{{ it.meta }}</span><span class="d">{{ it.date }}</span></button>
+      </sc-for>
+      <sc-if value="{{ noItems }}" hint-placeholder-val="{{ false }}"><div class="none">{{ noItemsMsg }}</div></sc-if>
+    </div>
+  </aside>
+
+  <main class="main">
+    <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
+      <div class="hero">
+        <div><h1>{{ sel.store }}</h1><div class="sub">{{ sel.sub }}</div></div>
+        <div class="acts">
+          <sc-if value="{{ sel.unsent }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn amber" onClick="{{ pushNow }}">시트로 전송</button></sc-if>
+          <button type="button" class="btn" onClick="{{ copyPayn }}">접수 양식 전체 복사</button>
+          <a class="btn ghost" href="{{ sel.mapHref }}" target="_blank" rel="noopener">지도</a>
+          <sc-if value="{{ sel.pending }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn ok" onClick="{{ markDone }}">등록 완료 처리</button></sc-if>
+          <sc-if value="{{ sel.registered }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn ghost" onClick="{{ markUndone }}">등록 완료 취소</button></sc-if>
+          <sc-if value="{{ sel.canDelete }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn danger" onClick="{{ remove }}">삭제</button></sc-if>
+        </div>
+        <div class="tags">
+          <span class="pill blue">{{ sel.mode }}</span>
+          <span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span>
+          <span class="pill">상태 · {{ sel.status }}</span>
+          <span class="pill">상담 {{ sel.date }}</span>
+          <span class="pill">{{ sel.agent }}</span>
+          <span class="pill">{{ sel.where }}</span>
+        </div>
+      </div>
+
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <section class="group">
+          <h2>{{ g.name }}</h2>
+          <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="4">
+            <div class="{{ f.cls }}"><span class="k">{{ f.key }}</span><span class="v" onClick="{{ f.copy }}" title="클릭하면 복사">{{ f.value }}</span><button type="button" class="cp" onClick="{{ f.copy }}">복사</button></div>
+          </sc-for>
+        </section>
+      </sc-for>
+
+      <div class="texts">
+        <div class="tbox"><h3>페이앤 관리자 전달 양식 <button type="button" class="cp" onClick="{{ copyPayn }}">복사</button></h3><textarea readonly value="{{ sel.payn }}"></textarea></div>
+        <div class="tbox"><h3>고객 안내 문자 <button type="button" class="cp" onClick="{{ copySms }}">복사</button></h3><textarea readonly class="sms" value="{{ sel.sms }}"></textarea></div>
+        <div class="tbox"><h3>시트 한 줄 (탭 구분) <button type="button" class="cp" onClick="{{ copyTsv }}">복사</button></h3><textarea readonly rows="3" style="min-height:70px" value="{{ sel.tsv }}"></textarea></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ noSel }}" hint-placeholder-val="{{ false }}">
+      <div class="blank">{{ blankMsg }}<br><a href="consult.html">상담 업무로 가기 →</a></div>
+    </sc-if>
+  </main>
+  <div class="{{ toastCls }}">{{ toastMsg }}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { lib: null, records: [], filter: 'pending', query: '', selId: null, toast: '', toastOn: false, copiedKey: '', source: 'local', gsErr: '', loading: false };
+  KEY = 'udongji-records-v1';
+  GROUPS = [
+    ['고객 기본정보', ['고객명','연락처','이메일','영문 성함','매장명','매장 주소','업종','판매 물품','매장 구분','네이버 ID']],
+    ['사업자·심사', ['사업자번호','대형/개인/법인','단독/공동','개인정보 제3자 제공 동의','우동지 수신 동의']],
+    ['구성·설치', ['안내한 상품 구성','월 이용요금','VAN','POS 프로그램','배달 필요 여부','기기 색상','인터넷 회선(랜선) 보유','랜선 직접 준비 안내','인터넷 변경/신규 필요','인터넷 상담 요청 일정','인테리어 타공']],
+    ['신규 오픈', ['오픈 예정일','사업자등록증 발급']],
+    ['기존 운영', ['현재 운영 방식','현재 단말기·POS','기존 장비 모델명','약정 잔여 개월','월 납부금','VAN 유실적 — NICE','VAN 유실적 — KIS']],
+    ['메모·진행', ['특이사항','기타 상담 내용','상담 결과','상태','다음 액션 · 일시','상담일','상담자']]
+  ];
+  async componentDidMount() {
+    try { const lib = await import('./udongji-lib.js'); this.setState({ lib }, () => this.load(true)); } catch (e) { this.load(true); }
+    this._on = () => this.load(false); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
+    this._hash = () => { const id = location.hash.slice(1); if (id) this.setState({ selId: id, filter: 'all' }); }; window.addEventListener('hashchange', this._hash);
+  }
+  componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); window.removeEventListener('hashchange', this._hash); }
+  localRecords() { try { return JSON.parse(localStorage.getItem(this.KEY) || '[]') || []; } catch (e) { return []; } }
+  async load(first) {
+    const lib = this.state.lib; let records = [], source = 'local', gsErr = '';
+    const local = this.localRecords();
+    if (lib && lib.isConfigured() && lib.isSignedIn()) {
+      this.setState({ loading: true });
+      try {
+        const { items } = await lib.readAll();
+        const recs = items.map(it => ({ id: it.data[lib.ID_COL] || ('row' + it.row), row: it.row, data: it.data, registered: !!String(it.data[lib.REG_COL] || '').trim(), registeredAt: String(it.data[lib.REG_COL] || ''), savedAt: it.data['상담일'] || '', source: 'sheet' })).reverse();
+        const ids = new Set(recs.map(r => r.id));
+        const pend = local.filter(r => r.synced === false && !ids.has(r.id)).map(r => Object.assign({}, r, { unsent: true, source: 'local' }));
+        records = pend.concat(recs); source = 'sheet';
+      } catch (e) { gsErr = e.message; records = local.map(r => Object.assign({}, r, { source: 'local' })); }
+      this.setState({ loading: false });
+    } else records = local.map(r => Object.assign({}, r, { source: 'local' }));
+    const st = { records, source, gsErr };
+    if (first) { const id = location.hash.slice(1); if (id && records.some(r => r.id === id)) { st.selId = id; st.filter = 'all'; } }
+    this.setState(st, () => { if (!this.state.selId || !this.state.records.some(r => r.id === this.state.selId)) this.autoSelect(); });
+  }
+  persistLocal(records) { try { localStorage.setItem(this.KEY, JSON.stringify(records)); } catch (e) {} }
+  visible(records = this.state.records, filter = this.state.filter, query = this.state.query) {
+    const q = query.trim().toLowerCase();
+    return records.filter(r => {
+      const d = r.data || {}, go = (d['상담 결과'] || '상담 진행') === '상담 진행';
+      if (filter === 'pending' && (r.registered || !go)) return false;
+      if (filter === 'done' && !r.registered) return false;
+      if (q && ![d['매장명'], d['고객명'], d['연락처'], d['사업자번호']].some(v => String(v || '').toLowerCase().includes(q))) return false;
+      return true;
+    });
+  }
+  autoSelect() { const v = this.visible(); this.setState({ selId: v.length ? v[0].id : null }); }
+  toast(msg) { clearTimeout(this._t); this.setState({ toast: msg, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false, copiedKey: '' }), 1600); }
+  copy(text, label, key) {
+    const ok = () => { this.setState({ copiedKey: key || '' }); this.toast((label ? label + ' ' : '') + '복사됨'); };
+    const legacy = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px;top:0'; document.body.appendChild(ta); ta.focus(); ta.select(); let d = false; try { d = document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); d ? ok() : this.toast('복사 실패 — 직접 선택해 복사하세요'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy); else legacy();
+  }
+  setFilter(f) { this.setState({ filter: f }, () => { if (!this.visible().some(r => r.id === this.state.selId)) this.autoSelect(); }); }
+  async setRegistered(rec, on) {
+    const lib = this.state.lib;
+    if (rec.source === 'sheet' && lib) {
+      try { await lib.setCell(rec.row, lib.REG_COL, on ? lib.todayStr() : ''); this.toast(on ? '시트에 등록 완료로 기록했어요' : '시트에서 등록 완료를 지웠어요'); await this.load(false); } catch (e) { this.toast('시트 기록 실패: ' + e.message); }
+      return;
+    }
+    const list = this.localRecords().map(r => r.id === rec.id ? Object.assign({}, r, { registered: on, registeredAt: on ? new Date().toISOString() : undefined }) : r);
+    this.persistLocal(list); this.toast(on ? '등록 완료로 표시했어요' : '미등록으로 되돌렸어요'); this.load(false);
+  }
+  async pushNow(rec) {
+    const lib = this.state.lib; if (!lib || !lib.isConfigured() || !lib.isSignedIn()) { this.toast('먼저 홈에서 구글 로그인하세요'); return; }
+    try {
+      const row = await lib.findRowById(rec.id);
+      const r2 = row ? (await lib.updateRecord(row, rec.data, rec.id), row) : await lib.appendRecord(rec.data, rec.id);
+      const list = this.localRecords().map(r => r.id === rec.id ? Object.assign({}, r, { synced: true, sheetRow: r2 }) : r); this.persistLocal(list);
+      this.toast('시트로 전송했어요' + (r2 ? ' (' + r2 + '행)' : '')); await this.load(false);
+    } catch (e) { this.toast('전송 실패: ' + e.message); }
+  }
+  renderVals() {
+    const { lib, records, filter, query, selId, toast, toastOn, copiedKey, source, gsErr, loading } = this.state;
+    const isGo = r => ((r.data || {})['상담 결과'] || '상담 진행') === '상담 진행';
+    const pendingCount = records.filter(r => !r.registered && isGo(r)).length, doneCount = records.filter(r => r.registered).length;
+    const vis = this.visible();
+    const fmtDate = s => String(s || '').slice(0, 16).replace('T', '\n');
+    const items = vis.map(r => { const d = r.data || {}; return {
+      store: d['매장명'] || d['고객명'] || '(매장명 없음)', meta: [d['고객명'], d['연락처'], d['매장 구분']].filter(Boolean).join(' · '), date: fmtDate(r.savedAt),
+      cls: 'item' + (r.id === selId ? ' on' : ''), dot: r.unsent ? 'amber' : r.registered ? 'ok' : isGo(r) ? '' : 'gray',
+      select: () => { this.setState({ selId: r.id }); history.replaceState(null, '', '#' + r.id); }
+    }; });
+    const rec = records.find(r => r.id === selId) || null;
+    let sel = null, groups = [];
+    if (rec) {
+      const d = rec.data || {}, go = isGo(rec), addr = d['매장 주소'] || '', store = d['매장명'] || '';
+      const payn = lib ? lib.buildPayn(d) : (rec.payn || ''), sms = lib ? lib.buildSMS(d).text : (rec.sms || ''), tsv = lib ? lib.buildTSV(d) : (rec.tsv || '');
+      sel = {
+        store: store || d['고객명'] || '(매장명 없음)', sub: [d['고객명'] ? d['고객명'] + ' 대표' : '', d['연락처'], d['업종'], addr].filter(Boolean).join(' · '),
+        mode: d['매장 구분'] || '구분 없음', status: d['상태'] || '—', date: d['상담일'] || fmtDate(rec.savedAt).replace('\n', ' '), agent: d['상담자'] ? '상담 ' + d['상담자'] : '상담자 미입력',
+        registered: !!rec.registered, pending: !rec.registered && go, unsent: !!rec.unsent, canDelete: rec.source !== 'sheet',
+        regTag: rec.registered ? '등록 완료 ' + String(rec.registeredAt || '').slice(0, 10) : go ? '미등록' : (d['상담 결과'] || ''), regCls: rec.registered ? 'ok' : go ? 'hot' : '',
+        where: rec.source === 'sheet' ? '시트 ' + rec.row + '행' : rec.unsent ? '이 기기 · 시트 미전송' : '이 기기',
+        payn, sms, tsv, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((addr ? addr + ' ' : '') + store)
+      };
+      const isNew = d['매장 구분'] === '신규 오픈', isOld = d['매장 구분'] === '기존 운영';
+      groups = this.GROUPS.filter(([name]) => !(name === '신규 오픈' && isOld) && !(name === '기존 운영' && isNew)).map(([name, keys]) => ({
+        name, fields: keys.map(k => { const v = lib ? lib.val(d, k) : String(d[k] || '').trim(); return { key: k, value: v || '—', cls: 'frow' + (v ? '' : ' empty') + (copiedKey === k ? ' copied' : ''), copy: v ? () => this.copy(v, k, k) : () => {} }; })
+      })).filter(g => g.fields.some(f => f.value !== '—') || g.name === '고객 기본정보');
+    }
+    const configured = lib && lib.isConfigured(), signed = lib && lib.isSignedIn();
+    const gsCls = gsErr ? 'err' : !configured ? 'off' : !signed ? 'warn' : 'on';
+    const gsText = gsErr ? '시트 오류: ' + gsErr : !configured ? '구글 시트 미연결 — 이 기기 기록만 표시' : !signed ? '시트 로그인 필요 — 이 기기 기록만 표시' : (loading ? '시트 읽는 중…' : '구글 시트 · ' + (lib.userEmail() || '연결됨'));
+    return {
+      pendingCount, doneCount, totalCount: records.length, query,
+      gsCls, gsText, gsNeedLogin: !!configured && !signed, gsOn: !!configured && !!signed && !gsErr, gsOff: !configured,
+      signIn: async () => { try { await lib.signIn(true); this.setState({ gsErr: '' }); this.load(false); } catch (e) { this.toast('로그인 실패: ' + e.message); } },
+      reload: () => this.load(false),
+      segPendingCls: filter === 'pending' ? 'on' : '', segDoneCls: filter === 'done' ? 'on' : '', segAllCls: filter === 'all' ? 'on' : '',
+      setPending: () => this.setFilter('pending'), setDone: () => this.setFilter('done'), setAll: () => this.setFilter('all'),
+      onQuery: e => this.setState({ query: e.target.value }, () => { if (!this.visible().some(r => r.id === this.state.selId)) this.autoSelect(); }),
+      items, noItems: items.length === 0, noItemsMsg: records.length === 0 ? (source === 'sheet' ? '시트에 데이터가 없어요.' : '아직 저장된 상담이 없어요.') : query ? '검색 결과가 없어요.' : filter === 'pending' ? '미등록 건이 없어요.' : '해당 건이 없어요.',
+      hasSel: !!sel, noSel: !sel, sel: sel || {}, groups,
+      blankMsg: records.length === 0 ? '상담 업무에서 작성 완료하면 여기에 기록이 쌓여요.' : '왼쪽 목록에서 건을 선택하세요.',
+      copyPayn: () => sel && this.copy(sel.payn, '접수 양식'), copySms: () => sel && this.copy(sel.sms, '안내 문자'), copyTsv: () => sel && this.copy(sel.tsv, '시트 한 줄'),
+      markDone: () => rec && this.setRegistered(rec, true), markUndone: () => rec && this.setRegistered(rec, false), pushNow: () => rec && this.pushNow(rec),
+      remove: () => { if (!rec) return; if (!confirm('이 기기의 상담 기록을 삭제할까요? 되돌릴 수 없어요.')) return; this.persistLocal(this.localRecords().filter(r => r.id !== selId)); this.setState({ selId: null }, () => this.load(false)); },
+      toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
+    };
+  }
+}
+</script>
+</body>
+</html>
