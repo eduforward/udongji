@@ -74,10 +74,11 @@ export function buildSMS(d) {
 // ───────── 구글 시트 연동 ─────────
 const CFG_KEY = 'udongji-gsheet-cfg', TOK_KEY = 'udongji-gtoken';
 // 기본 연결값 (관리자가 설정에서 덤어쓸 수 있음)
-export const DEFAULT_CFG = { clientId: '400925977165-l9e7jj8vkh3t9lu7k32vq2m8jtqgrb26.apps.googleusercontent.com', sheetId: '1FXAdF7g2rlGvPlTdixoDUNogSFe2Q8LlBKmG5pc7k44', tab: '고객목록' };
-const SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email';
-export function getCfg() { try { const saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); const c = Object.assign({}, DEFAULT_CFG); for (const k of ['clientId', 'sheetId', 'tab']) if (saved[k] && String(saved[k]).trim()) c[k] = saved[k]; return c; } catch (e) { return Object.assign({}, DEFAULT_CFG); } }
-export function setCfg(c) { const cur = getCfg(); const next = Object.assign(cur, c); next.sheetId = parseSheetId(next.sheetId); try { localStorage.setItem(CFG_KEY, JSON.stringify(next)); } catch (e) {} return next; }
+export const DEFAULT_CFG = { clientId: '400925977165-l9e7jj8vkh3t9lu7k32vq2m8jtqgrb26.apps.googleusercontent.com', sheetId: '1FXAdF7g2rlGvPlTdixoDUNogSFe2Q8LlBKmG5pc7k44', tab: '고객목록', folderId: '' };
+const SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email';
+export function getCfg() { try { const saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); const c = Object.assign({}, DEFAULT_CFG); for (const k of ['clientId', 'sheetId', 'tab', 'folderId']) if (saved[k] && String(saved[k]).trim()) c[k] = saved[k]; return c; } catch (e) { return Object.assign({}, DEFAULT_CFG); } }
+export function setCfg(c) { const cur = getCfg(); const next = Object.assign(cur, c); next.sheetId = parseSheetId(next.sheetId); next.folderId = parseFolderId(next.folderId); try { localStorage.setItem(CFG_KEY, JSON.stringify(next)); } catch (e) {} return next; }
+export function parseFolderId(s) { const m = /\/folders\/([a-zA-Z0-9-_]+)/.exec(String(s || '')); return m ? m[1] : String(s || '').trim(); }
 export function parseSheetId(s) { const m = /\/d\/([a-zA-Z0-9-_]+)/.exec(String(s || '')); return m ? m[1] : String(s || '').trim(); }
 export function isConfigured() { const c = getCfg(); return !!(c.clientId && c.sheetId && c.tab); }
 export function getToken() { try { const t = JSON.parse(localStorage.getItem(TOK_KEY) || sessionStorage.getItem(TOK_KEY) || 'null'); return t && t.exp > Date.now() ? t : null; } catch (e) { return null; } }
@@ -225,15 +226,19 @@ export function requiredDocs(d) {
 export function parseDocCheck(s) { const o = {}; String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { o[x] = true; }); return o; }
 export function parseDocFiles(s) { try { const j = JSON.parse(s || '[]'); return Array.isArray(j) ? j : []; } catch (e) { return []; } }
 
-// Drive 업로드 (drive.file 스코프: 이 앱이 만든 파일/폴더만 접근)
+// Drive 업로드. 대상 폴더: 설정의 folderId(공유 드라이브/공유 폴더) → 없으면 로그인 계정 "우동지 계약서류"
 const FOLDER_KEY = 'udongji-drive-folder';
+const SD = '&supportsAllDrives=true&includeItemsFromAllDrives=true';
 async function driveApi(path, opt = {}) {
   let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.');
-  const r = await fetch('https://www.googleapis.com/drive/v3' + path, Object.assign({}, opt, { headers: Object.assign({ Authorization: 'Bearer ' + t.access_token }, opt.headers || {}) }));
+  const url = 'https://www.googleapis.com/drive/v3' + path + (path.includes('?') ? SD : '?' + SD.slice(1));
+  const r = await fetch(url, Object.assign({}, opt, { headers: Object.assign({ Authorization: 'Bearer ' + t.access_token }, opt.headers || {}) }));
   if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); }
   return r.json();
 }
 export async function ensureRootFolder() {
+  const cfg = getCfg();
+  if (cfg.folderId) { await driveApi('/files/' + cfg.folderId + '?fields=id,name,trashed').then(f => { if (f.trashed) throw new Error('설정된 서류 폴더가 휴지통에 있어요'); }); return cfg.folderId; }
   let id = ''; try { id = localStorage.getItem(FOLDER_KEY) || ''; } catch (e) {}
   if (id) { try { await driveApi('/files/' + id + '?fields=id,trashed').then(f => { if (f.trashed) throw new Error('trashed'); }); return id; } catch (e) { id = ''; } }
   const q = encodeURIComponent("name='우동지 계약서류' and mimeType='application/vnd.google-apps.folder' and trashed=false");
@@ -243,14 +248,21 @@ export async function ensureRootFolder() {
   try { localStorage.setItem(FOLDER_KEY, id); } catch (e) {}
   return id;
 }
+export function safeName(s) { return String(s || '').replace(/[\/\\:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim(); }
 export async function ensureCustomerFolder(label) {
   const root = await ensureRootFolder();
-  const name = String(label || '이름 없음').replace(/[\/\\:*?"<>|]/g, ' ').trim();
+  const name = safeName(label) || '이름 없음';
   const q = encodeURIComponent("name='" + name.replace(/'/g, "\\'") + "' and '" + root + "' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false");
   const found = await driveApi('/files?q=' + q + '&fields=files(id)');
   if (found.files && found.files.length) return found.files[0].id;
   const f = await driveApi('/files?fields=id', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: [root] }) });
   return f.id;
+}
+// 파일명 규칙: [매장명]_[고객명]_[서류명]_[순번].확장자
+export function docFileName(d, docName, seq, origName) {
+  const ext = (/\.([a-zA-Z0-9]{1,5})$/.exec(origName || '') || [])[1] || 'jpg';
+  const parts = [val(d, '매장명') || '매장', val(d, '고객명') || '고객', docName, String(seq)].map(x => safeName(x).replace(/\s+/g, ''));
+  return parts.join('_') + '.' + ext.toLowerCase();
 }
 export async function uploadFile(file, folderId, name) {
   let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.');
@@ -258,11 +270,12 @@ export async function uploadFile(file, folderId, name) {
   const fd = new FormData();
   fd.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
   fd.append('file', file);
-  const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,size', { method: 'POST', headers: { Authorization: 'Bearer ' + t.access_token }, body: fd });
+  const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,webViewLink,size', { method: 'POST', headers: { Authorization: 'Bearer ' + t.access_token }, body: fd });
   if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); }
   return r.json();
 }
-export async function deleteFile(id) { let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.'); const r = await fetch('https://www.googleapis.com/drive/v3/files/' + id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + t.access_token } }); if (!r.ok && r.status !== 404) throw new Error('HTTP ' + r.status); }
+export async function deleteFile(id) { let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.'); const r = await fetch('https://www.googleapis.com/drive/v3/files/' + id + '?supportsAllDrives=true', { method: 'DELETE', headers: { Authorization: 'Bearer ' + t.access_token } }); if (!r.ok && r.status !== 404) throw new Error('HTTP ' + r.status); }
+export async function folderInfo(id) { return driveApi('/files/' + id + '?fields=id,name,driveId,webViewLink'); }
 
 // 새 스프레드시트 생성 + 헤더 행 작성 + 설정 저장. 리턴: { id, url }
 export async function createSheet(title = '우동지 고객 목록', tab = '고객목록') {

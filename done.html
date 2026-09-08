@@ -89,7 +89,7 @@ class Component extends DCLogic {
   async componentDidMount() {
     let rec = null; try { rec = JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) {}
     if (!rec) { this.setState({ rec: null }); return; }
-    let lib = null; try { lib = await import('./udongji-lib.js?v=9'); } catch (e) {}
+    let lib = null; try { lib = await import('./udongji-lib.js?v=10'); } catch (e) {}
     const sms = lib ? lib.buildSMS(rec.data).text : '';
     this.setState({ lib, rec, sms, sync: rec.synced ? 'ok' : 'wait', row: rec.sheetRow || null });
     if (lib && !rec.synced) this.push(lib, rec);

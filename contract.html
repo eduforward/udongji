@@ -159,7 +159,7 @@
             <label class="btn up">{{ d.upLabel }}<input type="file" multiple accept="image/*,.pdf" onChange="{{ d.upload }}"></label>
           </div>
         </sc-for>
-        <div class="note">파일은 로그인 계정 드라이브의 "우동지 계약서류 / 매장명" 폴더에 올라가요. 업로드하면 자동으로 받음 체크.</div>
+        <div class="note">{{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번</b>으로 자동 정리. 업로드하면 자동으로 받음 체크.</div>
       </div>
 
       <div class="sec">
@@ -183,7 +183,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, folderId: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js?v=9');
+      const lib = await import('./udongji-lib.js?v=10');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
       this.setState({ lib }, () => { this.load(true); lib.ensureRootFolder().then(id => this.setState({ folderId: id })).catch(() => {}); });
@@ -268,8 +268,8 @@ class Component extends DCLogic {
           this.setState({ busy: true });
           try {
             const folder = await lib.ensureCustomerFolder(label);
-            const added = [];
-            for (const file of list2) { const r = await lib.uploadFile(file, folder, x.name + ' — ' + file.name); added.push({ id: r.id, name: file.name, url: r.webViewLink, doc: x.id, at: today }); }
+            const added = []; let seq = myFiles.length;
+            for (const file of list2) { seq++; const nm = lib.docFileName(d, x.name, seq, file.name); const r = await lib.uploadFile(file, folder, nm); added.push({ id: r.id, name: nm, url: r.webViewLink, doc: x.id, at: today }); }
             const n = Object.assign({}, chk, { [x.id]: true });
             await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(fl.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, added.length + '개 파일 업로드 · 받음 체크');
           } catch (er) { this.toast('업로드 실패: ' + er.message); }
@@ -284,6 +284,7 @@ class Component extends DCLogic {
       fActiveCls: filter === 'active' ? 'on' : '', fDocsCls: filter === 'docs' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fAllCls: filter === 'all' ? 'on' : '',
       setActive: setF('active'), setDocs: setF('docs'), setDone: setF('done'), setAll: setF('all'),
       reload: () => this.load(false), folderUrl: folderId ? 'https://drive.google.com/drive/folders/' + folderId : 'https://drive.google.com/',
+      folderNote: (lib && lib.getCfg().folderId) ? '파일은 공용 서류 폴더의 "매장명" 하위 폴더에 올라가요.' : '공용 폴더가 아직 설정되지 않아 로그인 계정 드라이브 "우동지 계약서류 / 매장명"에 올라가요. 홈 → 설정에서 공용 폴더 URL을 넣으세요.',
       cntCls: err ? 'err' : '', cntText: err ? '시트 오류: ' + err : loading ? '시트 읽는 중…' : list.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '시트를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, close: () => this.setState({ selRow: null }),

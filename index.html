@@ -166,6 +166,7 @@
       <div class="wide"><label>OAuth 클라이언트 ID</label><input type="text" value="{{ cfg.clientId }}" onInput="{{ onClientId }}"></div>
       <div class="wide"><label>구글 시트 URL (또는 ID)</label><input type="text" value="{{ cfg.sheetId }}" onInput="{{ onSheetId }}"></div>
       <div><label>탭 이름</label><input type="text" value="{{ cfg.tab }}" onInput="{{ onTab }}"></div>
+      <div class="wide"><label>서류 저장 폴더 URL (공유 드라이브 또는 공유 폴더 — 비우면 각자 드라이브)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" style="flex:1 1 260px" placeholder="https://drive.google.com/drive/folders/…" value="{{ cfg.folderId }}" onInput="{{ onFolder }}"><button type="button" class="btn ghost" onClick="{{ testFolder }}">폴더 확인</button></div></div>
       <div style="display:flex;align-items:flex-end"><button type="button" class="btn ghost" onClick="{{ saveCfg }}">설정 저장</button></div>
     </div>
     <div class="msg {{ msgCls }}">{{ msg }}</div>
@@ -178,6 +179,7 @@
           <li>클라이언트 → 웹 애플리케이션 → 승인된 JavaScript 원본에 <code>{{ origin }}</code> → 클라이언트 ID를 위에 입력.</li>
           <li>고객 목록 시트 URL·탭 이름 입력 → 설정 저장 → 로그인 → <b>연결 확인</b>(빈 시트면 헤더 자동 세팅).</li>
           <li>시트 공유 → 상담자 이메일에 <b>편집자</b> 권한. 이 권한이 있는 계정만 데이터를 볼 수 있어요.</li>
+          <li>서류 폴더: 공용 계정 드라이브에서 <b>공유 드라이브</b>(또는 폴더)를 만들고 상담자들을 <b>콘텐츠 관리자</b>로 추가 → 그 URL을 위에 넣고 <b>폴더 확인</b> → 설정 저장. 이 값은 이 브라우저에만 저장되니 각 상담자 기기에서 한 번씩 넣거나, 제게 알려주면 코드 기본값으로 넣어드려요.</li>
         </ol>
         <p style="margin-top:8px">기본 연결값은 코드에 내장돼 있어 상담자는 로그인만 하면 됩니다. 여기서 바꾼 값은 이 브라우저에만 저장돼요.</p>
       </div>
@@ -190,7 +192,7 @@
 class Component extends DCLogic {
   state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false, showAdmin: false, sheetErr: '' };
   async componentDidMount() {
-    try { const lib = await import('./udongji-lib.js?v=9'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-lib.js?v=10'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
     this._tick = setInterval(() => { const lib = this.state.lib; if (lib && this.state.signedIn !== lib.isSignedIn()) this.setState({ signedIn: lib.isSignedIn(), email: lib.userEmail() }); }, 15000);
   }
@@ -240,7 +242,8 @@ class Component extends DCLogic {
       cfg, statusCls, statusText, msg, msgCls, origin: location.origin,
       sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
       showAdmin, adminLabel: showAdmin ? '설정 닫기' : '설정', toggleAdmin: () => this.setState({ showAdmin: !showAdmin, msg: '', msgCls: '' }),
-      onClientId: setC('clientId'), onSheetId: setC('sheetId'), onTab: setC('tab'),
+      onClientId: setC('clientId'), onSheetId: setC('sheetId'), onTab: setC('tab'), onFolder: setC('folderId'),
+      testFolder: async () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); if (!c.folderId) { this.setState({ cfg: c, msg: '폴더 URL이 비어 있어요 — 각자 드라이브에 저장됩니다.', msgCls: '' }); return; } try { const f = await lib.folderInfo(c.folderId); this.setState({ cfg: c, msg: '폴더 확인: "' + f.name + '"' + (f.driveId ? ' (공유 드라이브)' : ' (개인 드라이브 공유 폴더)') + ' — 이 계정으로 접근 가능해요.', msgCls: 'ok' }); } catch (e) { fail('폴더 확인 실패: ', e); } },
       saveCfg: () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); this.setState({ cfg: c, msg: '설정을 저장했어요.', msgCls: 'ok' }); this.load(); },
       resetCfg: () => { if (!lib) return; try { localStorage.removeItem('udongji-gsheet-cfg'); } catch (e) {} this.setState({ cfg: lib.getCfg(), msg: '기본 연결값으로 되돌렸어요.', msgCls: 'ok' }); this.load(); },
       signIn: async () => { if (!lib) return; this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); this.setState({ signedIn: true, email: tok.email, busy: false, msg: '', msgCls: '' }); await this.load(); } catch (e) { fail('로그인 실패: ', e); } },
