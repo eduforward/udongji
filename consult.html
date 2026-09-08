@@ -488,7 +488,12 @@ class Component extends DCLogic {
   componentDidMount() {
     var o = document.getElementById('overlay'); if (o) o.hidden = true;
     var m = document.getElementById('missing'); if (m) m.hidden = true;
-    import('./udongji-lib.js').then(mod => { this.lib = mod; this.boot(); }, () => this.boot());
+    import('./udongji-lib.js').then(async mod => {
+      this.lib = mod;
+      if (!mod.isConfigured()) { location.replace('index.html#gsheet'); return; }
+      if (!mod.isSignedIn()) { await mod.ensureSignedIn(); if (!mod.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
+      this.boot();
+    }, () => { location.replace('index.html#gsheet'); });
   }
   boot() {
     var page = document.querySelector('.page'); if (!page || page.dataset.booted) return; page.dataset.booted = '1';

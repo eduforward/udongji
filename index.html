@@ -43,6 +43,10 @@
     .pill.draft { background: var(--amber-2); border-color: transparent; color: var(--amber); }
     .pill.blue { background: var(--blue-2); border-color: transparent; color: var(--blue); }
     a.task .go { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--blue); }
+    .grid.locked a.task { pointer-events: none; opacity: .45; filter: grayscale(.4); }
+    .gate { display: flex; flex-direction: column; gap: 4px; background: var(--amber-2); border: 1px solid #F0D9A6; color: #7A4F0E; border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; font-size: 14px; line-height: 1.55; }
+    .gate b { font-size: 15px; font-weight: 700; }
+    .card.hi { border: 2px solid var(--blue); box-shadow: 0 0 0 4px var(--blue-2), var(--shadow); }
     .card { margin-top: 20px; background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 24px 20px; }
     .card h3 { font-size: 13px; font-weight: 700; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
     .recent { padding-bottom: 8px; }
@@ -87,7 +91,10 @@
 </helmet>
 <div class="wrap">
   <div class="top"><div class="mark">우</div><div><h1>우동지 업무 홈</h1><div class="sub">커넥트 상담 → 페이앤 등록</div></div><div class="date">{{ today }}</div></div>
-  <div class="grid">
+  <sc-if value="{{ locked }}" hint-placeholder-val="{{ false }}">
+    <div class="gate"><b>구글 시트를 먼저 연결해야 업무를 시작할 수 있어요.</b><span>아래에서 설정 저장 → 구글 계정으로 로그인하면 상담·등록 업무가 열립니다. 모든 상담 기록은 공용 시트에만 저장돼요.</span></div>
+  </sc-if>
+  <div class="grid {{ gridCls }}">
     <a class="task consult" href="consult.html">
       <div class="ic">☎</div>
       <div><h2>상담 업무</h2><p>스크립트 보면서 통화하고, 답변을 바로 기록. 끝나면 시트 한 줄·안내 문자·접수 양식이 나와요.</p></div>
@@ -100,7 +107,7 @@
     </a>
   </div>
 
-  <div class="card" id="gsheet">
+  <div class="card {{ cardCls }}" id="gsheet">
     <div class="gs-head"><h3>구글 시트 연결</h3><span class="status {{ statusCls }}">{{ statusText }}</span>
       <div class="acts">
         <sc-if value="{{ canSignIn }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ signIn }}">구글 계정으로 로그인</button></sc-if>
@@ -131,6 +138,7 @@
     </details>
   </div>
 
+  <sc-if value="{{ unlocked }}" hint-placeholder-val="{{ false }}">
   <div class="card recent">
     <h3>최근 상담 <span style="font-weight:500;text-transform:none;letter-spacing:0">· {{ sourceLabel }}</span></h3>
     <sc-for list="{{ recent }}" as="r" hint-placeholder-count="0">
@@ -138,6 +146,7 @@
     </sc-for>
     <sc-if value="{{ noRecent }}" hint-placeholder-val="{{ false }}"><div class="empty">아직 완료된 상담이 없어요. 상담 업무에서 작성 완료하면 여기에 쌓여요.</div></sc-if>
   </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -145,22 +154,23 @@ class Component extends DCLogic {
   state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false };
   async componentDidMount() {
     try { const lib = await import('./udongji-lib.js'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => this.load()); } catch (e) { this.load(); }
+    this._tick = setInterval(() => { const lib = this.state.lib; if (lib && this.state.signedIn !== lib.isSignedIn()) this.setState({ signedIn: lib.isSignedIn(), email: lib.userEmail() }); }, 15000);
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
   }
-  componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); }
+  componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); clearInterval(this._tick); }
   async load() {
     const lib = this.state.lib; let local = [], draft = null;
     try { local = JSON.parse(localStorage.getItem('udongji-records-v1') || '[]') || []; } catch (e) {}
     try { draft = JSON.parse(localStorage.getItem('udongji-script-draft-v1') || 'null'); } catch (e) {}
-    if (lib && lib.isConfigured() && lib.isSignedIn()) {
+    if (!(lib && lib.isConfigured() && lib.isSignedIn())) { this.setState({ records: [], draft, source: 'local', signedIn: lib ? lib.isSignedIn() : false }); return; }
+    {
       try {
         const { items } = await lib.readAll();
         const recs = items.map(it => ({ id: it.data[lib.ID_COL] || ('row' + it.row), row: it.row, data: it.data, registered: !!String(it.data[lib.REG_COL] || '').trim(), savedAt: it.data['상담일'] || '' })).reverse();
         const pend = local.filter(r => r.synced === false).map(r => Object.assign({}, r, { unsent: true }));
         this.setState({ records: pend.concat(recs), draft, source: 'sheet', signedIn: true, email: lib.userEmail() }); return;
-      } catch (e) { this.setState({ msg: '시트 읽기 실패: ' + e.message, msgCls: 'err', signedIn: lib.isSignedIn() }); }
+      } catch (e) { this.setState({ records: [], draft, source: 'local', msg: '시트 읽기 실패: ' + e.message, msgCls: 'err', signedIn: lib.isSignedIn() }); }
     }
-    this.setState({ records: local, draft, source: 'local', signedIn: lib ? lib.isSignedIn() : false });
   }
   renderVals() {
     const { lib, records, draft, cfg, signedIn, email, msg, msgCls, source, busy } = this.state;
@@ -179,7 +189,9 @@ class Component extends DCLogic {
     const statusCls = !configured ? 'off' : signedIn ? 'on' : 'warn';
     const statusText = !configured ? '미설정' : signedIn ? '연결됨 · ' + (email || '로그인됨') : '로그인 필요';
     const setC = (k) => e => this.setState({ cfg: Object.assign({}, this.state.cfg, { [k]: e.target.value }) });
+    const unlocked = configured && signedIn;
     return {
+      locked: !unlocked, unlocked, gridCls: unlocked ? '' : 'locked', cardCls: unlocked ? '' : 'hi',
       today: `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())}`,
       todayCount: records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr).length,
       totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0,

@@ -174,7 +174,12 @@ class Component extends DCLogic {
     ['메모·진행', ['특이사항','기타 상담 내용','상담 결과','상태','다음 액션 · 일시','상담일','상담자']]
   ];
   async componentDidMount() {
-    try { const lib = await import('./udongji-lib.js'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib }, () => this.load(true)); } catch (e) { this.load(true); }
+    try {
+      const lib = await import('./udongji-lib.js');
+      if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
+      if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
+      this.setState({ lib }, () => this.load(true));
+    } catch (e) { location.replace('index.html#gsheet'); }
     this._on = () => this.load(false); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
     this._hash = () => { const id = location.hash.slice(1); if (id) this.setState({ selId: id, filter: 'all' }); }; window.addEventListener('hashchange', this._hash);
   }
