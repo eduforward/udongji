@@ -124,15 +124,31 @@ async function api(path, opt = {}) {
 }
 function colLetter(n) { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
 export async function getHeader() { const cfg = getCfg(); const res = await api('/values/' + q(cfg.tab + '!1:1')); return ((res.values || [[]])[0] || []).map(h => String(h)); }
-// 헤더가 비어 있으면 전체 열 이름으로 첫 행을 채운다. 이미 있으면 건드리지 않고 반환.
-export async function initHeaderIfEmpty() {
+export const FULL_HEADER = () => COLS.map(c => c.name).concat([ID_COL, REG_COL]);
+// 헤더 보증: 바른 헤더가 있으면 그대로(무는 열만 덧붙임), 본문 열이 하나도 없으면(빈 시트 / ID·등록만 있는 시트) 전체 헤더로 교체
+export async function ensureHeader() {
   const cfg = getCfg(); const h = await getHeader();
-  if (h.some(x => x.trim())) return { created: false, header: h };
-  const header = COLS.map(c => c.name).concat([ID_COL, REG_COL]);
-  await api('/values/' + q(cfg.tab + '!1:1') + '?valueInputOption=RAW', { method: 'PUT', body: JSON.stringify({ range: cfg.tab + '!1:1', majorDimension: 'ROWS', values: [header] }) });
-  try { const meta = await api('?fields=sheets.properties'); const sh = (meta.sheets || []).find(s => s.properties && s.properties.title === cfg.tab); if (sh) await api(':batchUpdate', { method: 'POST', body: JSON.stringify({ requests: [{ updateSheetProperties: { properties: { sheetId: sh.properties.sheetId, gridProperties: { frozenRowCount: 1, frozenColumnCount: 2 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' } }, { repeatCell: { range: { sheetId: sh.properties.sheetId, startRowIndex: 0, endRowIndex: 1 }, cell: { userEnteredFormat: { textFormat: { bold: true }, backgroundColor: { red: 0.93, green: 0.95, blue: 1 } } }, fields: 'userEnteredFormat(textFormat,backgroundColor)' } }] }) }); } catch (e) {}
-  return { created: true, header };
+  const hasBody = h.some(x => { const k = colOf(x); return k && k.name !== '고객번호'; });
+  if (!hasBody) {
+    const header = FULL_HEADER();
+    await api('/values/' + q(cfg.tab + '!1:1') + '?valueInputOption=RAW', { method: 'PUT', body: JSON.stringify({ range: cfg.tab + '!1:1', majorDimension: 'ROWS', values: [header] }) });
+    // 기존에 ID·등록만 있던 헤더로 들어간 행들을 새 열 위치로 이동
+    if (h.length) {
+      const res = await api('/values/' + q(cfg.tab) + '?majorDimension=ROWS'); const rows = res.values || [];
+      const fixed = [];
+      for (let i = 1; i < rows.length; i++) { const r = rows[i] || []; const d = {}; h.forEach((name, j) => { d[keyOf(name)] = r[j] == null ? '' : r[j]; }); fixed.push(header.map(name => d[keyOf(name)] || '')); }
+      if (fixed.length) await api('/values/' + q(cfg.tab + '!A2') + '?valueInputOption=USER_ENTERED', { method: 'PUT', body: JSON.stringify({ values: fixed }) });
+    }
+    try { await styleHeader(); } catch (e) {}
+    return header;
+  }
+  return ensureColumns(h, [ID_COL, REG_COL]);
 }
+async function styleHeader() {
+  const cfg = getCfg(); const meta = await api('?fields=sheets.properties'); const sh = (meta.sheets || []).find(s => s.properties && s.properties.title === cfg.tab); if (!sh) return;
+  await api(':batchUpdate', { method: 'POST', body: JSON.stringify({ requests: [{ updateSheetProperties: { properties: { sheetId: sh.properties.sheetId, gridProperties: { frozenRowCount: 1, frozenColumnCount: 2 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' } }, { repeatCell: { range: { sheetId: sh.properties.sheetId, startRowIndex: 0, endRowIndex: 1 }, cell: { userEnteredFormat: { textFormat: { bold: true }, backgroundColor: { red: 0.93, green: 0.95, blue: 1 } } }, fields: 'userEnteredFormat(textFormat,backgroundColor)' } }] }) });
+}
+export async function initHeaderIfEmpty() { const before = await getHeader(); const header = await ensureHeader(); return { created: !before.some(x => colOf(x) && colOf(x).name !== '고객번호'), header }; }
 export async function listTabs() { const meta = await api('?fields=sheets.properties.title'); return (meta.sheets || []).map(s => s.properties.title); }
 export async function ensureColumns(header, names) {
   const cfg = getCfg(); const missing = names.filter(n => !header.some(h => norm(h) === norm(n))); if (!missing.length) return header;
@@ -148,13 +164,13 @@ export async function readAll() {
   return { header, items };
 }
 export async function appendRecord(d, id) {
-  const cfg = getCfg(); let header = await getHeader(); header = await ensureColumns(header, [ID_COL, REG_COL]);
+  const cfg = getCfg(); const header = await ensureHeader();
   const res = await api('/values/' + q(cfg.tab + '!A1') + ':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS', { method: 'POST', body: JSON.stringify({ values: [rowFor(header, d, { [ID_COL]: id })] }) });
   const m = /![A-Z]+(\d+)(?::|$)/.exec((res.updates && res.updates.updatedRange) || ''); return m ? Number(m[1]) : null;
 }
 export async function findRowById(id) { const { items } = await readAll(); const it = items.find(x => x.data[ID_COL] === id); return it ? it.row : null; }
 export async function updateRecord(row, d, id) {
-  const cfg = getCfg(); let header = await getHeader(); header = await ensureColumns(header, [ID_COL, REG_COL]);
+  const cfg = getCfg(); const header = await ensureHeader();
   const regIdx = header.findIndex(h => norm(h) === norm(REG_COL));
   const cur = await api('/values/' + q(cfg.tab + '!' + colLetter(regIdx + 1) + row)).catch(() => ({}));
   const reg = cur.values && cur.values[0] ? cur.values[0][0] : '';
