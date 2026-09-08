@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=7"></script>
+  <script src="./udongji-nav.js?v=8"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -34,6 +34,7 @@
     .btn:disabled { opacity: .45; cursor: default; }
     .cnt { font-size: 12.5px; color: var(--text-3); margin-left: auto; white-space: nowrap; } .cnt.err { color: var(--red); font-weight: 600; }
     .status { font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: var(--green-2); color: var(--green); }
+    .status.off { background: var(--amber-2); color: var(--amber); }
     /* 계정 관리 카드 */
     .card { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px 24px; }
     .card h3 { font-size: 13px; font-weight: 700; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; }
@@ -70,11 +71,11 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="admin" page-v="30"></udongji-nav>
+<udongji-nav current="admin" page-v="31"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><span class="mark">!</span><div><b>슈퍼관리자</b><small>{{ email }}</small></div></div>
-    <div class="seg"><button type="button" class="{{ tabUsersCls }}" onClick="{{ showUsers }}">계정 관리</button><button type="button" class="{{ tabLogCls }}" onClick="{{ showLog }}">삭제 로그</button></div>
+    <div class="seg"><button type="button" class="{{ tabUsersCls }}" onClick="{{ showUsers }}">계정 관리</button><button type="button" class="{{ tabLogCls }}" onClick="{{ showLog }}">삭제 로그</button><button type="button" class="{{ tabNlCls }}" onClick="{{ showNl }}">뉴스레터 연동</button></div>
     <sc-if value="{{ isLog }}" hint-placeholder-val="{{ false }}"><input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 · 삭제한 사람 검색" value="{{ query }}" onInput="{{ onQuery }}"></sc-if>
     <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
     <span class="cnt {{ cntCls }}">{{ cntText }}</span>
@@ -123,15 +124,39 @@
     <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}"><div class="empty">{{ emptyMsg }}</div></sc-if>
   </div>
   </sc-if>
+  <sc-if value="{{ isNl }}" hint-placeholder-val="{{ false }}">
+  <div class="card">
+    <div class="gs-head"><h3>스티비 뉴스레터 연동</h3><span class="status {{ nlStatusCls }}">{{ nlStatus }}</span></div>
+    <p class="hint">커넥트 <b>수령 완료</b> 처리 시 고객 이름·이메일을 구글 시트(Apps Script 웹훅)에 넣고, 스티비가 그 시트를 읽어 0일차부터 뉴스레터를 보내요. 이메일이 없거나 수신 동의가 X면 보내지 않아요.</p>
+    <div class="frm" style="flex-direction:column;align-items:stretch">
+      <input type="url" placeholder="Apps Script 웹앱 URL (https://script.google.com/macros/s/…/exec)" value="{{ nlUrl }}" onInput="{{ onNlUrl }}">
+      <input type="text" placeholder="시크릿 (Apps Script의 SECRET 값과 동일)" value="{{ nlSecret }}" onInput="{{ onNlSecret }}">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13.5px"><input type="checkbox" checked="{{ nlEnabled }}" onChange="{{ onNlEnabled }}">연동 켜기</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn primary" onClick="{{ saveNl }}" disabled="{{ busy }}">저장</button><button type="button" class="btn" onClick="{{ testNl }}" disabled="{{ busy }}">테스트 전송</button></div>
+    </div>
+    <div class="msg {{ msgCls }}">{{ msg }}</div>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>시각</th><th>처리한 사람</th><th>고객 · 이메일</th><th>매장</th><th>결과</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ nlRows }}" as="r" hint-placeholder-count="0">
+          <tr><td class="when">{{ r.when }}</td><td class="who">{{ r.by }}</td><td>{{ r.who }}</td><td>{{ r.store }}</td><td><span class="pill {{ r.cls }}">{{ r.st }}</span></td></tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <sc-if value="{{ noNlRows }}" hint-placeholder-val="{{ false }}"><div class="empty">아직 전송 기록이 없어요.</div></sc-if>
+  </div>
+  </sc-if>
   <div class="{{ toastCls }}">{{ toastMsg }}</div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, tab: location.hash === '#log' ? 'log' : 'users', logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
+  state = { lib: null, tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : 'users', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=3'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=4'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const email = lib.userEmail(); const ok = await lib.isAdmin(email);
       this.setState({ lib, ok, denied: !ok, email, loading: ok }, () => { if (ok) this.load(); });
@@ -143,7 +168,8 @@ class Component extends DCLogic {
     try {
       const [admins, users, all] = await Promise.all([lib.listAdmins(), lib.listUsers(), lib.readAll()]);
       let logs = []; try { logs = await lib.listDeleted(); } catch (e) { this.setState({ err: '삭제 로그: ' + e.message }); }
-      this.setState({ admins, users, records: all.items, logs, loading: false });
+      let nlCfg = {}, nlLog = []; try { nlCfg = await lib.getNewsletterConfig(true); } catch (e) {} try { nlLog = await lib.listNewsletterLog(); } catch (e) {}
+      this.setState({ admins, users, records: all.items, logs, nlCfg, nlLog, nlUrl: nlCfg.url || 'https://script.google.com/macros/s/AKfycbzYuxZuF9Wrd4BBLPtK2UFiuVbCP94Ydr5nmhLzk5OMysh-PMnefofxSW5CaHchWmfn/exec', nlSecret: nlCfg.secret || '', nlEnabled: nlCfg.enabled !== false, loading: false });
     } catch (e) { this.setState({ loading: false, err: e.message }); }
   }
   toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
@@ -167,10 +193,17 @@ class Component extends DCLogic {
         remove: async () => { if (!confirm(u.email + ' 을(를) 사용자에서 제거할까요? 이후 로그인해도 데이터가 보이지 않아요.')) return; try { await lib.removeUser(u.email); this.say('제거했어요.', 'ok'); this.load(); } catch (e) { this.say('제거 실패: ' + e.message, 'err'); } } })));
     const adminRows = ROOT.map(e => ({ email: e, meta: '기본 관리자', removable: false, remove: () => {} })).concat(admins.map(a => ({ email: a.email, meta: (a.at ? a.at + ' 위임' : '') + (a.by ? ' · ' + a.by : ''), removable: true,
       remove: async () => { if (!confirm(a.email + ' 의 관리자 권한을 해제할까요?')) return; try { await lib.removeAdmin(a.email); this.say('해제했어요.', 'ok'); this.load(); } catch (e) { this.say('해제 실패: ' + e.message, 'err'); } } })));
-    const setTab = t => () => { this.setState({ tab: t, msg: '' }); try { history.replaceState(null, '', t === 'log' ? '#log' : '#'); } catch (e) {} };
-    const isLog = tab === 'log';
+    const setTab = t => () => { this.setState({ tab: t, msg: '' }); try { history.replaceState(null, '', t === 'log' ? '#log' : t === 'nl' ? '#newsletter' : '#'); } catch (e) {} };
+    const isLog = tab === 'log', isNl = tab === 'nl';
+    const { nlCfg, nlLog, nlUrl, nlSecret, nlEnabled } = this.state;
+    const nlRows = nlLog.map(L => ({ when: fmt(L.at), by: L.by || '', who: [L.name, L.email].filter(Boolean).join(' · '), store: L.store || '', st: L.status === 'sent' ? '전송' : L.status === 'skip' ? '건너뜀 · ' + (L.detail || '') : '실패 · ' + (L.detail || ''), cls: L.status === 'sent' ? 'ok' : L.status === 'skip' ? '' : '' }));
+    const nlReady = !!(nlCfg.url && nlCfg.secret) && nlCfg.enabled !== false;
     return {
-      email, ok, denied, isLog, isUsers: !isLog, tabUsersCls: isLog ? '' : 'on', tabLogCls: isLog ? 'on' : '', showUsers: setTab('users'), showLog: setTab('log'),
+      email, ok, denied, isLog, isNl, isUsers: !isLog && !isNl, tabUsersCls: !isLog && !isNl ? 'on' : '', tabLogCls: isLog ? 'on' : '', tabNlCls: isNl ? 'on' : '', showUsers: setTab('users'), showLog: setTab('log'), showNl: setTab('nl'),
+      nlUrl, nlSecret, nlEnabled, onNlUrl: e => this.setState({ nlUrl: e.target.value }), onNlSecret: e => this.setState({ nlSecret: e.target.value }), onNlEnabled: e => this.setState({ nlEnabled: e.target.checked }),
+      nlStatus: nlReady ? '연동 중' : nlCfg.url ? '꺼짐' : '미설정', nlStatusCls: nlReady ? '' : 'off', nlRows, noNlRows: nlRows.length === 0,
+      saveNl: async () => { if (!lib) return; const u = nlUrl.trim(); if (u && !/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(u)) { this.say('Apps Script 웹앱 URL 형식이 아니에요 (…/exec 로 끝나야 함)', 'err'); return; } this.setState({ busy: true }); try { await lib.setNewsletterConfig({ url: u, secret: nlSecret.trim(), enabled: nlEnabled }); this.say('저장했어요.', 'ok'); await this.load(); } catch (e) { this.say('저장 실패: ' + e.message, 'err'); } this.setState({ busy: false }); },
+      testNl: async () => { if (!lib) return; const u = nlUrl.trim(); if (!u) { this.say('URL을 먼저 입력하세요', 'err'); return; } this.setState({ busy: true }); try { await fetch(u, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ secret: nlSecret.trim(), name: '테스트', email: 'test+' + Date.now() + '@udongji.test', store: '테스트 매장', at: lib.todayStr(), id: 'test' }) }); this.say('테스트를 보냈어요. 구글 시트에 "테스트" 행이 추가됐는지 확인하세요 (안 됐으면 URL·시크릿·배포 권한 확인).', 'ok'); } catch (e) { this.say('전송 실패: ' + e.message, 'err'); } this.setState({ busy: false }); },
       query, onQuery: e => this.setState({ query: e.target.value }), reload: () => this.load(),
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : isLog ? rows.length + '건' : users.length + '명 · 고객 ' + records.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '로그를 읽지 못했어요. Firestore 규칙(deleted)을 배포했는지 확인하세요.' : '삭제된 기록이 없어요.',

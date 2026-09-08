@@ -77,8 +77,9 @@ export const STAGES = [
   { key: 'docs', label: '수취자료' },
   { key: 'handoff', label: '페이앤 이관' },
   { key: 'sign', label: '전자서명 완료' },
-  { key: 'install', label: '커넥트 설치 완료' }
+  { key: 'install', label: '커넥트 수령 완료' }
 ];
+export const NEWSLETTER_COL = '뉴스레터 등록일';
 // 고객 조건에 따라 필요 서류 목록
 export function requiredDocs(d) {
   const v = k => val(d, k), corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동', isNew = v('매장 구분') === '신규 오픈', isOld = v('매장 구분') === '기존 운영';
@@ -252,6 +253,28 @@ export async function uploadFile(blob, folder, name) {
   return { id: path, name, webViewLink: url, size: blob.size };
 }
 export async function deleteFile(id) { await init(); need(); const { st } = _mods; try { await st.deleteObject(st.ref(_st, id)); } catch (e) { if (!/not-found/.test(String(e && e.code))) throw e; } }
+// ── 뉴스레터(스티비) 연동: config/newsletter {url, secret, enabled} — 관리자만 읽기/쓰기, 전송 로그는 newsletter_log ──
+let _nlCfg = null;
+export async function getNewsletterConfig(force) { await init(); if (_nlCfg && !force) return _nlCfg; const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'config', 'newsletter')); _nlCfg = s.exists() ? s.data() : {}; } catch (e) { _nlCfg = {}; } return _nlCfg; }
+export async function setNewsletterConfig(cfg) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, 'config', 'newsletter'), Object.assign({}, cfg, { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true }); _nlCfg = null; }
+export async function listNewsletterLog() { await init(); need(); const { fs } = _mods; const s = await fs.getDocs(fs.query(fs.collection(_db, 'newsletter_log'), fs.orderBy('at', 'desc'), fs.limit(200))); return s.docs.map(d => Object.assign({ logId: d.id }, d.data())); }
+// 수령 완료 시 호출. 반환: {ok, skipped?, reason?}
+export async function notifyNewsletter(id, d, opts) {
+  await init(); need(); const { fs } = _mods; opts = opts || {};
+  const cfg = await getNewsletterConfig(); const name = val(d, '고객명'), email = val(d, '이메일').toLowerCase(), store = val(d, '매장명');
+  const logIt = async (status, detail) => { try { await fs.addDoc(fs.collection(_db, 'newsletter_log'), { at: new Date().toISOString(), by: userEmail(), recordId: id, name, email, store, status, detail: detail || '' }); } catch (e) {} };
+  if (!cfg.url || !cfg.secret) { return { ok: false, skipped: true, reason: '연동 미설정 (관리자 > 연동 설정)' }; }
+  if (cfg.enabled === false) return { ok: false, skipped: true, reason: '연동 꺼짐' };
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { await logIt('skip', '이메일 없음'); return { ok: false, skipped: true, reason: '이메일 없음' }; }
+  if (val(d, '우동지 수신 동의') === 'X') { await logIt('skip', '수신 동의 X'); return { ok: false, skipped: true, reason: '수신 동의 X' }; }
+  if (!opts.force && String(d[NEWSLETTER_COL] || '').trim()) return { ok: true, skipped: true, reason: '이미 등록됨 ' + d[NEWSLETTER_COL] };
+  try {
+    // Apps Script 웹앱은 CORS 헤더를 안 주므로 text/plain + no-cors로 보내고, 응답은 읽지 않는다 (발사 후 망각). 실패는 네트워크 오류만 감지.
+    await fetch(cfg.url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ secret: cfg.secret, name, email, store, at: todayStr(), id }) });
+    await updateCells(id, { [NEWSLETTER_COL]: todayStr() }); d[NEWSLETTER_COL] = todayStr();
+    await logIt('sent'); return { ok: true };
+  } catch (e) { await logIt('fail', e.message); return { ok: false, reason: e.message }; }
+}
 export function storageConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/storage'; }
 export function firestoreConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/firestore'; }
 
