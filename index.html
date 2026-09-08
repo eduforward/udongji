@@ -128,7 +128,7 @@
     <a class="task consult" href="consult.html">
       <div class="ic">☎</div>
       <div><h2>상담 업무</h2><p>스크립트 보면서 통화하고, 답변을 바로 기록. 끝나면 저장되고 안내 문자가 나와요.</p></div>
-      <div class="foot"><sc-if value="{{ hasDraft }}" hint-placeholder-val="{{ false }}"><span class="pill draft">작성 중 · {{ draftName }}</span></sc-if><span class="pill">오늘 {{ todayCount }}건</span><span class="pill purple">나의 진행 중 {{ myConsult }}건</span><span class="pill">총 진행 중 {{ allConsult }}건</span><span class="go">시작 →</span></div>
+      <div class="foot"><sc-if value="{{ hasDraft }}" hint-placeholder-val="{{ false }}"><span class="pill draft">작성 중 · {{ draftName }}</span></sc-if><span class="pill purple">나의 오늘 {{ myToday }}건</span><span class="pill">총 오늘 {{ todayCount }}건</span><span class="go">시작 →</span></div>
     </a>
     <a class="task recall" href="recall.html">
       <div class="ic">↻</div>
@@ -202,9 +202,8 @@ class Component extends DCLogic {
     const inProgress = prog.length;
     const mine = r => !!myName && String((r.data || {})['상담자'] || '').trim() === myName;
     const myProgress = prog.filter(mine).length, myCall = recalls.filter(mine).length;
-    // 상담 진행 중 = 서류 수치 전 단계(상담 결과가 진행이고 아직 수치 미완료)
-    const consulting = goRecs.filter(r => !String((r.data || {})['수치 완료일'] || '').trim() && !String((r.data || {})['설치일'] || '').trim());
-    const allConsult = consulting.length, myConsult = consulting.filter(mine).length;
+    const todayRecs = records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr);
+    const myToday = todayRecs.filter(mine).length;
     const docsWait = goRecs.filter(r => { const d = r.data || {}; return !String(d['수취 완료일'] || '').trim() && !String(d['설치일'] || '').trim(); }).length;
     const hasDraft = !!draft && Object.keys(draft).some(k => k !== '상담일' && k !== '상담자' && k[0] !== '_' && String(draft[k] || '').trim());
     const recent = records.slice(0, 6).map(r => {
@@ -219,8 +218,8 @@ class Component extends DCLogic {
     const deniedMsg = signedIn && !allowed && !msg;
     return {
       today: `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())}`,
-      todayCount: records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr).length,
-      totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0, dueCount, hasDue: dueCount > 0, inProgress, myProgress, myCall, allConsult, myConsult, docsWait, hasDocsWait: docsWait > 0,
+      todayCount: todayRecs.length, myToday,
+      totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0, dueCount, hasDue: dueCount > 0, inProgress, myProgress, myCall, docsWait, hasDocsWait: docsWait > 0,
       hasDraft, draftName: hasDraft ? (draft['매장명'] || draft['고객명'] || '이름 미입력') : '',
       recent, noRecent: recent.length === 0, sourceLabel: '회사 서버',
       locked: !unlocked, unlocked, signedIn, gridCls: unlocked ? '' : 'locked', busy, hasMsg: !!msg || deniedMsg,
