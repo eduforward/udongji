@@ -80,6 +80,22 @@
     .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 30; }
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
     .scrim { position: fixed; inset: 0; background: rgba(23,28,43,.25); z-index: 19; }
+    /* 서류 행 */
+    .drow { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 8px 22px; border-top: 1px solid var(--line-2); }
+    .drow .n { font-size: 14px; font-weight: 600; } .drow .h { font-size: 12px; color: var(--text-3); }
+    .drow .n.on::before { content: '✓ '; color: var(--green); }
+    .drow .none .n { color: var(--text-3); font-weight: 400; }
+    .up { position: relative; overflow: hidden; }
+    .up input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    /* 뷰어 */
+    .vscrim { position: fixed; inset: 0; background: rgba(15,18,28,.82); z-index: 40; display: flex; flex-direction: column; }
+    .vhead { display: flex; align-items: center; gap: 10px; padding: 12px 18px; color: #fff; font-size: 14px; font-weight: 700; }
+    .vhead .x { margin-left: auto; font: inherit; font-size: 20px; width: 36px; height: 36px; border-radius: 9px; border: 1px solid rgba(255,255,255,.25); background: transparent; color: #fff; cursor: pointer; }
+    .vhead .btn { background: transparent; color: #fff; border-color: rgba(255,255,255,.3); }
+    .vbody { flex: 1; overflow: auto; padding: 0 18px 24px; display: grid; gap: 18px; justify-items: center; align-content: start; }
+    .vimg { max-width: min(1000px, 100%); max-height: 85vh; border-radius: 8px; background: #fff; }
+    .vcap { color: rgba(255,255,255,.75); font-size: 12.5px; text-align: center; margin-top: -10px; display: flex; gap: 10px; align-items: center; }
+    .vcap a { color: #fff; } .vcap button { border: 0; background: transparent; color: #FF8A94; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
   </style>
 </helmet>
 <udongji-nav current="customers"></udongji-nav>
@@ -146,6 +162,13 @@
       </sc-if>
     </div>
     <div class="dbody">
+      <div class="g">수치 서류 <span style="font-weight:500;letter-spacing:0;text-transform:none">· {{ docSummary }}</span></div>
+      <sc-for list="{{ docs }}" as="d" hint-placeholder-count="0">
+        <div class="drow {{ d.cls }}"><div><div class="n {{ d.nCls }}">{{ d.name }}</div><div class="h">{{ d.hint }}</div></div>
+          <sc-if value="{{ d.has }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ d.view }}">보기 {{ d.count }}</button></sc-if>
+          <sc-if value="{{ d.none }}" hint-placeholder-val="{{ true }}"><label class="btn up">{{ d.upLabel }}<input type="file" multiple accept="image/*,.pdf,.heic,.heif" onChange="{{ d.upload }}"></label></sc-if>
+        </div>
+      </sc-for>
       <sc-for list="{{ groups }}" as="g" hint-placeholder-count="0">
         <div class="g">{{ g.name }}</div>
         <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="0">
@@ -158,6 +181,17 @@
       </sc-for>
     </div>
   </aside>
+  <sc-if value="{{ hasViewer }}" hint-placeholder-val="{{ false }}">
+    <div class="vscrim" onClick="{{ closeViewer }}">
+      <div class="vhead"><span>{{ viewer.title }}</span><label class="btn up" onClick="{{ stop }}">{{ viewer.upLabel }}<input type="file" multiple accept="image/*,.pdf,.heic,.heif" onChange="{{ viewer.upload }}"></label><button type="button" class="x" onClick="{{ closeViewer }}" aria-label="닫기">×</button></div>
+      <div class="vbody">
+        <sc-for list="{{ viewer.files }}" as="f" hint-placeholder-count="0">
+          <img class="vimg" src="{{ f.url }}" alt="{{ f.name }}" onClick="{{ stop }}">
+          <div class="vcap" onClick="{{ stop }}"><span>{{ f.name }}</span><a href="{{ f.url }}" target="_blank" rel="noopener">원본 열기</a><button type="button" onClick="{{ f.remove }}">삭제</button></div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
   <div class="{{ toastCls }}">{{ toastMsg }}</div>
 </div>
 </x-dc>
@@ -181,7 +215,7 @@ class Component extends DCLogic {
       this.setState({ lib }, () => this.load());
     } catch (e) { location.replace('index.html#login'); }
     this._on = () => this.load(); window.addEventListener('focus', this._on);
-    this._esc = e => { if (e.key === 'Escape') this.setState(this.state.editing ? { editing: false, draft: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
+    this._esc = e => { if (e.key === 'Escape') this.setState(this.state.viewDoc ? { viewDoc: null } : this.state.editing ? { editing: false, draft: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('keydown', this._esc); }
   async load() {
@@ -238,6 +272,32 @@ class Component extends DCLogic {
       }) })).filter(g => editing || g.fields.some(f => f.value !== '—'));
     }
     const selRec = rec;
+    // 수치 서류: 보기(라이트박스) / 업로드
+    let docs = [], docSummary = '', viewer = null;
+    if (rec && lib) {
+      const d = rec.data, req = lib.requiredDocs(d), chk = lib.parseDocCheck(d[lib.DOC_CHECK_COL]), fl = lib.parseDocFiles(d[lib.DOC_FILES_COL]);
+      const label = V(d, '매장명') || V(d, '고객명') || ('행' + rec.row), today = lib.todayStr(), busyUp = this.state.uploading;
+      const upload = x => async e => {
+        const list2 = Array.from(e.target.files || []); e.target.value = ''; if (!list2.length) return;
+        this.setState({ uploading: true });
+        try {
+          const folder = await lib.ensureCustomerFolder(label, rec.row); const mine = fl.filter(f => f.doc === x.id); let seq = mine.length; const added = [];
+          for (const file of list2) { const parts = await lib.toJpgs(file); for (const p of parts) { seq++; const nm = lib.docFileName(d, x.name, seq, p.ext); const r = await lib.uploadFile(p.blob, folder, nm); added.push({ id: r.id, name: nm, url: r.webViewLink, doc: x.id, at: today }); } }
+          const n = Object.assign({}, chk, { [x.id]: true });
+          await lib.updateCells(rec.row, { [lib.DOC_FILES_COL]: JSON.stringify(fl.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') });
+          this.toast(added.length + '개 파일 업로드'); await this.load();
+        } catch (er) { this.toast('업로드 실패: ' + er.message); }
+        this.setState({ uploading: false });
+      };
+      const removeFile = f => async e => { e.preventDefault(); e.stopPropagation(); if (!confirm('"' + f.name + '" 파일을 삭제할까요?')) return; try { await lib.deleteFile(f.id); } catch (er) {} const nf = fl.filter(z => z.id !== f.id); await lib.updateCells(rec.row, { [lib.DOC_FILES_COL]: JSON.stringify(nf) }); this.toast('파일 삭제'); await this.load(); };
+      docs = req.map(x => { const mine = fl.filter(f => f.doc === x.id), has = mine.length > 0, on = !!chk[x.id]; return {
+        name: x.name, hint: x.hint, cls: has || on ? '' : 'none', nCls: on ? 'on' : '', has, none: !has, count: mine.length + '장', upLabel: busyUp ? '업로드 중…' : '업로드',
+        view: () => this.setState({ viewDoc: x.id }), upload: upload(x)
+      }; });
+      const got = req.filter(x => chk[x.id]).length; docSummary = got + ' / ' + req.length + ' 받음';
+      const vx = req.find(x => x.id === this.state.viewDoc);
+      if (vx) { const mine = fl.filter(f => f.doc === vx.id); viewer = { title: label + ' · ' + vx.name + ' (' + mine.length + '장)', upLabel: busyUp ? '업로드 중…' : '+ 추가 업로드', upload: upload(vx), files: mine.map(f => ({ name: f.name, url: f.url, remove: removeFile(f) })) }; }
+    }
     const setF = f => () => this.setState({ filter: f });
     return {
       query, onQuery: e => this.setState({ query: e.target.value }), mode, onMode: e => this.setState({ mode: e.target.value }), agent, onAgent: e => this.setState({ agent: e.target.value }), agents,
@@ -247,7 +307,8 @@ class Component extends DCLogic {
       reload: () => this.load(), exportTsv: () => lib && this.copy(lib.buildExportTSV(items), '전체 ' + items.length + '건 (엑셀에 붙이기)'),
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + ' / ' + items.length + '건',
       cols, rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : items.length === 0 ? '아직 상담 기록이 없어요.' : '조건에 맞는 건이 없어요.',
-      hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, groups, close: () => this.setState({ selRow: null, editing: false, draft: null }),
+      hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, groups, close: () => this.setState({ selRow: null, editing: false, draft: null, viewDoc: null }),
+      docs, docSummary, viewer: viewer || { files: [] }, hasViewer: !!viewer, closeViewer: () => this.setState({ viewDoc: null }), stop: e => e.stopPropagation(),
       editing, notEditing: !editing, saving, saveLabel: saving ? '저장 중…' : '저장',
       startEdit: () => selRec && this.setState({ editing: true, draft: Object.assign({}, selRec.data) }),
       cancelEdit: () => this.setState({ editing: false, draft: null }),
