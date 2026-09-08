@@ -72,6 +72,8 @@
     @media (max-width: 880px) { nav.toc .tot { flex-basis: 100%; } }
     @media (max-width: 880px) { nav.toc { position: static; display: flex; flex-wrap: wrap; gap: 2px; padding: 12px; } nav.toc .logo { flex-basis: 100%; padding-bottom: 10px; } nav.toc .k { display: none; } nav.toc a { padding: 6px 8px; } }
 
+    .recall { background: var(--amber-2); border: 1px solid #F0D9A6; color: #7A4F0E; border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    .recall[hidden] { display: none; }
     /* 헤더 */
     header.doc { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 26px 28px; display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
     header.doc h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
@@ -220,6 +222,7 @@
   </nav>
 
   <main>
+    <div class="recall" id="recall-banner" hidden></div>
     <header class="doc">
       <div>
         <div class="kicker">우동지 × Npay 커넥트 · 인바운드 / 아웃바운드 공통 · 우리 소개는 항상 "우동지"</div>
@@ -437,6 +440,22 @@ class Component extends DCLogic {
     import('./udongji-fb.js?v=2').then(async mod => {
       this.lib = mod; await mod.init();
       if (!mod.isSignedIn()) { location.replace('index.html#login'); return; }
+      // 재연락: ?id=… 로 들어오면 그 고객 기록을 폼에 불러와 이어서 상담 (작성 완료 시 같은 기록 갱신)
+      const m = /[?&]id=([^&]+)/.exec(location.search);
+      if (m) {
+        try {
+          const { items } = await mod.readAll(); const it = items.find(x => x.id === decodeURIComponent(m[1]));
+          if (it) {
+            const d = Object.assign({}, it.data); delete d[mod.ID_COL];
+            const agent = (() => { try { return (JSON.parse(localStorage.getItem('udongji-script-draft-v1') || '{}') || {})['상담자'] || ''; } catch (e) { return ''; } })();
+            const p = String(d['상담일'] || '').trim();
+            d._id = it.id; d._prev = { 결과: d['상담 결과'] || '', 상태: d['상태'] || '', 일시: d['다음 액션 · 일시'] || '', 상담일: p };
+            d['상담 결과'] = ''; d['상태'] = ''; d['다음 액션 · 일시'] = ''; d['상담일'] = new Date().toISOString().slice(0, 10); if (agent) d['상담자'] = agent;
+            localStorage.setItem('udongji-script-draft-v1', JSON.stringify(d));
+          }
+        } catch (e) {}
+        try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      }
       this.boot();
     }, () => { location.replace('index.html#login'); });
   }
@@ -479,7 +498,9 @@ class Component extends DCLogic {
     function today(){ var t=new Date(); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
     try { var d = stGet(); if(d) S = JSON.parse(d) || {}; } catch(e){}
     if(!S['상담일']) S['상담일'] = today();
-    var hasDraft = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && (S[k]||'').toString().trim(); });
+    var hasDraft = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && k[0] !== '_' && (S[k]||'').toString().trim(); });
+    // 재연락 배너
+    (function(){ var b = $('recall-banner'); if(!b) return; var p = S._prev; if(!p){ b.hidden = true; return; } b.hidden = false; b.textContent = '재연락 상담 · 이전 ' + (p.상담일 || '') + ' ' + (p.결과 || '') + (p.일시 ? ' · 약속 ' + p.일시 : '') + ' — 상담 결과부터 다시 고르세요. 작성 완료하면 같은 고객 기록이 갱신돼요.'; })();
     window.addEventListener('beforeunload', function(){ stPut(JSON.stringify(S)); });
     window.addEventListener('pagehide', function(){ stPut(JSON.stringify(S)); });
     document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') stPut(JSON.stringify(S)); });
@@ -614,6 +635,7 @@ class Component extends DCLogic {
     function archive(){
       if(!S._id) S._id = 'r' + Date.now().toString(36);
       var id = S._id, data = {}; Object.keys(S).forEach(function(k){ if(k[0] !== '_') data[k] = S[k]; });
+      if(S._prev){ var hist = '[재연락 ' + today() + '] 이전 ' + (S._prev.상담일 || '') + ' ' + (S._prev.결과 || '') + (S._prev.일시 ? ' (약속 ' + S._prev.일시 + ')' : ''); data['재연락 이력'] = ((data['재연락 이력'] || '') + (data['재연락 이력'] ? '\n' : '') + hist); data['재연락 횟수'] = String((parseInt(data['재연락 횟수'] || '0', 10) || 0) + 1); }
       var done = function(ok, err){
         try { localStorage.setItem('udongji-last-done', JSON.stringify({ id: id, data: data, savedAt: new Date().toISOString(), synced: !!ok, err: err || '' })); } catch(e){}
         var agent = S['상담자'] || ''; S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent; save();
@@ -653,6 +675,7 @@ class Component extends DCLogic {
     function resetForm(){
       var agent = S['상담자'] || '';
       S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent;
+      var rb = $('recall-banner'); if(rb) rb.hidden = true;
       fields.forEach(function(f){ if(f.ctrl.tagName==='INPUT' && f.key !== '상담자') f.ctrl.value=''; });
       render(); save(); window.scrollTo(0,0);
     }
