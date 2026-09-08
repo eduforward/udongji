@@ -128,17 +128,17 @@
     <a class="task consult" href="consult.html">
       <div class="ic">☎</div>
       <div><h2>상담 업무</h2><p>스크립트 보면서 통화하고, 답변을 바로 기록. 끝나면 저장되고 안내 문자가 나와요.</p></div>
-      <div class="foot"><sc-if value="{{ hasDraft }}" hint-placeholder-val="{{ false }}"><span class="pill draft">작성 중 · {{ draftName }}</span></sc-if><span class="pill">오늘 {{ todayCount }}건</span><span class="go">시작 →</span></div>
+      <div class="foot"><sc-if value="{{ hasDraft }}" hint-placeholder-val="{{ false }}"><span class="pill draft">작성 중 · {{ draftName }}</span></sc-if><span class="pill">오늘 {{ todayCount }}건</span><span class="pill purple">나의 진행 중 {{ myConsult }}건</span><span class="pill">총 진행 중 {{ allConsult }}건</span><span class="go">시작 →</span></div>
     </a>
     <a class="task recall" href="recall.html">
       <div class="ic">↻</div>
       <div><h2>재연락</h2><p>상담 불가·재연락 예정 고객을 약속 날짜순으로. 이어서 상담하면 같은 고객 기록이 갱신돼요.</p></div>
-      <div class="foot"><sc-if value="{{ hasDue }}" hint-placeholder-val="{{ false }}"><span class="pill hot">오늘까지 {{ dueCount }}건</span></sc-if><span class="pill draft">재연락 {{ callCount }}건</span><span class="go">열기 →</span></div>
+      <div class="foot"><sc-if value="{{ hasDue }}" hint-placeholder-val="{{ false }}"><span class="pill hot">오늘까지 {{ dueCount }}건</span></sc-if><span class="pill purple">나의 진행 중 {{ myCall }}건</span><span class="pill">총 진행 중 {{ callCount }}건</span><span class="go">열기 →</span></div>
     </a>
     <a class="task contract" href="contract.html">
       <div class="ic">▤</div>
       <div><h2>계약 업무</h2><p>상담 후 고객별로 수취자료 → 페이앤 이관 → 전자서명 → 커넥트 설치까지 추적. 서류 업로드와 완료 처리.</p></div>
-      <div class="foot"><sc-if value="{{ hasDocsWait }}" hint-placeholder-val="{{ false }}"><span class="pill hot">서류 대기 {{ docsWait }}건</span></sc-if><span class="pill purple">진행 중 {{ inProgress }}건</span><span class="go">열기 →</span></div>
+      <div class="foot"><sc-if value="{{ hasDocsWait }}" hint-placeholder-val="{{ false }}"><span class="pill hot">서류 대기 {{ docsWait }}건</span></sc-if><span class="pill purple">나의 진행 중 {{ myProgress }}건</span><span class="pill">총 진행 중 {{ inProgress }}건</span><span class="go">열기 →</span></div>
     </a>
     <a class="task list" href="customers.html">
       <div class="ic">☰</div>
@@ -170,7 +170,7 @@ class Component extends DCLogic {
   }
   async componentDidMount() {
     if (location.hash === '#admin') { location.replace('admin.html'); return; }
-    try { const lib = await import('./udongji-fb.js?v=3'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-fb.js?v=3'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); lib.myName().then(n => this.setState({ myName: n || '' })).catch(() => {}); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); }
@@ -185,7 +185,7 @@ class Component extends DCLogic {
     } catch (e) { const denied = /permission|insufficient/i.test(e.message); this.setState({ records: [], draft, err: denied ? '' : e.message, allowed: !denied, signedIn: lib.isSignedIn(), email: lib.userEmail() }); }
   }
   renderVals() {
-    const { lib, records, draft, signedIn, email, msg, msgCls, busy, showAdmin, err, isAdmin, allowed, admins, users, newAdmin, newUser, newUserName } = this.state;
+    const { lib, records, draft, signedIn, email, msg, msgCls, busy, showAdmin, err, isAdmin, allowed, admins, users, newAdmin, newUser, newUserName } = this.state; const myName = this.state.myName || '';
     const ROOT = lib ? lib.ROOT_ADMINS : [];
     const rename = (em, cur) => async () => { const n = prompt(em + ' 의 상담자 이름 (상담 기록에 자동 기입되고 본인은 바꿀 수 없어요)', cur || ''); if (n === null) return; try { await lib.addUser(em, email, n.trim()); this.setState({ msg: '이름을 저장했어요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ msg: '저장 실패: ' + e.message, msgCls: 'err' }); } };
     const userRows = ROOT.map(e => ({ email: e, name: (users.find(u => u.email === e) || {}).name || '', meta: '슈퍼관리자', removable: false, remove: () => {}, rename: rename(e, (users.find(u => u.email === e) || {}).name) })).concat(users.filter(u => !ROOT.includes(u.email)).map(u => ({ email: u.email, name: u.name || '(이름 없음)', rename: rename(u.email, u.name), meta: (admins.some(a => a.email === u.email) ? '관리자 · ' : '') + (u.at ? u.at + ' 추가' : ''), removable: true, remove: async () => { if (!confirm(u.email + ' 을(를) 사용자에서 제거할까요? 이후 로그인해도 데이터가 보이지 않아요.')) return; try { await lib.removeUser(u.email); this.setState({ msg: '제거했어요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ msg: '제거 실패: ' + e.message, msgCls: 'err' }); } } })));
@@ -198,7 +198,13 @@ class Component extends DCLogic {
     const callCount = recalls.length;
     const dueCount = recalls.filter(r => { const s = String((r.data || {})['다음 액션 · 일시'] || ''); const m = /(\d{4})[-./](\d{1,2})[-./](\d{1,2})/.exec(s) || /(\d{1,2})[./월]\s*(\d{1,2})/.exec(s); if (!m) return true; const dt = m.length === 4 ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(t.getFullYear(), +m[1] - 1, +m[2]); return dt.setHours(0,0,0,0) <= new Date().setHours(0,0,0,0); }).length;
     const goRecs = records.filter(r => isGo(r) && (r.data || {})['상태'] !== '종료');
-    const inProgress = goRecs.filter(r => !String((r.data || {})['설치일'] || '').trim()).length;
+    const prog = goRecs.filter(r => !String((r.data || {})['설치일'] || '').trim());
+    const inProgress = prog.length;
+    const mine = r => !!myName && String((r.data || {})['상담자'] || '').trim() === myName;
+    const myProgress = prog.filter(mine).length, myCall = recalls.filter(mine).length;
+    // 상담 진행 중 = 서류 수치 전 단계(상담 결과가 진행이고 아직 수치 미완료)
+    const consulting = goRecs.filter(r => !String((r.data || {})['수치 완료일'] || '').trim() && !String((r.data || {})['설치일'] || '').trim());
+    const allConsult = consulting.length, myConsult = consulting.filter(mine).length;
     const docsWait = goRecs.filter(r => { const d = r.data || {}; return !String(d['수취 완료일'] || '').trim() && !String(d['설치일'] || '').trim(); }).length;
     const hasDraft = !!draft && Object.keys(draft).some(k => k !== '상담일' && k !== '상담자' && k[0] !== '_' && String(draft[k] || '').trim());
     const recent = records.slice(0, 6).map(r => {
@@ -214,7 +220,7 @@ class Component extends DCLogic {
     return {
       today: `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())}`,
       todayCount: records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr).length,
-      totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0, dueCount, hasDue: dueCount > 0, inProgress, docsWait, hasDocsWait: docsWait > 0,
+      totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0, dueCount, hasDue: dueCount > 0, inProgress, myProgress, myCall, allConsult, myConsult, docsWait, hasDocsWait: docsWait > 0,
       hasDraft, draftName: hasDraft ? (draft['매장명'] || draft['고객명'] || '이름 미입력') : '',
       recent, noRecent: recent.length === 0, sourceLabel: '회사 서버',
       locked: !unlocked, unlocked, signedIn, gridCls: unlocked ? '' : 'locked', busy, hasMsg: !!msg || deniedMsg,
