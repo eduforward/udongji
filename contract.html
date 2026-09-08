@@ -183,7 +183,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, folderId: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js?v=10');
+      const lib = await import('./udongji-lib.js?v=11');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
       this.setState({ lib }, () => { this.load(true); lib.ensureRootFolder().then(id => this.setState({ folderId: id })).catch(() => {}); });
