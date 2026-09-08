@@ -213,7 +213,7 @@ export function requiredDocs(d) {
     { id: 'idcard', name: '대표 신분증', hint: '주민등록증 또는 운전면허증 (여관 불가)' },
     { id: 'bank', name: '정산 통장 사본', hint: corp ? '예금주 = 법인명' : '모바일 캡처 가능' },
     { id: 'photo_out', name: '매장 바깥 사진 2장', hint: '간판 나오게 (간판 없으면 건물 바깥 1 + 입구 1 + 도로명주소 표지판 1)' },
-    { id: 'photo_in', name: '매장 안체 사진 2장', hint: '전체가 보이게' }
+    { id: 'photo_in', name: '매장 안쪽 사진 2장', hint: '전체가 보이게' }
   ];
   if (food) list.push({ id: 'food', name: '영업신고증', hint: '음식점' });
   if (corp) list.push({ id: 'corp', name: '법인 서류', hint: '등기부등본 · 인감증명서(3개월) · 주주명부 · 소유지배자 확인서 (사용인감계)' });
