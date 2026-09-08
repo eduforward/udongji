@@ -195,6 +195,38 @@ export async function updateCells(row, patch) {
 }
 export function todayStr() { const t = new Date(), p = n => String(n).padStart(2, '0'); return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()); }
 
+// ──── 슈퍼관리자: 시트의 '관리자' 탭에 이메일 목록. 코드 기본 관리자는 항상 포함.
+export const ROOT_ADMINS = ['daylightism@gmail.com'];
+const ADMIN_TAB = '관리자';
+async function ensureAdminTab() {
+  const meta = await api('?fields=sheets.properties.title'); const tabs = (meta.sheets || []).map(s => s.properties.title);
+  if (tabs.includes(ADMIN_TAB)) return;
+  await api(':batchUpdate', { method: 'POST', body: JSON.stringify({ requests: [{ addSheet: { properties: { title: ADMIN_TAB } } }] }) });
+  await api('/values/' + q(ADMIN_TAB + '!A1') + '?valueInputOption=RAW', { method: 'PUT', body: JSON.stringify({ values: [['이메일', '추가일', '추가한 사람']] }) });
+}
+export async function listAdmins() {
+  try { const res = await api('/values/' + q(ADMIN_TAB + '!A2:C')); return (res.values || []).filter(r => r[0] && String(r[0]).trim()).map(r => ({ email: String(r[0]).trim().toLowerCase(), at: r[1] || '', by: r[2] || '' })); }
+  catch (e) { return []; }
+}
+export async function isAdmin(email) {
+  const e = String(email || '').trim().toLowerCase(); if (!e) return false;
+  if (ROOT_ADMINS.includes(e)) return true;
+  const list = await listAdmins(); return list.some(a => a.email === e);
+}
+export async function addAdmin(email, by) {
+  const e = String(email || '').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('이메일 형식이 아니에요');
+  await ensureAdminTab();
+  const list = await listAdmins(); if (ROOT_ADMINS.includes(e) || list.some(a => a.email === e)) throw new Error('이미 관리자예요');
+  await api('/values/' + q(ADMIN_TAB + '!A1') + ':append?valueInputOption=RAW&insertDataOption=INSERT_ROWS', { method: 'POST', body: JSON.stringify({ values: [[e, todayStr(), by || '']] }) });
+}
+export async function removeAdmin(email) {
+  const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) throw new Error('기본 관리자는 해제할 수 없어요');
+  const res = await api('/values/' + q(ADMIN_TAB + '!A2:A')); const rows = res.values || [];
+  const i = rows.findIndex(r => String(r[0] || '').trim().toLowerCase() === e); if (i < 0) return;
+  const meta = await api('?fields=sheets.properties'); const sh = (meta.sheets || []).find(s => s.properties.title === ADMIN_TAB);
+  await api(':batchUpdate', { method: 'POST', body: JSON.stringify({ requests: [{ deleteDimension: { range: { sheetId: sh.properties.sheetId, dimension: 'ROWS', startIndex: i + 1, endIndex: i + 2 } } }] }) });
+}
+
 // ──── 계약 업무: 단계 · 서류 · 파일 ────
 export const STAGE_COLS = { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
 export const DOC_CHECK_COL = '서류 체크', DOC_FILES_COL = '서류 파일', PROGRESS_NOTE_COL = '진행 메모';

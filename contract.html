@@ -183,7 +183,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, folderId: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js?v=12');
+      const lib = await import('./udongji-lib.js?v=13');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
       this.setState({ lib }, () => { this.load(true); lib.ensureRootFolder().then(id => this.setState({ folderId: id })).catch(() => {}); });
@@ -288,7 +288,7 @@ class Component extends DCLogic {
       fActiveCls: filter === 'active' ? 'on' : '', fDocsCls: filter === 'docs' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fAllCls: filter === 'all' ? 'on' : '',
       setActive: setF('active'), setDocs: setF('docs'), setDone: setF('done'), setAll: setF('all'),
       reload: () => this.load(false), folderUrl: folderId ? 'https://drive.google.com/drive/folders/' + folderId : 'https://drive.google.com/',
-      folderNote: (lib && lib.getCfg().folderId) ? '파일은 공용 서류 폴더의 "매장명" 하위 폴더에 올라가요.' : '공용 폴더가 아직 설정되지 않아 로그인 계정 드라이브 "우동지 계약서류 / 매장명"에 올라가요. 홈 → 설정에서 공용 폴더 URL을 넣으세요.',
+      folderNote: (lib && lib.getCfg().folderId) ? '파일은 공용 서류 폴더의 "매장명" 하위 폴더에 올라가요.' : '공용 폴더가 아직 설정되지 않아 로그인 계정 드라이브 "우동지 계약서류 / 매장명"에 올라가요. 관리자에게 알려주세요.',
       cntCls: err ? 'err' : '', cntText: err ? '시트 오류: ' + err : loading ? '시트 읽는 중…' : list.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '시트를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, close: () => this.setState({ selRow: null }),

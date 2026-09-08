@@ -81,6 +81,11 @@
     .fields input::placeholder { color: var(--text-3); }
     .fields .wide { grid-column: 1 / -1; }
     .card .msg { margin-top: 12px; }
+    .admins { margin-top: 12px; border-top: 1px solid var(--line); }
+    .arow { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+    .arow b { font-weight: 600; }
+    .arow .m { color: var(--text-3); font-size: 12.5px; margin-left: auto; }
+    .arow .lk { color: var(--red); }
     details { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
     summary { cursor: pointer; font-size: 13.5px; font-weight: 700; color: var(--text-2); list-style: none; display: flex; align-items: center; gap: 6px; }
     summary::-webkit-details-marker { display: none; }
@@ -107,7 +112,7 @@
     <div class="right">
       <span class="status {{ statusCls }}">{{ statusText }}</span>
       <sc-if value="{{ unlocked }}" hint-placeholder-val="{{ false }}"><a class="lk" href="{{ sheetUrl }}" target="_blank" rel="noopener">시트 열기</a><button type="button" class="lk" onClick="{{ signOut }}">로그아웃</button></sc-if>
-      <button type="button" class="lk" onClick="{{ toggleAdmin }}">{{ adminLabel }}</button>
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ toggleAdmin }}">{{ adminLabel }}</button></sc-if>
       <span class="date">{{ today }}</span>
     </div>
   </div>
@@ -155,6 +160,17 @@
   </sc-if>
 
   <sc-if value="{{ showAdmin }}" hint-placeholder-val="{{ false }}">
+  <div class="card" id="admins">
+    <div class="gs-head"><h3>슈퍼관리자</h3><span class="status on">{{ email }}</span></div>
+    <p class="msg" style="margin-top:6px">슈퍼관리자만 이 설정 화면을 볼 수 있어요. 다른 사용자는 로그인 후 업무 화면만 보입니다. 위임한 계정은 모든 기기에서 즉시 적용돼요.</p>
+    <div class="fields" style="margin-top:10px">
+      <div class="wide"><label>슈퍼관리자 위임 (구글 이메일)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="email" style="flex:1 1 260px" placeholder="name@gmail.com" value="{{ newAdmin }}" onInput="{{ onNewAdmin }}"><button type="button" class="btn" onClick="{{ addAdmin }}" disabled="{{ busy }}">위임</button></div></div>
+    </div>
+    <div class="admins">
+      <sc-for list="{{ admins }}" as="a" hint-placeholder-count="1"><div class="arow"><b>{{ a.email }}</b><span class="m">{{ a.meta }}</span><sc-if value="{{ a.removable }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ a.remove }}">해제</button></sc-if></div></sc-for>
+    </div>
+    <div class="msg {{ msgCls }}">{{ msg }}</div>
+  </div>
   <div class="card" id="admin">
     <div class="gs-head"><h3>관리자 설정 · 구글 시트 연결</h3>
       <div class="acts">
@@ -202,9 +218,15 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false, showAdmin: false, sheetErr: '' };
+  state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false, showAdmin: false, sheetErr: '', isAdmin: false, admins: [], newAdmin: '' };
+  async refreshAdmin() {
+    const lib = this.state.lib; if (!lib || !lib.isSignedIn()) { this.setState({ isAdmin: false, admins: [], showAdmin: false }); return; }
+    const email = lib.userEmail(); const ok = await lib.isAdmin(email);
+    const admins = ok ? await lib.listAdmins() : [];
+    this.setState({ isAdmin: ok, admins, showAdmin: ok && (this.state.showAdmin || location.hash === '#admin') });
+  }
   async componentDidMount() {
-    try { const lib = await import('./udongji-lib.js?v=12'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-lib.js?v=13'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
     this._tick = setInterval(() => { const lib = this.state.lib; if (lib && this.state.signedIn !== lib.isSignedIn()) this.setState({ signedIn: lib.isSignedIn(), email: lib.userEmail() }); }, 15000);
   }
@@ -222,7 +244,9 @@ class Component extends DCLogic {
     } catch (e) { this.setState({ records: [], draft, source: 'local', sheetErr: e.message, signedIn: lib.isSignedIn() }); }
   }
   renderVals() {
-    const { lib, records, draft, cfg, signedIn, email, msg, msgCls, source, busy, showAdmin, sheetErr } = this.state;
+    const { lib, records, draft, cfg, signedIn, email, msg, msgCls, source, busy, showAdmin, sheetErr, isAdmin, admins, newAdmin } = this.state;
+    const ROOT = lib ? lib.ROOT_ADMINS : [];
+    const adminRows = ROOT.map(e => ({ email: e, meta: '기본 관리자', removable: false, remove: () => {} })).concat(admins.map(a => ({ email: a.email, meta: (a.at ? a.at + ' 위임' : '') + (a.by ? ' · ' + a.by : ''), removable: true, remove: async () => { if (!confirm(a.email + ' 의 슈퍼관리자 권한을 해제할까요?')) return; try { await lib.removeAdmin(a.email); this.setState({ msg: '해제했어요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ msg: '해제 실패: ' + e.message, msgCls: 'err' }); } } })));
     const t = new Date(), pad = n => String(n).padStart(2, '0');
     const todayStr = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
     const isGo = r => ((r.data || {})['상담 결과'] || '상담 진행') === '상담 진행';
@@ -254,13 +278,15 @@ class Component extends DCLogic {
       cfg, statusCls, statusText, msg, msgCls, origin: location.origin,
       sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
       folderUrl: cfg.folderId ? 'https://drive.google.com/drive/folders/' + cfg.folderId : 'https://drive.google.com/',
-      showAdmin, adminLabel: showAdmin ? '설정 닫기' : '설정', toggleAdmin: () => this.setState({ showAdmin: !showAdmin, msg: '', msgCls: '' }),
+      showAdmin: showAdmin && isAdmin, isAdmin, adminLabel: showAdmin ? '설정 닫기' : '설정', toggleAdmin: () => this.setState({ showAdmin: !showAdmin, msg: '', msgCls: '' }),
+      admins: adminRows, newAdmin, onNewAdmin: e => this.setState({ newAdmin: e.target.value }),
+      addAdmin: async () => { if (!lib || !newAdmin.trim()) return; this.setState({ busy: true }); try { await lib.addAdmin(newAdmin, email); this.setState({ busy: false, newAdmin: '', msg: newAdmin.trim() + ' 을(를) 슈퍼관리자로 위임했어요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ busy: false, msg: '위임 실패: ' + e.message, msgCls: 'err' }); } },
       onClientId: setC('clientId'), onSheetId: setC('sheetId'), onTab: setC('tab'), onFolder: setC('folderId'),
       testFolder: async () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); if (!c.folderId) { this.setState({ cfg: c, msg: '폴더 URL이 비어 있어요 — 각자 드라이브에 저장됩니다.', msgCls: '' }); return; } try { const f = await lib.folderInfo(c.folderId); this.setState({ cfg: c, msg: '폴더 확인: "' + f.name + '"' + (f.driveId ? ' (공유 드라이브)' : ' (개인 드라이브 공유 폴더)') + ' — 이 계정으로 접근 가능해요.', msgCls: 'ok' }); } catch (e) { fail('폴더 확인 실패: ', e); } },
       saveCfg: () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); this.setState({ cfg: c, msg: '설정을 저장했어요.', msgCls: 'ok' }); this.load(); },
       resetCfg: () => { if (!lib) return; try { localStorage.removeItem('udongji-gsheet-cfg'); } catch (e) {} this.setState({ cfg: lib.getCfg(), msg: '기본 연결값으로 되돌렸어요.', msgCls: 'ok' }); this.load(); },
-      signIn: async () => { if (!lib) return; this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); this.setState({ signedIn: true, email: tok.email, busy: false, msg: '', msgCls: '' }); await this.load(); } catch (e) { fail('로그인 실패: ', e); } },
-      signOut: async () => { if (!lib) return; await lib.signOut(); this.setState({ signedIn: false, email: '', msg: '', msgCls: '', records: [] }); },
+      signIn: async () => { if (!lib) return; this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); this.setState({ signedIn: true, email: tok.email, busy: false, msg: '', msgCls: '' }); await this.load(); this.refreshAdmin(); } catch (e) { fail('로그인 실패: ', e); } },
+      signOut: async () => { if (!lib) return; await lib.signOut(); this.setState({ signedIn: false, email: '', msg: '', msgCls: '', records: [], isAdmin: false, admins: [], showAdmin: false }); },
       test: async () => {
         if (!lib) return; lib.setCfg(this.state.cfg);
         try {
