@@ -22,11 +22,17 @@
     button, input { font-family: inherit; }
     :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .wrap { max-width: 980px; margin: 0 auto; padding: 48px 24px 80px; }
-    .top { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; }
+    .top { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
     .mark { width: 40px; height: 40px; border-radius: 12px; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 17px; }
     .top h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
     .top .sub { font-size: 13px; color: var(--text-3); font-weight: 500; }
-    .top .date { margin-left: auto; font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums; font-weight: 500; }
+    .top .right { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .top .date { font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums; font-weight: 500; }
+    .status { font-size: 12.5px; font-weight: 700; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
+    .status::before { content: "●"; font-size: 8px; }
+    .status.off { background: var(--card-2); color: var(--text-3); } .status.warn { background: var(--amber-2); color: var(--amber); } .status.on { background: var(--green-2); color: var(--green); } .status.err { background: var(--red-2); color: var(--red); }
+    .lk { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-3); background: none; border: 0; cursor: pointer; text-decoration: underline; padding: 0; }
+    .lk:hover { color: var(--text); }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .wrap { padding: 24px 14px 60px; } }
     a.task { display: flex; flex-direction: column; gap: 18px; background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 26px 26px 24px; text-decoration: none; color: var(--text); min-height: 230px; border: 1px solid transparent; transition: transform .15s, box-shadow .15s, border-color .15s; position: relative; }
@@ -44,39 +50,34 @@
     .pill.blue { background: var(--blue-2); border-color: transparent; color: var(--blue); }
     a.task .go { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--blue); }
     .grid.locked a.task { pointer-events: none; opacity: .45; filter: grayscale(.4); }
-    .gate { display: flex; flex-direction: column; gap: 4px; background: var(--amber-2); border: 1px solid #F0D9A6; color: #7A4F0E; border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; font-size: 14px; line-height: 1.55; }
-    .gate b { font-size: 15px; font-weight: 700; }
-    .card.hi { border: 2px solid var(--blue); box-shadow: 0 0 0 4px var(--blue-2), var(--shadow); }
-    .card { margin-top: 20px; background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 24px 20px; }
-    .card h3 { font-size: 13px; font-weight: 700; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
-    .recent { padding-bottom: 8px; }
-    .row { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr) auto auto; gap: 14px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); font-size: 14px; text-decoration: none; color: var(--text); }
-    .row:hover { color: var(--blue); }
-    .row b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .row .m { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .row .d { color: var(--text-3); font-size: 12.5px; font-variant-numeric: tabular-nums; }
-    .empty { padding: 14px 0 12px; color: var(--text-3); font-size: 14px; border-top: 1px solid var(--line); }
-    @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .row .m, .row .d { display: none; } }
-    /* 시트 연결 */
-    .gs-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
-    .gs-head h3 { margin: 0; }
-    .status { font-size: 12.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
-    .status::before { content: "● "; font-size: 8px; vertical-align: 1px; }
-    .status.off { background: var(--card-2); color: var(--text-3); } .status.warn { background: var(--amber-2); color: var(--amber); } .status.on { background: var(--green-2); color: var(--green); } .status.err { background: var(--red-2); color: var(--red); }
-    .gs-head .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn { font: inherit; font-size: 13.5px; font-weight: 700; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; letter-spacing: -0.01em; }
+    /* 로그인 게이트 */
+    .gate { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 34px 30px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; border: 2px solid var(--blue); }
+    .gate .g { width: 52px; height: 52px; border-radius: 14px; background: var(--blue-2); display: grid; place-items: center; font-size: 22px; font-weight: 800; color: var(--blue); flex: 0 0 auto; }
+    .gate h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+    .gate p { font-size: 14px; color: var(--text-2); margin-top: 4px; max-width: 52ch; text-wrap: pretty; }
+    .gate .act { margin-left: auto; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .btn { font: inherit; font-size: 14px; font-weight: 700; padding: 11px 18px; border-radius: 10px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; letter-spacing: -0.01em; white-space: nowrap; }
     .btn:hover { background: var(--blue-d); border-color: var(--blue-d); }
     .btn.ghost { background: var(--card); color: var(--text-2); border-color: var(--line); }
     .btn.ghost:hover { background: var(--card-2); color: var(--text); }
     .btn.ok { background: var(--green); border-color: var(--green); }
     .btn:disabled { opacity: .5; cursor: default; }
+    .msg { font-size: 13.5px; color: var(--text-2); min-height: 20px; }
+    .msg.err { color: var(--red); font-weight: 600; } .msg.ok { color: var(--green); font-weight: 600; }
+    .gate .msg { flex-basis: 100%; }
+    /* 관리자 설정 */
+    .card { margin-top: 20px; background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 24px 20px; }
+    .card h3 { font-size: 13px; font-weight: 700; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
+    .gs-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+    .gs-head h3 { margin: 0; }
+    .gs-head .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    .gs-head .btn { font-size: 13px; padding: 8px 13px; }
     .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
     .fields label { display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin-bottom: 5px; }
     .fields input { width: 100%; font: inherit; font-size: 13.5px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
     .fields input::placeholder { color: var(--text-3); }
     .fields .wide { grid-column: 1 / -1; }
-    .msg { margin-top: 12px; font-size: 13.5px; color: var(--text-2); min-height: 20px; }
-    .msg.err { color: var(--red); font-weight: 600; } .msg.ok { color: var(--green); font-weight: 600; }
+    .card .msg { margin-top: 12px; }
     details { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
     summary { cursor: pointer; font-size: 13.5px; font-weight: 700; color: var(--text-2); list-style: none; display: flex; align-items: center; gap: 6px; }
     summary::-webkit-details-marker { display: none; }
@@ -86,14 +87,37 @@
     .guide ol { padding-left: 20px; }
     .guide li { margin: 4px 0; }
     .guide code { font: 12.5px ui-monospace, Menlo, Consolas, monospace; background: var(--card-2); padding: 1px 6px; border-radius: 5px; color: var(--text); }
-    .guide .warnbox { margin-top: 10px; background: var(--amber-2); color: #7A4F0E; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 500; }
+    /* 최근 */
+    .recent { padding-bottom: 8px; }
+    .row { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr) auto auto; gap: 14px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); font-size: 14px; text-decoration: none; color: var(--text); }
+    .row:hover { color: var(--blue); }
+    .row b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row .m { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row .d { color: var(--text-3); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+    .empty { padding: 14px 0 12px; color: var(--text-3); font-size: 14px; border-top: 1px solid var(--line); }
+    @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .row .m, .row .d { display: none; } }
   </style>
 </helmet>
 <div class="wrap">
-  <div class="top"><div class="mark">우</div><div><h1>우동지 업무 홈</h1><div class="sub">커넥트 상담 → 페이앤 등록</div></div><div class="date">{{ today }}</div></div>
+  <div class="top">
+    <div class="mark">우</div><div><h1>우동지 업무 홈</h1><div class="sub">커넥트 상담 → 페이앤 등록</div></div>
+    <div class="right">
+      <span class="status {{ statusCls }}">{{ statusText }}</span>
+      <sc-if value="{{ unlocked }}" hint-placeholder-val="{{ false }}"><a class="lk" href="{{ sheetUrl }}" target="_blank" rel="noopener">시트 열기</a><button type="button" class="lk" onClick="{{ signOut }}">로그아웃</button></sc-if>
+      <button type="button" class="lk" onClick="{{ toggleAdmin }}">{{ adminLabel }}</button>
+      <span class="date">{{ today }}</span>
+    </div>
+  </div>
+
   <sc-if value="{{ locked }}" hint-placeholder-val="{{ false }}">
-    <div class="gate"><b>구글 시트를 먼저 연결해야 업무를 시작할 수 있어요.</b><span>아래에서 설정 저장 → 구글 계정으로 로그인하면 상담·등록 업무가 열립니다. 모든 상담 기록은 공용 시트에만 저장돼요.</span></div>
+    <div class="gate" id="gsheet">
+      <div class="g">G</div>
+      <div><h2>구글 계정으로 로그인하세요</h2><p>고객 목록 시트에 편집 권한이 있는 구글 계정으로 로그인하면 상담·등록 업무가 열립니다. 모든 기록은 공용 시트에만 저장돼요.</p></div>
+      <div class="act"><button type="button" class="btn" onClick="{{ signIn }}" disabled="{{ busy }}">구글 계정으로 로그인</button></div>
+      <sc-if value="{{ hasMsg }}" hint-placeholder-val="{{ false }}"><div class="msg {{ msgCls }}">{{ msg }}</div></sc-if>
+    </div>
   </sc-if>
+
   <div class="grid {{ gridCls }}">
     <a class="task consult" href="consult.html">
       <div class="ic">☎</div>
@@ -107,39 +131,6 @@
     </a>
   </div>
 
-  <div class="card {{ cardCls }}" id="gsheet">
-    <div class="gs-head"><h3>구글 시트 연결</h3><span class="status {{ statusCls }}">{{ statusText }}</span>
-      <div class="acts">
-        <sc-if value="{{ canSignIn }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ signIn }}">구글 계정으로 로그인</button></sc-if>
-        <sc-if value="{{ needSheetLogin }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ signIn }}">구글 로그인 후 시트 만들기</button></sc-if>
-        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a class="btn ghost" href="{{ sheetUrl }}" target="_blank" rel="noopener">시트 열기</a><button type="button" class="btn ok" onClick="{{ test }}">연결 확인</button><button type="button" class="btn ghost" onClick="{{ signOut }}">로그아웃</button></sc-if>
-      </div>
-    </div>
-    <div class="fields">
-      <div class="wide"><label>OAuth 클라이언트 ID</label><input type="text" placeholder="xxxxxxxx.apps.googleusercontent.com" value="{{ cfg.clientId }}" onInput="{{ onClientId }}"></div>
-      <div class="wide"><label>구글 시트 URL (또는 ID)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" style="flex:1 1 260px" placeholder="https://docs.google.com/spreadsheets/d/…/edit  — 없으면 오른쪽 버튼으로 새로 만들기" value="{{ cfg.sheetId }}" onInput="{{ onSheetId }}"><button type="button" class="btn ghost" onClick="{{ createSheet }}" disabled="{{ noCreate }}">새 시트 만들기</button></div></div>
-      <div><label>탭 이름</label><input type="text" placeholder="고객목록" value="{{ cfg.tab }}" onInput="{{ onTab }}"></div>
-      <div style="display:flex;align-items:flex-end"><button type="button" class="btn ghost" onClick="{{ saveCfg }}">설정 저장</button></div>
-    </div>
-    <div class="msg {{ msgCls }}">{{ msg }}</div>
-    <details>
-      <summary>처음 설정하는 방법 (1회, 관리자)</summary>
-      <div class="guide">
-        <ol>
-          <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud 콘솔</a>에서 프로젝트 하나 만들기 (이름 예: 우동지 업무).</li>
-          <li>API 및 서비스 → 라이브러리 → <b>Google Sheets API</b> 사용 설정.</li>
-          <li>API 및 서비스 → OAuth 동의 화면 → 사용자 유형 <b>외부</b>(개인 gmail) 또는 <b>내부</b>(워크스페이스). 범위는 추가 안 해도 됨. 외부면 <b>테스트 사용자</b>에 상담자들 이메일 추가.</li>
-          <li>사용자 인증 정보 → 사용자 인증 정보 만들기 → <b>OAuth 클라이언트 ID</b> → 유형 <b>웹 애플리케이션</b>.</li>
-          <li><b>승인된 JavaScript 원본</b>에 이 페이지가 올라가는 주소를 넣기: <code>{{ origin }}</code></li>
-          <li>생성된 클라이언트 ID를 위 칸에 붙이고 <b>설정 저장</b> → <b>구글 로그인</b> → <b>새 시트 만들기</b>(헤더 자동 생성). 이미 쓰는 시트가 있으면 URL을 넣고 설정 저장.</li>
-          <li>만들어진 시트를 열어 <b>공유</b> → 상담자들 이메일에 <b>편집자</b> 권한. 이 권한이 있는 계정만 이 페이지에서 데이터를 볼 수 있어요.</li>
-        </ol>
-        <p style="margin-top:8px">시트는 상담자 각자의 구글 계정 편집 권한으로 읽고 씁니다. 로그인은 브라우저 탭 기준 약 1시간 유지되고, 만료되면 다시 로그인 버튼이 뜹니다. 시트 첫 줄이 헤더여야 하고, 없는 열(<code>레코드ID</code>, <code>페이앤 등록</code>)은 처음 전송할 때 맨 끝에 자동 추가됩니다.</p>
-        <div class="warnbox">이 페이지를 임시 미리보기 주소로 보고 있다면 구글이 그 주소를 원본으로 허용하지 않을 수 있어요. 실제 사용은 고정 주소(회사 서버, GitHub Pages 등)에 올린 뒤 그 주소를 원본에 등록하세요.</div>
-      </div>
-    </details>
-  </div>
-
   <sc-if value="{{ unlocked }}" hint-placeholder-val="{{ false }}">
   <div class="card recent">
     <h3>최근 상담 <span style="font-weight:500;text-transform:none;letter-spacing:0">· {{ sourceLabel }}</span></h3>
@@ -149,33 +140,62 @@
     <sc-if value="{{ noRecent }}" hint-placeholder-val="{{ false }}"><div class="empty">아직 완료된 상담이 없어요. 상담 업무에서 작성 완료하면 여기에 쌓여요.</div></sc-if>
   </div>
   </sc-if>
+
+  <sc-if value="{{ showAdmin }}" hint-placeholder-val="{{ false }}">
+  <div class="card" id="admin">
+    <div class="gs-head"><h3>관리자 설정 · 구글 시트 연결</h3>
+      <div class="acts">
+        <sc-if value="{{ unlocked }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn ok" onClick="{{ test }}">연결 확인 · 헤더 세팅</button><button type="button" class="btn ghost" onClick="{{ createSheet }}">새 시트 만들기</button></sc-if>
+        <button type="button" class="btn ghost" onClick="{{ resetCfg }}">기본값으로</button>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="wide"><label>OAuth 클라이언트 ID</label><input type="text" value="{{ cfg.clientId }}" onInput="{{ onClientId }}"></div>
+      <div class="wide"><label>구글 시트 URL (또는 ID)</label><input type="text" value="{{ cfg.sheetId }}" onInput="{{ onSheetId }}"></div>
+      <div><label>탭 이름</label><input type="text" value="{{ cfg.tab }}" onInput="{{ onTab }}"></div>
+      <div style="display:flex;align-items:flex-end"><button type="button" class="btn ghost" onClick="{{ saveCfg }}">설정 저장</button></div>
+    </div>
+    <div class="msg {{ msgCls }}">{{ msg }}</div>
+    <details>
+      <summary>처음 설정하는 방법 (관리자)</summary>
+      <div class="guide">
+        <ol>
+          <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud 콘솔</a> → 프로젝트 → Google Sheets API 사용 설정.</li>
+          <li>Google 인증 플랫폼 → 대상 → 사용자 유형 외부, <b>테스트 사용자</b>에 상담자 gmail 추가.</li>
+          <li>클라이언트 → 웹 애플리케이션 → 승인된 JavaScript 원본에 <code>{{ origin }}</code> → 클라이언트 ID를 위에 입력.</li>
+          <li>고객 목록 시트 URL·탭 이름 입력 → 설정 저장 → 로그인 → <b>연결 확인</b>(빈 시트면 헤더 자동 세팅).</li>
+          <li>시트 공유 → 상담자 이메일에 <b>편집자</b> 권한. 이 권한이 있는 계정만 데이터를 볼 수 있어요.</li>
+        </ol>
+        <p style="margin-top:8px">기본 연결값은 코드에 내장돼 있어 상담자는 로그인만 하면 됩니다. 여기서 바꾼 값은 이 브라우저에만 저장돼요.</p>
+      </div>
+    </details>
+  </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false };
+  state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false, showAdmin: false, sheetErr: '' };
   async componentDidMount() {
-    try { const lib = await import('./udongji-lib.js'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => this.load()); } catch (e) { this.load(); }
-    this._tick = setInterval(() => { const lib = this.state.lib; if (lib && this.state.signedIn !== lib.isSignedIn()) this.setState({ signedIn: lib.isSignedIn(), email: lib.userEmail() }); }, 15000);
+    try { const lib = await import('./udongji-lib.js?v=6'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
+    this._tick = setInterval(() => { const lib = this.state.lib; if (lib && this.state.signedIn !== lib.isSignedIn()) this.setState({ signedIn: lib.isSignedIn(), email: lib.userEmail() }); }, 15000);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); clearInterval(this._tick); }
   async load() {
-    const lib = this.state.lib; let local = [], draft = null;
-    try { local = JSON.parse(localStorage.getItem('udongji-records-v1') || '[]') || []; } catch (e) {}
+    const lib = this.state.lib; let draft = null;
     try { draft = JSON.parse(localStorage.getItem('udongji-script-draft-v1') || 'null'); } catch (e) {}
     if (!(lib && lib.isConfigured() && lib.isSignedIn())) { this.setState({ records: [], draft, source: 'local', signedIn: lib ? lib.isSignedIn() : false }); return; }
-    {
-      try {
-        const { items } = await lib.readAll();
-        const recs = items.map(it => ({ id: it.data[lib.ID_COL] || ('row' + it.row), row: it.row, data: it.data, registered: !!String(it.data[lib.REG_COL] || '').trim(), savedAt: it.data['상담일'] || '' })).reverse();
-        const pend = local.filter(r => r.synced === false).map(r => Object.assign({}, r, { unsent: true }));
-        this.setState({ records: pend.concat(recs), draft, source: 'sheet', signedIn: true, email: lib.userEmail() }); return;
-      } catch (e) { this.setState({ records: [], draft, source: 'local', msg: '시트 읽기 실패: ' + e.message, msgCls: 'err', signedIn: lib.isSignedIn() }); }
-    }
+    try {
+      const { items } = await lib.readAll();
+      const recs = items.map(it => ({ id: it.data[lib.ID_COL] || ('row' + it.row), row: it.row, data: it.data, registered: !!String(it.data[lib.REG_COL] || '').trim(), savedAt: it.data['상담일'] || '' })).reverse();
+      let local = []; try { local = JSON.parse(localStorage.getItem('udongji-records-v1') || '[]') || []; } catch (e) {}
+      const pend = local.filter(r => r.synced === false).map(r => Object.assign({}, r, { unsent: true }));
+      this.setState({ records: pend.concat(recs), draft, source: 'sheet', signedIn: true, email: lib.userEmail(), sheetErr: '' });
+    } catch (e) { this.setState({ records: [], draft, source: 'local', sheetErr: e.message, signedIn: lib.isSignedIn() }); }
   }
   renderVals() {
-    const { lib, records, draft, cfg, signedIn, email, msg, msgCls, source, busy } = this.state;
+    const { lib, records, draft, cfg, signedIn, email, msg, msgCls, source, busy, showAdmin, sheetErr } = this.state;
     const t = new Date(), pad = n => String(n).padStart(2, '0');
     const todayStr = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
     const isGo = r => ((r.data || {})['상담 결과'] || '상담 진행') === '상담 진행';
@@ -188,43 +208,42 @@ class Component extends DCLogic {
       return { store: d['매장명'] || d['고객명'] || '(매장명 없음)', meta: [d['고객명'], d['매장 구분'], d['업종']].filter(Boolean).join(' · '), tag, cls, date: String(r.savedAt || '').slice(0, 16).replace('T', ' '), href: 'register.html#' + r.id };
     });
     const configured = !!(cfg.clientId && cfg.sheetId && cfg.tab);
-    const hasClient = !!cfg.clientId, tokenOk = lib && lib.isSignedIn();
-    const statusCls = !configured ? 'off' : signedIn ? 'on' : 'warn';
-    const statusText = !configured ? '미설정' : signedIn ? '연결됨 · ' + (email || '로그인됨') : '로그인 필요';
-    const setC = (k) => e => this.setState({ cfg: Object.assign({}, this.state.cfg, { [k]: e.target.value }) });
     const unlocked = configured && signedIn;
+    const statusCls = sheetErr ? 'err' : !configured ? 'off' : signedIn ? 'on' : 'warn';
+    const statusText = sheetErr ? '시트 오류 · ' + sheetErr : !configured ? '연결 설정 없음' : signedIn ? '시트 연결됨 · ' + (email || '로그인됨') : '로그인 필요';
+    const setC = (k) => e => this.setState({ cfg: Object.assign({}, this.state.cfg, { [k]: e.target.value }) });
+    const fail = (pre, e) => this.setState({ busy: false, msg: pre + e.message + (/(origin|redirect|invalid_client|idpiframe)/i.test(e.message) ? ' — 승인된 JavaScript 원본(' + location.origin + ')을 확인하세요.' : /access_denied|blocked/i.test(e.message) ? ' — 이 계정이 테스트 사용자에 등록돼 있는지 확인하세요.' : ''), msgCls: 'err' });
     return {
-      locked: !unlocked, unlocked, gridCls: unlocked ? '' : 'locked', cardCls: unlocked ? '' : 'hi',
-      needSheetLogin: hasClient && !cfg.sheetId && !tokenOk && !busy, noCreate: !(hasClient && tokenOk) || busy,
-      sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
-      createSheet: async () => {
-        if (!lib) return; lib.setCfg(this.state.cfg);
-        if (!lib.isSignedIn()) { try { await lib.signIn(true); } catch (e) { this.setState({ msg: '로그인 실패: ' + e.message, msgCls: 'err' }); return; } }
-        if (!confirm('로그인한 구글 계정의 드라이브에 "우동지 고객 목록" 시트를 새로 만들까요? 헤더가 자동으로 채워지고 설정에 바로 연결돼요.')) return;
-        this.setState({ busy: true, msg: '시트 만드는 중…', msgCls: '' });
-        try { const r = await lib.createSheet('우동지 고객 목록', this.state.cfg.tab || '고객목록'); this.setState({ cfg: lib.getCfg(), signedIn: true, email: lib.userEmail(), busy: false, msg: '시트를 만들고 연결했어요. 상담자들에게 이 시트의 편집 권한을 공유하세요: ' + r.url, msgCls: 'ok' }); this.load(); }
-        catch (e) { this.setState({ busy: false, msg: '시트 생성 실패: ' + e.message, msgCls: 'err' }); }
-      },
       today: `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())}`,
       todayCount: records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr).length,
       totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0,
       hasDraft, draftName: hasDraft ? (draft['매장명'] || draft['고객명'] || '이름 미입력') : '',
-      recent, noRecent: recent.length === 0, sourceLabel: source === 'sheet' ? '구글 시트' : '이 기기 (시트 미연결)',
+      recent, noRecent: recent.length === 0, sourceLabel: source === 'sheet' ? '구글 시트' : '—',
+      locked: !unlocked, unlocked, gridCls: unlocked ? '' : 'locked', busy, hasMsg: !!msg,
       cfg, statusCls, statusText, msg, msgCls, origin: location.origin,
-      canSignIn: configured && !signedIn && !busy, signedIn: signedIn && configured,
+      sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
+      showAdmin, adminLabel: showAdmin ? '설정 닫기' : '설정', toggleAdmin: () => this.setState({ showAdmin: !showAdmin, msg: '', msgCls: '' }),
       onClientId: setC('clientId'), onSheetId: setC('sheetId'), onTab: setC('tab'),
-      saveCfg: () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); this.setState({ cfg: c, msg: '설정을 저장했어요.' + (lib.isSignedIn() ? '' : ' 이제 구글 계정으로 로그인하세요.'), msgCls: 'ok' }); },
-      signIn: async () => { if (!lib) return; lib.setCfg(this.state.cfg); this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); if (!this.state.cfg.sheetId) { this.setState({ signedIn: true, email: tok.email, busy: false, msg: '로그인됐어요. 이제 "새 시트 만들기"를 누르거나 기존 시트 URL을 넣고 설정 저장하세요.', msgCls: 'ok' }); return; } this.setState({ signedIn: true, email: tok.email, msg: '로그인됐어요. 시트를 읽어옵니다…', msgCls: 'ok', busy: false }); await this.load(); this.setState({ msg: '연결됐어요. 시트에서 ' + this.state.records.length + '건을 읽었어요.', msgCls: 'ok' }); } catch (e) { this.setState({ busy: false, msg: '로그인 실패: ' + e.message + (/(origin|redirect|invalid_client|idpiframe)/i.test(e.message) ? ' — 클라이언트 ID와 승인된 JavaScript 원본(' + location.origin + ')을 확인하세요.' : ''), msgCls: 'err' }); } },
-      signOut: async () => { if (!lib) return; await lib.signOut(); this.setState({ signedIn: false, email: '', msg: '로그아웃했어요.', msgCls: '' }); this.load(); },
+      saveCfg: () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); this.setState({ cfg: c, msg: '설정을 저장했어요.', msgCls: 'ok' }); this.load(); },
+      resetCfg: () => { if (!lib) return; try { localStorage.removeItem('udongji-gsheet-cfg'); } catch (e) {} this.setState({ cfg: lib.getCfg(), msg: '기본 연결값으로 되돌렸어요.', msgCls: 'ok' }); this.load(); },
+      signIn: async () => { if (!lib) return; this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); this.setState({ signedIn: true, email: tok.email, busy: false, msg: '', msgCls: '' }); await this.load(); } catch (e) { fail('로그인 실패: ', e); } },
+      signOut: async () => { if (!lib) return; await lib.signOut(); this.setState({ signedIn: false, email: '', msg: '', msgCls: '', records: [] }); },
       test: async () => {
         if (!lib) return; lib.setCfg(this.state.cfg);
         try {
           const tabs = await lib.listTabs();
-          if (!tabs.includes(this.state.cfg.tab)) { this.setState({ msg: '시트는 열리는데 "' + this.state.cfg.tab + '" 탭이 없어요. 이 시트의 탭: ' + tabs.join(', ') + ' — 탭 이름을 그중 하나로 바꾸고 설정 저장하세요.', msgCls: 'err' }); return; }
+          if (!tabs.includes(this.state.cfg.tab)) { this.setState({ msg: '"' + this.state.cfg.tab + '" 탭이 없어요. 이 시트의 탭: ' + tabs.join(', ') + ' — 탭 이름을 바꾸고 설정 저장하세요.', msgCls: 'err' }); return; }
           const r = await lib.initHeaderIfEmpty();
-          this.setState({ msg: r.created ? '연결 정상 · 빈 시트라서 헤더 ' + r.header.length + '열을 첫 행에 채웠어요. 이제 상담자들에게 편집 권한을 공유하면 끝.' : '연결 정상 · 탭 "' + this.state.cfg.tab + '" 헤더 ' + r.header.length + '열 (' + r.header.slice(0, 5).join(', ') + '…)', msgCls: 'ok', cfg: lib.getCfg() });
+          this.setState({ msg: r.created ? '연결 정상 · 빈 시트라서 헤더 ' + r.header.length + '열을 채웠어요.' : '연결 정상 · 헤더 ' + r.header.length + '열.', msgCls: 'ok', cfg: lib.getCfg() });
           this.load();
-        } catch (e) { this.setState({ msg: '연결 실패: ' + e.message, msgCls: 'err', signedIn: lib.isSignedIn() }); }
+        } catch (e) { fail('연결 실패: ', e); }
+      },
+      createSheet: async () => {
+        if (!lib) return;
+        if (!confirm('로그인한 계정의 드라이브에 "우동지 고객 목록" 시트를 새로 만들고 이 브라우저의 연결을 그 시트로 바꿀까요?')) return;
+        this.setState({ busy: true, msg: '시트 만드는 중…', msgCls: '' });
+        try { const r = await lib.createSheet('우동지 고객 목록', this.state.cfg.tab || '고객목록'); this.setState({ cfg: lib.getCfg(), busy: false, msg: '시트를 만들었어요: ' + r.url + ' — 다른 상담자도 쓰려면 코드 기본값을 이 시트로 바꿔야 해요.', msgCls: 'ok' }); this.load(); }
+        catch (e) { fail('시트 생성 실패: ', e); }
       }
     };
   }

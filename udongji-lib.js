@@ -73,8 +73,10 @@ export function buildSMS(d) {
 
 // ───────── 구글 시트 연동 ─────────
 const CFG_KEY = 'udongji-gsheet-cfg', TOK_KEY = 'udongji-gtoken';
+// 기본 연결값 (관리자가 설정에서 덤어쓸 수 있음)
+export const DEFAULT_CFG = { clientId: '400925977165-l9e7jj8vkh3t9lu7k32vq2m8jtqgrb26.apps.googleusercontent.com', sheetId: '1FXAdF7g2rlGvPlTdixoDUNogSFe2Q8LlBKmG5pc7k44', tab: '고객목록' };
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email';
-export function getCfg() { try { return Object.assign({ clientId: '', sheetId: '', tab: '고객목록' }, JSON.parse(localStorage.getItem(CFG_KEY) || '{}')); } catch (e) { return { clientId: '', sheetId: '', tab: '고객목록' }; } }
+export function getCfg() { try { const saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); const c = Object.assign({}, DEFAULT_CFG); for (const k of ['clientId', 'sheetId', 'tab']) if (saved[k] && String(saved[k]).trim()) c[k] = saved[k]; return c; } catch (e) { return Object.assign({}, DEFAULT_CFG); } }
 export function setCfg(c) { const cur = getCfg(); const next = Object.assign(cur, c); next.sheetId = parseSheetId(next.sheetId); try { localStorage.setItem(CFG_KEY, JSON.stringify(next)); } catch (e) {} return next; }
 export function parseSheetId(s) { const m = /\/d\/([a-zA-Z0-9-_]+)/.exec(String(s || '')); return m ? m[1] : String(s || '').trim(); }
 export function isConfigured() { const c = getCfg(); return !!(c.clientId && c.sheetId && c.tab); }

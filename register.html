@@ -101,7 +101,7 @@
   <aside class="side">
     <div class="head">
       <a class="brand" href="index.html"><div class="mark">우</div><div><b>등록 업무</b><small>상담 기록 → 페이앤 입력</small></div><span class="home">← 홈</span></a>
-      <div class="gs {{ gsCls }}">{{ gsText }}<sc-if value="{{ gsNeedLogin }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ signIn }}">로그인</button></sc-if><sc-if value="{{ gsOn }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ reload }}">새로고침</button></sc-if><sc-if value="{{ gsOff }}" hint-placeholder-val="{{ true }}"><a class="lk" href="index.html#gsheet">설정</a></sc-if></div>
+      <div class="gs {{ gsCls }}">{{ gsText }}<sc-if value="{{ gsNeedLogin }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ signIn }}">로그인</button></sc-if><sc-if value="{{ gsOn }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ reload }}">새로고침</button></sc-if><sc-if value="{{ gsOff }}" hint-placeholder-val="{{ true }}"><a class="lk" href="index.html#admin">설정</a></sc-if></div>
       <div class="seg">
         <button type="button" class="{{ segPendingCls }}" onClick="{{ setPending }}">미등록 {{ pendingCount }}</button>
         <button type="button" class="{{ segDoneCls }}" onClick="{{ setDone }}">등록 완료 {{ doneCount }}</button>
@@ -175,7 +175,7 @@ class Component extends DCLogic {
   ];
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js');
+      const lib = await import('./udongji-lib.js?v=6');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
       this.setState({ lib }, () => this.load(true));
