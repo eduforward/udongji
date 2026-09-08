@@ -86,7 +86,7 @@
 </helmet>
 <div class="page">
   <div class="bar">
-    <a class="brand" href="index.html"><div class="mark">우</div><div><b>고객 목록</b><small>구글 시트 전체 보기</small></div></a>
+    <a class="brand" href="index.html"><div class="mark">우</div><div><b>고객 목록</b><small>전체 상담 기록</small></div></a>
     <a class="home" href="index.html">← 홈</a>
     <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 · 사업자번호 · 업종 검색" value="{{ query }}" onInput="{{ onQuery }}">
     <div class="seg">
@@ -177,10 +177,10 @@ class Component extends DCLogic {
   ];
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=1'); await lib.init();
-      if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; }
+      const lib = await import('./udongji-fb.js?v=2'); await lib.init();
+      if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       this.setState({ lib }, () => this.load());
-    } catch (e) { location.replace('index.html#gsheet'); }
+    } catch (e) { location.replace('index.html#login'); }
     this._on = () => this.load(); window.addEventListener('focus', this._on);
     this._esc = e => { if (e.key === 'Escape') this.setState(this.state.editing ? { editing: false, draft: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
   }

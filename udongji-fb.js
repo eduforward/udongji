@@ -11,8 +11,6 @@ export function fmtPhone(v) { const d = String(v || '').replace(/\D/g, ''); if (
 export function fmtBiz(v) { const d = String(v || '').replace(/\D/g, ''); return d.length === 10 ? d.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3') : String(v || '').trim(); }
 export function val(d, k) { const v = String((d || {})[k] || '').replace(/[\t\r\n]+/g, ' ').trim(); if (k === '연락처') return fmtPhone(v); if (k === '사업자번호') return fmtBiz(v); return v; }
 
-export function buildTSV(d) { return COLS.slice(1).map(c => val(d, c.name)).join('\t'); }
-
 export function buildPayn(d) {
   const v = k => val(d, k), isNew = v('매장 구분') === '신규 오픈', r = v('상담 결과');
   if (r && r !== '상담 진행') return ['[' + r + '] ' + (v('매장명') || v('고객명')), '· 대표 / 연락처 : ' + v('고객명') + ' / ' + v('연락처'), '· 상태 : ' + v('상태'), r === '상담 불가' ? '· 다음 연락 : ' + v('다음 액션 · 일시') : '· 메모 : ' + v('특이사항')].join('\n');
@@ -171,21 +169,15 @@ export function init() {
   })();
   return _ready;
 }
-export function isConfigured() { return true; }
 export function isSignedIn() { return !!_user; }
 export function userEmail() { return _user ? (_user.email || '') : ''; }
-export function hasEverSignedIn() { try { return !!localStorage.getItem('udongji-fb-hint'); } catch (e) { return false; } }
-export async function ensureSignedIn() { await init(); return _user; }
 export async function signIn() {
   await init(); const { auth } = _mods;
   const p = new auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
   const r = await auth.signInWithPopup(_auth, p); _user = r.user;
-  try { localStorage.setItem('udongji-fb-hint', _user.email || '1'); } catch (e) {}
-  return { email: _user.email };
+    return { email: _user.email };
 }
-export async function signOut() { await init(); await _mods.auth.signOut(_auth); _user = null; try { localStorage.removeItem('udongji-fb-hint'); } catch (e) {} }
-export function getCfg() { return { projectId: FIREBASE.projectId }; }
-export function setCfg() { return getCfg(); }
+export async function signOut() { await init(); await _mods.auth.signOut(_auth); _user = null; }
 export function todayStr() { const t = new Date(), p = n => String(n).padStart(2, '0'); return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()); }
 
 // ── 레코드 (Firestore: customers/{id}) ── 페이지 호환을 위해 { row: id, data } 형태로 반환
@@ -221,11 +213,6 @@ export async function deleteRow(id) {
   try { const list = await st.listAll(st.ref(_st, 'docs/' + id)); await Promise.all(list.items.map(it => st.deleteObject(it).catch(() => {}))); } catch (e) {}
   await fs.deleteDoc(fs.doc(_db, COL, id));
 }
-// 호환용 (시트 전용 기능은 no-op)
-export async function ensureHeader() { return FULL_HEADER(); }
-export async function initHeaderIfEmpty() { return { created: false, header: FULL_HEADER() }; }
-export async function listTabs() { return ['customers']; }
-
 // ── 관리자 (Firestore: admins/{email}) ──
 export async function listAdmins() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'admins')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '' })); } catch (e) { return []; } }
 export async function isAdmin(email) { const e = String(email || '').trim().toLowerCase(); if (!e) return false; if (ROOT_ADMINS.includes(e)) return true; await init(); const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'admins', e)); return s.exists(); } catch (er) { return false; } }
@@ -238,7 +225,6 @@ export async function removeUser(email) { const e = String(email || '').trim().t
 export async function isAllowed(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) return true; await init(); const { fs } = _mods; try { return (await fs.getDoc(fs.doc(_db, 'users', e))).exists(); } catch (er) { return false; } }
 
 // ── 파일 (Storage: docs/{recordId}/{name}) ──
-export async function ensureRootFolder() { return 'storage'; }
 export async function ensureCustomerFolder(label, recordId) { return recordId || safeName(label); }
 export async function uploadFile(blob, folder, name) {
   await init(); need(); const { st } = _mods;
@@ -249,7 +235,6 @@ export async function uploadFile(blob, folder, name) {
   return { id: path, name, webViewLink: url, size: blob.size };
 }
 export async function deleteFile(id) { await init(); need(); const { st } = _mods; try { await st.deleteObject(st.ref(_st, id)); } catch (e) { if (!/not-found/.test(String(e && e.code))) throw e; } }
-export async function folderInfo() { return { id: 'storage', name: 'Firebase Storage', driveId: '' }; }
 export function storageConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/storage'; }
 export function firestoreConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/firestore'; }
 

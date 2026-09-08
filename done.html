@@ -83,25 +83,24 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, rec: null, sync: 'wait', err: '', row: null, sms: '', copiedSms: '' };
+  state = { lib: null, rec: null, sync: 'wait', err: '', sms: '', copiedSms: '' };
   KEY = 'udongji-last-done';
   async componentDidMount() {
     let rec = null; try { rec = JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) {}
     if (!rec) { this.setState({ rec: null }); return; }
-    let lib = null; try { lib = await import('./udongji-fb.js?v=1'); await lib.init(); } catch (e) {}
+    let lib = null; try { lib = await import('./udongji-fb.js?v=2'); await lib.init(); } catch (e) {}
     const sms = lib ? lib.buildSMS(rec.data).text : '';
-    this.setState({ lib, rec, sms, sync: rec.synced ? 'ok' : 'wait', row: rec.sheetRow || null });
-    if (lib && !rec.synced) this.push(lib, rec);
+    this.setState({ lib, rec, sms, sync: rec.synced ? 'ok' : 'wait', err: rec.err || '' });
+    if (lib && !rec.synced) this.retry(lib, rec);
   }
-  async push(lib, rec) {
+  // 상담 페이지에서 저장 실패했을 때 한 번 더 시도
+  async retry(lib, rec) {
     try {
-      if (!lib.isSignedIn()) await lib.ensureSignedIn();
-      if (!lib.isSignedIn()) throw new Error('구글 로그인이 필요해요. 홈에서 로그인하면 자동 전송됩니다.');
-      let row = rec.sheetRow || await lib.findRowById(rec.id);
-      if (row) await lib.updateRecord(row, rec.data, rec.id); else row = await lib.appendRecord(rec.data, rec.id);
-      rec.synced = true; rec.sheetRow = row; localStorage.setItem(this.KEY, JSON.stringify(rec));
-      try { const list = JSON.parse(localStorage.getItem('udongji-records-v1') || '[]'); const i = list.findIndex(x => x.id === rec.id); if (i >= 0) { list[i].synced = true; list[i].sheetRow = row; localStorage.setItem('udongji-records-v1', JSON.stringify(list)); } } catch (e) {}
-      this.setState({ sync: 'ok', row });
+      if (!lib.isSignedIn()) throw new Error('구글 로그인이 필요해요. 홈에서 로그인 후 다시 시도하세요.');
+      const row = await lib.findRowById(rec.id);
+      if (row) await lib.updateRecord(row, rec.data, rec.id); else await lib.appendRecord(rec.data, rec.id);
+      rec.synced = true; rec.err = ''; localStorage.setItem(this.KEY, JSON.stringify(rec));
+      this.setState({ sync: 'ok', err: '' });
     } catch (e) { this.setState({ sync: 'bad', err: e.message }); }
   }
   copy(text, key) {
@@ -110,7 +109,7 @@ class Component extends DCLogic {
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy); else legacy();
   }
   renderVals() {
-    const { lib, rec, sync, err, row, sms, copiedSms } = this.state;
+    const { lib, rec, sync, err, sms, copiedSms } = this.state;
     if (!rec) return { hasRec: false, noRec: true };
     const d = rec.data || {}, V = k => lib ? lib.val(d, k) : String(d[k] || '');
     const res = V('상담 결과') || '상담 진행', go = res === '상담 진행';
@@ -119,7 +118,7 @@ class Component extends DCLogic {
       hasRec: true, noRec: false,
       ckCls: sync === 'ok' ? 'ok' : sync === 'bad' ? 'bad' : 'wait', ckIcon: sync === 'ok' ? '✓' : sync === 'bad' ? '!' : '…',
       title: sync === 'ok' ? '상담 기록이 저장됐어요' : sync === 'bad' ? '저장에 실패했어요' : '저장하는 중…',
-      sub: sync === 'ok' ? '고객 목록에 들어갔어요. 아래 안내 문자를 고객에게 보내고 다음 상담으로 넘어가세요. 값을 고쳐야 하면 고객 목록에서 수정하세요.' : sync === 'bad' ? err + ' — 이 기기에 보관돼 있으니 로그인 후 등록 업무에서 "시트로 전송"을 누르면 됩니다.' : '잠시만요.',
+      sub: sync === 'ok' ? '고객 목록에 들어갔어요. 아래 안내 문자를 고객에게 보내고 다음 상담으로 넘어가세요. 값을 고쳐야 하면 고객 목록에서 수정하세요.' : sync === 'bad' ? err + ' — 이 페이지를 새로고침하면 다시 저장을 시도합니다.' : '잠시만요.',
       subCls: sync === 'bad' ? 'bad' : '',
       store: V('매장명') || '(매장명 없음)', who: (V('고객명') || '고객') + ' · ' + V('연락처'), mode: V('매장 구분') || res, agent: V('상담자') || '—',
       statusTag: V('상태') || res, statusCls: go ? (V('상태') === '재연락 예정' ? 'amber' : 'ok') : '',

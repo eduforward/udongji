@@ -179,13 +179,13 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, folderId: '' };
+  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=1'); await lib.init();
-      if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; }
+      const lib = await import('./udongji-fb.js?v=2'); await lib.init();
+      if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       this.setState({ lib }, () => this.load(true));
-    } catch (e) { location.replace('index.html#gsheet'); }
+    } catch (e) { location.replace('index.html#login'); }
     this._on = () => this.load(false); window.addEventListener('focus', this._on);
     this._esc = e => { if (e.key === 'Escape') this.setState({ selRow: null }); }; window.addEventListener('keydown', this._esc);
   }
@@ -212,7 +212,7 @@ class Component extends DCLogic {
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy); else legacy();
   }
   renderVals() {
-    const { lib, items, loading, err, query, filter, selRow, memo, toast, toastOn, busy, folderId } = this.state;
+    const { lib, items, loading, err, query, filter, selRow, memo, toast, toastOn, busy } = this.state;
     const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
     const SC = lib ? lib.STAGE_COLS : { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
     const STAGES = lib ? lib.STAGES : [];

@@ -117,7 +117,7 @@
   </div>
 
   <sc-if value="{{ locked }}" hint-placeholder-val="{{ false }}">
-    <div class="gate" id="gsheet">
+    <div class="gate" id="login">
       <div class="g">G</div>
       <div><h2>구글 계정으로 로그인하세요</h2><p>관리자가 등록한 구글 계정으로 로그인하면 상담·계약·등록 업무가 열립니다. 모든 기록은 회사 서버에만 저장돼요.</p></div>
       <div class="act"><button type="button" class="btn" onClick="{{ signIn }}" disabled="{{ busy }}">구글 계정으로 로그인</button></div>
@@ -208,7 +208,7 @@ class Component extends DCLogic {
     this.setState({ isAdmin: ok, admins, users, showAdmin: ok && (this.state.showAdmin || location.hash === '#admin') });
   }
   async componentDidMount() {
-    try { const lib = await import('./udongji-fb.js?v=1'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-fb.js?v=2'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); }
@@ -219,9 +219,7 @@ class Component extends DCLogic {
     try {
       const { items } = await lib.readAll();
       const recs = items.map(it => ({ id: it.id, row: it.row, data: it.data, registered: !!String(it.data[lib.REG_COL] || '').trim(), savedAt: it.data['상담일'] || '' })).reverse();
-      let local = []; try { local = JSON.parse(localStorage.getItem('udongji-records-v1') || '[]') || []; } catch (e) {}
-      const pend = local.filter(r => r.synced === false).map(r => Object.assign({}, r, { unsent: true }));
-      this.setState({ records: pend.concat(recs), draft, signedIn: true, email: lib.userEmail(), err: '', allowed: true });
+      this.setState({ records: recs, draft, signedIn: true, email: lib.userEmail(), err: '', allowed: true });
     } catch (e) { const denied = /permission|insufficient/i.test(e.message); this.setState({ records: [], draft, err: denied ? '' : e.message, allowed: !denied, signedIn: lib.isSignedIn(), email: lib.userEmail() }); }
   }
   renderVals() {
@@ -240,8 +238,8 @@ class Component extends DCLogic {
     const hasDraft = !!draft && Object.keys(draft).some(k => k !== '상담일' && k !== '상담자' && k[0] !== '_' && String(draft[k] || '').trim());
     const recent = records.slice(0, 6).map(r => {
       const d = r.data || {}, res = d['상담 결과'] || '상담 진행';
-      const tag = r.unsent ? '미전송' : r.registered ? '등록 완료' : res !== '상담 진행' ? res : (d['상태'] || '미등록');
-      const cls = r.unsent ? 'draft' : r.registered ? 'ok' : res === '상담 진행' ? 'hot' : '';
+      const tag = r.registered ? '등록 완료' : res !== '상담 진행' ? res : (d['상태'] || '미등록');
+      const cls = r.registered ? 'ok' : res === '상담 진행' ? 'hot' : '';
       return { store: d['매장명'] || d['고객명'] || '(매장명 없음)', meta: [d['고객명'], d['매장 구분'], d['업종']].filter(Boolean).join(' · '), tag, cls, date: String(r.savedAt || '').slice(0, 16).replace('T', ' '), href: 'register.html#' + r.id };
     });
     const unlocked = signedIn && allowed;
@@ -263,7 +261,7 @@ class Component extends DCLogic {
       usersStatus: users.length + '명 등록', usersStatusCls: 'on',
       users: userRows, noUsers: users.length === 0, newUser, newUserName, onNewUser: e => this.setState({ newUser: e.target.value }), onNewUserName: e => this.setState({ newUserName: e.target.value }),
       addUser: async () => { const v = newUser.trim(); if (!lib || !v) return; this.setState({ busy: true }); try { await lib.addUser(v, email, newUserName); this.setState({ busy: false, newUser: '', newUserName: '', msg: v + ' 을(를) 사용자로 추가했어요. 이제 그 계정으로 로그인하면 바로 사용 가능해요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ busy: false, msg: '추가 실패: ' + e.message, msgCls: 'err' }); } },
-      exportAll: () => { if (!lib) return; const items = records.filter(r => !r.unsent).map(r => ({ data: r.data })); const txt = lib.buildExportTSV(items); const ok = () => this.setState({ msg: items.length + '건을 복사했어요. 빈 시트 A1에 붙여넣기.', msgCls: 'ok' }); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => this.setState({ msg: '복사 실패', msgCls: 'err' })); },
+      exportAll: () => { if (!lib) return; const items = records.map(r => ({ data: r.data })); const txt = lib.buildExportTSV(items); const ok = () => this.setState({ msg: items.length + '건을 복사했어요. 빈 시트 A1에 붙여넣기.', msgCls: 'ok' }); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => this.setState({ msg: '복사 실패', msgCls: 'err' })); },
       signIn: async () => { if (!lib) return; this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const r = await lib.signIn(); this.setState({ signedIn: true, email: r.email, busy: false, msg: '', msgCls: '' }); await this.load(); this.refreshAdmin(); } catch (e) { this.setState({ busy: false, msg: '로그인 실패: ' + e.message + (/unauthorized-domain/.test(e.message) ? ' — Firebase 콘솔 → Authentication → 설정 → 승인된 도메인에 ' + location.hostname + ' 추가' : ''), msgCls: 'err' }); } },
       signOut: async () => { if (!lib) return; await lib.signOut(); this.setState({ signedIn: false, email: '', msg: '', msgCls: '', records: [], isAdmin: false, admins: [], users: [], showAdmin: false, allowed: true }); }
     };

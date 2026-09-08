@@ -224,9 +224,9 @@
       <div>
         <div class="kicker">우동지 × Npay 커넥트 · 인바운드 / 아웃바운드 공통 · 우리 소개는 항상 "우동지"</div>
         <h1>상담 대응 스크립트</h1>
-        <p>인사·아이스브레이킹이 끝난 시점부터. 말은 짧게, 하나 묻고 하나 적기. 빨간 입력칸이 고객 목록 시트에 들어갈 값, <b>필수</b> 표시는 반드시. 다 채우고 <b>작성 완료</b>를 누르면 시트에 저장되고 안내 문자가 나온다.</p>
+        <p>인사·아이스브레이킹이 끝난 시점부터. 말은 짧게, 하나 묻고 하나 적기. 빨간 입력칸이 고객 목록에 저장될 값, <b>필수</b> 표시는 반드시. 다 채우고 <b>작성 완료</b>를 누르면 시트에 저장되고 안내 문자가 나온다.</p>
       </div>
-      <div class="pills"><span class="rec agent" data-col="상담자" data-val=""></span><span class="pill">v4 · 2026-09</span><span class="pill">동의는 유선 녹취</span><span class="pill blue">기록 = 고객 목록 시트</span><span class="pill modetag" id="modetag"></span></div>
+      <div class="pills"><span class="rec agent" data-col="상담자" data-val=""></span><span class="pill">v4 · 2026-09</span><span class="pill">동의는 유선 녹취</span><span class="pill blue">작성 완료 시 자동 저장</span><span class="pill modetag" id="modetag"></span></div>
     </header>
 
     <section class="step basic" id="basic" data-screen-label="기본정보">
@@ -361,11 +361,11 @@
       <div class="say consent"><span class="who">동의 문장</span>대표님 성함, 연락처, 이메일, 사업자번호, 매장 정보, 그리고 접수 서류인 사업자등록증·신분증·통장 사본·매장 사진을 저희 제휴사인 페이앤스토어랑 가맹 등록하는 밴사, NICE·KIS에 전달합니다. 카드 가맹 심사랑 밴 등록, 장비 설치에만 쓰이고, 계약 안 하시면 상담 끝나고 파기돼요. 동의 안 하셔도 되는데 그러면 커넥트 진행은 어렵고요. 동의하시겠어요?</div>
       <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="개인정보 제3자 제공 동의" data-val="O"></span></div>
       <div class="say"><span class="who">상담원</span>사업자번호 불러주시겠어요? 개인사업자세요, 법인이세요? 혼자 명의세요, 공동대표세요?<br><span class="rec" data-col="사업자번호" data-val=""></span><span class="rec" data-col="대형/개인/법인" data-val=""></span><span class="rec" data-col="단독/공동" data-val=""></span></div>
-      <p class="note">녹취 파일이 동의 증빙. 통화 끝나고 시트에 O 체크하고 녹취 보관.</p>
+      <p class="note">녹취 파일이 동의 증빙. 녹취 보관.</p>
     </section>
 
     <section class="step gated" id="s6" data-screen-label="6 서류·접수">
-      <div class="step-h"><div class="no">6</div><div class="t">서류 안내 <small>1차 통화에서는 안내만. 서류는 통화 뒤 카톡으로 받고, 수취·접수 체크는 엑셀 시트에서 한다. 점주에게 페이앤 링크는 보내지 않는다.</small></div></div>
+      <div class="step-h"><div class="no">6</div><div class="t">서류 안내 <small>1차 통화에서는 안내만. 서류는 통화 뒤 카톡으로 받고, 수취·접수는 계약 업무에서 체크한다. 점주에게 페이앤 링크는 보내지 않는다.</small></div></div>
 
       <div class="say"><span class="who">상담원</span>서류는 통화 끝나고 카톡으로 저한테 보내주시면 제가 접수까지 다 넣어드릴게요. 휴대폰으로 찍으신 걸로 돼요. 준비하실 게 몇 개 있어요.</div>
       <div class="say"><span class="who">상담원 · 준비물</span>사업자등록증 최근 발급본이요, 가리는 데 없이요. 대표님 신분증은 주민등록증이나 운전면허증만 돼요, 여권은 안 되고요. 정산받으실 통장 사본, 모바일 캡처도 돼요. 음식점이시면 영업신고증도요. 매장 사진은 간판 나오는 바깥 사진 두 장, 안쪽 전체 사진 두 장이요.</div>
@@ -434,11 +434,11 @@
 class Component extends DCLogic {
   renderVals() { return {}; }
   componentDidMount() {
-    import('./udongji-fb.js?v=1').then(async mod => {
+    import('./udongji-fb.js?v=2').then(async mod => {
       this.lib = mod; await mod.init();
-      if (!mod.isSignedIn()) { location.replace('index.html#gsheet'); return; }
+      if (!mod.isSignedIn()) { location.replace('index.html#login'); return; }
       this.boot();
-    }, () => { location.replace('index.html#gsheet'); });
+    }, () => { location.replace('index.html#login'); });
   }
   boot() {
     var page = document.querySelector('.page'); if (!page || page.dataset.booted) return; page.dataset.booted = '1';
@@ -605,112 +605,23 @@ class Component extends DCLogic {
     var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
     navLinks.forEach(function(a){ if(!a.querySelector('.prog')){ var p = document.createElement('span'); p.className = 'prog'; a.appendChild(p); } });
     render();
-    if(LIB){ buildTSV = function(){ return LIB.buildTSV(S); }; buildPayn = function(){ return LIB.buildPayn(S); }; buildSMS = function(){ return LIB.buildSMS(S); }; }
-    // 시트 연결 상태 표시 + 미전송 건 자동 전송
-    function gsStatus(){ var el = $('gs-status'); if(!el) return; if(!LIB || !LIB.isSignedIn()){ el.textContent = '로그인 필요'; el.className = 'gs warn'; return; } var pend = loadRecords().filter(function(r){ return r.synced === false; }).length; el.textContent = '연결됨 · ' + (LIB.userEmail() || '') + (pend ? ' · 미전송 ' + pend : ''); el.className = 'gs on'; }
-    gsStatus();
-    function syncPending(){ if(!LIB || !LIB.isConfigured() || !LIB.isSignedIn()) return; var list = loadRecords(); var pend = list.filter(function(r){ return r.synced === false; }); (function next(i){ if(i >= pend.length){ gsStatus(); return; } pushRecord(pend[i]).then(function(){ next(i+1); }, function(){ next(i+1); }); })(0); }
-    function pushRecord(rec){
-      if(!LIB || !LIB.isConfigured() || !LIB.isSignedIn()) return Promise.reject(new Error('not_connected'));
-      var p = rec.sheetRow ? LIB.updateRecord(rec.sheetRow, rec.data, rec.id).then(function(){ return rec.sheetRow; }) : LIB.findRowById(rec.id).then(function(row){ return row ? LIB.updateRecord(row, rec.data, rec.id).then(function(){ return row; }) : LIB.appendRecord(rec.data, rec.id); });
-      return p.then(function(row){ var list = loadRecords(); var i = list.findIndex(function(x){ return x.id === rec.id; }); if(i >= 0){ list[i].synced = true; list[i].sheetRow = row || list[i].sheetRow || null; try { localStorage.setItem(RKEY, JSON.stringify(list)); } catch(e){} } return row; });
-    }
-    setTimeout(function(){ if(LIB && LIB.isConfigured() && !LIB.isSignedIn() && LIB.hasEverSignedIn()){ LIB.ensureSignedIn().then(function(){ gsStatus(); syncPending(); }); } else syncPending(); }, 300);
+    var gsEl = $('gs-status'); if(gsEl){ gsEl.textContent = '연결됨 · ' + (LIB ? LIB.userEmail() : ''); gsEl.className = 'gs on'; }
     if(hasDraft){ savedAt = new Date(); var sn = $('savenote'); if(sn) sn.textContent = '이전 상담 내용 불러왔어요'; }
 
     function fmtPhone(v){ var d = String(v).replace(/\D/g,''); if(d.length===11) return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3'); if(d.length===10) return d.slice(0,2)==='02' ? d.replace(/(\d{2})(\d{4})(\d{4})/,'$1-$2-$3') : d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3'); if(d.length===9 && d.slice(0,2)==='02') return d.replace(/(\d{2})(\d{3})(\d{4})/,'$1-$2-$3'); return String(v).trim(); }
     function fmtBiz(v){ var d = String(v).replace(/\D/g,''); return d.length===10 ? d.replace(/(\d{3})(\d{2})(\d{5})/,'$1-$2-$3') : String(v).trim(); }
-    function val(k){ var v = (S[k] || '').toString().replace(/[\t\r\n]+/g,' ').trim(); if(k==='연락처') return fmtPhone(v); if(k==='사업자번호') return fmtBiz(v); return v; }
-    function buildTSV(){ return COLS.slice(1).map(function(c){ return val(c.name); }).join('\t'); }
-    function buildPayn(){
-      var isNew = val('매장 구분') === '신규 오픈';
-      var L = [];
-      var r = val('상담 결과');
-      if(r && r !== '상담 진행'){
-        return ['['+r+'] '+(val('매장명')||val('고객명')), '· 대표 / 연락처 : '+val('고객명')+' / '+val('연락처'), '· 상태 : '+val('상태'), r==='상담 불가' ? '· 다음 연락 : '+val('다음 액션 · 일시') : '· 메모 : '+val('특이사항')].join('\n');
-      }
-      L.push('['+(isNew?'신규 매장':'기존 운영 매장')+' 상담 접수] '+val('매장명')+(val('매장 주소')?' ('+val('매장 주소')+')':''));
-      L.push('· 대표 / 연락처 : '+val('고객명')+' / '+val('연락처'));
-      L.push('· 업종 : '+val('업종')+(val('판매 물품')?' — '+val('판매 물품'):''));
-      L.push(isNew ? '· 오픈 예정일 : '+val('오픈 예정일')+(val('사업자등록증 발급')?' ('+val('사업자등록증 발급')+')':'') : '· 현재 운영 방식 : '+val('현재 운영 방식'));
-      L.push('· 인터넷 회선(랜선) 보유 여부 : '+val('인터넷 회선(랜선) 보유')+(val('인터넷 변경/신규 필요')?' / 변경·신규 '+val('인터넷 변경/신규 필요'):''));
-      L.push('· 커넥트 설치 시 랜선 직접 준비 안내 여부 : '+val('랜선 직접 준비 안내'));
-      L.push('· 사업자번호 : '+val('사업자번호'));
-      L.push('· 대형 / 개인 / 법인 / 단독 / 공동 : '+[val('대형/개인/법인'), val('단독/공동')].filter(Boolean).join(' / '));
-      L.push('· 안내한 상품 구성 및 월 이용요금 : '+val('안내한 상품 구성')+(val('월 이용요금')?' / 월 '+val('월 이용요금')+'원':''));
-      L.push('· POS 프로그램 사용 여부 : '+val('POS 프로그램')+(!isNew && val('현재 단말기·POS') ? ' (현재 '+val('현재 단말기·POS')+')' : ''));
-      L.push('· VAN : '+val('VAN'));
-      L.push('· 배달 필요 여부 : '+val('배달 필요 여부'));
-      if(val('인터넷 상담 요청 일정') || val('매장 주소')) L.push('· 인터넷 상담 : '+val('매장 주소')+' / '+val('인터넷 상담 요청 일정'));
-      L.push('· 인테리어 타공 : '+val('인테리어 타공'));
-      L.push('· 기기 색상 : '+val('기기 색상'));
-      if(!isNew){ L.push('· VAN 전산 유실적 : NICE '+val('VAN 유실적 — NICE')+' / KIS '+val('VAN 유실적 — KIS')); L.push('· 기존 약정 : 잔여 '+val('약정 잔여 개월')+'개월 / 월 '+val('월 납부금')+'원'); }
-      L.push('· 특이사항 : '+val('특이사항'));
-      L.push('· 기타 상담 내용 : '+val('기타 상담 내용'));
-      L.push('· 서류 : 통화 후 카톡 수취 예정' + (val('서류 분류') ? ' / '+val('서류 분류') : ''));
-      return L.join('\n');
-    }
-    function buildSMS(){
-      var name = val('고객명') ? val('고객명') + ' 대표님' : '대표님';
-      var agent = val('상담자') || '담당자';
-      var head = '[우동지] ' + name + ', 우동지 ' + agent + '입니다.';
-      var tail = '\n\n궁금한 점은 이 번호로 카톡 주시면 바로 답드릴게요.\n감사합니다.';
-      var r = val('상담 결과');
-      if(r === '상담 거부'){
-        return { kind: '상담 거부 · 마무리 인사', text: head + '\n오늘 시간 내주셔서 감사합니다.\n나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.' + tail };
-      }
-      if(r === '상담 불가' || val('상태') === '재연락 예정'){
-        var when = val('다음 액션 · 일시') || '○월 ○일';
-        return { kind: '재연락 안내', text: head + '\n오늘 통화 감사합니다. 말씀해주신 대로 ' + when + '에 다시 연락드리겠습니다.\n그 전에 준비되시면 미리 보내주셔도 좋아요.' + tail };
-      }
-      var isNew = val('매장 구분') === '신규 오픈';
-      var corp = val('대형/개인/법인') === '법인';
-      var joint = val('단독/공동') === '공동';
-      var food = /음식|식당|카페|주점|치킨|피자|분식|베이커리|제과|호프|술/.test(val('업종'));
-      var docs = [];
-      docs.push('1. 사업자등록증 (최근 발급본, 가리는 곳 없이)');
-      docs.push('2. 대표님 신분증 (주민등록증 또는 운전면허증 — 여권 불가)');
-      docs.push('3. 정산받으실 통장 사본 (모바일 캡처 가능' + (corp ? ', 예금주 = 법인명' : '') + ')');
-      var n = 4;
-      if(food) docs.push((n++) + '. 영업신고증');
-      docs.push((n++) + '. 매장 사진 — 간판 나오는 바깥 사진 2장, 안쪽 전체 사진 2장\n   (간판이 없으면: 건물 바깥 1장, 입구에서 안이 보이게 1장, 도로명주소 표지판 1장, 안쪽 전체 2장)');
-      if(corp) docs.push((n++) + '. 법인: 등기부등본, 인감증명서(3개월 이내), 주주명부, 소유지배자 확인서' + '\n   (사용인감 쓰시면 사용인감계도)');
-      if(joint) docs.push((n++) + '. 공동대표: 가입 동의·위임장, 결제계좌 동의서, 공동대표님 신분증·연락처\n   (서식은 따로 보내드릴게요)');
-      var extra = [];
-      if(!val('네이버 ID')) extra.push('네이버 아이디 (대표님 개인 명의 계정)');
-      if(isNew && !corp && !val('영문 성함')) extra.push('성함 영문 표기 (여권 기준)');
-      if(!val('이메일')) extra.push('이메일 주소');
-      var body = head + '\n오늘 통화 감사합니다. 안내드린 대로 아래 서류를 이 번호로 카톡/문자로 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 사진으로 충분합니다.\n\n' + docs.join('\n');
-      if(extra.length) body += '\n\n함께 알려주세요:\n- ' + extra.join('\n- ');
-      var summary = [];
-      if(val('안내한 상품 구성')) summary.push('구성: ' + val('안내한 상품 구성') + (val('월 이용요금') ? ' / 월 ' + val('월 이용요금') + '원' : ''));
-      if(val('기기 색상')) summary.push('기기 색상: ' + val('기기 색상'));
-      if(val('VAN')) summary.push('밴사: ' + val('VAN'));
-      if(summary.length) body += '\n\n오늘 정리된 내용\n- ' + summary.join('\n- ');
-      if(val('랜선 직접 준비 안내') === 'O') body += '\n\n설치는 택배 자가설치가 기본이며, 랜선 케이블은 직접 준비해주셔야 합니다 (다이소·온라인 몇 천 원).';
-      body += '\n\n서류 접수 후 페이앤에서 전자계약서가 카톡으로 발송되며, 서명하시면 완료됩니다.' + (joint ? ' 공동대표님도 함께 서명하셔야 합니다.' : '');
-      if(val('상태') === '밴 조회 대기') body += '\n\n밴 등록 조회 결과는 나오는 대로 바로 연락드리겠습니다.';
-      body += tail;
-      return { kind: (isNew ? '신규 오픈' : '기존 운영') + ' · 서류 안내', text: body };
-    }
-    // 작성 완료 → 등록 업무 목록에 보관
-    var RKEY = 'udongji-records-v1';
-    function loadRecords(){ try { return JSON.parse(localStorage.getItem(RKEY) || '[]') || []; } catch(e){ return []; } }
-    // 작성 완료: 기록을 기기에 저장하고 완료 페이지로 이동 (시트 전송은 완료 페이지가 처리)
+    // 작성 완료: 서버(Firestore)에 저장 → 폼 초기화(상담자 유지) → 완료 페이지
     function archive(){
       if(!S._id) S._id = 'r' + Date.now().toString(36);
-      var list = loadRecords(), data = {}; Object.keys(S).forEach(function(k){ if(k[0] !== '_') data[k] = S[k]; });
-      var rec = { id: S._id, savedAt: new Date().toISOString(), data: data, registered: false, synced: false, sheetRow: null };
-      var i = list.findIndex(function(x){ return x.id === S._id; });
-      if(i >= 0){ rec.registered = !!list[i].registered; rec.registeredAt = list[i].registeredAt; rec.sheetRow = list[i].sheetRow || null; list[i] = rec; } else list.unshift(rec);
-      try { localStorage.setItem(RKEY, JSON.stringify(list)); localStorage.setItem('udongji-last-done', JSON.stringify(rec)); } catch(e){}
-      // 폼 초기화 (상담자는 유지) — 다음 상담은 빈 상태에서 시작
-      var agent = S['상담자'] || '';
-      S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent;
-      save();
-      location.href = 'done.html';
+      var id = S._id, data = {}; Object.keys(S).forEach(function(k){ if(k[0] !== '_') data[k] = S[k]; });
+      var done = function(ok, err){
+        try { localStorage.setItem('udongji-last-done', JSON.stringify({ id: id, data: data, savedAt: new Date().toISOString(), synced: !!ok, err: err || '' })); } catch(e){}
+        var agent = S['상담자'] || ''; S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent; save();
+        location.href = 'done.html';
+      };
+      if(!LIB){ done(false, '연결 안 됨'); return; }
+      LIB.findRowById(id).then(function(row){ return row ? LIB.updateRecord(row, data, id) : LIB.appendRecord(data, id); }).then(function(){ done(true); }, function(e){ done(false, e && e.message || String(e)); });
     }
-    function esc(x){ return String(x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
     function scrollToEl(el){ var r = el.getBoundingClientRect(); window.scrollTo({ top: window.scrollY + r.top - window.innerHeight/2 + r.height/2, behavior: 'smooth' }); }
     function isVisible(el){ return !!(el.offsetParent) && !el.closest('.skip, li.off, .result-branch:not(.picked), .issue-branch:not(.picked), .gated:not(.open), .gated-go:not(.open)'); }
     function jumpTo(key){
@@ -747,7 +658,7 @@ class Component extends DCLogic {
     }
     $('btn-reset').addEventListener('click', function(){
       var has = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && (S[k]||'').toString().trim(); });
-      if(has && !window.confirm('지금 입력한 내용을 모두 지우고 새 상담을 시작할까요?\n(작성 완료를 안 했으면 시트에 저장되지 않아요)')) return;
+      if(has && !window.confirm('지금 입력한 내용을 모두 지우고 새 상담을 시작할까요?\n(작성 완료를 안 했으면 저장되지 않아요)')) return;
       resetForm();
     });
     // 완료 페이지에서 "새 상담 시작"으로 들어온 경우
