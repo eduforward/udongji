@@ -78,10 +78,11 @@ export function getCfg() { try { return Object.assign({ clientId: '', sheetId: '
 export function setCfg(c) { const cur = getCfg(); const next = Object.assign(cur, c); next.sheetId = parseSheetId(next.sheetId); try { localStorage.setItem(CFG_KEY, JSON.stringify(next)); } catch (e) {} return next; }
 export function parseSheetId(s) { const m = /\/d\/([a-zA-Z0-9-_]+)/.exec(String(s || '')); return m ? m[1] : String(s || '').trim(); }
 export function isConfigured() { const c = getCfg(); return !!(c.clientId && c.sheetId && c.tab); }
-export function getToken() { try { const t = JSON.parse(sessionStorage.getItem(TOK_KEY) || 'null'); return t && t.exp > Date.now() ? t : null; } catch (e) { return null; } }
+export function getToken() { try { const t = JSON.parse(localStorage.getItem(TOK_KEY) || sessionStorage.getItem(TOK_KEY) || 'null'); return t && t.exp > Date.now() ? t : null; } catch (e) { return null; } }
+export function hasEverSignedIn() { try { return !!localStorage.getItem(TOK_KEY + '-hint'); } catch (e) { return false; } }
 export function isSignedIn() { return !!getToken(); }
 export function userEmail() { const t = getToken(); return t ? (t.email || '') : ''; }
-export function clearToken() { try { sessionStorage.removeItem(TOK_KEY); } catch (e) {} }
+export function clearToken() { try { localStorage.removeItem(TOK_KEY); sessionStorage.removeItem(TOK_KEY); } catch (e) {} }
 function gis() { return new Promise((res, rej) => { let n = 0; const t = () => { if (window.google && window.google.accounts && window.google.accounts.oauth2) return res(window.google); if (++n > 100) return rej(new Error('구글 로그인 스크립트를 불러오지 못했어요 (네트워크/차단 확인)')); setTimeout(t, 100); }; t(); }); }
 export async function signIn(interactive = true) {
   const cfg = getCfg(); if (!cfg.clientId) throw new Error('OAuth 클라이언트 ID가 없어요. 홈 → 구글 시트 연결에서 입력하세요.');
@@ -93,22 +94,29 @@ export async function signIn(interactive = true) {
         if (r.error) return rej(new Error(r.error_description || r.error));
         const tok = { access_token: r.access_token, exp: Date.now() + (Number(r.expires_in || 3600) - 60) * 1000, email: '' };
         try { const u = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + r.access_token } }).then(x => x.json()); tok.email = u.email || ''; } catch (e) {}
-        try { sessionStorage.setItem(TOK_KEY, JSON.stringify(tok)); } catch (e) {}
+        try { localStorage.setItem(TOK_KEY, JSON.stringify(tok)); localStorage.setItem(TOK_KEY + '-hint', tok.email || '1'); } catch (e) {}
         res(tok);
       },
       error_callback: e => rej(new Error(e && e.type === 'popup_closed' ? '로그인 창이 닫혔어요' : (e && e.message) || '로그인 실패'))
     });
-    tc.requestAccessToken({ prompt: interactive ? 'select_account' : '' });
+    const hint = (() => { try { return localStorage.getItem(TOK_KEY + '-hint') || ''; } catch (e) { return ''; } })();
+    tc.requestAccessToken(interactive ? { prompt: hint ? '' : 'select_account', hint: hint && hint !== '1' ? hint : undefined } : { prompt: '', hint: hint && hint !== '1' ? hint : undefined });
   });
 }
-export async function signOut() { const t = getToken(); clearToken(); try { const g = await gis(); if (t) g.accounts.oauth2.revoke(t.access_token, () => {}); } catch (e) {} }
+// 만료 시 조용히 재로그인 시도(이전에 동의한 계정이면 팝업이 바로 닫힘). 실패하면 null.
+export async function ensureSignedIn() {
+  if (getToken()) return getToken();
+  if (!isConfigured() || !hasEverSignedIn()) return null;
+  try { return await signIn(false); } catch (e) { return null; }
+}
+export async function signOut() { const t = getToken(); clearToken(); try { localStorage.removeItem(TOK_KEY + '-hint'); } catch (e) {} try { const g = await gis(); if (t) g.accounts.oauth2.revoke(t.access_token, () => {}); } catch (e) {} }
 
 const q = s => encodeURIComponent(s);
 async function api(path, opt = {}) {
-  const t = getToken(); if (!t) throw new Error('not_signed_in');
+  let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요. 홈에서 구글 계정으로 로그인하세요.');
   const cfg = getCfg();
   const r = await fetch('https://sheets.googleapis.com/v4/spreadsheets/' + cfg.sheetId + path, Object.assign({}, opt, { headers: Object.assign({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + t.access_token }, opt.headers || {}) }));
-  if (r.status === 401) { clearToken(); throw new Error('로그인이 만료됐어요. 다시 로그인하세요.'); }
+  if (r.status === 401) { clearToken(); const t2 = await ensureSignedIn(); if (t2 && !opt._retry) return api(path, Object.assign({}, opt, { _retry: true })); throw new Error('로그인이 만료됐어요. 다시 로그인하세요.'); }
   if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); }
   return r.json();
 }
