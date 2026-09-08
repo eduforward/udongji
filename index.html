@@ -111,12 +111,13 @@
     <div class="gs-head"><h3>구글 시트 연결</h3><span class="status {{ statusCls }}">{{ statusText }}</span>
       <div class="acts">
         <sc-if value="{{ canSignIn }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ signIn }}">구글 계정으로 로그인</button></sc-if>
-        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn ok" onClick="{{ test }}">연결 확인</button><button type="button" class="btn ghost" onClick="{{ signOut }}">로그아웃</button></sc-if>
+        <sc-if value="{{ needSheetLogin }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ signIn }}">구글 로그인 후 시트 만들기</button></sc-if>
+        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a class="btn ghost" href="{{ sheetUrl }}" target="_blank" rel="noopener">시트 열기</a><button type="button" class="btn ok" onClick="{{ test }}">연결 확인</button><button type="button" class="btn ghost" onClick="{{ signOut }}">로그아웃</button></sc-if>
       </div>
     </div>
     <div class="fields">
       <div class="wide"><label>OAuth 클라이언트 ID</label><input type="text" placeholder="xxxxxxxx.apps.googleusercontent.com" value="{{ cfg.clientId }}" onInput="{{ onClientId }}"></div>
-      <div class="wide"><label>구글 시트 URL (또는 ID)</label><input type="text" placeholder="https://docs.google.com/spreadsheets/d/…/edit" value="{{ cfg.sheetId }}" onInput="{{ onSheetId }}"></div>
+      <div class="wide"><label>구글 시트 URL (또는 ID)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" style="flex:1 1 260px" placeholder="https://docs.google.com/spreadsheets/d/…/edit  — 없으면 오른쪽 버튼으로 새로 만들기" value="{{ cfg.sheetId }}" onInput="{{ onSheetId }}"><button type="button" class="btn ghost" onClick="{{ createSheet }}" disabled="{{ noCreate }}">새 시트 만들기</button></div></div>
       <div><label>탭 이름</label><input type="text" placeholder="고객목록" value="{{ cfg.tab }}" onInput="{{ onTab }}"></div>
       <div style="display:flex;align-items:flex-end"><button type="button" class="btn ghost" onClick="{{ saveCfg }}">설정 저장</button></div>
     </div>
@@ -130,7 +131,8 @@
           <li>API 및 서비스 → OAuth 동의 화면 → 사용자 유형 <b>외부</b>(개인 gmail) 또는 <b>내부</b>(워크스페이스). 범위는 추가 안 해도 됨. 외부면 <b>테스트 사용자</b>에 상담자들 이메일 추가.</li>
           <li>사용자 인증 정보 → 사용자 인증 정보 만들기 → <b>OAuth 클라이언트 ID</b> → 유형 <b>웹 애플리케이션</b>.</li>
           <li><b>승인된 JavaScript 원본</b>에 이 페이지가 올라가는 주소를 넣기: <code>{{ origin }}</code></li>
-          <li>생성된 클라이언트 ID를 위 칸에 붙이고, 고객 목록 시트 URL과 탭 이름을 넣고 <b>설정 저장</b> → <b>구글 계정으로 로그인</b>.</li>
+          <li>생성된 클라이언트 ID를 위 칸에 붙이고 <b>설정 저장</b> → <b>구글 로그인</b> → <b>새 시트 만들기</b>(헤더 자동 생성). 이미 쓰는 시트가 있으면 URL을 넣고 설정 저장.</li>
+          <li>만들어진 시트를 열어 <b>공유</b> → 상담자들 이메일에 <b>편집자</b> 권한. 이 권한이 있는 계정만 이 페이지에서 데이터를 볼 수 있어요.</li>
         </ol>
         <p style="margin-top:8px">시트는 상담자 각자의 구글 계정 편집 권한으로 읽고 씁니다. 로그인은 브라우저 탭 기준 약 1시간 유지되고, 만료되면 다시 로그인 버튼이 뜹니다. 시트 첫 줄이 헤더여야 하고, 없는 열(<code>레코드ID</code>, <code>페이앤 등록</code>)은 처음 전송할 때 맨 끝에 자동 추가됩니다.</p>
         <div class="warnbox">이 페이지를 임시 미리보기 주소로 보고 있다면 구글이 그 주소를 원본으로 허용하지 않을 수 있어요. 실제 사용은 고정 주소(회사 서버, GitHub Pages 등)에 올린 뒤 그 주소를 원본에 등록하세요.</div>
@@ -186,12 +188,23 @@ class Component extends DCLogic {
       return { store: d['매장명'] || d['고객명'] || '(매장명 없음)', meta: [d['고객명'], d['매장 구분'], d['업종']].filter(Boolean).join(' · '), tag, cls, date: String(r.savedAt || '').slice(0, 16).replace('T', ' '), href: 'register.html#' + r.id };
     });
     const configured = !!(cfg.clientId && cfg.sheetId && cfg.tab);
+    const hasClient = !!cfg.clientId, tokenOk = lib && lib.isSignedIn();
     const statusCls = !configured ? 'off' : signedIn ? 'on' : 'warn';
     const statusText = !configured ? '미설정' : signedIn ? '연결됨 · ' + (email || '로그인됨') : '로그인 필요';
     const setC = (k) => e => this.setState({ cfg: Object.assign({}, this.state.cfg, { [k]: e.target.value }) });
     const unlocked = configured && signedIn;
     return {
       locked: !unlocked, unlocked, gridCls: unlocked ? '' : 'locked', cardCls: unlocked ? '' : 'hi',
+      needSheetLogin: hasClient && !cfg.sheetId && !tokenOk && !busy, noCreate: !(hasClient && tokenOk) || busy,
+      sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
+      createSheet: async () => {
+        if (!lib) return; lib.setCfg(this.state.cfg);
+        if (!lib.isSignedIn()) { try { await lib.signIn(true); } catch (e) { this.setState({ msg: '로그인 실패: ' + e.message, msgCls: 'err' }); return; } }
+        if (!confirm('로그인한 구글 계정의 드라이브에 "우동지 고객 목록" 시트를 새로 만들까요? 헤더가 자동으로 채워지고 설정에 바로 연결돼요.')) return;
+        this.setState({ busy: true, msg: '시트 만드는 중…', msgCls: '' });
+        try { const r = await lib.createSheet('우동지 고객 목록', this.state.cfg.tab || '고객목록'); this.setState({ cfg: lib.getCfg(), signedIn: true, email: lib.userEmail(), busy: false, msg: '시트를 만들고 연결했어요. 상담자들에게 이 시트의 편집 권한을 공유하세요: ' + r.url, msgCls: 'ok' }); this.load(); }
+        catch (e) { this.setState({ busy: false, msg: '시트 생성 실패: ' + e.message, msgCls: 'err' }); }
+      },
       today: `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())}`,
       todayCount: records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr).length,
       totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0,
@@ -201,7 +214,7 @@ class Component extends DCLogic {
       canSignIn: configured && !signedIn && !busy, signedIn: signedIn && configured,
       onClientId: setC('clientId'), onSheetId: setC('sheetId'), onTab: setC('tab'),
       saveCfg: () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); this.setState({ cfg: c, msg: '설정을 저장했어요.' + (lib.isSignedIn() ? '' : ' 이제 구글 계정으로 로그인하세요.'), msgCls: 'ok' }); },
-      signIn: async () => { if (!lib) return; lib.setCfg(this.state.cfg); this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); this.setState({ signedIn: true, email: tok.email, msg: '로그인됐어요. 시트를 읽어옵니다…', msgCls: 'ok', busy: false }); await this.load(); this.setState({ msg: '연결됐어요. 시트에서 ' + this.state.records.length + '건을 읽었어요.', msgCls: 'ok' }); } catch (e) { this.setState({ busy: false, msg: '로그인 실패: ' + e.message + (/(origin|redirect|invalid_client|idpiframe)/i.test(e.message) ? ' — 클라이언트 ID와 승인된 JavaScript 원본(' + location.origin + ')을 확인하세요.' : ''), msgCls: 'err' }); } },
+      signIn: async () => { if (!lib) return; lib.setCfg(this.state.cfg); this.setState({ busy: true, msg: '구글 로그인 창을 확인하세요…', msgCls: '' }); try { const tok = await lib.signIn(true); if (!this.state.cfg.sheetId) { this.setState({ signedIn: true, email: tok.email, busy: false, msg: '로그인됐어요. 이제 "새 시트 만들기"를 누르거나 기존 시트 URL을 넣고 설정 저장하세요.', msgCls: 'ok' }); return; } this.setState({ signedIn: true, email: tok.email, msg: '로그인됐어요. 시트를 읽어옵니다…', msgCls: 'ok', busy: false }); await this.load(); this.setState({ msg: '연결됐어요. 시트에서 ' + this.state.records.length + '건을 읽었어요.', msgCls: 'ok' }); } catch (e) { this.setState({ busy: false, msg: '로그인 실패: ' + e.message + (/(origin|redirect|invalid_client|idpiframe)/i.test(e.message) ? ' — 클라이언트 ID와 승인된 JavaScript 원본(' + location.origin + ')을 확인하세요.' : ''), msgCls: 'err' }); } },
       signOut: async () => { if (!lib) return; await lib.signOut(); this.setState({ signedIn: false, email: '', msg: '로그아웃했어요.', msgCls: '' }); this.load(); },
       test: async () => { if (!lib) return; try { const h = await lib.getHeader(); this.setState({ msg: '연결 정상 · 탭 "' + cfg.tab + '" 헤더 ' + h.length + '열 (' + h.slice(0, 5).join(', ') + '…)', msgCls: 'ok' }); this.load(); } catch (e) { this.setState({ msg: '연결 실패: ' + e.message, msgCls: 'err', signedIn: lib.isSignedIn() }); } }
     };

@@ -73,7 +73,7 @@ export function buildSMS(d) {
 
 // ───────── 구글 시트 연동 ─────────
 const CFG_KEY = 'udongji-gsheet-cfg', TOK_KEY = 'udongji-gtoken';
-const SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email';
+const SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email';
 export function getCfg() { try { return Object.assign({ clientId: '', sheetId: '', tab: '고객목록' }, JSON.parse(localStorage.getItem(CFG_KEY) || '{}')); } catch (e) { return { clientId: '', sheetId: '', tab: '고객목록' }; } }
 export function setCfg(c) { const cur = getCfg(); const next = Object.assign(cur, c); next.sheetId = parseSheetId(next.sheetId); try { localStorage.setItem(CFG_KEY, JSON.stringify(next)); } catch (e) {} return next; }
 export function parseSheetId(s) { const m = /\/d\/([a-zA-Z0-9-_]+)/.exec(String(s || '')); return m ? m[1] : String(s || '').trim(); }
@@ -154,3 +154,18 @@ export async function setCell(row, headerName, value) {
   await api('/values/' + q(cfg.tab + '!' + colLetter(idx + 1) + row) + '?valueInputOption=USER_ENTERED', { method: 'PUT', body: JSON.stringify({ values: [[value]] }) });
 }
 export function todayStr() { const t = new Date(), p = n => String(n).padStart(2, '0'); return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()); }
+
+// 새 스프레드시트 생성 + 헤더 행 작성 + 설정 저장. 리턴: { id, url }
+export async function createSheet(title = '우동지 고객 목록', tab = '고객목록') {
+  const t = getToken() || await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.');
+  const header = COLS.map(c => c.name).concat([ID_COL, REG_COL]);
+  const body = {
+    properties: { title, locale: 'ko_KR', timeZone: 'Asia/Seoul' },
+    sheets: [{ properties: { title: tab, gridProperties: { frozenRowCount: 1, frozenColumnCount: 2 } }, data: [{ startRow: 0, startColumn: 0, rowData: [{ values: header.map(h => ({ userEnteredValue: { stringValue: h }, userEnteredFormat: { textFormat: { bold: true }, backgroundColor: { red: 0.93, green: 0.95, blue: 1 } } })) }] }] }]
+  };
+  const r = await fetch('https://sheets.googleapis.com/v4/spreadsheets', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t.access_token }, body: JSON.stringify(body) });
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); }
+  const j = await r.json();
+  setCfg({ sheetId: j.spreadsheetId, tab });
+  return { id: j.spreadsheetId, url: j.spreadsheetUrl };
+}
