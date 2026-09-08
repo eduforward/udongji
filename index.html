@@ -278,7 +278,7 @@ class Component extends DCLogic {
       cfg, statusCls, statusText, msg, msgCls, origin: location.origin,
       sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
       folderUrl: cfg.folderId ? 'https://drive.google.com/drive/folders/' + cfg.folderId : 'https://drive.google.com/',
-      showAdmin: showAdmin && isAdmin, isAdmin, adminLabel: showAdmin ? '설정 닫기' : '설정', toggleAdmin: () => this.setState({ showAdmin: !showAdmin, msg: '', msgCls: '' }),
+      email, showAdmin: showAdmin && isAdmin, isAdmin, adminLabel: showAdmin ? '설정 닫기' : '설정', toggleAdmin: () => this.setState({ showAdmin: !showAdmin, msg: '', msgCls: '' }),
       admins: adminRows, newAdmin, onNewAdmin: e => this.setState({ newAdmin: e.target.value }),
       addAdmin: async () => { if (!lib || !newAdmin.trim()) return; this.setState({ busy: true }); try { await lib.addAdmin(newAdmin, email); this.setState({ busy: false, newAdmin: '', msg: newAdmin.trim() + ' 을(를) 슈퍼관리자로 위임했어요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ busy: false, msg: '위임 실패: ' + e.message, msgCls: 'err' }); } },
       onClientId: setC('clientId'), onSheetId: setC('sheetId'), onTab: setC('tab'), onFolder: setC('folderId'),
