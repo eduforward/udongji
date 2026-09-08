@@ -197,6 +197,18 @@
     .pmodal .opt { display: flex; gap: 6px; margin-bottom: 12px; }
     .pmodal .opt button { flex: 1; font: inherit; font-size: 13.5px; font-weight: 700; padding: 9px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; }
     .pmodal .opt button.on { background: var(--blue-2); border-color: var(--blue); color: var(--blue); }
+    /* 1단계: 종류 (큰 카드) */
+    .pmodal .kind { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .pmodal .kind button { font: inherit; text-align: left; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+    .pmodal .kind button b { font-size: 14.5px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
+    .pmodal .kind button small { font-size: 12px; color: var(--text-3); }
+    .pmodal .kind button.on { border-color: var(--blue); background: var(--blue-2); } .pmodal .kind button.on b { color: var(--blue); }
+    .pmodal .kind button.on.reject { border-color: var(--red); background: var(--red-2); } .pmodal .kind button.on.reject b { color: var(--red); }
+    /* 2단계: 재연락 시기 (하위 패널) */
+    .pmodal .sub { background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
+    .pmodal .sub .lab { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; }
+    .pmodal .sub .opt { margin-bottom: 10px; } .pmodal .sub .opt button { font-size: 13px; padding: 8px; }
+    .pmodal .sub .dt { margin-bottom: 0; } .pmodal .sub .miss { margin: 6px 0 0; }
     .pmodal .dt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
     .pmodal .dt input { font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); width: 100%; }
     .pmodal .dt[hidden] { display: none; }
@@ -447,11 +459,12 @@
       <div class="pmodal" role="dialog" aria-labelledby="pause-h">
         <h3 id="pause-h">일시 종료</h3>
         <p>고객이 바빠서 끊었거나 거절했을 때. 지금까지 입력한 내용은 그대로 저장돼요.</p>
-        <div class="opt"><button type="button" id="pause-kind-delay" class="on">상담 연기 · 다시 연락</button><button type="button" id="pause-kind-reject">상담 거부 · 종료</button></div>
-        <div id="pause-when">
-          <div class="miss" id="pause-miss"></div>
-          <div class="opt"><button type="button" id="pause-tbd">미정</button><button type="button" id="pause-sched" class="on">재연락 시기</button></div>
+        <div class="kind"><button type="button" id="pause-kind-delay" class="on"><b>상담 연기</b><small>나중에 다시 연락 → 재연락 목록</small></button><button type="button" id="pause-kind-reject" class="reject"><b>상담 거부</b><small>종료 · 더 연락 안 함</small></button></div>
+        <div id="pause-when" class="sub">
+          <div class="lab">재연락 시기</div>
+          <div class="opt"><button type="button" id="pause-tbd">미정</button><button type="button" id="pause-sched" class="on">날짜 지정</button></div>
           <div class="dt" id="pause-dt"><input type="date" id="pause-date"><input type="time" id="pause-time" step="600"></div>
+          <div class="miss" id="pause-miss"></div>
         </div>
         <textarea id="pause-memo" placeholder="메모 (예: 점심 장사 중, 오후 3시 이후 가능 / 거부 사유)"></textarea>
         <div class="acts"><button type="button" class="btn ghost" id="pause-cancel">돌아가기</button><button type="button" class="btn" id="pause-ok">종료 완료</button></div>
