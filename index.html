@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=4"></script>
+  <script src="./udongji-nav.js?v=5"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.14); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -110,7 +110,7 @@
     <div class="mark">우</div><div><h1>우동지 업무 홈</h1><div class="sub">커넥트 상담 → 페이앤 등록</div></div>
     <div class="right">
       <span class="status {{ statusCls }}">{{ statusText }}</span>
-      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ toggleAdmin }}">{{ adminLabel }}</button></sc-if>
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><a class="lk" href="admin.html" style="text-decoration:none">관리자</a></sc-if>
       <span class="date">{{ today }}</span>
     </div>
   </div>
@@ -162,44 +162,6 @@
   </div>
   </sc-if>
 
-  <sc-if value="{{ showAdmin }}" hint-placeholder-val="{{ false }}">
-  <div class="card" id="admins">
-    <div class="gs-head"><h3>슈퍼관리자</h3><span class="status on">{{ email }}</span></div>
-    <p class="msg" style="margin-top:6px">슈퍼관리자만 이 설정 화면을 볼 수 있어요. 다른 사용자는 로그인 후 업무 화면만 보입니다. 위임한 계정은 모든 기기에서 즉시 적용돼요.</p>
-    <div class="fields" style="margin-top:10px">
-      <div class="wide"><label>슈퍼관리자 위임 (구글 이메일)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="email" style="flex:1 1 260px" placeholder="name@gmail.com" value="{{ newAdmin }}" onInput="{{ onNewAdmin }}"><button type="button" class="btn" onClick="{{ addAdmin }}" disabled="{{ busy }}">위임</button></div></div>
-    </div>
-    <div class="admins">
-      <sc-for list="{{ admins }}" as="a" hint-placeholder-count="1"><div class="arow"><b>{{ a.email }}</b><span class="m">{{ a.meta }}</span><sc-if value="{{ a.removable }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ a.remove }}">해제</button></sc-if></div></sc-for>
-    </div>
-    <div class="msg {{ msgCls }}">{{ msg }}</div>
-  </div>
-  <div class="card" id="admin">
-    <div class="gs-head"><h3>사용자 관리</h3><span class="status {{ usersStatusCls }}">{{ usersStatus }}</span>
-      <div class="acts"><button type="button" class="btn ghost" onClick="{{ exportAll }}">엑셀용 전체 복사</button><a class="btn ghost" href="{{ consoleUrl }}" target="_blank" rel="noopener">Firebase 콘솔</a></div>
-    </div>
-    <p class="msg" style="margin-top:6px">여기 등록된 구글 계정만 로그인 후 데이터를 볼 수 있어요. 신규 상담자는 이메일 추가 한 번이면 끝 — 본인은 사이트에서 구글 로그인만 하면 됩니다. 퇴사자는 제거.</p>
-    <div class="fields" style="margin-top:10px">
-      <div class="wide"><label>사용자 추가 (구글 이메일 · 이름)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="email" style="flex:2 1 220px" placeholder="name@gmail.com" value="{{ newUser }}" onInput="{{ onNewUser }}"><input type="text" style="flex:1 1 120px" placeholder="이름 (선택)" value="{{ newUserName }}" onInput="{{ onNewUserName }}"><button type="button" class="btn" onClick="{{ addUser }}" disabled="{{ busy }}">추가</button></div></div>
-    </div>
-    <div class="admins">
-      <sc-for list="{{ users }}" as="u" hint-placeholder-count="1"><div class="arow"><b>{{ u.email }}</b><span style="color:var(--text-2);font-size:13px">{{ u.name }}</span><button type="button" class="lk" onClick="{{ u.rename }}">이름 수정</button><span class="m">{{ u.meta }}</span><sc-if value="{{ u.removable }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk" onClick="{{ u.remove }}">제거</button></sc-if></div></sc-for>
-      <sc-if value="{{ noUsers }}" hint-placeholder-val="{{ false }}"><div class="arow" style="color:var(--text-3)">아직 등록된 사용자가 없어요. 슈퍼관리자는 자동 허용.</div></sc-if>
-    </div>
-    <div class="msg {{ msgCls }}">{{ msg }}</div>
-    <details>
-      <summary>안내</summary>
-      <div class="guide">
-        <ul style="padding-left:18px">
-          <li>데이터는 Firebase(Firestore)에, 서류 파일은 Firebase Storage에 저장돼요. 시트·드라이브 공유 작업은 더 이상 필요 없습니다.</li>
-          <li>엑셀로 보고 싶으면 <b>엑셀용 전체 복사</b> → 빈 시트 A1에 붙이기. 고객 목록 화면에도 같은 버튼이 있어요.</li>
-          <li>구글 로그인은 한 번 하면 브라우저에 유지되고 자동 갱신돼요. 1시간마다 팝업 뜨던 문제는 없어졌습니다.</li>
-          <li>비용: 누적 고객 약 500건까지 무료 구간, 이후에도 월 수천 원 수준. 예산 알림은 Firebase 콘솔 → 사용량 및 결제.</li>
-        </ul>
-      </div>
-    </details>
-  </div>
-  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -212,6 +174,7 @@ class Component extends DCLogic {
     this.setState({ isAdmin: ok, admins, users, showAdmin: ok && (this.state.showAdmin || location.hash === '#admin') });
   }
   async componentDidMount() {
+    if (location.hash === '#admin') { location.replace('admin.html'); return; }
     try { const lib = await import('./udongji-fb.js?v=3'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
   }
