@@ -74,6 +74,12 @@
     .cp { font: inherit; font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 7px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; }
     .cp:hover { border-color: var(--blue-3); color: var(--blue); background: var(--blue-2); }
     .frow.empty .cp { visibility: hidden; }
+    .frow .ed { grid-column: 2 / -1; font: inherit; font-size: 13.5px; padding: 6px 9px; border: 1px solid var(--blue-3); border-radius: 7px; background: var(--card); color: var(--text); width: 100%; }
+    .frow .ed:focus { border-color: var(--blue); }
+    .btn.danger { color: var(--red); }
+    .btn.danger:hover { background: var(--red-2); }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .hint { font-size: 12px; color: var(--text-3); align-self: center; }
     .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 30; }
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
     .scrim { position: fixed; inset: 0; background: rgba(23,28,43,.25); z-index: 19; }
@@ -128,15 +134,30 @@
     <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
     <div class="dtags"><span class="pill blue">{{ sel.mode }}</span><span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span><span class="pill">상태 · {{ sel.status }}</span><span class="pill">{{ sel.agent }}</span><span class="pill">시트 {{ sel.row }}행</span></div>
     <div class="dacts">
-      <a class="btn primary" href="{{ sel.regHref }}">등록 업무에서 열기 →</a>
-      <a class="btn" href="{{ sel.mapHref }}" target="_blank" rel="noopener">지도</a>
-      <button type="button" class="btn" onClick="{{ copyPayn }}">접수 양식 복사</button>
-      <button type="button" class="btn" onClick="{{ copySms }}">안내 문자 복사</button>
+      <sc-if value="{{ notEditing }}" hint-placeholder-val="{{ true }}">
+        <a class="btn primary" href="{{ sel.regHref }}">등록 업무에서 열기 →</a>
+        <button type="button" class="btn" onClick="{{ startEdit }}">수정</button>
+        <a class="btn" href="{{ sel.mapHref }}" target="_blank" rel="noopener">지도</a>
+        <button type="button" class="btn" onClick="{{ copyPayn }}">접수 양식 복사</button>
+        <button type="button" class="btn" onClick="{{ copySms }}">안내 문자 복사</button>
+        <button type="button" class="btn danger" onClick="{{ remove }}">삭제</button>
+      </sc-if>
+      <sc-if value="{{ editing }}" hint-placeholder-val="{{ false }}">
+        <button type="button" class="btn primary" onClick="{{ saveEdit }}" disabled="{{ saving }}">{{ saveLabel }}</button>
+        <button type="button" class="btn" onClick="{{ cancelEdit }}">취소</button>
+        <span class="hint">값을 고치고 저장하면 시트의 해당 행이 바로 바뀝니다.</span>
+      </sc-if>
     </div>
     <div class="dbody">
       <sc-for list="{{ groups }}" as="g" hint-placeholder-count="0">
         <div class="g">{{ g.name }}</div>
-        <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="0"><div class="{{ f.cls }}"><span class="k">{{ f.key }}</span><span class="v">{{ f.value }}</span><button type="button" class="cp" onClick="{{ f.copy }}">복사</button></div></sc-for>
+        <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="0">
+          <div class="{{ f.cls }}"><span class="k">{{ f.key }}</span>
+            <sc-if value="{{ f.ro }}" hint-placeholder-val="{{ true }}"><span class="v">{{ f.value }}</span><button type="button" class="cp" onClick="{{ f.copy }}">복사</button></sc-if>
+            <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ false }}"><input class="ed" type="text" value="{{ f.raw }}" onInput="{{ f.onChange }}"><span></span></sc-if>
+            <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}"><select class="ed" value="{{ f.raw }}" onChange="{{ f.onChange }}"><option value="">—</option><sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="0"><option value="{{ o }}">{{ o }}</option></sc-for></select><span></span></sc-if>
+          </div>
+        </sc-for>
       </sc-for>
     </div>
   </aside>
@@ -145,7 +166,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'all', mode: '', agent: '', sortKey: '상담일', sortDir: -1, selRow: null, toast: '', toastOn: false };
+  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'all', mode: '', agent: '', sortKey: '상담일', sortDir: -1, selRow: null, toast: '', toastOn: false, editing: false, draft: null, saving: false };
   COLS = [['상담일','date'],['매장명','store'],['고객명','name'],['연락처','phone'],['업종','biz'],['매장 구분','mode'],['안내한 상품 구성','plan'],['상태','status'],['페이앤 등록','reg'],['상담자','agent'],['다음 액션 · 일시','next']];
   GROUPS = [
     ['고객 기본정보', ['고객명','연락처','이메일','영문 성함','매장명','매장 주소','업종','판매 물품','매장 구분','네이버 ID']],
@@ -157,13 +178,13 @@ class Component extends DCLogic {
   ];
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js?v=7');
+      const lib = await import('./udongji-lib.js?v=8');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
       this.setState({ lib }, () => this.load());
     } catch (e) { location.replace('index.html#gsheet'); }
     this._on = () => this.load(); window.addEventListener('focus', this._on);
-    this._esc = e => { if (e.key === 'Escape') this.setState({ selRow: null }); }; window.addEventListener('keydown', this._esc);
+    this._esc = e => { if (e.key === 'Escape') this.setState(this.state.editing ? { editing: false, draft: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('keydown', this._esc); }
   async load() {
@@ -179,7 +200,7 @@ class Component extends DCLogic {
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy); else legacy();
   }
   renderVals() {
-    const { lib, items, loading, err, query, filter, mode, agent, sortKey, sortDir, selRow, toast, toastOn } = this.state;
+    const { lib, items, loading, err, query, filter, mode, agent, sortKey, sortDir, selRow, toast, toastOn, editing, draft, saving } = this.state;
     const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
     const REG = lib ? lib.REG_COL : '페이앤 등록', ID = lib ? lib.ID_COL : '레코드ID';
     const isGo = d => (d['상담 결과'] || '상담 진행') === '상담 진행';
@@ -212,8 +233,14 @@ class Component extends DCLogic {
       sel = { store: store || V(d, '고객명') || '(매장명 없음)', sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '업종'), addr].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '구분 없음', regTag: ri.tag, regCls: ri.cls, status: V(d, '상태') || '—', agent: V(d, '상담자') ? '상담 ' + V(d, '상담자') : '상담자 미입력', row: rec.row,
         regHref: 'register.html#' + (d[ID] || 'row' + rec.row), mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((addr ? addr + ' ' : '') + store) };
       const isNew = d['매장 구분'] === '신규 오픈', isOld = d['매장 구분'] === '기존 운영';
-      groups = this.GROUPS.filter(([n]) => !(n === '신규 오픈' && isOld) && !(n === '기존 운영' && isNew)).map(([name, keys]) => ({ name, fields: keys.map(k => { const v = V(d, k); return { key: k, value: v || '—', cls: 'frow' + (v ? '' : ' empty'), copy: v ? () => this.copy(v, k) : () => {} }; }) })).filter(g => g.fields.some(f => f.value !== '—'));
+      const src = editing && draft ? draft : d;
+      groups = this.GROUPS.filter(([n]) => !(n === '신규 오픈' && isOld) && !(n === '기존 운영' && isNew)).map(([name, keys]) => ({ name, fields: keys.map(k => {
+        const v = V(src, k), col = lib ? lib.colOf(k) : null, opts = col && col.opts ? col.opts : null;
+        const canEdit = editing && k !== '페이앤 등록';
+        return { key: k, value: v || '—', raw: String(src[k] || ''), cls: 'frow' + (v || editing ? '' : ' empty'), copy: v ? () => this.copy(v, k) : () => {}, ro: !canEdit, isInput: canEdit && !opts, isSelect: canEdit && !!opts, opts: opts || [], onChange: e => this.setState({ draft: Object.assign({}, this.state.draft, { [k]: e.target.value }) }) };
+      }) })).filter(g => editing || g.fields.some(f => f.value !== '—'));
     }
+    const selRec = rec;
     const cfg = lib ? lib.getCfg() : {};
     const setF = f => () => this.setState({ filter: f });
     return {
@@ -224,7 +251,25 @@ class Component extends DCLogic {
       reload: () => this.load(), sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
       cntCls: err ? 'err' : '', cntText: err ? '시트 오류: ' + err : loading ? '시트 읽는 중…' : list.length + ' / ' + items.length + '건',
       cols, rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '시트를 읽지 못했어요.' : items.length === 0 ? '시트에 아직 상담 기록이 없어요.' : '조건에 맞는 건이 없어요.',
-      hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, groups, close: () => this.setState({ selRow: null }),
+      hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, groups, close: () => this.setState({ selRow: null, editing: false, draft: null }),
+      editing, notEditing: !editing, saving, saveLabel: saving ? '저장 중…' : '저장',
+      startEdit: () => selRec && this.setState({ editing: true, draft: Object.assign({}, selRec.data) }),
+      cancelEdit: () => this.setState({ editing: false, draft: null }),
+      saveEdit: async () => {
+        if (!selRec || !draft || !lib) return;
+        const patch = {}; Object.keys(draft).forEach(k => { if (String(draft[k] || '') !== String(selRec.data[k] || '')) patch[k] = draft[k]; });
+        if (!Object.keys(patch).length) { this.setState({ editing: false, draft: null }); return; }
+        this.setState({ saving: true });
+        try { await lib.updateCells(selRec.row, patch); this.toast(Object.keys(patch).length + '개 항목을 시트에 저장했어요'); this.setState({ editing: false, draft: null, saving: false }); await this.load(); }
+        catch (e) { this.setState({ saving: false }); this.toast('저장 실패: ' + e.message); }
+      },
+      remove: async () => {
+        if (!selRec || !lib) return;
+        const name = V(selRec.data, '매장명') || V(selRec.data, '고객명') || selRec.row + '행';
+        if (!confirm('"' + name + '" 기록을 시트에서 삭제할까요?\n되돌릴 수 없어요 (시트의 변경 기록에서만 복구 가능).')) return;
+        try { await lib.deleteRow(selRec.row); this.toast('삭제했어요'); this.setState({ selRow: null, editing: false, draft: null }); await this.load(); }
+        catch (e) { this.toast('삭제 실패: ' + e.message); }
+      },
       copyPayn: () => rec && lib && this.copy(lib.buildPayn(rec.data), '접수 양식'), copySms: () => rec && lib && this.copy(lib.buildSMS(rec.data).text, '안내 문자'),
       toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
     };

@@ -248,7 +248,7 @@
       <div>
         <div class="kicker">우동지 × Npay 커넥트 · 인바운드 / 아웃바운드 공통 · 우리 소개는 항상 "우동지"</div>
         <h1>상담 대응 스크립트</h1>
-        <p>인사·아이스브레이킹이 끝난 시점부터. 말은 짧게, 하나 묻고 하나 적기. 빨간 입력칸이 고객 목록 시트에 들어갈 값, <b>필수</b> 표시는 반드시. 다 채우고 <b>작성 완료</b>를 누르면 복사용으로 나온다.</p>
+        <p>인사·아이스브레이킹이 끝난 시점부터. 말은 짧게, 하나 묻고 하나 적기. 빨간 입력칸이 고객 목록 시트에 들어갈 값, <b>필수</b> 표시는 반드시. 다 채우고 <b>작성 완료</b>를 누르면 시트에 저장되고 안내 문자가 나온다.</p>
       </div>
       <div class="pills"><span class="rec agent" data-col="상담자" data-val=""></span><span class="pill">v4 · 2026-09</span><span class="pill">동의는 유선 녹취</span><span class="pill blue">기록 = 고객 목록 시트</span><span class="pill modetag" id="modetag"></span></div>
     </header>
@@ -452,43 +452,13 @@
     <div class="donebar"><button type="button" class="btn ghost" id="btn-reset">새 상담</button><span class="donebar-note" id="fillcount"></span><span class="donebar-note save" id="savenote"></span><button type="button" class="btn" id="btn-done">작성 완료</button></div>
   </main>
 
-  <div class="overlay" id="overlay" hidden>
-    <div class="ov-card">
-      <div class="missing-panel" id="missing" hidden></div>
-      <div class="ov-head">
-        <div><div class="kicker">작성 완료</div><h2>엑셀에 붙여넣기</h2><p class="copied" id="arch-note" style="margin-top:6px"></p><p>고객 목록 시트에서 빈 줄의 <b>B열(고객명)</b>을 클릭하고 붙여넣으면 열 순서대로 들어가요. A열 고객번호는 시트에서 이어서 적으세요.</p></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><a class="btn ghost" href="register.html" style="text-decoration:none">등록 업무로 →</a><button type="button" class="btn ghost" id="btn-back">← 돌아가기</button></div>
-      </div>
-      <div class="ov-row">
-        <div class="ov-label">고객 목록 시트 한 줄 <span class="muted">(탭 구분, B열부터)</span></div>
-        <textarea id="tsv" readonly rows="3"></textarea>
-        <div class="ov-actions"><button type="button" class="btn" id="btn-copy-tsv">복사</button><span class="copied" id="copied-tsv"></span></div>
-      </div>
-      <div class="ov-row">
-        <div class="ov-label">고객 안내 문자 <span class="muted" id="sms-kind"></span></div>
-        <textarea id="sms" rows="12" spellcheck="false"></textarea>
-        <div class="ov-actions"><button type="button" class="btn" id="btn-copy-sms">복사</button><span class="copied" id="copied-sms"></span><span class="note" style="display:inline;margin-left:auto">보내기 전에 ○○ 자리만 확인. 직접 고쳐서 복사해도 돼요.</span></div>
-      </div>
-      <div class="ov-row">
-        <div class="ov-label">페이앤 관리자 전달용 접수 양식</div>
-        <textarea id="payn" readonly rows="12"></textarea>
-        <div class="ov-actions"><button type="button" class="btn" id="btn-copy-payn">복사</button><span class="copied" id="copied-payn"></span><span class="rec" data-col="관리자 전달" data-val="O" style="margin-left:auto"></span><span class="note" style="display:inline">이 양식을 관리자에게 보냈으면 체크 — 시트 열에 같이 들어감</span></div>
-      </div>
-      <div class="ov-row">
-        <div class="ov-label">확인용</div>
-        <div class="tscroll"><table class="qa chk"><thead><tr><th>열</th><th>값</th></tr></thead><tbody id="chk"></tbody></table></div>
-      </div>
-    </div>
-  </div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   renderVals() { return {}; }
   componentDidMount() {
-    var o = document.getElementById('overlay'); if (o) o.hidden = true;
-    var m = document.getElementById('missing'); if (m) m.hidden = true;
-    import('./udongji-lib.js?v=7').then(async mod => {
+    import('./udongji-lib.js?v=8').then(async mod => {
       this.lib = mod;
       if (!mod.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!mod.isSignedIn()) { await mod.ensureSignedIn(); if (!mod.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
@@ -551,7 +521,6 @@ class Component extends DCLogic {
       var m = S['매장 구분']; return ['상담 결과'].concat(REQ_ALL, m==='신규 오픈'?REQ_NEW: m==='기존 운영'?REQ_OLD:[]);
     }
     function isReq(key){ return reqList().indexOf(key) !== -1; }
-    $('overlay').hidden = true; $('missing').hidden = true;
     var fields = [];
     document.querySelectorAll('.rec[data-col]').forEach(function(el){
       var name = el.getAttribute('data-col'), preset = el.getAttribute('data-val') || '';
@@ -560,7 +529,7 @@ class Component extends DCLogic {
       var ctrl;
       if(preset){
         ctrl = document.createElement('button'); ctrl.type='button'; ctrl.className='tog'; ctrl.textContent = preset;
-        ctrl.addEventListener('click', function(){ S[key] = (S[key] === preset) ? '' : preset; render(); save(); if(!$('overlay').hidden){ $('tsv').value = buildTSV(); } });
+        ctrl.addEventListener('click', function(){ S[key] = (S[key] === preset) ? '' : preset; render(); save(); });
       } else if(col && col.opts){
         ctrl = document.createElement('select');
         var o0 = document.createElement('option'); o0.value=''; o0.textContent='선택'; ctrl.appendChild(o0);
@@ -752,20 +721,16 @@ class Component extends DCLogic {
     // 작성 완료 → 등록 업무 목록에 보관
     var RKEY = 'udongji-records-v1';
     function loadRecords(){ try { return JSON.parse(localStorage.getItem(RKEY) || '[]') || []; } catch(e){ return []; } }
-    function archive(tsv, payn, sms){
+    // 작성 완료: 기록을 기기에 저장하고 완료 페이지로 이동 (시트 전송은 완료 페이지가 처리)
+    function archive(){
       if(!S._id) S._id = 'r' + Date.now().toString(36);
       var list = loadRecords(), data = {}; Object.keys(S).forEach(function(k){ if(k[0] !== '_') data[k] = S[k]; });
-      var rec = { id: S._id, savedAt: new Date().toISOString(), data: data, tsv: tsv, payn: payn, sms: sms, registered: false, synced: false, sheetRow: null };
+      var rec = { id: S._id, savedAt: new Date().toISOString(), data: data, registered: false, synced: false, sheetRow: null };
       var i = list.findIndex(function(x){ return x.id === S._id; });
       if(i >= 0){ rec.registered = !!list[i].registered; rec.registeredAt = list[i].registeredAt; rec.sheetRow = list[i].sheetRow || null; list[i] = rec; } else list.unshift(rec);
-      try { localStorage.setItem(RKEY, JSON.stringify(list)); } catch(e){}
+      try { localStorage.setItem(RKEY, JSON.stringify(list)); localStorage.setItem('udongji-last-done', JSON.stringify(rec)); } catch(e){}
       save();
-      var n = $('arch-note'); if(!n) return;
-      var connected = LIB && LIB.isConfigured() && LIB.isSignedIn();
-      if(!connected && LIB && LIB.isConfigured() && LIB.hasEverSignedIn()){ n.textContent = '구글 로그인 갱신 중…'; n.style.color = ''; LIB.ensureSignedIn().then(function(t){ if(t){ archive(tsv, payn, sms); } else { n.textContent = '이 기기에 저장됐어요. 구글 시트에는 아직 안 갔어요 — 홈에서 구글 로그인하면 자동 전송돼요.'; n.style.color = 'var(--amber)'; gsStatus(); } }); return; }
-      if(!connected){ n.textContent = (i >= 0 ? '기존 건을 갱신했어요.' : '이 기기에 저장됐어요.') + ' 구글 시트에는 아직 안 갔어요 — 홈에서 구글 로그인하면 자동 전송돼요.'; n.style.color = 'var(--amber)'; gsStatus(); return; }
-      n.textContent = '구글 시트로 전송 중…'; n.style.color = '';
-      pushRecord(rec).then(function(row){ n.textContent = (rec.sheetRow || i >= 0 ? '구글 시트의 기존 행을 갱신했어요' : '구글 시트에 행이 추가됐어요') + (row ? ' (' + row + '행)' : '') + '. 등록 업무에서 바로 볼 수 있어요.'; n.style.color = ''; gsStatus(); }, function(err){ n.textContent = '시트 전송 실패: ' + (err && err.message || err) + ' — 기기에 보관했고, 다음에 로그인하면 다시 보내요.'; n.style.color = 'var(--red)'; gsStatus(); });
+      location.href = 'done.html';
     }
     function esc(x){ return String(x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
     function scrollToEl(el){ var r = el.getBoundingClientRect(); window.scrollTo({ top: window.scrollY + r.top - window.innerHeight/2 + r.height/2, behavior: 'smooth' }); }
@@ -773,19 +738,15 @@ class Component extends DCLogic {
     function jumpTo(key){
       var cands = fields.filter(function(x){ return x.key === key; });
       var f = cands.filter(function(x){ return isVisible(x.el); })[0] || cands[0]; if(!f) return;
-      $('overlay').hidden = true;
       scrollToEl(f.el); f.el.classList.add('missing');
       var c = f.ctrl; setTimeout(function(){ try { c.focus({preventScroll:true}); } catch(e){} }, 350);
     }
-    function chkRows(showReq){ return COLS.map(function(c){ var v = val(c.name); return '<tr><td>'+esc(c.name)+(showReq && isReq(c.name)?' <span style="color:var(--form)">*</span>':'')+'</td><td'+(v?'':' class="empty"')+'>'+(v?esc(v):'—')+'</td></tr>'; }).join(''); }
     $('btn-done').addEventListener('click', function(){
       var miss = reqList().filter(function(k){ return !(S[k]||'').toString().trim(); });
-      var mp = $('missing');
       fields.forEach(function(f){ f.el.classList.toggle('missing', miss.indexOf(f.key) !== -1 && isVisible(f.el)); });
       // 화면에 안 보이는 칸만 남은 필수가 있으면 안내
       var unreachable = miss.filter(function(k){ return !fields.some(function(f){ return f.key === k && isVisible(f.el); }); });
       if(miss.length){
-        $('overlay').hidden = true; mp.hidden = true;
         // 화면 순서상 가장 위에 있는 빈 필수 칸으로 이동
         var first = null, top = Infinity;
         fields.forEach(function(f){
@@ -797,39 +758,22 @@ class Component extends DCLogic {
         var fc = $('fillcount'); fc.textContent = '필수 ' + miss.length + '개 남음 — ' + miss.join(', ') + (unreachable.length ? ' (안 보이는 칸: ' + unreachable.join(', ') + ' — 위 선택 확인)' : ''); fc.classList.add('bad');
         return;
       }
-      mp.hidden = true;
-      $('tsv').value = buildTSV();
-      $('payn').value = buildPayn();
-      var sms = buildSMS(); $('sms').value = sms.text; $('sms-kind').textContent = '(' + sms.kind + ')';
-      archive($('tsv').value, $('payn').value, sms.text);
-      $('chk').innerHTML = chkRows(false);
-      $('overlay').hidden = false; window.scrollTo(0,0);
+      $('btn-done').disabled = true; $('btn-done').textContent = '저장 중…';
+      archive();
     });
-    $('btn-back').addEventListener('click', function(){ $('overlay').hidden = true; });
-    $('btn-reset').addEventListener('click', function(){
-      var has = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && (S[k]||'').toString().trim(); });
-      if(has && !window.confirm('지금 입력한 내용을 모두 지우고 새 상담을 시작할까요?\n(복사 안 했으면 먼저 작성 완료 → 복사)')) return;
+    function resetForm(){
       var agent = S['상담자'] || '';
       S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent;
-      var an = $('arch-note'); if(an) an.textContent = '';
       fields.forEach(function(f){ if(f.ctrl.tagName==='INPUT' && f.key !== '상담자') f.ctrl.value=''; });
       render(); save(); window.scrollTo(0,0);
-    });
-    function copyFrom(id, msgId){
-      var ta = $(id), msg = $(msgId);
-      function ok(){ msg.textContent = '복사됨'; setTimeout(function(){ msg.textContent=''; }, 1800); }
-      function legacy(){
-        var ro = ta.readOnly; ta.readOnly = false;
-        ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
-        var done = false; try { done = document.execCommand('copy'); } catch(e){}
-        ta.readOnly = ro; ta.setSelectionRange(0, 0); ta.blur();
-        if(done) ok(); else { ta.focus(); ta.select(); msg.textContent = '직접 복사(Ctrl+C)'; }
-      }
-      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(ok, legacy); } else legacy();
     }
-    $('btn-copy-tsv').addEventListener('click', function(){ copyFrom('tsv','copied-tsv'); });
-    $('btn-copy-payn').addEventListener('click', function(){ copyFrom('payn','copied-payn'); });
-    $('btn-copy-sms').addEventListener('click', function(){ copyFrom('sms','copied-sms'); });
+    $('btn-reset').addEventListener('click', function(){
+      var has = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && (S[k]||'').toString().trim(); });
+      if(has && !window.confirm('지금 입력한 내용을 모두 지우고 새 상담을 시작할까요?\n(작성 완료를 안 했으면 시트에 저장되지 않아요)')) return;
+      resetForm();
+    });
+    // 완료 페이지에서 "새 상담 시작"으로 들어온 경우
+    if(/[?&]new=1/.test(location.search)){ resetForm(); try { history.replaceState(null, '', location.pathname); } catch(e){} }
 
     // 목차 현재 위치 표시
     var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));

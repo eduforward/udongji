@@ -181,6 +181,17 @@ export async function setCell(row, headerName, value) {
   const idx = header.findIndex(h => norm(h) === norm(headerName));
   await api('/values/' + q(cfg.tab + '!' + colLetter(idx + 1) + row) + '?valueInputOption=USER_ENTERED', { method: 'PUT', body: JSON.stringify({ values: [[value]] }) });
 }
+// 행 삭제 (시트에서 행 자체를 제거)
+export async function deleteRow(row) {
+  const cfg = getCfg(); const meta = await api('?fields=sheets.properties'); const sh = (meta.sheets || []).find(s => s.properties && s.properties.title === cfg.tab); if (!sh) throw new Error('탭을 찾지 못했어요');
+  await api(':batchUpdate', { method: 'POST', body: JSON.stringify({ requests: [{ deleteDimension: { range: { sheetId: sh.properties.sheetId, dimension: 'ROWS', startIndex: row - 1, endIndex: row } } }] }) });
+}
+// 여러 셀 한 번에 수정: patch = { 열이름: 값 }
+export async function updateCells(row, patch) {
+  const cfg = getCfg(); let header = await getHeader(); header = await ensureColumns(header, Object.keys(patch));
+  const data = Object.keys(patch).map(k => { const idx = header.findIndex(h => norm(h) === norm(k)); return { range: cfg.tab + '!' + colLetter(idx + 1) + row, values: [[patch[k] == null ? '' : String(patch[k])]] }; });
+  await api('/values:batchUpdate', { method: 'POST', body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }) });
+}
 export function todayStr() { const t = new Date(), p = n => String(n).padStart(2, '0'); return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()); }
 
 // 새 스프레드시트 생성 + 헤더 행 작성 + 설정 저장. 리턴: { id, url }
