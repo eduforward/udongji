@@ -64,7 +64,7 @@
 <udongji-nav current="recall"></udongji-nav>
 <div class="page">
   <div class="bar">
-    <div class="brand"><div class="mark">우</div><div><b>재연락</b><small>상담 불가 · 재연락 예정 고객</small></div></div>
+    <div class="brand"><div class="mark">우</div><div><b>재연락</b><small>상담 연기 · 재연락 예정 고객</small></div></div>
     <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 검색" value="{{ query }}" onInput="{{ onQuery }}">
     <div class="seg">
       <button type="button" class="{{ fDueCls }}" onClick="{{ setDue }}">오늘까지 {{ nDue }}</button>
@@ -135,7 +135,8 @@ class Component extends DCLogic {
     const { lib, items, loading, err, query, filter, modal, busy, toast, toastOn } = this.state;
     const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
     const me = lib ? lib.userEmail() : '';
-    const isRecall = d => d['상태'] !== '종료' && d['상담 결과'] !== '상담 거부' && (d['상담 결과'] === '상담 불가' || d['상태'] === '재연락 예정' || d['상태'] === '보류');
+    const isPost = d => d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
+    const isRecall = d => d['상태'] !== '종료' && d['상담 결과'] !== '상담 거부' && (isPost(d) || d['상태'] === '재연락 예정' || d['상태'] === '보류');
     const today0 = new Date(); today0.setHours(0, 0, 0, 0);
     const all = items.filter(it => isRecall(it.data));
     const q = query.trim().toLowerCase();
@@ -152,11 +153,11 @@ class Component extends DCLogic {
       const cls = 'item ' + (days === null ? '' : days < 0 ? 'due' : days === 0 ? 'today' : 'soon');
       const whenTag = days === null ? (V(d, '다음 액션 · 일시') ? '날짜 해석 불가' : '일정 없음') : days < 0 ? (-days) + '일 지남' : days === 0 ? '오늘' : days + '일 후';
       const when = dt ? pad(dt.getMonth() + 1) + '/' + pad(dt.getDate()) : (V(d, '다음 액션 · 일시') || '—');
-      const res = d['상담 결과'] === '상담 불가' ? '상담 불가' : (d['상태'] || '재연락');
+      const res = isPost(d) ? '상담 연기' : (d['상태'] || '재연락');
       const n = parseInt(d['재연락 횟수'] || '0', 10) || 0;
       const hist = [V(d, '다음 액션 · 일시') && dt ? '약속: ' + V(d, '다음 액션 · 일시') : '', V(d, '특이사항'), V(d, '재연락 이력') ? V(d, '재연락 이력').split('\n').slice(-1)[0] : ''].filter(Boolean).join(' · ');
       return {
-        cls, when, whenCls, whenTag, store: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', res, resCls: d['상담 결과'] === '상담 불가' ? 'gray' : 'amber',
+        cls, when, whenCls, whenTag, store: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', res, resCls: isPost(d) ? 'gray' : 'amber',
         meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분'), V(d, '상담일') ? '상담 ' + V(d, '상담일') : '', V(d, '상담자'), n ? '재연락 ' + n + '회' : ''].filter(Boolean).join(' · '), hist,
         consultHref: 'consult.html?id=' + encodeURIComponent(it.id),
         copySms: () => { const name = V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님'; this.copy('[우동지] ' + name + ', 우동지 ' + (V(d, '상담자') || '담당자') + '입니다.\n말씀하신 대로 커넥트 상담 이어서 연락드렸는데 통화가 어려우신 것 같아요. 편한 시간 알려주시면 그때 다시 전화드릴게요.\n감사합니다.', '재연락 문자'); },
@@ -181,7 +182,7 @@ class Component extends DCLogic {
         try {
           const stamp = '[' + lib.todayStr() + '] ';
           if (modal.kind === 'reschedule') { if (!modal.when.trim()) { this.setState({ busy: false }); this.toast('일시를 입력하세요'); return; } await lib.updateCells(it.id, { '다음 액션 · 일시': modal.when.trim(), '상태': '재연락 예정', '재연락 이력': (V(d, '재연락 이력') ? V(d, '재연락 이력') + '\n' : '') + stamp + '일정 변경 → ' + modal.when.trim() + (modal.note ? ' · ' + modal.note : '') }); this.toast('일정을 변경했어요'); }
-          else { await lib.updateCells(it.id, { '상태': '종료', '상담 결과': d['상담 결과'] === '상담 불가' ? '상담 거부' : d['상담 결과'], '재연락 이력': (V(d, '재연락 이력') ? V(d, '재연락 이력') + '\n' : '') + stamp + '재연락 종료' + (modal.note ? ' · ' + modal.note : '') }); this.toast('종료 처리했어요'); }
+          else { await lib.updateCells(it.id, { '상태': '종료', '상담 결과': isPost(d) ? '상담 거부' : d['상담 결과'], '재연락 이력': (V(d, '재연락 이력') ? V(d, '재연락 이력') + '\n' : '') + stamp + '재연락 종료' + (modal.note ? ' · ' + modal.note : '') }); this.toast('종료 처리했어요'); }
           this.setState({ modal: null, busy: false }); await this.load();
         } catch (e) { this.setState({ busy: false }); this.toast('저장 실패: ' + e.message); }
       },

@@ -236,7 +236,7 @@ class Component extends DCLogic {
     const REG = lib ? lib.REG_COL : '페이앤 등록', ID = lib ? lib.ID_COL : '레코드ID';
     const isGo = d => (d['상담 결과'] || '상담 진행') === '상담 진행';
     const isReg = d => !!String(d[REG] || '').trim();
-    const isCall = d => d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 불가';
+    const isCall = d => d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
     const agents = [...new Set(items.map(it => V(it.data, '상담자')).filter(Boolean))].sort();
     const q = query.trim().toLowerCase();
     let list = items.filter(it => {
