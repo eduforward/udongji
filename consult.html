@@ -262,8 +262,8 @@
       <div class="say"><span class="who">상담원</span>네, 그럼 매장 상황 몇 가지만 여쭤보고 거기에 맞는 구성으로 안내드릴게요. 한 5분이면 돼요.</div>
       <p class="note">아웃바운드(문의 남긴 분께 우리가 거는 전화)일 때는 앞에 한 줄 더.</p>
       <div class="say"><span class="who">상담원 · 아웃바운드</span>우동지 광고 보시고 커넥트 상담 남겨주셔서 연락드렸어요. 지금 잠깐 통화 괜찮으세요?</div>
-      <div class="say"><span class="who">상담 결과</span>진행 · 불가 · 거부 중 하나로.<br><span class="rec" data-col="상담 결과" data-val=""></span></div>
-      <ul class="branch result-branch">
+      <p class="note">고객이 지금 통화가 어렵거나 거절하면 → 하단 <b>일시 종료</b> 버튼(상담 연기 · 상담 거부). 이어가면 아래 매장 구분으로.</p>
+      <ul class="branch result-branch" hidden>
         <li data-result="상담 진행"><span class="if">상담 진행</span><span class="arrow">→</span>아래 매장 구분으로 이어서</li>
         <li data-result="상담 연기"><span class="if">상담 연기 · 지금 통화 어려움</span><span class="arrow">→</span><div class="say">언제가 편하세요? 그때 다시 연락드릴게요.<br><span class="rec" data-col="상태" data-val="재연락 예정"></span><span class="rec" data-col="다음 액션·일시" data-val=""></span></div><span class="note">고객명·연락처만 채우고 <b>일시 종료</b> 버튼 → 재연락 시기 입력.</span></li>
         <li data-result="상담 거부"><span class="if">상담 거부</span><span class="arrow">→</span><div class="say">네, 알겠습니다. 시간 내주셔서 감사해요.<br><span class="rec" data-col="상태" data-val="종료"></span><span class="rec" data-col="특이사항" data-val=""></span></div><span class="note">바로 작성 완료.</span></li>
@@ -445,12 +445,15 @@
     <div class="donebar"><button type="button" class="btn ghost" id="btn-reset">새 상담</button><span class="donebar-note" id="fillcount"></span><span class="donebar-note save" id="savenote"></span><button type="button" class="btn warn" id="btn-pause">일시 종료</button><button type="button" class="btn" id="btn-done">작성 완료</button></div>
     <div class="pscrim" id="pause" hidden>
       <div class="pmodal" role="dialog" aria-labelledby="pause-h">
-        <h3 id="pause-h">일시 종료 · 재연락 시기</h3>
-        <p>고객이 바빠서 끊었을 때. 지금까지 입력한 내용은 그대로 저장되고, 재연락 목록에 올라가요.</p>
-        <div class="miss" id="pause-miss"></div>
-        <div class="opt"><button type="button" id="pause-tbd">미정</button><button type="button" id="pause-sched" class="on">일시 지정</button></div>
-        <div class="dt" id="pause-dt"><input type="date" id="pause-date"><input type="time" id="pause-time" step="600"></div>
-        <textarea id="pause-memo" placeholder="메모 (예: 점심 장사 중, 오후 3시 이후 가능)"></textarea>
+        <h3 id="pause-h">일시 종료</h3>
+        <p>고객이 바빠서 끊었거나 거절했을 때. 지금까지 입력한 내용은 그대로 저장돼요.</p>
+        <div class="opt"><button type="button" id="pause-kind-delay" class="on">상담 연기 · 다시 연락</button><button type="button" id="pause-kind-reject">상담 거부 · 종료</button></div>
+        <div id="pause-when">
+          <div class="miss" id="pause-miss"></div>
+          <div class="opt"><button type="button" id="pause-tbd">미정</button><button type="button" id="pause-sched" class="on">재연락 시기</button></div>
+          <div class="dt" id="pause-dt"><input type="date" id="pause-date"><input type="time" id="pause-time" step="600"></div>
+        </div>
+        <textarea id="pause-memo" placeholder="메모 (예: 점심 장사 중, 오후 3시 이후 가능 / 거부 사유)"></textarea>
         <div class="acts"><button type="button" class="btn ghost" id="pause-cancel">돌아가기</button><button type="button" class="btn" id="pause-ok">종료 완료</button></div>
       </div>
     </div>
@@ -538,11 +541,11 @@ class Component extends DCLogic {
     var REQ_OLD = ['현재 단말기·POS','약정 잔여 개월'];
     function reqList(){
       var r = S['상담 결과'] || '';
-      if(r === '상담 거부') return ['상담자','고객명','연락처','상담 결과','상태'];
-      if(r === '상담 연기' || r === '상담 불가') return ['상담자','고객명','연락처','상담 결과','상태','다음 액션 · 일시'];
-      if(S['상태']==='재연락 예정' || S['상태']==='보류' || S['상태']==='종료') return ['상담자','고객명','연락처','상담 결과','상태','다음 액션 · 일시'];
-      if(S['매장 구분']==='신규 오픈' && S['사업자등록증 발급']==='발급 예정') return ['상담자','고객명','연락처','상담 결과','매장 구분','업종','오픈 예정일','사업자등록증 발급','상태','다음 액션 · 일시'];
-      var m = S['매장 구분']; return ['상담 결과'].concat(REQ_ALL, m==='신규 오픈'?REQ_NEW: m==='기존 운영'?REQ_OLD:[]);
+      if(r === '상담 거부') return ['상담자','고객명','연락처'];
+      if(r === '상담 연기' || r === '상담 불가') return ['상담자','고객명','연락처','다음 액션 · 일시'];
+      if(S['상태']==='재연락 예정' || S['상태']==='보류' || S['상태']==='종료') return ['상담자','고객명','연락처','상태','다음 액션 · 일시'];
+      if(S['매장 구분']==='신규 오픈' && S['사업자등록증 발급']==='발급 예정') return ['상담자','고객명','연락처','매장 구분','업종','오픈 예정일','사업자등록증 발급','상태','다음 액션 · 일시'];
+      var m = S['매장 구분']; return [].concat(REQ_ALL, m==='신규 오픈'?REQ_NEW: m==='기존 운영'?REQ_OLD:[]);
     }
     function isReq(key){ return reqList().indexOf(key) !== -1; }
     var fields = [];
@@ -582,7 +585,7 @@ class Component extends DCLogic {
     });
 
     function applyMode(){
-      var r = S['상담 결과'] || '', go = r === '상담 진행';
+      var r = S['상담 결과'] || '', go = !r || r === '상담 진행';
       document.querySelectorAll('li[data-result]').forEach(function(li){
         var v = li.getAttribute('data-result');
         li.classList.toggle('off', !!r && r !== v);
@@ -684,8 +687,9 @@ class Component extends DCLogic {
       var c = f.ctrl; setTimeout(function(){ try { c.focus({preventScroll:true}); } catch(e){} }, 350);
     }
     $('btn-done').addEventListener('click', function(){
-      // 상담 연기 선택 시 작성 완료도 일시 종료 폼으로
+      // 상담 연기/거부는 일시 종료 폼에서; 작성 완료 = 상담 진행
       if(S['상담 결과'] === '상담 연기' && !(S['다음 액션 · 일시']||'').trim()){ openPause(); return; }
+      if(S['상담 결과'] !== '상담 연기' && S['상담 결과'] !== '상담 거부') S['상담 결과'] = '상담 진행';
       var miss = reqList().filter(function(k){ return !(S[k]||'').toString().trim(); });
       fields.forEach(function(f){ f.el.classList.toggle('missing', miss.indexOf(f.key) !== -1 && isVisible(f.el)); });
       // 화면에 안 보이는 칸만 남은 필수가 있으면 안내
@@ -706,7 +710,8 @@ class Component extends DCLogic {
       archive();
     });
     // 일시 종료: 고객명·연락처만 확인 → 재연락 시기 입력 → 상담 연기로 저장
-    var pauseMode = 'sched';
+    var pauseMode = 'sched', pauseKind = 'delay';
+    function setPauseKind(k){ pauseKind = k; $('pause-kind-delay').classList.toggle('on', k === 'delay'); $('pause-kind-reject').classList.toggle('on', k === 'reject'); $('pause-when').hidden = k !== 'delay'; $('pause-ok').textContent = k === 'reject' ? '거부로 종료' : '종료 완료'; }
     function setPauseMode(m){ pauseMode = m; $('pause-tbd').classList.toggle('on', m === 'tbd'); $('pause-sched').classList.toggle('on', m === 'sched'); $('pause-dt').hidden = m !== 'sched'; }
     function openPause(){
       var need = ['고객명','연락처'].filter(function(k){ return !(S[k]||'').trim(); });
@@ -714,19 +719,23 @@ class Component extends DCLogic {
       var prev = (S['다음 액션 · 일시']||'').trim(), m = /(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}:\d{2}))?/.exec(prev);
       if(prev === '미정') setPauseMode('tbd'); else { setPauseMode('sched'); if(m){ $('pause-date').value = m[1]+'-'+m[2]+'-'+m[3]; $('pause-time').value = m[4] || ''; } else { var t = new Date(Date.now() + 86400000); $('pause-date').value = t.toISOString().slice(0,10); $('pause-time').value = ''; } }
       $('pause-memo').value = S['특이사항'] || ''; $('pause-miss').textContent = '';
+      setPauseKind(S['상담 결과'] === '상담 거부' ? 'reject' : 'delay');
       $('pause').hidden = false; setTimeout(function(){ try { (pauseMode==='sched' ? $('pause-date') : $('pause-memo')).focus(); } catch(e){} }, 50);
     }
     $('btn-pause').addEventListener('click', openPause);
+    $('pause-kind-delay').addEventListener('click', function(){ setPauseKind('delay'); });
+    $('pause-kind-reject').addEventListener('click', function(){ setPauseKind('reject'); });
     $('pause-tbd').addEventListener('click', function(){ setPauseMode('tbd'); });
     $('pause-sched').addEventListener('click', function(){ setPauseMode('sched'); });
     $('pause-cancel').addEventListener('click', function(){ $('pause').hidden = true; });
     $('pause').addEventListener('click', function(e){ if(e.target === $('pause')) $('pause').hidden = true; });
     $('pause-ok').addEventListener('click', function(){
+      var memo = $('pause-memo').value.trim(); if(memo) S['특이사항'] = memo;
+      if(pauseKind === 'reject'){ S['상담 결과'] = '상담 거부'; S['상태'] = '종료'; S['다음 액션 · 일시'] = ''; save(); $('pause').hidden = true; $('pause-ok').disabled = true; $('pause-ok').textContent = '저장 중…'; archive(); return; }
       var when;
       if(pauseMode === 'tbd') when = '미정';
       else { var dd = $('pause-date').value, tt = $('pause-time').value; if(!dd){ $('pause-miss').textContent = '날짜를 선택하세요 (또는 미정)'; return; } when = dd + (tt ? ' ' + tt : ''); }
       S['상담 결과'] = '상담 연기'; S['상태'] = '재연락 예정'; S['다음 액션 · 일시'] = when;
-      var memo = $('pause-memo').value.trim(); if(memo) S['특이사항'] = memo;
       save(); $('pause').hidden = true; $('pause-ok').disabled = true; $('pause-ok').textContent = '저장 중…';
       archive();
     });
