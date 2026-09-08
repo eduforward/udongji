@@ -12,7 +12,6 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -113,7 +112,7 @@
       <button type="button" class="{{ fAllCls }}" onClick="{{ setAll }}">전체 {{ nAll }}</button>
     </div>
     <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
-    <a class="btn" href="{{ folderUrl }}" target="_blank" rel="noopener">서류 폴더</a>
+    <a class="btn" href="{{ folderUrl }}" target="_blank" rel="noopener">저장소 열기</a>
     <span class="cnt {{ cntCls }}">{{ cntText }}</span>
   </div>
 
@@ -183,10 +182,9 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, folderId: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js?v=13');
-      if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
-      if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
-      this.setState({ lib }, () => { this.load(true); lib.ensureRootFolder().then(id => this.setState({ folderId: id })).catch(() => {}); });
+      const lib = await import('./udongji-fb.js?v=1'); await lib.init();
+      if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; }
+      this.setState({ lib }, () => this.load(true));
     } catch (e) { location.replace('index.html#gsheet'); }
     this._on = () => this.load(false); window.addEventListener('focus', this._on);
     this._esc = e => { if (e.key === 'Escape') this.setState({ selRow: null }); }; window.addEventListener('keydown', this._esc);
@@ -267,7 +265,7 @@ class Component extends DCLogic {
           const list2 = Array.from(e.target.files || []); e.target.value = ''; if (!list2.length) return;
           this.setState({ busy: true });
           try {
-            const folder = await lib.ensureCustomerFolder(label);
+            const folder = await lib.ensureCustomerFolder(label, rec.row);
             const added = []; let seq = myFiles.length, converted = 0;
             for (const file of list2) {
               const parts = await lib.toJpgs(file);
@@ -287,10 +285,10 @@ class Component extends DCLogic {
       nAll: all.length, nActive: all.filter(it => !stageDone(it.data, 'install')).length, nDocs: all.filter(it => !stageDone(it.data, 'docs') && !stageDone(it.data, 'install')).length, nDone: all.filter(it => stageDone(it.data, 'install')).length,
       fActiveCls: filter === 'active' ? 'on' : '', fDocsCls: filter === 'docs' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fAllCls: filter === 'all' ? 'on' : '',
       setActive: setF('active'), setDocs: setF('docs'), setDone: setF('done'), setAll: setF('all'),
-      reload: () => this.load(false), folderUrl: folderId ? 'https://drive.google.com/drive/folders/' + folderId : 'https://drive.google.com/',
-      folderNote: (lib && lib.getCfg().folderId) ? '파일은 공용 서류 폴더의 "매장명" 하위 폴더에 올라가요.' : '공용 폴더가 아직 설정되지 않아 로그인 계정 드라이브 "우동지 계약서류 / 매장명"에 올라가요. 관리자에게 알려주세요.',
-      cntCls: err ? 'err' : '', cntText: err ? '시트 오류: ' + err : loading ? '시트 읽는 중…' : list.length + '건',
-      rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '시트를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
+      reload: () => this.load(false), folderUrl: lib ? lib.storageConsoleUrl() : '#',
+      folderNote: '파일은 회사 저장소(Firebase Storage)에 고객별로 보관돼요.',
+      cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + '건',
+      rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, close: () => this.setState({ selRow: null }),
       onMemo: e => this.setState({ memo: e.target.value }),
       saveMemo: () => { if (rec && lib && (rec.data[lib.PROGRESS_NOTE_COL] || '') !== memo) this.patch(rec, { [lib.PROGRESS_NOTE_COL]: memo }, '메모 저장'); },

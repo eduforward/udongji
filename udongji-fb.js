@@ -1,0 +1,257 @@
+// 우동지 공용: 열 정의 · 텍스트 생성 · Firebase 연동 (Auth · Firestore · Storage)
+export const COLS = [{"g":"식별","name":"고객번호","opts":null},{"g":"식별","name":"고객명","opts":null},{"g":"고객 기본정보","name":"연락처","opts":null},{"g":"고객 기본정보","name":"이메일","opts":null},{"g":"고객 기본정보","name":"영문 성함","opts":null},{"g":"고객 기본정보","name":"매장명","opts":null},{"g":"고객 기본정보","name":"매장 주소","opts":null},{"g":"고객 기본정보","name":"업종","opts":null},{"g":"고객 기본정보","name":"판매 물품","opts":null},{"g":"고객 기본정보","name":"매장 구분","opts":["신규 오픈","기존 운영"]},{"g":"고객 기본정보","name":"상담일","opts":null},{"g":"고객 기본정보","name":"상담자","opts":null},{"g":"공통","name":"인터넷 회선(랜선) 보유","opts":["O","X"]},{"g":"공통","name":"랜선 직접 준비 안내","opts":["O","X"]},{"g":"공통","name":"인터넷 변경/신규 필요","opts":["필요","불필요"]},{"g":"공통","name":"인터넷 상담 요청 일정","opts":null},{"g":"공통","name":"인테리어 타공","opts":["O","X","해당없음"]},{"g":"공통","name":"사업자번호","opts":null},{"g":"공통","name":"대형/개인/법인","opts":["대형","개인","법인"]},{"g":"공통","name":"단독/공동","opts":["단독","공동"]},{"g":"공통","name":"배달 필요 여부","opts":["없음","위젯만","매출연동"]},{"g":"공통","name":"POS 프로그램","opts":["사용 안 함","페이앤","오케이","기타"]},{"g":"공통","name":"안내한 상품 구성","opts":null},{"g":"공통","name":"월 이용요금","opts":null},{"g":"공통","name":"VAN","opts":["NICE","KIS"]},{"g":"공통","name":"기기 색상","opts":["블랙","화이트"]},{"g":"공통","name":"특이사항","opts":null},{"g":"공통","name":"기타 상담 내용","opts":null},{"g":"공통","name":"개인정보 제3자 제공 동의","opts":["O","X"]},{"g":"공통","name":"우동지 수신 동의","opts":["O","X"]},{"g":"공통","name":"네이버 ID","opts":null},{"g":"공통","name":"서류 분류","opts":null},{"g":"공통","name":"서류 수취 완료","opts":["O","X"]},{"g":"공통","name":"링크 접수 완료","opts":["O","X"]},{"g":"신규 오픈","name":"오픈 예정일","opts":null},{"g":"신규 오픈","name":"사업자등록증 발급","opts":["발급 완료","발급 예정"]},{"g":"기존 운영","name":"현재 운영 방식","opts":null},{"g":"기존 운영","name":"현재 단말기·POS","opts":null},{"g":"기존 운영","name":"기존 장비 모델명","opts":null},{"g":"기존 운영","name":"장비 사진","opts":["O","X"]},{"g":"기존 운영","name":"약정 잔여 개월","opts":null},{"g":"기존 운영","name":"월 납부금","opts":null},{"g":"기존 운영","name":"VAN 유실적 — NICE","opts":["무실적","유실적","모름"]},{"g":"기존 운영","name":"VAN 유실적 — KIS","opts":["무실적","유실적","모름"]},{"g":"기존 운영","name":"관리자 전달","opts":["O","X"]},{"g":"진행","name":"상담 결과","opts":["상담 진행","상담 불가","상담 거부"]},{"g":"진행","name":"상태","opts":["상담 중","서류 발송","밴 조회 대기","서명 완료","재연락 예정","보류","종료"]},{"g":"진행","name":"다음 액션 · 일시","opts":null}];
+export const ID_COL = '레코드ID', REG_COL = '페이앤 등록';
+
+export function norm(x) { return String(x == null ? '' : x).replace(/\s+/g, '').replace(/\//g, '·'); }
+const byNorm = {}; COLS.forEach(c => { byNorm[norm(c.name)] = c; });
+export function colOf(name) { return byNorm[norm(name)] || null; }
+export function keyOf(header) { const c = colOf(header); return c ? c.name : String(header || '').trim(); }
+
+export function fmtPhone(v) { const d = String(v || '').replace(/\D/g, ''); if (d.length === 11) return d.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'); if (d.length === 10) return d.slice(0, 2) === '02' ? d.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3') : d.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'); if (d.length === 9 && d.slice(0, 2) === '02') return d.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3'); return String(v || '').trim(); }
+export function fmtBiz(v) { const d = String(v || '').replace(/\D/g, ''); return d.length === 10 ? d.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3') : String(v || '').trim(); }
+export function val(d, k) { const v = String((d || {})[k] || '').replace(/[\t\r\n]+/g, ' ').trim(); if (k === '연락처') return fmtPhone(v); if (k === '사업자번호') return fmtBiz(v); return v; }
+
+export function buildTSV(d) { return COLS.slice(1).map(c => val(d, c.name)).join('\t'); }
+
+export function buildPayn(d) {
+  const v = k => val(d, k), isNew = v('매장 구분') === '신규 오픈', r = v('상담 결과');
+  if (r && r !== '상담 진행') return ['[' + r + '] ' + (v('매장명') || v('고객명')), '· 대표 / 연락처 : ' + v('고객명') + ' / ' + v('연락처'), '· 상태 : ' + v('상태'), r === '상담 불가' ? '· 다음 연락 : ' + v('다음 액션 · 일시') : '· 메모 : ' + v('특이사항')].join('\n');
+  const L = [];
+  L.push('[' + (isNew ? '신규 매장' : '기존 운영 매장') + ' 상담 접수] ' + v('매장명') + (v('매장 주소') ? ' (' + v('매장 주소') + ')' : ''));
+  L.push('· 대표 / 연락처 : ' + v('고객명') + ' / ' + v('연락처'));
+  L.push('· 업종 : ' + v('업종') + (v('판매 물품') ? ' — ' + v('판매 물품') : ''));
+  L.push(isNew ? '· 오픈 예정일 : ' + v('오픈 예정일') + (v('사업자등록증 발급') ? ' (' + v('사업자등록증 발급') + ')' : '') : '· 현재 운영 방식 : ' + v('현재 운영 방식'));
+  L.push('· 인터넷 회선(랜선) 보유 여부 : ' + v('인터넷 회선(랜선) 보유') + (v('인터넷 변경/신규 필요') ? ' / 변경·신규 ' + v('인터넷 변경/신규 필요') : ''));
+  L.push('· 커넥트 설치 시 랜선 직접 준비 안내 여부 : ' + v('랜선 직접 준비 안내'));
+  L.push('· 사업자번호 : ' + v('사업자번호'));
+  L.push('· 대형 / 개인 / 법인 / 단독 / 공동 : ' + [v('대형/개인/법인'), v('단독/공동')].filter(Boolean).join(' / '));
+  L.push('· 안내한 상품 구성 및 월 이용요금 : ' + v('안내한 상품 구성') + (v('월 이용요금') ? ' / 월 ' + v('월 이용요금') + '원' : ''));
+  L.push('· POS 프로그램 사용 여부 : ' + v('POS 프로그램') + (!isNew && v('현재 단말기·POS') ? ' (현재 ' + v('현재 단말기·POS') + ')' : ''));
+  L.push('· VAN : ' + v('VAN'));
+  L.push('· 배달 필요 여부 : ' + v('배달 필요 여부'));
+  if (v('인터넷 상담 요청 일정') || v('매장 주소')) L.push('· 인터넷 상담 : ' + v('매장 주소') + ' / ' + v('인터넷 상담 요청 일정'));
+  L.push('· 인테리어 타공 : ' + v('인테리어 타공'));
+  L.push('· 기기 색상 : ' + v('기기 색상'));
+  if (!isNew) { L.push('· VAN 전산 유실적 : NICE ' + v('VAN 유실적 — NICE') + ' / KIS ' + v('VAN 유실적 — KIS')); L.push('· 기존 약정 : 잔여 ' + v('약정 잔여 개월') + '개월 / 월 ' + v('월 납부금') + '원'); }
+  L.push('· 특이사항 : ' + v('특이사항'));
+  L.push('· 기타 상담 내용 : ' + v('기타 상담 내용'));
+  L.push('· 서류 : 통화 후 카톡 수취 예정' + (v('서류 분류') ? ' / ' + v('서류 분류') : ''));
+  return L.join('\n');
+}
+
+export function buildSMS(d) {
+  const v = k => val(d, k);
+  const name = v('고객명') ? v('고객명') + ' 대표님' : '대표님', agent = v('상담자') || '담당자';
+  const head = '[우동지] ' + name + ', 우동지 ' + agent + '입니다.', tail = '\n\n궁금한 점은 이 번호로 카톡 주시면 바로 답드릴게요.\n감사합니다.';
+  const r = v('상담 결과');
+  if (r === '상담 거부') return { kind: '상담 거부 · 마무리 인사', text: head + '\n오늘 시간 내주셔서 감사합니다.\n나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.' + tail };
+  if (r === '상담 불가' || v('상태') === '재연락 예정') { const when = v('다음 액션 · 일시') || '○월 ○일'; return { kind: '재연락 안내', text: head + '\n오늘 통화 감사합니다. 말씀해주신 대로 ' + when + '에 다시 연락드리겠습니다.\n그 전에 준비되시면 미리 보내주셔도 좋아요.' + tail }; }
+  const isNew = v('매장 구분') === '신규 오픈', corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동';
+  const food = /음식|식당|카페|주점|치킨|피자|분식|베이커리|제과|호프|술/.test(v('업종'));
+  const docs = ['1. 사업자등록증 (최근 발급본, 가리는 곳 없이)', '2. 대표님 신분증 (주민등록증 또는 운전면허증 — 여권 불가)', '3. 정산받으실 통장 사본 (모바일 캡처 가능' + (corp ? ', 예금주 = 법인명' : '') + ')'];
+  let n = 4;
+  if (food) docs.push((n++) + '. 영업신고증');
+  docs.push((n++) + '. 매장 사진 — 간판 나오는 바깥 사진 2장, 안쪽 전체 사진 2장\n   (간판이 없으면: 건물 바깥 1장, 입구에서 안이 보이게 1장, 도로명주소 표지판 1장, 안쪽 전체 2장)');
+  if (corp) docs.push((n++) + '. 법인: 등기부등본, 인감증명서(3개월 이내), 주주명부, 소유지배자 확인서\n   (사용인감 쓰시면 사용인감계도)');
+  if (joint) docs.push((n++) + '. 공동대표: 가입 동의·위임장, 결제계좌 동의서, 공동대표님 신분증·연락처\n   (서식은 따로 보내드릴게요)');
+  const extra = [];
+  if (!v('네이버 ID')) extra.push('네이버 아이디 (대표님 개인 명의 계정)');
+  if (isNew && !corp && !v('영문 성함')) extra.push('성함 영문 표기 (여권 기준)');
+  if (!v('이메일')) extra.push('이메일 주소');
+  let body = head + '\n오늘 통화 감사합니다. 안내드린 대로 아래 서류를 이 번호로 카톡/문자로 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 사진으로 충분합니다.\n\n' + docs.join('\n');
+  if (extra.length) body += '\n\n함께 알려주세요:\n- ' + extra.join('\n- ');
+  const summary = [];
+  if (v('안내한 상품 구성')) summary.push('구성: ' + v('안내한 상품 구성') + (v('월 이용요금') ? ' / 월 ' + v('월 이용요금') + '원' : ''));
+  if (v('기기 색상')) summary.push('기기 색상: ' + v('기기 색상'));
+  if (v('VAN')) summary.push('밴사: ' + v('VAN'));
+  if (summary.length) body += '\n\n오늘 정리된 내용\n- ' + summary.join('\n- ');
+  if (v('랜선 직접 준비 안내') === 'O') body += '\n\n설치는 택배 자가설치가 기본이며, 랜선 케이블은 직접 준비해주셔야 합니다 (다이소·온라인 몇 천 원).';
+  body += '\n\n서류 접수 후 페이앤에서 전자계약서가 카톡으로 발송되며, 서명하시면 완료됩니다.' + (joint ? ' 공동대표님도 함께 서명하셔야 합니다.' : '');
+  if (v('상태') === '밴 조회 대기') body += '\n\n밴 등록 조회 결과는 나오는 대로 바로 연락드리겠습니다.';
+  return { kind: (isNew ? '신규 오픈' : '기존 운영') + ' · 서류 안내', text: body + tail };
+}
+
+// ───────── 구글 시트 연동 ─────────
+
+export const STAGE_COLS = { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
+export const DOC_CHECK_COL = '서류 체크', DOC_FILES_COL = '서류 파일', PROGRESS_NOTE_COL = '진행 메모';
+export const STAGES = [
+  { key: 'docs', label: '수취자료' },
+  { key: 'handoff', label: '페이앤 이관' },
+  { key: 'sign', label: '전자서명 완료' },
+  { key: 'install', label: '커넥트 설치 완료' }
+];
+// 고객 조건에 따라 필요 서류 목록
+export function requiredDocs(d) {
+  const v = k => val(d, k), corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동', isNew = v('매장 구분') === '신규 오픈', isOld = v('매장 구분') === '기존 운영';
+  const food = /음식|식당|카페|주점|치킨|피자|분식|베이카리|제과|호프|술|구이|횟집|국수|돈까스|버거|토스트|떡|디저트/.test(v('업종'));
+  const list = [
+    { id: 'biz', name: '사업자등록증', hint: '최근 발급본, 가리는 곳 없이' },
+    { id: 'idcard', name: '대표 신분증', hint: '주민등록증 또는 운전면허증 (여관 불가)' },
+    { id: 'bank', name: '정산 통장 사본', hint: corp ? '예금주 = 법인명' : '모바일 캡처 가능' },
+    { id: 'photo_out', name: '매장 바깥 사진 2장', hint: '간판 나오게 (간판 없으면 건물 바깥 1 + 입구 1 + 도로명주소 표지판 1)' },
+    { id: 'photo_in', name: '매장 안쪽 사진 2장', hint: '전체가 보이게' }
+  ];
+  if (food) list.push({ id: 'food', name: '영업신고증', hint: '음식점' });
+  if (corp) list.push({ id: 'corp', name: '법인 서류', hint: '등기부등본 · 인감증명서(3개월) · 주주명부 · 소유지배자 확인서 (사용인감계)' });
+  if (joint) list.push({ id: 'joint', name: '공동대표 서류', hint: '가입 동의·위임장 · 결제계좌 동의서 · 공동대표 신분증·연락처' });
+  if (isOld && (v('기존 장비 모델명') || v('현재 단말기·POS'))) list.push({ id: 'device', name: '기존 장비 사진', hint: '포스기·프린터 뒷면 모델명' });
+  if (!v('네이버 ID')) list.push({ id: 'naver', name: '네이버 아이디', hint: '대표 개인 명의 계정 (텍스트로 받음)' });
+  if (isNew && !corp && !v('영문 성함')) list.push({ id: 'engname', name: '영문 성함', hint: '여관 기준 (텍스트)' });
+  return list;
+}
+export function parseDocCheck(s) { const o = {}; String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { o[x] = true; }); return o; }
+export function parseDocFiles(s) { try { const j = JSON.parse(s || '[]'); return Array.isArray(j) ? j : []; } catch (e) { return []; } }
+
+export function safeName(s) { return String(s || '').replace(/[\/\\:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim(); }
+// 업로드 전 변환: PNG/WebP/HEIC → JPG, PDF → 페이지별 JPG. 반환: [{blob, ext:'jpg', page}] (이미 JPG면 그대로)
+let pdfjsP = null;
+function loadPdfjs() {
+  if (pdfjsP) return pdfjsP;
+  pdfjsP = import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs').then(m => { m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs'; return m; });
+  return pdfjsP;
+}
+function canvasToJpg(canvas, q = 0.9) { return new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('이미지 변환 실패')), 'image/jpeg', q)); }
+async function drawImageToJpg(file, maxSide = 2400) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('이미지를 열 수 없어요: ' + file.name)); i.src = url; });
+    const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0, c.width, c.height);
+    return canvasToJpg(c);
+  } finally { URL.revokeObjectURL(url); }
+}
+export async function toJpgs(file) {
+  const type = (file.type || '').toLowerCase(), name = (file.name || '').toLowerCase();
+  if (type === 'application/pdf' || name.endsWith('.pdf')) {
+    const pdfjs = await loadPdfjs();
+    const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+    const out = [];
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p); const vp0 = page.getViewport({ scale: 1 }); const scale = Math.min(3, 2000 / Math.max(vp0.width, vp0.height)); const vp = page.getViewport({ scale });
+      const c = document.createElement('canvas'); c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
+      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      out.push({ blob: await canvasToJpg(c), ext: 'jpg', page: p, pages: pdf.numPages });
+    }
+    return out;
+  }
+  if (type === 'image/jpeg' || /\.jpe?g$/.test(name)) return [{ blob: file, ext: 'jpg', page: 1, pages: 1 }];
+  if (type.startsWith('image/') || /\.(png|webp|gif|bmp|heic|heif|tiff?)$/.test(name)) {
+    try { return [{ blob: await drawImageToJpg(file), ext: 'jpg', page: 1, pages: 1 }]; }
+    catch (e) { if (/heic|heif/.test(type + name)) throw new Error('HEIC 파일은 이 보라우저가 열 수 없어요. 아이폰에서 "가장 호환성 높은 형식"으로 받으세요.'); throw e; }
+  }
+  const ext = (/\.([a-zA-Z0-9]{1,5})$/.exec(name) || [])[1] || 'bin';
+  return [{ blob: file, ext, page: 1, pages: 1 }];
+}
+// 파일명 규칙: [매장명]_[고객명]_[서류명]_[순번].확장자
+export function docFileName(d, docName, seq, ext) {
+  ext = String(ext || 'jpg').replace(/^\./, '').toLowerCase() || 'jpg';
+  const parts = [val(d, '매장명') || '매장', val(d, '고객명') || '고객', docName, String(seq)].map(x => safeName(x).replace(/\s+/g, ''));
+  return parts.join('_') + '.' + ext;
+}
+
+// ───────── Firebase ─────────
+export const FIREBASE = { apiKey: 'AIzaSyBd9_wZ0yy8rbFFNMsF9xGKqqrqQYsPKnU', authDomain: 'udongj-5d8da.firebaseapp.com', projectId: 'udongj-5d8da', storageBucket: 'udongj-5d8da.firebasestorage.app', messagingSenderId: '794429903467', appId: '1:794429903467:web:0383bfc3c41b71fb95d72e' };
+export const ROOT_ADMINS = ['daylightism@gmail.com'];
+const FBV = '10.14.1', FBU = 'https://www.gstatic.com/firebasejs/' + FBV + '/';
+let _app, _auth, _db, _st, _mods, _user = null, _ready;
+export function init() {
+  if (_ready) return _ready;
+  _ready = (async () => {
+    const [app, auth, fs, st] = await Promise.all([import(FBU + 'firebase-app.js'), import(FBU + 'firebase-auth.js'), import(FBU + 'firebase-firestore.js'), import(FBU + 'firebase-storage.js')]);
+    _mods = { auth, fs, st };
+    _app = app.getApps().length ? app.getApp() : app.initializeApp(FIREBASE);
+    _auth = auth.getAuth(_app); _db = fs.getFirestore(_app); _st = st.getStorage(_app);
+    await auth.setPersistence(_auth, auth.browserLocalPersistence).catch(() => {});
+    _user = await new Promise(res => { const off = auth.onAuthStateChanged(_auth, u => { off(); res(u); }); });
+    auth.onAuthStateChanged(_auth, u => { _user = u; });
+    return true;
+  })();
+  return _ready;
+}
+export function isConfigured() { return true; }
+export function isSignedIn() { return !!_user; }
+export function userEmail() { return _user ? (_user.email || '') : ''; }
+export function hasEverSignedIn() { try { return !!localStorage.getItem('udongji-fb-hint'); } catch (e) { return false; } }
+export async function ensureSignedIn() { await init(); return _user; }
+export async function signIn() {
+  await init(); const { auth } = _mods;
+  const p = new auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
+  const r = await auth.signInWithPopup(_auth, p); _user = r.user;
+  try { localStorage.setItem('udongji-fb-hint', _user.email || '1'); } catch (e) {}
+  return { email: _user.email };
+}
+export async function signOut() { await init(); await _mods.auth.signOut(_auth); _user = null; try { localStorage.removeItem('udongji-fb-hint'); } catch (e) {} }
+export function getCfg() { return { projectId: FIREBASE.projectId }; }
+export function setCfg() { return getCfg(); }
+export function todayStr() { const t = new Date(), p = n => String(n).padStart(2, '0'); return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()); }
+
+// ── 레코드 (Firestore: customers/{id}) ── 페이지 호환을 위해 { row: id, data } 형태로 반환
+const COL = 'customers';
+function need() { if (!_user) throw new Error('로그인이 필요해요. 홈에서 구글 계정으로 로그인하세요.'); }
+export async function readAll() {
+  await init(); need(); const { fs } = _mods;
+  const snap = await fs.getDocs(fs.query(fs.collection(_db, COL), fs.orderBy('_createdAt', 'asc')));
+  const items = snap.docs.map((d, i) => { const data = d.data(); const clean = {}; Object.keys(data).forEach(k => { if (k[0] !== '_') clean[k] = data[k] == null ? '' : String(data[k]); }); clean[ID_COL] = d.id; return { row: d.id, id: d.id, data: clean, _createdAt: data._createdAt || '', _updatedAt: data._updatedAt || '' }; });
+  return { header: FULL_HEADER(), items };
+}
+export const FULL_HEADER = () => COLS.map(c => c.name).concat([ID_COL, REG_COL]);
+function cleanIn(d) { const o = {}; Object.keys(d || {}).forEach(k => { if (k[0] !== '_' && k !== ID_COL) o[k] = d[k] == null ? '' : String(d[k]); }); return o; }
+export async function findRowById(id) { await init(); need(); const { fs } = _mods; const s = await fs.getDoc(fs.doc(_db, COL, id)); return s.exists() ? id : null; }
+export async function appendRecord(d, id) {
+  await init(); need(); const { fs } = _mods; const now = new Date().toISOString();
+  const ref = id ? fs.doc(_db, COL, id) : fs.doc(fs.collection(_db, COL));
+  await fs.setDoc(ref, Object.assign(cleanIn(d), { _createdAt: now, _updatedAt: now, _createdBy: userEmail() }), { merge: true });
+  return ref.id;
+}
+export async function updateRecord(id, d) {
+  await init(); need(); const { fs } = _mods;
+  const ref = fs.doc(_db, COL, id); const cur = await fs.getDoc(ref); const keep = cur.exists() ? cur.data() : {};
+  const patch = cleanIn(d);
+  // 계약 진행 열은 상담 폼이 덮어쓰지 않도록 보존
+  [REG_COL, DOC_CHECK_COL, DOC_FILES_COL, PROGRESS_NOTE_COL, ...Object.values(STAGE_COLS)].forEach(k => { if (keep[k] !== undefined && (patch[k] === undefined || patch[k] === '')) patch[k] = keep[k]; });
+  await fs.setDoc(ref, Object.assign(patch, { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true });
+}
+export async function updateCells(id, obj) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, COL, id), Object.assign(cleanIn(obj), { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true }); }
+export async function setCell(id, k, v) { return updateCells(id, { [k]: v }); }
+export async function deleteRow(id) {
+  await init(); need(); const { fs, st } = _mods;
+  try { const list = await st.listAll(st.ref(_st, 'docs/' + id)); await Promise.all(list.items.map(it => st.deleteObject(it).catch(() => {}))); } catch (e) {}
+  await fs.deleteDoc(fs.doc(_db, COL, id));
+}
+// 호환용 (시트 전용 기능은 no-op)
+export async function ensureHeader() { return FULL_HEADER(); }
+export async function initHeaderIfEmpty() { return { created: false, header: FULL_HEADER() }; }
+export async function listTabs() { return ['customers']; }
+
+// ── 관리자 (Firestore: admins/{email}) ──
+export async function listAdmins() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'admins')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '' })); } catch (e) { return []; } }
+export async function isAdmin(email) { const e = String(email || '').trim().toLowerCase(); if (!e) return false; if (ROOT_ADMINS.includes(e)) return true; await init(); const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'admins', e)); return s.exists(); } catch (er) { return false; } }
+export async function addAdmin(email, by) { const e = String(email || '').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('이메일 형식이 아니에요'); if (ROOT_ADMINS.includes(e)) throw new Error('이미 관리자예요'); await init(); need(); const { fs } = _mods; if ((await fs.getDoc(fs.doc(_db, 'admins', e))).exists()) throw new Error('이미 관리자예요'); await fs.setDoc(fs.doc(_db, 'admins', e), { at: todayStr(), by: by || '' }); }
+export async function removeAdmin(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) throw new Error('기본 관리자는 해제할 수 없어요'); await init(); need(); await _mods.fs.deleteDoc(_mods.fs.doc(_db, 'admins', e)); }
+// ── 허용 사용자 (Firestore: users/{email}) — 보안 규칙이 이 목록으로 접근 제어 ──
+export async function listUsers() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'users')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '', name: d.data().name || '' })); } catch (e) { return []; } }
+export async function addUser(email, by, name) { const e = String(email || '').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('이메일 형식이 아니에요'); await init(); need(); await _mods.fs.setDoc(_mods.fs.doc(_db, 'users', e), { at: todayStr(), by: by || '', name: name || '' }, { merge: true }); }
+export async function removeUser(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) throw new Error('기본 관리자는 제거할 수 없어요'); await init(); need(); await _mods.fs.deleteDoc(_mods.fs.doc(_db, 'users', e)); }
+export async function isAllowed(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) return true; await init(); const { fs } = _mods; try { return (await fs.getDoc(fs.doc(_db, 'users', e))).exists(); } catch (er) { return false; } }
+
+// ── 파일 (Storage: docs/{recordId}/{name}) ──
+export async function ensureRootFolder() { return 'storage'; }
+export async function ensureCustomerFolder(label, recordId) { return recordId || safeName(label); }
+export async function uploadFile(blob, folder, name) {
+  await init(); need(); const { st } = _mods;
+  const path = 'docs/' + folder + '/' + name;
+  const r = st.ref(_st, path);
+  await st.uploadBytes(r, blob, { contentType: blob.type || 'application/octet-stream' });
+  const url = await st.getDownloadURL(r);
+  return { id: path, name, webViewLink: url, size: blob.size };
+}
+export async function deleteFile(id) { await init(); need(); const { st } = _mods; try { await st.deleteObject(st.ref(_st, id)); } catch (e) { if (!/not-found/.test(String(e && e.code))) throw e; } }
+export async function folderInfo() { return { id: 'storage', name: 'Firebase Storage', driveId: '' }; }
+export function storageConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/storage'; }
+export function firestoreConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/firestore'; }
+
+// ── 시트 내보내기 (엑셀/시트에 붙일 TSV 전체) ──
+export function buildExportTSV(items) { const header = FULL_HEADER().concat([DOC_CHECK_COL, ...Object.values(STAGE_COLS), PROGRESS_NOTE_COL]); return [header.join('\t')].concat(items.map(it => header.map(h => val(it.data, h).replace(/\t/g, ' ')).join('\t'))).join('\n'); }

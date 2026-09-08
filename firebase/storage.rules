@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function email() { return request.auth != null ? request.auth.token.email.lower() : ''; }
+    function isRoot() { return email() == 'daylightism@gmail.com'; }
+    function isAdmin() { return isRoot() || firestore.exists(/databases/(default)/documents/admins/$(email())); }
+    function isUser() { return isAdmin() || firestore.exists(/databases/(default)/documents/users/$(email())); }
+
+    match /docs/{recordId}/{file} {
+      allow read: if isUser();
+      allow write: if isUser() && request.resource.size < 25 * 1024 * 1024;
+      allow delete: if isUser();
+    }
+  }
+}

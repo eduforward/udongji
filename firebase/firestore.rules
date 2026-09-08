@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function email() { return request.auth != null ? request.auth.token.email.lower() : ''; }
+    function isRoot() { return email() == 'daylightism@gmail.com'; }
+    function isAdmin() { return isRoot() || exists(/databases/$(database)/documents/admins/$(email())); }
+    function isUser() { return isAdmin() || exists(/databases/$(database)/documents/users/$(email())); }
+
+    match /customers/{id} { allow read, write: if isUser(); }
+    match /admins/{e} { allow read: if isUser(); allow write: if isAdmin(); }
+    match /users/{e} { allow read: if isUser(); allow write: if isAdmin(); }
+  }
+}

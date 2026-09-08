@@ -12,7 +12,6 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -203,7 +202,7 @@
   <nav class="toc" aria-label="목차">
     <a class="logo" href="index.html" style="text-decoration:none;padding:4px 8px 14px;border-radius:0" title="홈으로"><div class="mark">우</div><div><span class="name">우동지</span><span class="sub">상담 업무 · v4</span></div></a>
     <a href="index.html" class="home"><span class="n">←</span><span class="t">홈</span></a>
-    <a href="index.html#gsheet" class="gs off" id="gs-status">시트 미연결</a>
+    <a href="index.html" class="gs off" id="gs-status">연결 확인 중…</a>
     <div class="k">단계</div>
     <a href="#basic"><span class="n">✎</span><span class="t">기본정보</span></a>
     <a href="#s0"><span class="n">0</span><span class="t">본론 전환</span></a>
@@ -435,10 +434,9 @@
 class Component extends DCLogic {
   renderVals() { return {}; }
   componentDidMount() {
-    import('./udongji-lib.js?v=13').then(async mod => {
-      this.lib = mod;
-      if (!mod.isConfigured()) { location.replace('index.html#gsheet'); return; }
-      if (!mod.isSignedIn()) { await mod.ensureSignedIn(); if (!mod.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
+    import('./udongji-fb.js?v=1').then(async mod => {
+      this.lib = mod; await mod.init();
+      if (!mod.isSignedIn()) { location.replace('index.html#gsheet'); return; }
       this.boot();
     }, () => { location.replace('index.html#gsheet'); });
   }
@@ -609,7 +607,7 @@ class Component extends DCLogic {
     render();
     if(LIB){ buildTSV = function(){ return LIB.buildTSV(S); }; buildPayn = function(){ return LIB.buildPayn(S); }; buildSMS = function(){ return LIB.buildSMS(S); }; }
     // 시트 연결 상태 표시 + 미전송 건 자동 전송
-    function gsStatus(){ var el = $('gs-status'); if(!el) return; if(!LIB || !LIB.isConfigured()){ el.textContent = '시트 미연결'; el.className = 'gs off'; return; } if(!LIB.isSignedIn()){ el.textContent = '시트 로그인 필요'; el.className = 'gs warn'; return; } var pend = loadRecords().filter(function(r){ return r.synced === false; }).length; el.textContent = '시트 연결됨 · ' + (LIB.userEmail() || '') + (pend ? ' · 미전송 ' + pend : ''); el.className = 'gs on'; }
+    function gsStatus(){ var el = $('gs-status'); if(!el) return; if(!LIB || !LIB.isSignedIn()){ el.textContent = '로그인 필요'; el.className = 'gs warn'; return; } var pend = loadRecords().filter(function(r){ return r.synced === false; }).length; el.textContent = '연결됨 · ' + (LIB.userEmail() || '') + (pend ? ' · 미전송 ' + pend : ''); el.className = 'gs on'; }
     gsStatus();
     function syncPending(){ if(!LIB || !LIB.isConfigured() || !LIB.isSignedIn()) return; var list = loadRecords(); var pend = list.filter(function(r){ return r.synced === false; }); (function next(i){ if(i >= pend.length){ gsStatus(); return; } pushRecord(pend[i]).then(function(){ next(i+1); }, function(){ next(i+1); }); })(0); }
     function pushRecord(rec){
