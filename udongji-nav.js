@@ -1,12 +1,11 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v21 · 2026-09-08';
+  const VERSION = 'v22 · 2026-09-08';
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
     { key: 'recall', label: '재연락', file: '우동지 재연락.dc.html', dep: 'recall.html' },
     { key: 'contract', label: '계약 업무', file: '우동지 계약 업무.dc.html', dep: 'contract.html' },
-    { key: 'register', label: '등록 업무', file: '우동지 등록 업무.dc.html', dep: 'register.html' },
     { key: 'customers', label: '고객 목록', file: '우동지 고객 목록.dc.html', dep: 'customers.html' }
   ];
   const ADMIN_PAGE = { key: 'admin', label: '관리자', file: '우동지 관리자.dc.html', dep: 'admin.html' };
@@ -35,7 +34,7 @@
       const root = this.attachShadow({ mode: 'open' });
       const href = p => isDeploy ? p.dep : p.file;
       root.innerHTML = `<style>${css}</style><div class="bar"><div class="in">
-        <a class="brand" href="${href(PAGES[0])}"><span class="mark">우</span><span>우동지</span></a>
+        <a class="brand" href="${href(PAGES[0])}"><span class="mark">우</span><span>우동지CRM</span></a>
         <nav>${PAGES.map(p => `<a href="${href(p)}" class="${p.key === cur ? 'on' : ''}">${p.label}</a>`).join('')}<a id="adm" href="${href(ADMIN_PAGE)}" class="${ADMIN_PAGE.key === cur ? 'on' : ''}" hidden style="color:#D93A4A">${ADMIN_PAGE.label}</a></nav>
         <div class="right"><span class="ver" title="배포 버전">${VERSION}</span><span class="who" id="who"></span><button type="button" id="out" hidden>로그아웃</button></div>
       </div></div>`;

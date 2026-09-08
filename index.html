@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=5"></script>
+  <script src="./udongji-nav.js?v=6"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.14); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -107,7 +107,7 @@
 <udongji-nav current="home"></udongji-nav>
 <div class="wrap">
   <div class="top">
-    <div class="mark">우</div><div><h1>우동지 업무 홈</h1><div class="sub">커넥트 상담 → 페이앤 등록</div></div>
+    <div class="mark">우</div><div><h1>우동지CRM</h1><div class="sub">커넥트 상담 → 계약 → 설치</div></div>
     <div class="right">
       <span class="status {{ statusCls }}">{{ statusText }}</span>
       <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><a class="lk" href="admin.html" style="text-decoration:none">관리자</a></sc-if>
@@ -139,11 +139,6 @@
       <div class="ic">▤</div>
       <div><h2>계약 업무</h2><p>상담 후 고객별로 수취자료 → 페이앤 이관 → 전자서명 → 커넥트 설치까지 추적. 서류 업로드와 완료 처리.</p></div>
       <div class="foot"><sc-if value="{{ hasDocsWait }}" hint-placeholder-val="{{ false }}"><span class="pill hot">서류 대기 {{ docsWait }}건</span></sc-if><span class="pill purple">진행 중 {{ inProgress }}건</span><span class="go">열기 →</span></div>
-    </a>
-    <a class="task reg" href="register.html">
-      <div class="ic">✓</div>
-      <div><h2>등록 업무</h2><p>상담에서 기록한 정보를 항목별로 복사해 페이앤 입력폼에 붙여 넣고, 등록 완료 처리.</p></div>
-      <div class="foot"><sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}"><span class="pill hot">미등록 {{ pendingCount }}건</span></sc-if><sc-if value="{{ noPending }}" hint-placeholder-val="{{ true }}"><span class="pill ok">미등록 없음</span></sc-if><span class="pill">전체 {{ totalCount }}건</span><span class="go">열기 →</span></div>
     </a>
     <a class="task list" href="customers.html">
       <div class="ic">☰</div>
@@ -210,7 +205,7 @@ class Component extends DCLogic {
       const d = r.data || {}, res = d['상담 결과'] || '상담 진행';
       const tag = r.registered ? '등록 완료' : res !== '상담 진행' ? res : (d['상태'] || '미등록');
       const cls = r.registered ? 'ok' : res === '상담 진행' ? 'hot' : '';
-      return { store: d['매장명'] || d['고객명'] || '(매장명 없음)', meta: [d['고객명'], d['매장 구분'], d['업종']].filter(Boolean).join(' · '), tag, cls, date: String(r.savedAt || '').slice(0, 16).replace('T', ' '), href: 'register.html#' + r.id };
+      return { store: d['매장명'] || d['고객명'] || '(매장명 없음)', meta: [d['고객명'], d['매장 구분'], d['업종']].filter(Boolean).join(' · '), tag, cls, date: String(r.savedAt || '').slice(0, 16).replace('T', ' '), href: 'contract.html#' + r.id };
     });
     const unlocked = signedIn && allowed;
     const statusCls = err ? 'err' : !signedIn ? 'warn' : !allowed ? 'err' : 'on';
