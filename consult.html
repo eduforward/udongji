@@ -188,34 +188,11 @@
     .btn.ghost { background: var(--card); color: var(--text-2); border-color: var(--line); }
     .btn.ghost:hover { background: var(--card-2); color: var(--text); }
 
-    /* 결과 오버레이 */
-    .overlay { position: fixed; inset: 0; background: rgba(23,28,43,.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 20; overflow: auto; padding: 28px 16px; }
-    .overlay[hidden] { display: none; }
-    .ov-card { max-width: 920px; margin: 0 auto; background: var(--card); border-radius: 18px; box-shadow: var(--shadow-lg); padding: 26px 28px 30px; }
-    .ov-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 8px; }
-    .ov-head .kicker { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
-    .ov-head h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
-    .ov-head p { font-size: 14px; color: var(--text-2); margin-top: 8px; max-width: 58ch; }
-    .ov-head p b { color: var(--text); font-weight: 600; }
-    .ov-row { margin-top: 20px; }
-    .ov-label { font-size: 13px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
-    .ov-label .muted { font-weight: 500; color: var(--text-3); }
-    .overlay textarea { width: 100%; font: 13px/1.55 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--card-2); color: var(--text); resize: vertical; white-space: pre; overflow-x: auto; }
-    .overlay textarea#sms { font: 14.5px/1.65 var(--sans); white-space: pre-wrap; background: var(--card); border-color: var(--blue-3); letter-spacing: -0.01em; }
-    .ov-actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
-    .copied { font-size: 13px; color: var(--green); font-weight: 600; }
-    table.chk td:first-child { color: var(--text-2); font-weight: 500; font-size: 13px; width: 40%; }
-    table.chk td.empty { color: var(--text-3); }
-    .missing-panel { background: var(--form-2); border: 1px solid var(--form-3); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
-    .missing-panel b { color: #B12A39; display: block; margin-bottom: 8px; font-size: 14.5px; }
-    .missing-panel .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .missing-panel button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--form-3); background: var(--card); color: var(--form); cursor: pointer; }
-    .missing-panel button:hover { background: var(--form); color: #fff; border-color: var(--form); }
 
     @media print {
       body { background: #fff; font-size: 12px; }
       .page { grid-template-columns: 1fr; padding: 0; }
-      nav.toc, .donebar, .overlay { display: none !important; }
+      nav.toc, .donebar { display: none !important; }
       section.step, header.doc { box-shadow: none; border: 1px solid var(--line); }
       section.step, .say { break-inside: avoid; }
       .rec input, .rec select { border: none; background: transparent; }
