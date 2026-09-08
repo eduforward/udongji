@@ -171,6 +171,18 @@
     </div>
     <div class="msg {{ msgCls }}">{{ msg }}</div>
     <details>
+      <summary>신규 인원 추가 방법</summary>
+      <div class="guide">
+        <p>새 상담자 1명당 아래 3곳에 <b>같은 구글 계정(이메일)</b>을 넣어주면 끝. 본인은 사이트 열고 <b>구글 계정으로 로그인</b>만 하면 됩니다 (설정값은 코드에 내장).</p>
+        <ol>
+          <li><b>로그인 허용</b> — <a href="https://console.cloud.google.com/auth/audience?project=400925977165" target="_blank" rel="noopener">Google Cloud 콘솔 → Google 인증 플랫폼 → 대상</a> → 아래 "테스트 사용자" → <b>+ Add users</b> → 이메일 추가 → 저장. (빠지면 로그인 때 "액세스 차단됨")</li>
+          <li><b>시트 권한</b> — <a href="{{ sheetUrl }}" target="_blank" rel="noopener">고객 목록 시트</a> 우측 상단 <b>공유</b> → 이메일 추가 → <b>편집자</b>. (빠지면 로그인은 되지만 데이터가 안 보임)</li>
+          <li><b>서류 폴더 권한</b> — <a href="{{ folderUrl }}" target="_blank" rel="noopener">공유 드라이브</a> → 구성원 관리 → 이메일 추가 → <b>콘텐츠 관리자</b>. (빠지면 서류 업로드 실패)</li>
+        </ol>
+        <p style="margin-top:8px">첫 로그인 때 "Google에서 확인하지 않은 앱" 경고가 뜹니다 → <b>계속</b> → 권한 체크 후 계속. 이건 정상이고 한 번만 나옵니다. 퇴사자는 같은 3곳에서 제거하세요.</p>
+      </div>
+    </details>
+    <details>
       <summary>처음 설정하는 방법 (관리자)</summary>
       <div class="guide">
         <ol>
@@ -192,7 +204,7 @@
 class Component extends DCLogic {
   state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false, showAdmin: false, sheetErr: '' };
   async componentDidMount() {
-    try { const lib = await import('./udongji-lib.js?v=11'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-lib.js?v=12'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
     this._tick = setInterval(() => { const lib = this.state.lib; if (lib && this.state.signedIn !== lib.isSignedIn()) this.setState({ signedIn: lib.isSignedIn(), email: lib.userEmail() }); }, 15000);
   }
@@ -241,6 +253,7 @@ class Component extends DCLogic {
       locked: !unlocked, unlocked, gridCls: unlocked ? '' : 'locked', busy, hasMsg: !!msg,
       cfg, statusCls, statusText, msg, msgCls, origin: location.origin,
       sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
+      folderUrl: cfg.folderId ? 'https://drive.google.com/drive/folders/' + cfg.folderId : 'https://drive.google.com/',
       showAdmin, adminLabel: showAdmin ? '설정 닫기' : '설정', toggleAdmin: () => this.setState({ showAdmin: !showAdmin, msg: '', msgCls: '' }),
       onClientId: setC('clientId'), onSheetId: setC('sheetId'), onTab: setC('tab'), onFolder: setC('folderId'),
       testFolder: async () => { if (!lib) return; const c = lib.setCfg(this.state.cfg); if (!c.folderId) { this.setState({ cfg: c, msg: '폴더 URL이 비어 있어요 — 각자 드라이브에 저장됩니다.', msgCls: '' }); return; } try { const f = await lib.folderInfo(c.folderId); this.setState({ cfg: c, msg: '폴더 확인: "' + f.name + '"' + (f.driveId ? ' (공유 드라이브)' : ' (개인 드라이브 공유 폴더)') + ' — 이 계정으로 접근 가능해요.', msgCls: 'ok' }); } catch (e) { fail('폴더 확인 실패: ', e); } },

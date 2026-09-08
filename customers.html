@@ -178,7 +178,7 @@ class Component extends DCLogic {
   ];
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js?v=11');
+      const lib = await import('./udongji-lib.js?v=12');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
       this.setState({ lib }, () => this.load());

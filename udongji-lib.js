@@ -258,18 +258,59 @@ export async function ensureCustomerFolder(label) {
   const f = await driveApi('/files?fields=id', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: [root] }) });
   return f.id;
 }
+// 업로드 전 변환: PNG/WebP/HEIC → JPG, PDF → 페이지별 JPG. 반환: [{blob, ext:'jpg', page}] (이미 JPG면 그대로)
+let pdfjsP = null;
+function loadPdfjs() {
+  if (pdfjsP) return pdfjsP;
+  pdfjsP = import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs').then(m => { m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs'; return m; });
+  return pdfjsP;
+}
+function canvasToJpg(canvas, q = 0.9) { return new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('이미지 변환 실패')), 'image/jpeg', q)); }
+async function drawImageToJpg(file, maxSide = 2400) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('이미지를 열 수 없어요: ' + file.name)); i.src = url; });
+    const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0, c.width, c.height);
+    return canvasToJpg(c);
+  } finally { URL.revokeObjectURL(url); }
+}
+export async function toJpgs(file) {
+  const type = (file.type || '').toLowerCase(), name = (file.name || '').toLowerCase();
+  if (type === 'application/pdf' || name.endsWith('.pdf')) {
+    const pdfjs = await loadPdfjs();
+    const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+    const out = [];
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p); const vp0 = page.getViewport({ scale: 1 }); const scale = Math.min(3, 2000 / Math.max(vp0.width, vp0.height)); const vp = page.getViewport({ scale });
+      const c = document.createElement('canvas'); c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
+      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      out.push({ blob: await canvasToJpg(c), ext: 'jpg', page: p, pages: pdf.numPages });
+    }
+    return out;
+  }
+  if (type === 'image/jpeg' || /\.jpe?g$/.test(name)) return [{ blob: file, ext: 'jpg', page: 1, pages: 1 }];
+  if (type.startsWith('image/') || /\.(png|webp|gif|bmp|heic|heif|tiff?)$/.test(name)) {
+    try { return [{ blob: await drawImageToJpg(file), ext: 'jpg', page: 1, pages: 1 }]; }
+    catch (e) { if (/heic|heif/.test(type + name)) throw new Error('HEIC 파일은 이 보라우저가 열 수 없어요. 아이폰에서 "가장 호환성 높은 형식"으로 받으세요.'); throw e; }
+  }
+  const ext = (/\.([a-zA-Z0-9]{1,5})$/.exec(name) || [])[1] || 'bin';
+  return [{ blob: file, ext, page: 1, pages: 1 }];
+}
 // 파일명 규칙: [매장명]_[고객명]_[서류명]_[순번].확장자
-export function docFileName(d, docName, seq, origName) {
-  const ext = (/\.([a-zA-Z0-9]{1,5})$/.exec(origName || '') || [])[1] || 'jpg';
+export function docFileName(d, docName, seq, ext) {
+  ext = String(ext || 'jpg').replace(/^\./, '').toLowerCase() || 'jpg';
   const parts = [val(d, '매장명') || '매장', val(d, '고객명') || '고객', docName, String(seq)].map(x => safeName(x).replace(/\s+/g, ''));
-  return parts.join('_') + '.' + ext.toLowerCase();
+  return parts.join('_') + '.' + ext;
 }
 export async function uploadFile(file, folderId, name) {
   let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.');
-  const meta = { name: name || file.name, parents: [folderId] };
+  const meta = { name: name || file.name || 'file', parents: [folderId] };
   const fd = new FormData();
   fd.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
-  fd.append('file', file);
+  fd.append('file', file, meta.name);
   const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,webViewLink,size', { method: 'POST', headers: { Authorization: 'Bearer ' + t.access_token }, body: fd });
   if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); }
   return r.json();

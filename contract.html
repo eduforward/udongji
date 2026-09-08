@@ -156,10 +156,10 @@
             <div><div class="n">{{ d.name }}</div><div class="h">{{ d.hint }}</div>
               <div class="files"><sc-for list="{{ d.files }}" as="f" hint-placeholder-count="0"><a class="file" href="{{ f.url }}" target="_blank" rel="noopener"><span>{{ f.name }}</span><button type="button" onClick="{{ f.remove }}" title="삭제">×</button></a></sc-for></div>
             </div>
-            <label class="btn up">{{ d.upLabel }}<input type="file" multiple accept="image/*,.pdf" onChange="{{ d.upload }}"></label>
+            <label class="btn up">{{ d.upLabel }}<input type="file" multiple accept="image/*,.pdf,.heic,.heif" onChange="{{ d.upload }}"></label>
           </div>
         </sc-for>
-        <div class="note">{{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번</b>으로 자동 정리. 업로드하면 자동으로 받음 체크.</div>
+        <div class="note">{{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번.jpg</b>로 자동 정리 — PDF·PNG는 JPG로 변환(PDF는 페이지별). 업로드하면 자동으로 받음 체크.</div>
       </div>
 
       <div class="sec">
@@ -183,7 +183,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, folderId: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-lib.js?v=11');
+      const lib = await import('./udongji-lib.js?v=12');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
       this.setState({ lib }, () => { this.load(true); lib.ensureRootFolder().then(id => this.setState({ folderId: id })).catch(() => {}); });
@@ -268,10 +268,14 @@ class Component extends DCLogic {
           this.setState({ busy: true });
           try {
             const folder = await lib.ensureCustomerFolder(label);
-            const added = []; let seq = myFiles.length;
-            for (const file of list2) { seq++; const nm = lib.docFileName(d, x.name, seq, file.name); const r = await lib.uploadFile(file, folder, nm); added.push({ id: r.id, name: nm, url: r.webViewLink, doc: x.id, at: today }); }
+            const added = []; let seq = myFiles.length, converted = 0;
+            for (const file of list2) {
+              const parts = await lib.toJpgs(file);
+              if (parts.length > 1 || parts[0].blob !== file) converted++;
+              for (const p of parts) { seq++; const nm = lib.docFileName(d, x.name, seq, p.ext); const r = await lib.uploadFile(p.blob, folder, nm); added.push({ id: r.id, name: nm, url: r.webViewLink, doc: x.id, at: today }); }
+            }
             const n = Object.assign({}, chk, { [x.id]: true });
-            await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(fl.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, added.length + '개 파일 업로드 · 받음 체크');
+            await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(fl.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, added.length + '개 파일 업로드' + (converted ? ' (JPG 변환 ' + converted + '건)' : '') + ' · 받음 체크');
           } catch (er) { this.toast('업로드 실패: ' + er.message); }
           this.setState({ busy: false });
         }
