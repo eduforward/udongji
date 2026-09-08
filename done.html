@@ -76,12 +76,6 @@
       <div class="row"><button type="button" class="btn" onClick="{{ copySms }}">문자 복사</button><span class="copied">{{ copiedSms }}</span></div>
     </div>
 
-    <div class="tbox">
-      <h3>페이앤 관리자 전달 양식</h3>
-      <p class="d">관리자에게 카톡으로 보낼 때. 보냈으면 오른쪽 체크.</p>
-      <textarea class="mono" readonly value="{{ payn }}"></textarea>
-      <div class="row"><button type="button" class="btn ghost" onClick="{{ copyPayn }}">양식 복사</button><span class="copied">{{ copiedPayn }}</span><button type="button" class="btn ghost" style="margin-left:auto" onClick="{{ toggleSent }}">{{ sentLabel }}</button></div>
-    </div>
   </sc-if>
   <sc-if value="{{ noRec }}" hint-placeholder-val="{{ false }}">
     <div class="blank">표시할 상담이 없어요.<br><a href="consult.html">상담 업무로 →</a></div>
@@ -90,14 +84,14 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, rec: null, sync: 'wait', err: '', row: null, sms: '', copiedSms: '', copiedPayn: '', sent: false };
+  state = { lib: null, rec: null, sync: 'wait', err: '', row: null, sms: '', copiedSms: '' };
   KEY = 'udongji-last-done';
   async componentDidMount() {
     let rec = null; try { rec = JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) {}
     if (!rec) { this.setState({ rec: null }); return; }
     let lib = null; try { lib = await import('./udongji-lib.js?v=8'); } catch (e) {}
     const sms = lib ? lib.buildSMS(rec.data).text : '';
-    this.setState({ lib, rec, sms, sent: rec.data['관리자 전달'] === 'O', sync: rec.synced ? 'ok' : 'wait', row: rec.sheetRow || null });
+    this.setState({ lib, rec, sms, sync: rec.synced ? 'ok' : 'wait', row: rec.sheetRow || null });
     if (lib && !rec.synced) this.push(lib, rec);
   }
   async push(lib, rec) {
@@ -117,7 +111,7 @@ class Component extends DCLogic {
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy); else legacy();
   }
   renderVals() {
-    const { lib, rec, sync, err, row, sms, copiedSms, copiedPayn, sent } = this.state;
+    const { lib, rec, sync, err, row, sms, copiedSms } = this.state;
     if (!rec) return { hasRec: false, noRec: true };
     const d = rec.data || {}, V = k => lib ? lib.val(d, k) : String(d[k] || '');
     const res = V('상담 결과') || '상담 진행', go = res === '상담 진행';
@@ -132,9 +126,6 @@ class Component extends DCLogic {
       statusTag: V('상태') || res, statusCls: go ? (V('상태') === '재연락 예정' ? 'amber' : 'ok') : '',
       regHref: 'register.html#' + rec.id,
       smsKind: kind ? '· ' + kind : '', sms, onSms: e => this.setState({ sms: e.target.value }), copySms: () => this.copy(sms, 'copiedSms'), copiedSms,
-      payn: lib ? lib.buildPayn(d) : '', copyPayn: () => this.copy(lib ? lib.buildPayn(d) : '', 'copiedPayn'), copiedPayn,
-      sentLabel: sent ? '✓ 관리자 전달 완료' : '관리자에게 보냈어요',
-      toggleSent: async () => { const v = sent ? '' : 'O'; rec.data['관리자 전달'] = v; localStorage.setItem(this.KEY, JSON.stringify(rec)); this.setState({ sent: !sent }); if (lib && row) { try { await lib.setCell(row, '관리자 전달', v); } catch (e) {} } }
     };
   }
 }
