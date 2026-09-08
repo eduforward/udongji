@@ -15,113 +15,123 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
+    :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
     html { color-scheme: light; }
     body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
     a { color: var(--blue); } a:hover { color: var(--blue-d); }
-    button, input, select { font-family: inherit; }
+    button, input, select, textarea { font-family: inherit; }
     :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .page { max-width: 1400px; margin: 0 auto; padding: 20px 20px 60px; }
     .bar { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
-    .brand .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--text); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+    .brand .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--purple); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
     .brand b { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; display: block; line-height: 1.2; }
     .brand small { font-size: 11.5px; color: var(--text-3); font-weight: 500; }
     .home { font-size: 12.5px; color: var(--text-3); text-decoration: none; font-weight: 600; }
-    .search { flex: 1 1 220px; min-width: 0; font: inherit; font-size: 13.5px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
-    .search::placeholder { color: var(--text-3); }
-    select.f { font: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text-2); }
-    .seg { display: flex; background: var(--card-2); border-radius: 9px; padding: 3px; gap: 2px; }
+    .search { flex: 1 1 200px; min-width: 0; font: inherit; font-size: 13.5px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
+    .seg { display: flex; background: var(--card-2); border-radius: 9px; padding: 3px; gap: 2px; flex-wrap: wrap; }
     .seg button { border: 0; background: transparent; font-size: 12.5px; font-weight: 600; color: var(--text-2); padding: 6px 10px; border-radius: 7px; white-space: nowrap; cursor: pointer; font-variant-numeric: tabular-nums; }
     .seg button.on { background: var(--card); color: var(--text); box-shadow: 0 1px 2px rgba(20,27,45,.08); }
     .btn { font: inherit; font-size: 13px; font-weight: 700; padding: 8px 13px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; text-decoration: none; white-space: nowrap; }
     .btn:hover { background: var(--card-2); color: var(--text); }
-    .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-    .btn.primary:hover { background: var(--blue-d); }
-    .cnt { font-size: 12.5px; color: var(--text-3); font-variant-numeric: tabular-nums; margin-left: auto; white-space: nowrap; }
+    .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; } .btn.primary:hover { background: var(--blue-d); }
+    .btn.ok { background: var(--green); border-color: var(--green); color: #fff; }
+    .btn.danger { color: var(--red); } .btn.danger:hover { background: var(--red-2); }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .cnt { font-size: 12.5px; color: var(--text-3); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .cnt.err { color: var(--red); font-weight: 600; }
-    .tw { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: auto; max-height: calc(100vh - 150px); }
-    table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 1100px; font-size: 13.5px; }
-    thead th { position: sticky; top: 0; z-index: 2; background: var(--card-2); text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; cursor: pointer; user-select: none; }
-    thead th:hover { color: var(--text); }
-    thead th.sorted { color: var(--blue); }
-    thead th .arr { font-size: 10px; margin-left: 4px; }
-    tbody td { padding: 9px 12px; border-bottom: 1px solid var(--line-2); vertical-align: middle; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+    /* 표 */
+    .tw { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: auto; }
+    table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 980px; font-size: 13.5px; }
+    thead th { position: sticky; top: 0; background: var(--card-2); text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    thead th.st { text-align: center; }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line-2); vertical-align: middle; white-space: nowrap; }
     tbody tr { cursor: pointer; }
     tbody tr:hover td { background: var(--blue-2); }
     tbody tr.on td { background: #E4E9FD; }
-    tbody td.store { font-weight: 700; }
-    tbody td.num { font-variant-numeric: tabular-nums; }
-    tbody td.dim { color: var(--text-3); }
-    .pill { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--card-2); color: var(--text-2); white-space: nowrap; }
-    .pill.ok { background: var(--green-2); color: var(--green); } .pill.hot { background: var(--red-2); color: var(--red); } .pill.amber { background: var(--amber-2); color: var(--amber); } .pill.blue { background: var(--blue-2); color: var(--blue); }
+    tbody tr.done td { opacity: .6; }
+    td.store b { font-weight: 700; display: block; }
+    td.store small { color: var(--text-3); font-size: 12px; }
+    td.dim { color: var(--text-3); font-size: 12.5px; }
+    td.st { text-align: center; }
+    .stg { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 34px; height: 28px; padding: 0 9px; border-radius: 999px; font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; background: var(--card-2); color: var(--text-3); border: 1px solid var(--line); }
+    .stg.todo { background: var(--red-2); color: var(--red); border-color: transparent; }
+    .stg.next { background: var(--amber-2); color: var(--amber); border-color: transparent; }
+    .stg.done { background: var(--green-2); color: var(--green); border-color: transparent; }
+    .stg.wait { opacity: .6; }
+    .pill { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--card-2); color: var(--text-2); }
+    .pill.blue { background: var(--blue-2); color: var(--blue); } .pill.ok { background: var(--green-2); color: var(--green); } .pill.amber { background: var(--amber-2); color: var(--amber); } .pill.hot { background: var(--red-2); color: var(--red); }
     .empty { padding: 60px 20px; text-align: center; color: var(--text-3); }
-    /* 상세 패널 */
-    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); background: var(--card); box-shadow: -12px 0 40px rgba(20,27,45,.18); z-index: 20; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s; }
+    /* 드로어 */
+    .scrim { position: fixed; inset: 0; background: rgba(23,28,43,.25); z-index: 19; }
+    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(620px, 100vw); background: var(--card); box-shadow: -12px 0 40px rgba(20,27,45,.18); z-index: 20; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s; }
     .drawer.open { transform: none; }
     .dh { padding: 18px 22px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: flex-start; }
     .dh h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
     .dh .sub { font-size: 13px; color: var(--text-2); margin-top: 3px; }
     .dh .x { margin-left: auto; font: inherit; font-size: 18px; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; flex: 0 0 auto; }
-    .dtags { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 22px 0; }
-    .dacts { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 22px; border-bottom: 1px solid var(--line); }
-    .dbody { overflow: auto; padding: 6px 0 20px; }
-    .g { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); padding: 14px 22px 4px; }
-    .frow { display: grid; grid-template-columns: 150px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 7px 22px; border-top: 1px solid var(--line-2); }
-    .frow .k { font-size: 12.5px; color: var(--text-2); }
-    .frow .v { font-size: 14px; font-weight: 600; word-break: break-all; }
-    .frow.empty .v { color: var(--text-3); font-weight: 400; }
-    .cp { font: inherit; font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 7px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; }
-    .cp:hover { border-color: var(--blue-3); color: var(--blue); background: var(--blue-2); }
-    .frow.empty .cp { visibility: hidden; }
-    .frow .ed { grid-column: 2 / -1; font: inherit; font-size: 13.5px; padding: 6px 9px; border: 1px solid var(--blue-3); border-radius: 7px; background: var(--card); color: var(--text); width: 100%; }
-    .frow .ed:focus { border-color: var(--blue); }
-    .btn.danger { color: var(--red); }
-    .btn.danger:hover { background: var(--red-2); }
-    .btn:disabled { opacity: .5; cursor: default; }
-    .hint { font-size: 12px; color: var(--text-3); align-self: center; }
-    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 30; }
+    .dbody { overflow: auto; padding: 0 0 24px; }
+    /* 단계 스텝퍼 */
+    .steps { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; padding: 16px 22px 6px; }
+    .step { border-radius: 10px; padding: 10px 10px 9px; background: var(--card-2); border: 1px solid var(--line); text-align: left; cursor: pointer; font: inherit; color: var(--text-2); display: flex; flex-direction: column; gap: 3px; }
+    .step b { font-size: 12.5px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .step small { font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .step.done { background: var(--green-2); border-color: var(--green-3); } .step.done b { color: var(--green); } .step.done small { color: var(--green); }
+    .step.cur { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-2); }
+    .step.cur b { color: var(--blue); }
+    .sec { padding: 16px 22px 0; }
+    .sec h3 { font-size: 13.5px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .sec h3 .pill { margin-left: auto; }
+    .doc { display: grid; grid-template-columns: 26px minmax(0,1fr) auto; gap: 10px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line-2); }
+    .doc .cb { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--card); cursor: pointer; display: grid; place-items: center; color: #fff; font-size: 13px; font-weight: 800; margin-top: 1px; }
+    .doc.on .cb { background: var(--green); border-color: var(--green); }
+    .doc .n { font-size: 14px; font-weight: 600; }
+    .doc.on .n { color: var(--text-2); text-decoration: line-through; text-decoration-color: var(--green-3); }
+    .doc .h { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+    .doc .files { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .file { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 8px 4px 10px; border-radius: 7px; background: var(--blue-2); color: var(--blue); text-decoration: none; max-width: 260px; }
+    .file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file button { border: 0; background: transparent; color: var(--blue); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 2px; }
+    .up { position: relative; overflow: hidden; }
+    .up input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .note { font-size: 12.5px; color: var(--text-3); margin-top: 8px; }
+    textarea.memo { width: 100%; min-height: 70px; font: inherit; font-size: 13.5px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); resize: vertical; }
+    .acts { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px 22px 0; }
+    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 30; max-width: 90vw; }
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .scrim { position: fixed; inset: 0; background: rgba(23,28,43,.25); z-index: 19; }
   </style>
 </helmet>
 <div class="page">
   <div class="bar">
-    <a class="brand" href="index.html"><div class="mark">우</div><div><b>고객 목록</b><small>구글 시트 전체 보기</small></div></a>
+    <a class="brand" href="index.html"><div class="mark">우</div><div><b>계약 업무</b><small>수취자료 → 이관 → 서명 → 설치</small></div></a>
     <a class="home" href="index.html">← 홈</a>
-    <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 · 사업자번호 · 업종 검색" value="{{ query }}" onInput="{{ onQuery }}">
+    <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 검색" value="{{ query }}" onInput="{{ onQuery }}">
     <div class="seg">
+      <button type="button" class="{{ fActiveCls }}" onClick="{{ setActive }}">진행 중 {{ nActive }}</button>
+      <button type="button" class="{{ fDocsCls }}" onClick="{{ setDocs }}">서류 대기 {{ nDocs }}</button>
+      <button type="button" class="{{ fDoneCls }}" onClick="{{ setDone }}">설치 완료 {{ nDone }}</button>
       <button type="button" class="{{ fAllCls }}" onClick="{{ setAll }}">전체 {{ nAll }}</button>
-      <button type="button" class="{{ fPendCls }}" onClick="{{ setPend }}">미등록 {{ nPend }}</button>
-      <button type="button" class="{{ fDoneCls }}" onClick="{{ setDone }}">등록 완료 {{ nDone }}</button>
-      <button type="button" class="{{ fCallCls }}" onClick="{{ setCall }}">재연락 {{ nCall }}</button>
     </div>
-    <select class="f" value="{{ mode }}" onChange="{{ onMode }}"><option value="">구분 전체</option><option value="신규 오픈">신규 오픈</option><option value="기존 운영">기존 운영</option></select>
-    <select class="f" value="{{ agent }}" onChange="{{ onAgent }}"><option value="">상담자 전체</option><sc-for list="{{ agents }}" as="a" hint-placeholder-count="0"><option value="{{ a }}">{{ a }}</option></sc-for></select>
     <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
-    <a class="btn" href="{{ sheetUrl }}" target="_blank" rel="noopener">시트 열기</a>
+    <a class="btn" href="{{ folderUrl }}" target="_blank" rel="noopener">서류 폴더</a>
     <span class="cnt {{ cntCls }}">{{ cntText }}</span>
   </div>
 
   <div class="tw">
     <table>
-      <thead><tr>
-        <sc-for list="{{ cols }}" as="c" hint-placeholder-count="8"><th class="{{ c.cls }}" onClick="{{ c.sort }}">{{ c.label }}<span class="arr">{{ c.arr }}</span></th></sc-for>
-      </tr></thead>
+      <thead><tr><th>매장 · 고객</th><th>구분</th><th>상담일</th><th>상담자</th><th class="st">수취자료</th><th class="st">페이앤 이관</th><th class="st">전자서명 완료</th><th class="st">커넥트 설치 완료</th><th>메모</th></tr></thead>
       <tbody>
-        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
           <tr class="{{ r.cls }}" onClick="{{ r.open }}">
-            <td class="num dim">{{ r.date }}</td>
-            <td class="store">{{ r.store }}</td>
-            <td>{{ r.name }}</td>
-            <td class="num">{{ r.phone }}</td>
-            <td>{{ r.biz }}</td>
+            <td class="store"><b>{{ r.store }}</b><small>{{ r.who }}</small></td>
             <td><span class="pill blue">{{ r.mode }}</span></td>
-            <td>{{ r.plan }}</td>
-            <td>{{ r.status }}</td>
-            <td><span class="pill {{ r.regCls }}">{{ r.regTag }}</span></td>
+            <td class="dim">{{ r.date }}</td>
             <td class="dim">{{ r.agent }}</td>
-            <td class="dim">{{ r.next }}</td>
+            <td class="st"><span class="stg {{ r.s0 }}">{{ r.s0t }}</span></td>
+            <td class="st"><span class="stg {{ r.s1 }}">{{ r.s1t }}</span></td>
+            <td class="st"><span class="stg {{ r.s2 }}">{{ r.s2t }}</span></td>
+            <td class="st"><span class="stg {{ r.s3 }}">{{ r.s3t }}</span></td>
+            <td class="dim" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">{{ r.memo }}</td>
           </tr>
         </sc-for>
       </tbody>
@@ -132,33 +142,37 @@
   <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><div class="scrim" onClick="{{ close }}"></div></sc-if>
   <aside class="drawer {{ drawerCls }}">
     <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
-    <div class="dtags"><span class="pill blue">{{ sel.mode }}</span><span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span><span class="pill">상태 · {{ sel.status }}</span><span class="pill">{{ sel.agent }}</span><span class="pill">시트 {{ sel.row }}행</span></div>
-    <div class="dacts">
-      <sc-if value="{{ notEditing }}" hint-placeholder-val="{{ true }}">
-        <a class="btn primary" href="{{ sel.regHref }}">등록 업무에서 열기 →</a>
-        <button type="button" class="btn" onClick="{{ startEdit }}">수정</button>
-        <a class="btn" href="{{ sel.mapHref }}" target="_blank" rel="noopener">지도</a>
-        <button type="button" class="btn" onClick="{{ copyPayn }}">접수 양식 복사</button>
-        <button type="button" class="btn" onClick="{{ copySms }}">안내 문자 복사</button>
-        <button type="button" class="btn danger" onClick="{{ remove }}">삭제</button>
-      </sc-if>
-      <sc-if value="{{ editing }}" hint-placeholder-val="{{ false }}">
-        <button type="button" class="btn primary" onClick="{{ saveEdit }}" disabled="{{ saving }}">{{ saveLabel }}</button>
-        <button type="button" class="btn" onClick="{{ cancelEdit }}">취소</button>
-        <span class="hint">값을 고치고 저장하면 시트의 해당 행이 바로 바뀝니다.</span>
-      </sc-if>
-    </div>
     <div class="dbody">
-      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="0">
-        <div class="g">{{ g.name }}</div>
-        <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="0">
-          <div class="{{ f.cls }}"><span class="k">{{ f.key }}</span>
-            <sc-if value="{{ f.ro }}" hint-placeholder-val="{{ true }}"><span class="v">{{ f.value }}</span><button type="button" class="cp" onClick="{{ f.copy }}">복사</button></sc-if>
-            <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ false }}"><input class="ed" type="text" value="{{ f.raw }}" onInput="{{ f.onChange }}"><span></span></sc-if>
-            <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}"><select class="ed" value="{{ f.raw }}" onChange="{{ f.onChange }}"><option value="">—</option><sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="0"><option value="{{ o }}">{{ o }}</option></sc-for></select><span></span></sc-if>
+      <div class="steps">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4"><button type="button" class="{{ s.cls }}" onClick="{{ s.toggle }}" title="{{ s.title }}"><b>{{ s.label }}</b><small>{{ s.date }}</small></button></sc-for>
+      </div>
+      <div class="note" style="padding:0 22px">단계를 클릭하면 완료(오늘 날짜) / 취소가 토글돼요.</div>
+
+      <div class="sec">
+        <h3>수취 자료 <span class="pill {{ sel.docPillCls }}">{{ sel.docPill }}</span></h3>
+        <sc-for list="{{ docs }}" as="d" hint-placeholder-count="5">
+          <div class="{{ d.cls }}">
+            <button type="button" class="cb" onClick="{{ d.toggle }}" aria-label="받음 체크">{{ d.mark }}</button>
+            <div><div class="n">{{ d.name }}</div><div class="h">{{ d.hint }}</div>
+              <div class="files"><sc-for list="{{ d.files }}" as="f" hint-placeholder-count="0"><a class="file" href="{{ f.url }}" target="_blank" rel="noopener"><span>{{ f.name }}</span><button type="button" onClick="{{ f.remove }}" title="삭제">×</button></a></sc-for></div>
+            </div>
+            <label class="btn up">{{ d.upLabel }}<input type="file" multiple accept="image/*,.pdf" onChange="{{ d.upload }}"></label>
           </div>
         </sc-for>
-      </sc-for>
+        <div class="note">파일은 로그인 계정 드라이브의 "우동지 계약서류 / 매장명" 폴더에 올라가요. 업로드하면 자동으로 받음 체크.</div>
+      </div>
+
+      <div class="sec">
+        <h3>진행 메모</h3>
+        <textarea class="memo" value="{{ sel.memo }}" onInput="{{ onMemo }}" onBlur="{{ saveMemo }}" placeholder="재촉 연락, 특이사항 등"></textarea>
+      </div>
+
+      <div class="acts">
+        <button type="button" class="btn ok" onClick="{{ completeDocs }}" disabled="{{ sel.docsDone }}">{{ sel.docsBtn }}</button>
+        <a class="btn" href="{{ sel.regHref }}">등록 업무(페이앤 입력) →</a>
+        <button type="button" class="btn" onClick="{{ copyNudge }}">서류 재촉 문자 복사</button>
+        <a class="btn" href="{{ sel.mapHref }}" target="_blank" rel="noopener">지도</a>
+      </div>
     </div>
   </aside>
   <div class="{{ toastCls }}">{{ toastMsg }}</div>
@@ -166,111 +180,117 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'all', mode: '', agent: '', sortKey: '상담일', sortDir: -1, selRow: null, toast: '', toastOn: false, editing: false, draft: null, saving: false };
-  COLS = [['상담일','date'],['매장명','store'],['고객명','name'],['연락처','phone'],['업종','biz'],['매장 구분','mode'],['안내한 상품 구성','plan'],['상태','status'],['페이앤 등록','reg'],['상담자','agent'],['다음 액션 · 일시','next']];
-  GROUPS = [
-    ['고객 기본정보', ['고객명','연락처','이메일','영문 성함','매장명','매장 주소','업종','판매 물품','매장 구분','네이버 ID']],
-    ['사업자·심사', ['사업자번호','대형/개인/법인','단독/공동','개인정보 제3자 제공 동의','우동지 수신 동의']],
-    ['구성·설치', ['안내한 상품 구성','월 이용요금','VAN','POS 프로그램','배달 필요 여부','기기 색상','인터넷 회선(랜선) 보유','랜선 직접 준비 안내','인터넷 변경/신규 필요','인터넷 상담 요청 일정','인테리어 타공']],
-    ['신규 오픈', ['오픈 예정일','사업자등록증 발급']],
-    ['기존 운영', ['현재 운영 방식','현재 단말기·POS','기존 장비 모델명','약정 잔여 개월','월 납부금','VAN 유실적 — NICE','VAN 유실적 — KIS']],
-    ['메모·진행', ['특이사항','기타 상담 내용','상담 결과','상태','다음 액션 · 일시','상담일','상담자','페이앤 등록']]
-  ];
+  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, folderId: '' };
   async componentDidMount() {
     try {
       const lib = await import('./udongji-lib.js?v=9');
       if (!lib.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!lib.isSignedIn()) { await lib.ensureSignedIn(); if (!lib.isSignedIn()) { location.replace('index.html#gsheet'); return; } }
-      this.setState({ lib }, () => this.load());
+      this.setState({ lib }, () => { this.load(true); lib.ensureRootFolder().then(id => this.setState({ folderId: id })).catch(() => {}); });
     } catch (e) { location.replace('index.html#gsheet'); }
-    this._on = () => this.load(); window.addEventListener('focus', this._on);
-    this._esc = e => { if (e.key === 'Escape') this.setState(this.state.editing ? { editing: false, draft: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
+    this._on = () => this.load(false); window.addEventListener('focus', this._on);
+    this._esc = e => { if (e.key === 'Escape') this.setState({ selRow: null }); }; window.addEventListener('keydown', this._esc);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('keydown', this._esc); }
-  async load() {
+  async load(first) {
     const lib = this.state.lib; if (!lib) return;
     this.setState({ loading: true });
-    try { const { items } = await lib.readAll(); this.setState({ items, loading: false, err: '' }); }
-    catch (e) { this.setState({ loading: false, err: e.message }); }
+    try {
+      const { items } = await lib.readAll();
+      const st = { items, loading: false, err: '' };
+      if (first) { const id = location.hash.slice(1); const it = id && items.find(x => x.data[lib.ID_COL] === id); if (it) { st.selRow = it.row; st.memo = it.data[lib.PROGRESS_NOTE_COL] || ''; st.filter = 'all'; } }
+      this.setState(st);
+    } catch (e) { this.setState({ loading: false, err: e.message }); }
   }
-  toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1500); }
+  toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
+  async patch(rec, obj, msg) {
+    const lib = this.state.lib;
+    try { await lib.updateCells(rec.row, obj); Object.assign(rec.data, obj); this.setState({ items: this.state.items.slice() }); if (msg) this.toast(msg); }
+    catch (e) { this.toast('저장 실패: ' + e.message); }
+  }
   copy(text, label) {
-    const ok = () => this.toast((label ? label + ' ' : '') + '복사됨');
+    const ok = () => this.toast(label + ' 복사됨');
     const legacy = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select(); let d = false; try { d = document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); d ? ok() : this.toast('복사 실패'); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy); else legacy();
   }
   renderVals() {
-    const { lib, items, loading, err, query, filter, mode, agent, sortKey, sortDir, selRow, toast, toastOn, editing, draft, saving } = this.state;
+    const { lib, items, loading, err, query, filter, selRow, memo, toast, toastOn, busy, folderId } = this.state;
     const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
-    const REG = lib ? lib.REG_COL : '페이앤 등록', ID = lib ? lib.ID_COL : '레코드ID';
-    const isGo = d => (d['상담 결과'] || '상담 진행') === '상담 진행';
-    const isReg = d => !!String(d[REG] || '').trim();
-    const isCall = d => d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 불가';
-    const agents = [...new Set(items.map(it => V(it.data, '상담자')).filter(Boolean))].sort();
+    const SC = lib ? lib.STAGE_COLS : { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
+    const STAGES = lib ? lib.STAGES : [];
+    const today = lib ? lib.todayStr() : '';
+    const isGo = d => (d['상담 결과'] || '상담 진행') === '상담 진행' && d['상태'] !== '종료';
+    const reqDocs = d => lib ? lib.requiredDocs(d) : [];
+    const checked = d => lib ? lib.parseDocCheck(d[lib.DOC_CHECK_COL]) : {};
+    const files = d => lib ? lib.parseDocFiles(d[lib.DOC_FILES_COL]) : [];
+    const missing = d => reqDocs(d).filter(x => !checked(d)[x.id]).length;
+    const stageDone = (d, k) => !!String(d[SC[k]] || '').trim() || (k === 'handoff' && !!String(d[lib ? lib.REG_COL : '페이앤 등록'] || '').trim());
+    const stageDate = (d, k) => String(d[SC[k]] || (k === 'handoff' ? d[lib ? lib.REG_COL : '페이앤 등록'] : '') || '').slice(0, 10);
+    const all = items.filter(it => isGo(it.data));
     const q = query.trim().toLowerCase();
-    let list = items.filter(it => {
-      const d = it.data;
-      if (filter === 'pending' && (isReg(d) || !isGo(d))) return false;
-      if (filter === 'done' && !isReg(d)) return false;
-      if (filter === 'call' && !isCall(d)) return false;
-      if (mode && d['매장 구분'] !== mode) return false;
-      if (agent && V(d, '상담자') !== agent) return false;
-      if (q && !['매장명','고객명','연락처','사업자번호','업종','매장 주소','특이사항'].some(k => V(d, k).toLowerCase().includes(q))) return false;
+    const list = all.filter(it => {
+      const d = it.data, inst = stageDone(d, 'install');
+      if (filter === 'active' && inst) return false;
+      if (filter === 'docs' && (stageDone(d, 'docs') || inst)) return false;
+      if (filter === 'done' && !inst) return false;
+      if (q && !['매장명','고객명','연락처'].some(k => V(d, k).toLowerCase().includes(q))) return false;
       return true;
-    });
-    list.sort((a, b) => { const x = V(a.data, sortKey), y = V(b.data, sortKey); if (x === y) return (b.row - a.row); return (x < y ? -1 : 1) * sortDir; });
-    const regInfo = d => isReg(d) ? { tag: '등록 완료 ' + String(d[REG]).slice(5, 10), cls: 'ok' } : !isGo(d) ? { tag: d['상담 결과'] || '—', cls: '' } : isCall(d) ? { tag: '재연락', cls: 'amber' } : { tag: '미등록', cls: 'hot' };
-    const rows = list.map(it => { const d = it.data, ri = regInfo(d); return {
-      cls: it.row === selRow ? 'on' : '', open: () => this.setState({ selRow: it.row }),
-      date: V(d, '상담일').slice(5), store: V(d, '매장명') || '(매장명 없음)', name: V(d, '고객명'), phone: V(d, '연락처'), biz: V(d, '업종'), mode: V(d, '매장 구분') || '—',
-      plan: V(d, '안내한 상품 구성') + (V(d, '월 이용요금') ? ' · ' + V(d, '월 이용요금') + '원' : ''), status: V(d, '상태') || '—', regTag: ri.tag, regCls: ri.cls, agent: V(d, '상담자'), next: V(d, '다음 액션 · 일시')
+    }).sort((a, b) => b.row - a.row);
+    const cell = (d, k) => {
+      if (stageDone(d, k)) return { cls: 'done', t: '✓ ' + stageDate(d, k).slice(5) };
+      if (k === 'docs') { const m = missing(d); return m ? { cls: 'todo', t: String(m) } : { cls: 'next', t: '완료 처리' }; }
+      const prev = STAGES[STAGES.findIndex(s => s.key === k) - 1];
+      return prev && stageDone(d, prev.key) ? { cls: 'next', t: '대기' } : { cls: 'wait', t: '—' };
+    };
+    const rows = list.map(it => { const d = it.data, c = STAGES.map(s => cell(d, s.key)); return {
+      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '' }),
+      store: V(d, '매장명') || '(매장명 없음)', who: [V(d, '고객명'), V(d, '연락처')].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '—', date: V(d, '상담일').slice(5), agent: V(d, '상담자'), memo: V(d, lib ? lib.PROGRESS_NOTE_COL : '진행 메모'),
+      s0: c[0] ? c[0].cls : '', s0t: c[0] ? c[0].t : '', s1: c[1] ? c[1].cls : '', s1t: c[1] ? c[1].t : '', s2: c[2] ? c[2].cls : '', s2t: c[2] ? c[2].t : '', s3: c[3] ? c[3].cls : '', s3t: c[3] ? c[3].t : ''
     }; });
-    const cols = this.COLS.map(([k]) => ({ label: k, cls: sortKey === k ? 'sorted' : '', arr: sortKey === k ? (sortDir > 0 ? '▲' : '▼') : '', sort: () => this.setState(sortKey === k ? { sortDir: -sortDir } : { sortKey: k, sortDir: k === '상담일' ? -1 : 1 }) }));
     const rec = items.find(it => it.row === selRow) || null;
-    let sel = {}, groups = [];
-    if (rec) {
-      const d = rec.data, ri = regInfo(d), addr = V(d, '매장 주소'), store = V(d, '매장명');
-      sel = { store: store || V(d, '고객명') || '(매장명 없음)', sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '업종'), addr].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '구분 없음', regTag: ri.tag, regCls: ri.cls, status: V(d, '상태') || '—', agent: V(d, '상담자') ? '상담 ' + V(d, '상담자') : '상담자 미입력', row: rec.row,
-        regHref: 'register.html#' + (d[ID] || 'row' + rec.row), mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((addr ? addr + ' ' : '') + store) };
-      const isNew = d['매장 구분'] === '신규 오픈', isOld = d['매장 구분'] === '기존 운영';
-      const src = editing && draft ? draft : d;
-      groups = this.GROUPS.filter(([n]) => !(n === '신규 오픈' && isOld) && !(n === '기존 운영' && isNew)).map(([name, keys]) => ({ name, fields: keys.map(k => {
-        const v = V(src, k), col = lib ? lib.colOf(k) : null, opts = col && col.opts ? col.opts : null;
-        const canEdit = editing && k !== '페이앤 등록';
-        return { key: k, value: v || '—', raw: String(src[k] || ''), cls: 'frow' + (v || editing ? '' : ' empty'), copy: v ? () => this.copy(v, k) : () => {}, ro: !canEdit, isInput: canEdit && !opts, isSelect: canEdit && !!opts, opts: opts || [], onChange: e => this.setState({ draft: Object.assign({}, this.state.draft, { [k]: e.target.value }) }) };
-      }) })).filter(g => editing || g.fields.some(f => f.value !== '—'));
+    let sel = {}, steps = [], docs = [];
+    if (rec && lib) {
+      const d = rec.data, req = reqDocs(d), chk = checked(d), fl = files(d), miss = req.filter(x => !chk[x.id]).length, addr = V(d, '매장 주소'), store = V(d, '매장명');
+      const label = store || V(d, '고객명') || ('행' + rec.row);
+      sel = { store: label, sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '매장 구분'), V(d, '업종')].filter(Boolean).join(' · '),
+        docPill: miss ? '아직 ' + miss + '개 못 받음' : '전부 받음', docPillCls: miss ? 'hot' : 'ok', docsDone: stageDone(d, 'docs') || busy, docsBtn: stageDone(d, 'docs') ? '✓ 수취 완료됨' : miss ? '수취 완료 처리 (' + miss + '개 남음)' : '수취 완료 처리',
+        memo, regHref: 'register.html#' + (d[lib.ID_COL] || 'row' + rec.row), mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((addr ? addr + ' ' : '') + store) };
+      steps = STAGES.map((s, i) => { const done = stageDone(d, s.key), prevDone = i === 0 || stageDone(d, STAGES[i - 1].key); return {
+        label: s.label, date: done ? stageDate(d, s.key) : prevDone ? '진행 중' : '대기', cls: 'step' + (done ? ' done' : prevDone ? ' cur' : ''), title: done ? '클릭하면 완료 취소' : '클릭하면 오늘 날짜로 완료',
+        toggle: () => { if (done) { if (!confirm('"' + s.label + '" 완료를 취소할까요?')) return; const o = { [SC[s.key]]: '' }; if (s.key === 'handoff') o[lib.REG_COL] = ''; this.patch(rec, o, s.label + ' 완료 취소'); } else { if (s.key === 'docs' && miss && !confirm('아직 ' + miss + '개 서류를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; const o = { [SC[s.key]]: today }; if (s.key === 'handoff') o[lib.REG_COL] = today; this.patch(rec, o, s.label + ' 완료'); } }
+      }; });
+      docs = req.map(x => { const on = !!chk[x.id], myFiles = fl.filter(f => f.doc === x.id); return {
+        cls: 'doc' + (on ? ' on' : ''), mark: on ? '✓' : '', name: x.name, hint: x.hint, upLabel: busy ? '업로드 중…' : '업로드',
+        toggle: () => { const n = Object.assign({}, chk); if (on) delete n[x.id]; else n[x.id] = true; this.patch(rec, { [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, on ? '받음 해제' : '받음 체크'); },
+        files: myFiles.map(f => ({ name: f.name, url: f.url, remove: async e => { e.preventDefault(); e.stopPropagation(); if (!confirm('"' + f.name + '" 파일을 삭제할까요?')) return; try { await lib.deleteFile(f.id); } catch (er) {} const nf = fl.filter(z => z.id !== f.id); await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(nf) }, '파일 삭제'); } })),
+        upload: async e => {
+          const list2 = Array.from(e.target.files || []); e.target.value = ''; if (!list2.length) return;
+          this.setState({ busy: true });
+          try {
+            const folder = await lib.ensureCustomerFolder(label);
+            const added = [];
+            for (const file of list2) { const r = await lib.uploadFile(file, folder, x.name + ' — ' + file.name); added.push({ id: r.id, name: file.name, url: r.webViewLink, doc: x.id, at: today }); }
+            const n = Object.assign({}, chk, { [x.id]: true });
+            await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(fl.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, added.length + '개 파일 업로드 · 받음 체크');
+          } catch (er) { this.toast('업로드 실패: ' + er.message); }
+          this.setState({ busy: false });
+        }
+      }; });
     }
-    const selRec = rec;
-    const cfg = lib ? lib.getCfg() : {};
     const setF = f => () => this.setState({ filter: f });
     return {
-      query, onQuery: e => this.setState({ query: e.target.value }), mode, onMode: e => this.setState({ mode: e.target.value }), agent, onAgent: e => this.setState({ agent: e.target.value }), agents,
-      nAll: items.length, nPend: items.filter(it => !isReg(it.data) && isGo(it.data)).length, nDone: items.filter(it => isReg(it.data)).length, nCall: items.filter(it => isCall(it.data)).length,
-      fAllCls: filter === 'all' ? 'on' : '', fPendCls: filter === 'pending' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fCallCls: filter === 'call' ? 'on' : '',
-      setAll: setF('all'), setPend: setF('pending'), setDone: setF('done'), setCall: setF('call'),
-      reload: () => this.load(), sheetUrl: cfg.sheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.sheetId + '/edit' : '#',
-      cntCls: err ? 'err' : '', cntText: err ? '시트 오류: ' + err : loading ? '시트 읽는 중…' : list.length + ' / ' + items.length + '건',
-      cols, rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '시트를 읽지 못했어요.' : items.length === 0 ? '시트에 아직 상담 기록이 없어요.' : '조건에 맞는 건이 없어요.',
-      hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, groups, close: () => this.setState({ selRow: null, editing: false, draft: null }),
-      editing, notEditing: !editing, saving, saveLabel: saving ? '저장 중…' : '저장',
-      startEdit: () => selRec && this.setState({ editing: true, draft: Object.assign({}, selRec.data) }),
-      cancelEdit: () => this.setState({ editing: false, draft: null }),
-      saveEdit: async () => {
-        if (!selRec || !draft || !lib) return;
-        const patch = {}; Object.keys(draft).forEach(k => { if (String(draft[k] || '') !== String(selRec.data[k] || '')) patch[k] = draft[k]; });
-        if (!Object.keys(patch).length) { this.setState({ editing: false, draft: null }); return; }
-        this.setState({ saving: true });
-        try { await lib.updateCells(selRec.row, patch); this.toast(Object.keys(patch).length + '개 항목을 시트에 저장했어요'); this.setState({ editing: false, draft: null, saving: false }); await this.load(); }
-        catch (e) { this.setState({ saving: false }); this.toast('저장 실패: ' + e.message); }
-      },
-      remove: async () => {
-        if (!selRec || !lib) return;
-        const name = V(selRec.data, '매장명') || V(selRec.data, '고객명') || selRec.row + '행';
-        if (!confirm('"' + name + '" 기록을 시트에서 삭제할까요?\n되돌릴 수 없어요 (시트의 변경 기록에서만 복구 가능).')) return;
-        try { await lib.deleteRow(selRec.row); this.toast('삭제했어요'); this.setState({ selRow: null, editing: false, draft: null }); await this.load(); }
-        catch (e) { this.toast('삭제 실패: ' + e.message); }
-      },
-      copyPayn: () => rec && lib && this.copy(lib.buildPayn(rec.data), '접수 양식'), copySms: () => rec && lib && this.copy(lib.buildSMS(rec.data).text, '안내 문자'),
+      query, onQuery: e => this.setState({ query: e.target.value }),
+      nAll: all.length, nActive: all.filter(it => !stageDone(it.data, 'install')).length, nDocs: all.filter(it => !stageDone(it.data, 'docs') && !stageDone(it.data, 'install')).length, nDone: all.filter(it => stageDone(it.data, 'install')).length,
+      fActiveCls: filter === 'active' ? 'on' : '', fDocsCls: filter === 'docs' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fAllCls: filter === 'all' ? 'on' : '',
+      setActive: setF('active'), setDocs: setF('docs'), setDone: setF('done'), setAll: setF('all'),
+      reload: () => this.load(false), folderUrl: folderId ? 'https://drive.google.com/drive/folders/' + folderId : 'https://drive.google.com/',
+      cntCls: err ? 'err' : '', cntText: err ? '시트 오류: ' + err : loading ? '시트 읽는 중…' : list.length + '건',
+      rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '시트를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
+      hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, close: () => this.setState({ selRow: null }),
+      onMemo: e => this.setState({ memo: e.target.value }),
+      saveMemo: () => { if (rec && lib && (rec.data[lib.PROGRESS_NOTE_COL] || '') !== memo) this.patch(rec, { [lib.PROGRESS_NOTE_COL]: memo }, '메모 저장'); },
+      completeDocs: () => { if (!rec || !lib) return; const m = missing(rec.data); if (m && !confirm('아직 ' + m + '개 서류를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; this.patch(rec, { [SC.docs]: today }, '수취 완료'); },
+      copyNudge: () => { if (!rec || !lib) return; const d = rec.data, left = reqDocs(d).filter(x => !checked(d)[x.id]); const txt = '[우동지] ' + (V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님') + ', 우동지 ' + (V(d, '상담자') || '담당자') + '입니다.\n커넥트 접수 진행을 위해 아직 못 받은 서류가 있어요. 편하실 때 이 번호로 사진 보내주시면 바로 접수 넣어드릴게요.\n\n' + left.map((x, i) => (i + 1) + '. ' + x.name + (x.hint ? ' (' + x.hint + ')' : '')).join('\n') + '\n\n감사합니다.'; this.copy(txt, '재촉 문자'); },
       toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
     };
   }

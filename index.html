@@ -33,9 +33,10 @@
     .status.off { background: var(--card-2); color: var(--text-3); } .status.warn { background: var(--amber-2); color: var(--amber); } .status.on { background: var(--green-2); color: var(--green); } .status.err { background: var(--red-2); color: var(--red); }
     .lk { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-3); background: none; border: 0; cursor: pointer; text-decoration: underline; padding: 0; }
     .lk:hover { color: var(--text); }
-    .grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
-    @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
     a.task.list .ic { background: var(--card-2); color: var(--text); }
+    a.task.contract .ic { background: #F1EAFE; color: #7C3AED; }
+    .pill.purple { background: #F1EAFE; border-color: transparent; color: #7C3AED; }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .wrap { padding: 24px 14px 60px; } }
     a.task { display: flex; flex-direction: column; gap: 18px; background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 26px 26px 24px; text-decoration: none; color: var(--text); min-height: 230px; border: 1px solid transparent; transition: transform .15s, box-shadow .15s, border-color .15s; position: relative; }
     a.task:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--blue-3); color: var(--text); }
@@ -126,6 +127,11 @@
       <div><h2>상담 업무</h2><p>스크립트 보면서 통화하고, 답변을 바로 기록. 끝나면 시트 한 줄·안내 문자·접수 양식이 나와요.</p></div>
       <div class="foot"><sc-if value="{{ hasDraft }}" hint-placeholder-val="{{ false }}"><span class="pill draft">작성 중 · {{ draftName }}</span></sc-if><span class="pill">오늘 {{ todayCount }}건</span><span class="go">시작 →</span></div>
     </a>
+    <a class="task contract" href="contract.html">
+      <div class="ic">▤</div>
+      <div><h2>계약 업무</h2><p>상담 후 고객별로 수취자료 → 페이앤 이관 → 전자서명 → 커넥트 설치까지 추적. 서류 업로드와 완료 처리.</p></div>
+      <div class="foot"><sc-if value="{{ hasDocsWait }}" hint-placeholder-val="{{ false }}"><span class="pill hot">서류 대기 {{ docsWait }}건</span></sc-if><span class="pill purple">진행 중 {{ inProgress }}건</span><span class="go">열기 →</span></div>
+    </a>
     <a class="task reg" href="register.html">
       <div class="ic">✓</div>
       <div><h2>등록 업무</h2><p>상담에서 기록한 정보를 항목별로 복사해 페이앤 입력폼에 붙여 넣고, 등록 완료 처리.</p></div>
@@ -184,7 +190,7 @@
 class Component extends DCLogic {
   state = { lib: null, records: [], draft: null, cfg: { clientId: '', sheetId: '', tab: '고객목록' }, signedIn: false, email: '', msg: '', msgCls: '', source: 'local', busy: false, showAdmin: false, sheetErr: '' };
   async componentDidMount() {
-    try { const lib = await import('./udongji-lib.js?v=8'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-lib.js?v=9'); if (lib.isConfigured() && !lib.isSignedIn() && lib.hasEverSignedIn()) await lib.ensureSignedIn(); this.setState({ lib, cfg: lib.getCfg(), signedIn: lib.isSignedIn(), email: lib.userEmail(), showAdmin: location.hash === '#admin' }, () => this.load()); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
     this._tick = setInterval(() => { const lib = this.state.lib; if (lib && this.state.signedIn !== lib.isSignedIn()) this.setState({ signedIn: lib.isSignedIn(), email: lib.userEmail() }); }, 15000);
   }
@@ -208,6 +214,9 @@ class Component extends DCLogic {
     const isGo = r => ((r.data || {})['상담 결과'] || '상담 진행') === '상담 진행';
     const pending = records.filter(r => !r.registered && isGo(r));
     const callCount = records.filter(r => { const d = r.data || {}; return d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 불가'; }).length;
+    const goRecs = records.filter(r => isGo(r) && (r.data || {})['상태'] !== '종료');
+    const inProgress = goRecs.filter(r => !String((r.data || {})['설치일'] || '').trim()).length;
+    const docsWait = goRecs.filter(r => { const d = r.data || {}; return !String(d['수취 완료일'] || '').trim() && !String(d['설치일'] || '').trim(); }).length;
     const hasDraft = !!draft && Object.keys(draft).some(k => k !== '상담일' && k !== '상담자' && k[0] !== '_' && String(draft[k] || '').trim());
     const recent = records.slice(0, 6).map(r => {
       const d = r.data || {}, res = d['상담 결과'] || '상담 진행';
@@ -224,7 +233,7 @@ class Component extends DCLogic {
     return {
       today: `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())}`,
       todayCount: records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr).length,
-      totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0,
+      totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0, inProgress, docsWait, hasDocsWait: docsWait > 0,
       hasDraft, draftName: hasDraft ? (draft['매장명'] || draft['고객명'] || '이름 미입력') : '',
       recent, noRecent: recent.length === 0, sourceLabel: source === 'sheet' ? '구글 시트' : '—',
       locked: !unlocked, unlocked, gridCls: unlocked ? '' : 'locked', busy, hasMsg: !!msg,

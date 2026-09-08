@@ -435,7 +435,7 @@
 class Component extends DCLogic {
   renderVals() { return {}; }
   componentDidMount() {
-    import('./udongji-lib.js?v=8').then(async mod => {
+    import('./udongji-lib.js?v=9').then(async mod => {
       this.lib = mod;
       if (!mod.isConfigured()) { location.replace('index.html#gsheet'); return; }
       if (!mod.isSignedIn()) { await mod.ensureSignedIn(); if (!mod.isSignedIn()) { location.replace('index.html#gsheet'); return; } }

@@ -194,6 +194,76 @@ export async function updateCells(row, patch) {
 }
 export function todayStr() { const t = new Date(), p = n => String(n).padStart(2, '0'); return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()); }
 
+// ──── 계약 업무: 단계 · 서류 · 파일 ────
+export const STAGE_COLS = { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
+export const DOC_CHECK_COL = '서류 체크', DOC_FILES_COL = '서류 파일', PROGRESS_NOTE_COL = '진행 메모';
+export const STAGES = [
+  { key: 'docs', label: '수취자료' },
+  { key: 'handoff', label: '페이앤 이관' },
+  { key: 'sign', label: '전자서명 완료' },
+  { key: 'install', label: '커넥트 설치 완료' }
+];
+// 고객 조건에 따라 필요 서류 목록
+export function requiredDocs(d) {
+  const v = k => val(d, k), corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동', isNew = v('매장 구분') === '신규 오픈', isOld = v('매장 구분') === '기존 운영';
+  const food = /음식|식당|카페|주점|치킨|피자|분식|베이카리|제과|호프|술|구이|횟집|국수|돈까스|버거|토스트|떡|디저트/.test(v('업종'));
+  const list = [
+    { id: 'biz', name: '사업자등록증', hint: '최근 발급본, 가리는 곳 없이' },
+    { id: 'idcard', name: '대표 신분증', hint: '주민등록증 또는 운전면허증 (여관 불가)' },
+    { id: 'bank', name: '정산 통장 사본', hint: corp ? '예금주 = 법인명' : '모바일 캡처 가능' },
+    { id: 'photo_out', name: '매장 바깥 사진 2장', hint: '간판 나오게 (간판 없으면 건물 바깥 1 + 입구 1 + 도로명주소 표지판 1)' },
+    { id: 'photo_in', name: '매장 안체 사진 2장', hint: '전체가 보이게' }
+  ];
+  if (food) list.push({ id: 'food', name: '영업신고증', hint: '음식점' });
+  if (corp) list.push({ id: 'corp', name: '법인 서류', hint: '등기부등본 · 인감증명서(3개월) · 주주명부 · 소유지배자 확인서 (사용인감계)' });
+  if (joint) list.push({ id: 'joint', name: '공동대표 서류', hint: '가입 동의·위임장 · 결제계좌 동의서 · 공동대표 신분증·연락처' });
+  if (isOld && (v('기존 장비 모델명') || v('현재 단말기·POS'))) list.push({ id: 'device', name: '기존 장비 사진', hint: '포스기·프린터 뒷면 모델명' });
+  if (!v('네이버 ID')) list.push({ id: 'naver', name: '네이버 아이디', hint: '대표 개인 명의 계정 (텍스트로 받음)' });
+  if (isNew && !corp && !v('영문 성함')) list.push({ id: 'engname', name: '영문 성함', hint: '여관 기준 (텍스트)' });
+  return list;
+}
+export function parseDocCheck(s) { const o = {}; String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { o[x] = true; }); return o; }
+export function parseDocFiles(s) { try { const j = JSON.parse(s || '[]'); return Array.isArray(j) ? j : []; } catch (e) { return []; } }
+
+// Drive 업로드 (drive.file 스코프: 이 앱이 만든 파일/폴더만 접근)
+const FOLDER_KEY = 'udongji-drive-folder';
+async function driveApi(path, opt = {}) {
+  let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.');
+  const r = await fetch('https://www.googleapis.com/drive/v3' + path, Object.assign({}, opt, { headers: Object.assign({ Authorization: 'Bearer ' + t.access_token }, opt.headers || {}) }));
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); }
+  return r.json();
+}
+export async function ensureRootFolder() {
+  let id = ''; try { id = localStorage.getItem(FOLDER_KEY) || ''; } catch (e) {}
+  if (id) { try { await driveApi('/files/' + id + '?fields=id,trashed').then(f => { if (f.trashed) throw new Error('trashed'); }); return id; } catch (e) { id = ''; } }
+  const q = encodeURIComponent("name='우동지 계약서류' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+  const found = await driveApi('/files?q=' + q + '&fields=files(id)');
+  if (found.files && found.files.length) id = found.files[0].id;
+  else { const f = await driveApi('/files?fields=id', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: '우동지 계약서류', mimeType: 'application/vnd.google-apps.folder' }) }); id = f.id; }
+  try { localStorage.setItem(FOLDER_KEY, id); } catch (e) {}
+  return id;
+}
+export async function ensureCustomerFolder(label) {
+  const root = await ensureRootFolder();
+  const name = String(label || '이름 없음').replace(/[\/\\:*?"<>|]/g, ' ').trim();
+  const q = encodeURIComponent("name='" + name.replace(/'/g, "\\'") + "' and '" + root + "' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false");
+  const found = await driveApi('/files?q=' + q + '&fields=files(id)');
+  if (found.files && found.files.length) return found.files[0].id;
+  const f = await driveApi('/files?fields=id', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: [root] }) });
+  return f.id;
+}
+export async function uploadFile(file, folderId, name) {
+  let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.');
+  const meta = { name: name || file.name, parents: [folderId] };
+  const fd = new FormData();
+  fd.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+  fd.append('file', file);
+  const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,size', { method: 'POST', headers: { Authorization: 'Bearer ' + t.access_token }, body: fd });
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); }
+  return r.json();
+}
+export async function deleteFile(id) { let t = getToken(); if (!t) t = await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.'); const r = await fetch('https://www.googleapis.com/drive/v3/files/' + id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + t.access_token } }); if (!r.ok && r.status !== 404) throw new Error('HTTP ' + r.status); }
+
 // 새 스프레드시트 생성 + 헤더 행 작성 + 설정 저장. 리턴: { id, url }
 export async function createSheet(title = '우동지 고객 목록', tab = '고객목록') {
   const t = getToken() || await ensureSignedIn(); if (!t) throw new Error('로그인이 필요해요.');
