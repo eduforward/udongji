@@ -275,6 +275,32 @@ export async function notifyNewsletter(id, d, opts) {
     await logIt('sent'); return { ok: true };
   } catch (e) { await logIt('fail', e.message); return { ok: false, reason: e.message }; }
 }
+// ── 홈페이지 상담시간: public/consultHours {json, updatedAt} — 누구나 읽기(랜딩페이지·Apps Script), 관리자만 쓰기 ──
+export const HOURS_TZ = 'Asia/Seoul';
+export const DEFAULT_HOURS = () => ({ force: false, days: Object.fromEntries([0, 1, 2, 3, 4, 5, 6].map(i => [String(i), { on: i >= 1 && i <= 5, start: '13:00', end: '21:00' }])), holidays: [] });
+export function hoursPublicUrl() { return 'https://firestore.googleapis.com/v1/projects/' + FIREBASE.projectId + '/databases/(default)/documents/public/consultHours?key=' + FIREBASE.apiKey; }
+export function seoulNow(d) {
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone: HOURS_TZ, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short' }).formatToParts(d || new Date());
+  const g = t => (parts.find(p => p.type === t) || {}).value || '';
+  return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(g('weekday')), hm: g('hour') + ':' + g('minute'), ymd: g('year') + '-' + g('month') + '-' + g('day') };
+}
+// 최종 상담 가능 여부 (force → 휴무일 → 요일 시간). Apps Script doGet 과 같은 규칙
+export function computeLive(cfg, d) {
+  cfg = cfg || DEFAULT_HOURS(); const n = seoulNow(d); const day = (cfg.days || {})[String(n.day)] || { on: false };
+  if (cfg.force) return { live: false, why: '즉시 끄기 켜짐' };
+  if ((cfg.holidays || []).includes(n.ymd)) return { live: false, why: '휴무일 ' + n.ymd };
+  if (!day.on) return { live: false, why: '오늘 운영 안 함' };
+  const ok = n.hm >= day.start && n.hm < day.end; return { live: ok, why: ok ? '운영 시간 (' + day.start + '~' + day.end + ')' : '운영 시간 외 (' + day.start + '~' + day.end + ')' };
+}
+export async function getConsultHours() { await init(); const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'public', 'consultHours')); if (!s.exists()) return { cfg: DEFAULT_HOURS(), updatedAt: '' }; const d = s.data(); return { cfg: Object.assign(DEFAULT_HOURS(), JSON.parse(d.json || '{}')), updatedAt: d.updatedAt || '' }; } catch (e) { return { cfg: DEFAULT_HOURS(), updatedAt: '' }; } }
+export async function setConsultHours(cfg) {
+  await init(); need(); const { fs } = _mods; const now = new Date().toISOString();
+  const clean = { force: !!cfg.force, days: {}, holidays: Array.from(new Set((cfg.holidays || []).filter(h => /^\d{4}-\d{2}-\d{2}$/.test(h)))).sort() };
+  for (let i = 0; i < 7; i++) { const d = (cfg.days || {})[String(i)] || {}; clean.days[String(i)] = { on: !!d.on, start: /^\d{2}:\d{2}$/.test(d.start) ? d.start : '13:00', end: /^\d{2}:\d{2}$/.test(d.end) ? d.end : '21:00' }; }
+  clean.updatedAt = now;
+  await fs.setDoc(fs.doc(_db, 'public', 'consultHours'), { json: JSON.stringify(clean), updatedAt: now, timezone: HOURS_TZ, _updatedBy: userEmail() });
+  return clean;
+}
 export function storageConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/storage'; }
 export function firestoreConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/firestore'; }
 
