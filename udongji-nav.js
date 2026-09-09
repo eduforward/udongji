@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v37 · 2026-09-09';
+  const VERSION = 'v38 · 2026-09-09';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가
   const HISTORY = [
+    { v: 38, d: '2026-09-09', c: ['브라우저 탭 파비콘 추가 — 탭이 많아도 우동지 CRM을 바로 찾을 수 있어요', '상단 로고 마크를 파비콘과 같은 디자인으로 통일'] },
     { v: 37, d: '2026-09-09', c: ['상단 버전 배지를 클릭하뱴 배포 이력이 열려요'] },
     { v: 36, d: '2026-09-09', c: ['홈 화면 안의 관리자 링크 제거 (상단 네비에만)'] },
     { v: 35, d: '2026-09-09', c: ['계정 역할 4단계: 구성원(상담·영업) < 관리자 < 슈퍼관리자', '관리자 화면에 역할 드롭다운 — 관리자/슈퍼 지정은 슈퍼관리자만', '상담시간 설정은 관리자 이상만 (네비에도 관리자에게만 표시)'] },
@@ -14,7 +15,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 37;
+  const PAGE_V = 38;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -24,13 +25,14 @@
     { key: 'hours', label: '상담시간', file: '우동지 상담시간.dc.html', dep: 'hours.html', admin: true }
   ];
   const ADMIN_PAGE = { key: 'admin', label: '관리자', file: '우동지 관리자.dc.html', dep: 'admin.html' };
+  const ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3D5AF1"/><path d="M20 14v24a12 12 0 0 0 24 0V14" fill="none" stroke="#fff" stroke-width="10"/><circle cx="46" cy="16" r="11" fill="#3D5AF1"/><circle cx="46" cy="16" r="7" fill="#FF4D5E"/></svg>');
   const isDeploy = !/\.dc\.html$/.test(location.pathname) && !/\.dc\.html/.test(decodeURIComponent(location.pathname));
   const css = `
     :host { display: block; position: sticky; top: 0; z-index: 10; font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; letter-spacing: -0.01em; }
     .bar { background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid #E4E8F0; }
     .in { max-width: 1400px; margin: 0 auto; padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 4px; }
     a.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #171C2B; font-weight: 800; font-size: 15px; margin-right: 14px; white-space: nowrap; }
-    a.brand .mark { width: 28px; height: 28px; border-radius: 8px; background: #3D5AF1; color: #fff; display: grid; place-items: center; font-size: 13px; }
+    a.brand .mark { width: 28px; height: 28px; display: block; }
     nav { display: flex; gap: 2px; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
     nav::-webkit-scrollbar { display: none; }
     nav a { text-decoration: none; color: #58627A; font-size: 13.5px; font-weight: 600; padding: 7px 12px; border-radius: 8px; white-space: nowrap; transition: background .12s, color .12s; }
@@ -60,11 +62,12 @@
     connectedCallback() {
       const pv = parseInt(this.getAttribute('page-v') || '0', 10);
       if (pv && pv < PAGE_V) { try { const k = 'udongji-reload-' + PAGE_V; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, '1'); fetch(location.href, { cache: 'reload' }).catch(() => {}).then(() => location.reload()); return; } } catch (e) {} }
+      if (!document.querySelector('link[rel="icon"]')) { const l = document.createElement('link'); l.rel = 'icon'; l.type = 'image/svg+xml'; l.href = ICON; document.head.appendChild(l); }
       const cur = this.getAttribute('current') || '';
       const root = this.attachShadow({ mode: 'open' });
       const href = p => isDeploy ? p.dep : p.file;
       root.innerHTML = `<style>${css}</style><div class="bar"><div class="in">
-        <a class="brand" href="${href(PAGES[0])}"><span class="mark">우</span><span>우동지CRM</span></a>
+        <a class="brand" href="${href(PAGES[0])}"><img class="mark" src="${ICON}" alt=""><span>우동지CRM</span></a>
         <nav>${PAGES.map(p => `<a href="${href(p)}" class="${p.key === cur ? 'on' : ''}" ${p.admin ? 'data-admin hidden' : ''}>${p.label}</a>`).join('')}<a id="adm" href="${href(ADMIN_PAGE)}" class="${ADMIN_PAGE.key === cur ? 'on' : ''}" hidden style="color:#D93A4A">${ADMIN_PAGE.label}</a></nav>
         <div class="right"><span class="ver" id="ver" title="배포 이력 보기" role="button" tabindex="0">${VERSION}</span><span class="who" id="who"></span><button type="button" id="out" hidden>로그아웃</button></div>
       </div></div>
