@@ -1,14 +1,15 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v33 · 2026-09-09';
+  const VERSION = 'v34 · 2026-09-09';
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 33;
+  const PAGE_V = 34;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
     { key: 'recall', label: '재연락', file: '우동지 재연락.dc.html', dep: 'recall.html' },
     { key: 'contract', label: '계약 업무', file: '우동지 계약 업무.dc.html', dep: 'contract.html' },
-    { key: 'customers', label: '고객 목록', file: '우동지 고객 목록.dc.html', dep: 'customers.html' }
+    { key: 'customers', label: '고객 목록', file: '우동지 고객 목록.dc.html', dep: 'customers.html' },
+    { key: 'hours', label: '상담시간', file: '우동지 상담시간.dc.html', dep: 'hours.html' }
   ];
   const ADMIN_PAGE = { key: 'admin', label: '관리자', file: '우동지 관리자.dc.html', dep: 'admin.html' };
   const isDeploy = !/\.dc\.html$/.test(location.pathname) && !/\.dc\.html/.test(decodeURIComponent(location.pathname));
