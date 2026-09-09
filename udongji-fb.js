@@ -228,14 +228,27 @@ export async function restoreDeleted(logId) {
   await fs.setDoc(fs.doc(_db, COL, L.recordId), Object.assign({}, L.data, { _updatedAt: now, _updatedBy: userEmail(), _restoredAt: now, _restoredBy: userEmail() }), { merge: true });
   await fs.setDoc(fs.doc(_db, 'deleted', logId), { restoredAt: now, restoredBy: userEmail() }, { merge: true });
 }
-// ── 관리자 (Firestore: admins/{email}) ──
+// ── 관리자 (Firestore: admins/{email}) — 구버전 호환용. 지금은 users/{email}.role 이 기준 ──
+export const ROLES = [{ key: 'consult', label: '구성원 · 상담' }, { key: 'sales', label: '구성원 · 영업' }, { key: 'admin', label: '관리자' }, { key: 'super', label: '슈퍼관리자' }];
+export function roleLabel(r) { return (ROLES.find(x => x.key === r) || ROLES[0]).label; }
+export function isAdminRole(r) { return r === 'admin' || r === 'super'; }
 export async function listAdmins() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'admins')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '' })); } catch (e) { return []; } }
-export async function isAdmin(email) { const e = String(email || '').trim().toLowerCase(); if (!e) return false; if (ROOT_ADMINS.includes(e)) return true; await init(); const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'admins', e)); return s.exists(); } catch (er) { return false; } }
+// 내 역할: root → super, users.role, (구) admins 문서 → admin, 등록만 → consult, 미등록 → ''
+export async function roleOf(email) {
+  const e = String(email || '').trim().toLowerCase(); if (!e) return ''; if (ROOT_ADMINS.includes(e)) return 'super';
+  await init(); const { fs } = _mods;
+  try { const s = await fs.getDoc(fs.doc(_db, 'users', e)); if (!s.exists()) return ''; const r = s.data().role; if (r) return r; } catch (er) { return ''; }
+  try { if ((await fs.getDoc(fs.doc(_db, 'admins', e))).exists()) return 'admin'; } catch (er) {}
+  return 'consult';
+}
+export async function isSuper(email) { return (await roleOf(email)) === 'super'; }
+export async function isAdmin(email) { return isAdminRole(await roleOf(email)); }
 export async function addAdmin(email, by) { const e = String(email || '').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('이메일 형식이 아니에요'); if (ROOT_ADMINS.includes(e)) throw new Error('이미 관리자예요'); await init(); need(); const { fs } = _mods; if ((await fs.getDoc(fs.doc(_db, 'admins', e))).exists()) throw new Error('이미 관리자예요'); await fs.setDoc(fs.doc(_db, 'admins', e), { at: todayStr(), by: by || '' }); }
 export async function removeAdmin(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) throw new Error('기본 관리자는 해제할 수 없어요'); await init(); need(); await _mods.fs.deleteDoc(_mods.fs.doc(_db, 'admins', e)); }
 // ── 허용 사용자 (Firestore: users/{email}) — 보안 규칙이 이 목록으로 접근 제어 ──
-export async function listUsers() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'users')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '', name: d.data().name || '' })); } catch (e) { return []; } }
-export async function addUser(email, by, name) { const e = String(email || '').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('이메일 형식이 아니에요'); await init(); need(); await _mods.fs.setDoc(_mods.fs.doc(_db, 'users', e), { at: todayStr(), by: by || '', name: name || '' }, { merge: true }); }
+export async function listUsers() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'users')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '', name: d.data().name || '', role: d.data().role || '' })); } catch (e) { return []; } }
+export async function addUser(email, by, name, role) { const e = String(email || '').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) throw new Error('이메일 형식이 아니에요'); await init(); need(); const patch = { at: todayStr(), by: by || '', name: name || '' }; if (role) patch.role = role; await _mods.fs.setDoc(_mods.fs.doc(_db, 'users', e), patch, { merge: true }); }
+export async function setUserRole(email, role) { const e = String(email || '').trim().toLowerCase(); if (!ROLES.some(r => r.key === role)) throw new Error('역할 값이 이상해요'); if (ROOT_ADMINS.includes(e) && role !== 'super') throw new Error('기본 슈퍼관리자는 바꿀 수 없어요'); await init(); need(); await _mods.fs.setDoc(_mods.fs.doc(_db, 'users', e), { role, _roleBy: userEmail(), _roleAt: new Date().toISOString() }, { merge: true }); }
 export async function removeUser(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) throw new Error('기본 관리자는 제거할 수 없어요'); await init(); need(); await _mods.fs.deleteDoc(_mods.fs.doc(_db, 'users', e)); }
 export async function isAllowed(email) { const e = String(email || '').trim().toLowerCase(); if (ROOT_ADMINS.includes(e)) return true; await init(); const { fs } = _mods; try { return (await fs.getDoc(fs.doc(_db, 'users', e))).exists(); } catch (er) { return false; } }
 // 로그인 계정의 등록 이름(상담자) — 슈퍼관리자가 사용자 관리에서 지정. 본인은 바꿀 수 없다.

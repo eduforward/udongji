@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=11"></script>
+  <script src="./udongji-nav.js?v=12"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -54,6 +54,8 @@
     .arow .m { color: var(--text-3); font-size: 12.5px; margin-left: auto; }
     .lk { border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--blue); cursor: pointer; padding: 0; }
     .lk.red { color: var(--red); }
+    .lk:disabled { opacity: .4; cursor: default; }
+    .sel { font: inherit; font-size: 12.5px; font-weight: 600; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text-2); } .sel:disabled { opacity: .5; }
     .msg { font-size: 13px; margin-top: 10px; color: var(--text-2); min-height: 1.2em; } .msg.err { color: var(--red); font-weight: 600; } .msg.ok { color: var(--green); font-weight: 600; }
     /* 삭제 로그 표 */
     .tw { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: auto; }
@@ -92,36 +94,28 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="admin" page-v="34"></udongji-nav>
+<udongji-nav current="admin" page-v="35"></udongji-nav>
 <div class="page">
   <div class="bar">
-    <div class="brand"><span class="mark">!</span><div><b>슈퍼관리자</b><small>{{ email }}</small></div></div>
+    <div class="brand"><span class="mark">!</span><div><b>{{ myRoleLabel }}</b><small>{{ email }}</small></div></div>
     <div class="seg"><button type="button" class="{{ tabUsersCls }}" onClick="{{ showUsers }}">계정 관리</button><button type="button" class="{{ tabLogCls }}" onClick="{{ showLog }}">삭제 로그</button><button type="button" class="{{ tabNlCls }}" onClick="{{ showNl }}">뉴스레터 연동</button></div>
     <sc-if value="{{ isLog }}" hint-placeholder-val="{{ false }}"><input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 · 삭제한 사람 검색" value="{{ query }}" onInput="{{ onQuery }}"></sc-if>
     <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
     <span class="cnt {{ cntCls }}">{{ cntText }}</span>
   </div>
-  <sc-if value="{{ denied }}" hint-placeholder-val="{{ false }}"><div class="gate">이 화면은 슈퍼관리자만 볼 수 있어요.</div></sc-if>
+  <sc-if value="{{ denied }}" hint-placeholder-val="{{ false }}"><div class="gate">이 화면은 관리자 이상만 볼 수 있어요.</div></sc-if>
 
   <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ true }}">
   <div class="card">
     <div class="gs-head"><h3>사용자 관리</h3><span class="status">{{ usersStatus }}</span>
       <div class="acts"><button type="button" class="btn" onClick="{{ exportAll }}">엑셀용 전체 복사</button><a class="btn" href="{{ consoleUrl }}" target="_blank" rel="noopener">Firebase 콘솔</a></div>
     </div>
-    <p class="hint">여기 등록된 구글 계정만 로그인 후 데이터를 볼 수 있어요. <b>이름</b>은 상담 기록의 상담자 칸에 자동 기입되고 본인은 바꿀 수 없어요 — 이름 없는 계정은 상담 저장이 막힙니다.</p>
-    <div class="frm"><input type="email" style="flex:2 1 220px" placeholder="name@gmail.com" value="{{ newUser }}" onInput="{{ onNewUser }}"><input type="text" style="flex:1 1 120px" placeholder="이름 (상담자명)" value="{{ newUserName }}" onInput="{{ onNewUserName }}"><button type="button" class="btn primary" onClick="{{ addUser }}" disabled="{{ busy }}">추가</button></div>
+    <p class="hint">여기 등록된 구글 계정만 로그인 후 데이터를 볼 수 있어요. <b>이름</b>은 상담 기록의 상담자 칸에 자동 기입되고 본인은 바꿀 수 없어요. <b>역할</b>: 구성원(상담·영업) &lt; 관리자(계정 관리·상담시간·삭제 로그·연동) &lt; 슈퍼관리자(관리자 임벅). 관리자 이상은 슈퍼관리자만 지정할 수 있어요.</p>
+    <div class="frm"><input type="email" style="flex:2 1 220px" placeholder="name@gmail.com" value="{{ newUser }}" onInput="{{ onNewUser }}"><input type="text" style="flex:1 1 120px" placeholder="이름 (상담자명)" value="{{ newUserName }}" onInput="{{ onNewUserName }}"><select class="sel" value="{{ newUserRole }}" onChange="{{ onNewUserRole }}"><sc-for list="{{ roleOpts }}" as="r" hint-placeholder-count="4"><option value="{{ r.key }}" disabled="{{ r.dis }}">{{ r.label }}</option></sc-for></select><button type="button" class="btn primary" onClick="{{ addUser }}" disabled="{{ busy }}">추가</button></div>
     <div class="list">
-      <sc-for list="{{ users }}" as="u" hint-placeholder-count="2"><div class="arow"><b>{{ u.email }}</b><span class="nm">{{ u.name }}</span><button type="button" class="lk" onClick="{{ u.rename }}">이름 수정</button><span class="m">{{ u.meta }}</span><sc-if value="{{ u.removable }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk red" onClick="{{ u.remove }}">제거</button></sc-if></div></sc-for>
+      <sc-for list="{{ users }}" as="u" hint-placeholder-count="2"><div class="arow"><b>{{ u.email }}</b><span class="nm">{{ u.name }}</span><button type="button" class="lk" onClick="{{ u.rename }}" disabled="{{ u.lock }}">이름 수정</button><select class="sel" value="{{ u.role }}" onChange="{{ u.setRole }}" disabled="{{ u.lock }}"><sc-for list="{{ roleOpts }}" as="r" hint-placeholder-count="4"><option value="{{ r.key }}" disabled="{{ r.dis }}">{{ r.label }}</option></sc-for></select><span class="m">{{ u.meta }}</span><sc-if value="{{ u.removable }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk red" onClick="{{ u.remove }}">제거</button></sc-if></div></sc-for>
     </div>
     <div class="msg {{ msgCls }}">{{ msg }}</div>
-  </div>
-  <div class="card">
-    <div class="gs-head"><h3>슈퍼관리자 위임</h3></div>
-    <p class="hint">위임된 계정은 이 관리자 화면(계정 관리·삭제 로그·복구)을 볼 수 있어요.</p>
-    <div class="frm"><input type="email" style="flex:1 1 260px" placeholder="name@gmail.com" value="{{ newAdmin }}" onInput="{{ onNewAdmin }}"><button type="button" class="btn primary" onClick="{{ addAdmin }}" disabled="{{ busy }}">위임</button></div>
-    <div class="list">
-      <sc-for list="{{ admins }}" as="a" hint-placeholder-count="1"><div class="arow"><b>{{ a.email }}</b><span class="m">{{ a.meta }}</span><sc-if value="{{ a.removable }}" hint-placeholder-val="{{ false }}"><button type="button" class="lk red" onClick="{{ a.remove }}">해제</button></sc-if></div></sc-for>
-    </div>
   </div>
   </sc-if>
 
@@ -174,14 +168,14 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : 'users', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
+  state = { lib: null, myRole: '', newUserRole: 'consult', tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : 'users', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=5'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=6'); await lib.init();
       if (location.hash === '#hours') { location.replace('hours.html'); return; }
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
-      const email = lib.userEmail(); const ok = await lib.isAdmin(email);
-      this.setState({ lib, ok, denied: !ok, email, loading: ok }, () => { if (ok) this.load(); });
+      const email = lib.userEmail(); const myRole = await lib.roleOf(email); const ok = lib.isAdminRole(myRole);
+      this.setState({ lib, ok, denied: !ok, email, myRole, loading: ok }, () => { if (ok) this.load(); });
     } catch (e) { location.replace('index.html#login'); }
   }
   async load() {
@@ -189,6 +183,8 @@ class Component extends DCLogic {
     this.setState({ loading: true });
     try {
       const [admins, users, all] = await Promise.all([lib.listAdmins(), lib.listUsers(), lib.readAll()]);
+      // 일회성 이관: 역할 없는 계정은 관리자로 (슈퍼관리자가 열었을 때만)
+      if (this.state.myRole === 'super') { const todo = users.filter(u => !u.role && !lib.ROOT_ADMINS.includes(u.email)); if (todo.length) { await Promise.all(todo.map(u => lib.setUserRole(u.email, 'admin'))); todo.forEach(u => { u.role = 'admin'; }); this.toast(todo.length + '명을 관리자로 지정했어요'); } }
       let logs = []; try { logs = await lib.listDeleted(); } catch (e) { this.setState({ err: '삭제 로그: ' + e.message }); }
       let nlCfg = {}, nlLog = []; try { nlCfg = await lib.getNewsletterConfig(true); } catch (e) {} try { nlLog = await lib.listNewsletterLog(); } catch (e) {}
       this.setState({ admins, users, records: all.items, logs, nlCfg, nlLog, nlUrl: nlCfg.url || 'https://script.google.com/macros/s/AKfycbzYuxZuF9Wrd4BBLPtK2UFiuVbCP94Ydr5nmhLzk5OMysh-PMnefofxSW5CaHchWmfn/exec', nlSecret: nlCfg.secret || '', nlEnabled: nlCfg.enabled !== false, loading: false });
@@ -197,8 +193,10 @@ class Component extends DCLogic {
   toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
   say(msg, cls) { this.setState({ msg, msgCls: cls || '' }); }
   renderVals() {
-    const { lib, tab, logs, admins, users, records, loading, err, query, ok, denied, email, toast, toastOn, busy, msg, msgCls, newUser, newUserName, newAdmin } = this.state;
+    const { lib, tab, logs, admins, users, records, loading, err, query, ok, denied, email, toast, toastOn, busy, msg, msgCls, newUser, newUserName, newAdmin, myRole, newUserRole } = this.state;
     const ROOT = lib ? lib.ROOT_ADMINS : [];
+    const superMe = myRole === 'super';
+    const roleOpts = (lib ? lib.ROLES : []).map(r => ({ key: r.key, label: r.label, dis: !superMe && lib.isAdminRole(r.key) }));
     const q = query.trim().toLowerCase();
     const fmt = iso => { if (!iso) return ''; const d = new Date(iso); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); };
     const list = logs.filter(L => !q || [L.store, L.customer, L.phone, L.deletedBy].some(x => String(x || '').toLowerCase().includes(q)));
@@ -210,9 +208,11 @@ class Component extends DCLogic {
     }; });
     const rename = (em, cur) => async () => { const n = prompt(em + ' 의 상담자 이름', cur || ''); if (n === null) return; try { await lib.addUser(em, email, n.trim()); this.say('이름을 저장했어요.', 'ok'); this.load(); } catch (e) { this.say('저장 실패: ' + e.message, 'err'); } };
     const nameOf = e => (users.find(u => u.email === e) || {}).name || '';
-    const userRows = ROOT.map(e => ({ email: e, name: nameOf(e) || '(이름 없음)', meta: '슈퍼관리자', removable: false, remove: () => {}, rename: rename(e, nameOf(e)) }))
-      .concat(users.filter(u => !ROOT.includes(u.email)).map(u => ({ email: u.email, name: u.name || '(이름 없음)', rename: rename(u.email, u.name), meta: (admins.some(a => a.email === u.email) ? '관리자 · ' : '') + (u.at ? u.at + ' 추가' : ''), removable: true,
-        remove: async () => { if (!confirm(u.email + ' 을(를) 사용자에서 제거할까요? 이후 로그인해도 데이터가 보이지 않아요.')) return; try { await lib.removeUser(u.email); this.say('제거했어요.', 'ok'); this.load(); } catch (e) { this.say('제거 실패: ' + e.message, 'err'); } } })));
+    const roleOfU = u => u.role || (admins.some(a => a.email === u.email) ? 'admin' : 'consult');
+    const setRole = (em, cur) => async e => { const r = e.target.value; if (r === cur) return; if (lib.isAdminRole(r) !== lib.isAdminRole(cur) && !confirm(em + ' 을(를) "' + lib.roleLabel(r) + '"로 바꿀까요?')) { this.forceUpdate(); return; } try { await lib.setUserRole(em, r); this.say('역할을 바꿨어요.', 'ok'); this.load(); } catch (e2) { this.say('변경 실패: ' + e2.message, 'err'); this.forceUpdate(); } };
+    const userRows = ROOT.map(e => ({ email: e, name: nameOf(e) || '(이름 없음)', role: 'super', lock: !superMe, meta: '기본 슈퍼관리자', removable: false, remove: () => {}, rename: rename(e, nameOf(e)), setRole: () => {} }))
+      .concat(users.filter(u => !ROOT.includes(u.email)).map(u => { const r = roleOfU(u); const lock = !superMe && lib.isAdminRole(r); return { email: u.email, name: u.name || '(이름 없음)', role: r, lock, rename: rename(u.email, u.name), setRole: setRole(u.email, r), meta: u.at ? u.at + ' 추가' : '', removable: !lock,
+        remove: async () => { if (!confirm(u.email + ' 을(를) 사용자에서 제거할까요? 이후 로그인해도 데이터가 보이지 않아요.')) return; try { await lib.removeUser(u.email); this.say('제거했어요.', 'ok'); this.load(); } catch (e) { this.say('제거 실패: ' + e.message, 'err'); } } }; }));
     const adminRows = ROOT.map(e => ({ email: e, meta: '기본 관리자', removable: false, remove: () => {} })).concat(admins.map(a => ({ email: a.email, meta: (a.at ? a.at + ' 위임' : '') + (a.by ? ' · ' + a.by : ''), removable: true,
       remove: async () => { if (!confirm(a.email + ' 의 관리자 권한을 해제할까요?')) return; try { await lib.removeAdmin(a.email); this.say('해제했어요.', 'ok'); this.load(); } catch (e) { this.say('해제 실패: ' + e.message, 'err'); } } })));
     const setTab = t => () => { this.setState({ tab: t, msg: '' }); try { history.replaceState(null, '', t === 'log' ? '#log' : t === 'nl' ? '#newsletter' : '#'); } catch (e) {} };
@@ -229,9 +229,9 @@ class Component extends DCLogic {
       query, onQuery: e => this.setState({ query: e.target.value }), reload: () => this.load(),
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : isLog ? rows.length + '건' : users.length + '명 · 고객 ' + records.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '로그를 읽지 못했어요. Firestore 규칙(deleted)을 배포했는지 확인하세요.' : '삭제된 기록이 없어요.',
-      users: userRows, usersStatus: users.length + '명 등록', admins: adminRows, msg, msgCls, busy, consoleUrl: lib ? lib.firestoreConsoleUrl() : '#',
+      users: userRows, usersStatus: users.length + '명 등록', admins: adminRows, msg, msgCls, busy, consoleUrl: lib ? lib.firestoreConsoleUrl() : '#', myRoleLabel: lib ? lib.roleLabel(myRole) : '', roleOpts, newUserRole, onNewUserRole: e => this.setState({ newUserRole: e.target.value }),
       newUser, newUserName, newAdmin, onNewUser: e => this.setState({ newUser: e.target.value }), onNewUserName: e => this.setState({ newUserName: e.target.value }), onNewAdmin: e => this.setState({ newAdmin: e.target.value }),
-      addUser: async () => { const v = newUser.trim(); if (!lib || !v) return; if (!newUserName.trim() && !confirm('이름 없이 추가하면 그 계정은 상담을 저장할 수 없어요. 그래도 추가할까요?')) return; this.setState({ busy: true }); try { await lib.addUser(v, email, newUserName.trim()); this.setState({ busy: false, newUser: '', newUserName: '' }); this.say('추가했어요.', 'ok'); this.load(); } catch (e) { this.setState({ busy: false }); this.say('추가 실패: ' + e.message, 'err'); } },
+      addUser: async () => { const v = newUser.trim(); if (!lib || !v) return; if (!newUserName.trim() && !confirm('이름 없이 추가하면 그 계정은 상담을 저장할 수 없어요. 그래도 추가할까요?')) return; this.setState({ busy: true }); try { await lib.addUser(v, email, newUserName.trim(), newUserRole); this.setState({ busy: false, newUser: '', newUserName: '' }); this.say('추가했어요.', 'ok'); this.load(); } catch (e) { this.setState({ busy: false }); this.say('추가 실패: ' + e.message, 'err'); } },
       addAdmin: async () => { const v = newAdmin.trim(); if (!lib || !v) return; this.setState({ busy: true }); try { await lib.addAdmin(v, email); await lib.addUser(v, email, nameOf(v.toLowerCase())); this.setState({ busy: false, newAdmin: '' }); this.say('위임했어요.', 'ok'); this.load(); } catch (e) { this.setState({ busy: false }); this.say('위임 실패: ' + e.message, 'err'); } },
       exportAll: () => { if (!lib) return; const txt = lib.buildExportTSV(records.map(r => ({ data: r.data }))); const done = () => this.toast(records.length + '건 복사됨 — 빈 시트 A1에 붙이세요'); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, () => this.toast('복사 실패')); else { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { this.toast('복사 실패'); } document.body.removeChild(ta); } },
       toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast

@@ -1,15 +1,15 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v34 · 2026-09-09';
+  const VERSION = 'v35 · 2026-09-09';
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 34;
+  const PAGE_V = 35;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
     { key: 'recall', label: '재연락', file: '우동지 재연락.dc.html', dep: 'recall.html' },
     { key: 'contract', label: '계약 업무', file: '우동지 계약 업무.dc.html', dep: 'contract.html' },
     { key: 'customers', label: '고객 목록', file: '우동지 고객 목록.dc.html', dep: 'customers.html' },
-    { key: 'hours', label: '상담시간', file: '우동지 상담시간.dc.html', dep: 'hours.html' }
+    { key: 'hours', label: '상담시간', file: '우동지 상담시간.dc.html', dep: 'hours.html', admin: true }
   ];
   const ADMIN_PAGE = { key: 'admin', label: '관리자', file: '우동지 관리자.dc.html', dep: 'admin.html' };
   const isDeploy = !/\.dc\.html$/.test(location.pathname) && !/\.dc\.html/.test(decodeURIComponent(location.pathname));
@@ -40,12 +40,12 @@
       const href = p => isDeploy ? p.dep : p.file;
       root.innerHTML = `<style>${css}</style><div class="bar"><div class="in">
         <a class="brand" href="${href(PAGES[0])}"><span class="mark">우</span><span>우동지CRM</span></a>
-        <nav>${PAGES.map(p => `<a href="${href(p)}" class="${p.key === cur ? 'on' : ''}">${p.label}</a>`).join('')}<a id="adm" href="${href(ADMIN_PAGE)}" class="${ADMIN_PAGE.key === cur ? 'on' : ''}" hidden style="color:#D93A4A">${ADMIN_PAGE.label}</a></nav>
+        <nav>${PAGES.map(p => `<a href="${href(p)}" class="${p.key === cur ? 'on' : ''}" ${p.admin ? 'data-admin hidden' : ''}>${p.label}</a>`).join('')}<a id="adm" href="${href(ADMIN_PAGE)}" class="${ADMIN_PAGE.key === cur ? 'on' : ''}" hidden style="color:#D93A4A">${ADMIN_PAGE.label}</a></nav>
         <div class="right"><span class="ver" title="배포 버전">${VERSION}</span><span class="who" id="who"></span><button type="button" id="out" hidden>로그아웃</button></div>
       </div></div>`;
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=5';
-      import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; if (await m.isAdmin(m.userEmail())) adm.hidden = false; } }).catch(() => {});
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=6';
+      import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; if (await m.isAdmin(m.userEmail())) { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } } }).catch(() => {});
     }
   }
   if (!customElements.get('udongji-nav')) customElements.define('udongji-nav', UNav);
