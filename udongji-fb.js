@@ -77,7 +77,7 @@ export const STAGES = [
   { key: 'docs', label: '수취자료' },
   { key: 'handoff', label: '페이앤 이관' },
   { key: 'sign', label: '전자서명 완료' },
-  { key: 'install', label: '커넥트 수령 완료' }
+  { key: 'install', label: '커넥트 배송 완료' }
 ];
 export const NEWSLETTER_COL = '뉴스레터 등록일';
 // 고객 조건에 따라 필요 서류 목록
