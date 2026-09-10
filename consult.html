@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=17"></script>
+  <script src="./udongji-nav.js?v=18"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -229,7 +229,7 @@
     }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="40"></udongji-nav>
+<udongji-nav current="consult" page-v="41"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="목차">
     <div class="logo"><div class="mark">우</div><div><span class="name">상담 업무</span><span class="sub">스크립트 v4</span></div></div>
@@ -594,8 +594,7 @@ class Component extends DCLogic {
         var mapBtn = document.createElement('button'); mapBtn.type='button'; mapBtn.className='tog map'; mapBtn.textContent='지도'; mapBtn.title='네이버 지도에서 매장명 검색 (새 탭)';
         mapBtn.addEventListener('click', function(){
           var q = (S['매장명']||'').trim(); if(!q){ ctrl.focus(); return; }
-          var addr = (S['매장 주소']||'').trim();
-          window.open('https://map.naver.com/p/search/' + encodeURIComponent(addr ? addr + ' ' + q : q), '_blank', 'noopener');
+          window.open('https://map.naver.com/p/search/' + encodeURIComponent(q), '_blank', 'noopener');
         });
         el.appendChild(mapBtn);
       }

@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=17"></script>
+  <script src="./udongji-nav.js?v=18"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -105,7 +105,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="40"></udongji-nav>
+<udongji-nav current="contract" page-v="41"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>계약 업무</b><small>수취자료 → 이관 → 서명 → 수령</small></div></div>
@@ -278,7 +278,7 @@ class Component extends DCLogic {
         payn: lib.buildPayn(d), sms: lib.buildSMS(d).text,
         signDone: stageDone(d, 'sign') || busy, signBtn: stageDone(d, 'sign') ? '✓ 전자서명 완료됨' : '전자서명 완료 처리', installDone: stageDone(d, 'install') || busy, installBtn: stageDone(d, 'install') ? '✓ 커넥트 배송 완료됨' : '커넥트 배송 완료 처리',
         nlDone: !!String(d[lib.NEWSLETTER_COL] || '').trim(), nlTag: String(d[lib.NEWSLETTER_COL] || '').trim() ? '뉴스레터 등록 ' + String(d[lib.NEWSLETTER_COL]).slice(5) : '뉴스레터 미등록', nlCls: String(d[lib.NEWSLETTER_COL] || '').trim() ? 'ok' : 'hot', showNl: stageDone(d, 'install'),
-        memo, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((addr ? addr + ' ' : '') + store) };
+        memo, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent(store) };
       steps = STAGES.map((s, i) => { const done = stageDone(d, s.key), prevDone = i === 0 || stageDone(d, STAGES[i - 1].key); return {
         key: s.key, label: s.label, date: done ? stageDate(d, s.key) : prevDone ? '진행 중' : '대기', cls: 'step' + (done ? ' done' : prevDone ? ' cur' : ''), title: done ? '클릭하면 완료 취소' : '클릭하면 오늘 날짜로 완료',
         toggle: () => { if (done) { if (!confirm('"' + s.label + '" 완료를 취소할까요?')) return; const o = { [SC[s.key]]: '' }; if (s.key === 'handoff') o[lib.REG_COL] = ''; this.patch(rec, o, s.label + ' 완료 취소'); } else { if (s.key === 'docs' && miss && !confirm('아직 ' + miss + '개 서류를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; const o = { [SC[s.key]]: today }; if (s.key === 'handoff') o[lib.REG_COL] = today; if (s.key === 'install' && !V(d, '이메일') && !confirm('이메일이 없어서 뉴스레터를 보낼 수 없어요. 그래도 수령 완료로 처리할까요?')) return; this.patch(rec, o, s.label + ' 완료').then(ok => { if (ok && s.key === 'install') this.sendNewsletter(rec, false); }); } }
