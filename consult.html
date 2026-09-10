@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=16"></script>
+  <script src="./udongji-nav.js?v=17"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -229,7 +229,7 @@
     }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="39"></udongji-nav>
+<udongji-nav current="consult" page-v="40"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="목차">
     <div class="logo"><div class="mark">우</div><div><span class="name">상담 업무</span><span class="sub">스크립트 v4</span></div></div>
@@ -585,7 +585,8 @@ class Component extends DCLogic {
       } else {
         ctrl = document.createElement('input'); ctrl.type='text'; ctrl.placeholder='입력';
         if(/기타 상담 내용|특이사항|안내한 상품 구성|매장 주소|이메일|기존 장비 모델명|현재 단말기/.test(key)) ctrl.className='wide';
-        ctrl.addEventListener('input', function(){ S[key] = ctrl.value; render(true); save(); });
+        if(key==='연락처'){ ctrl.type='tel'; ctrl.inputMode='tel'; ctrl.maxLength=13; ctrl.placeholder='010-0000-0000'; }
+        ctrl.addEventListener('input', function(){ if(key==='연락처'){ var f = fmtPhoneLive(ctrl.value); if(f !== ctrl.value){ ctrl.value = f; } } S[key] = ctrl.value; render(true); save(); });
         if(key==='연락처' || key==='사업자번호') ctrl.addEventListener('blur', function(){ var f = key==='연락처' ? fmtPhone(ctrl.value) : fmtBiz(ctrl.value); S[key] = f; render(); save(); });
       }
       el.appendChild(ctrl);
@@ -681,6 +682,7 @@ class Component extends DCLogic {
     if(hasDraft){ savedAt = new Date(); var sn = $('savenote'); if(sn) sn.textContent = '이전 상담 내용 불러왔어요'; }
 
     function fmtPhone(v){ var d = String(v).replace(/\D/g,''); if(d.length===11) return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3'); if(d.length===10) return d.slice(0,2)==='02' ? d.replace(/(\d{2})(\d{4})(\d{4})/,'$1-$2-$3') : d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3'); if(d.length===9 && d.slice(0,2)==='02') return d.replace(/(\d{2})(\d{3})(\d{4})/,'$1-$2-$3'); return String(v).trim(); }
+    function fmtPhoneLive(v){ var d = String(v||'').replace(/\D/g,'').slice(0,11); if(!d) return ''; if(d.slice(0,2)==='02'){ if(d.length<=2) return d; if(d.length<=5) return d.slice(0,2)+'-'+d.slice(2); if(d.length<=9) return d.slice(0,2)+'-'+d.slice(2,5)+'-'+d.slice(5); return d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6,10); } if(d.length<=3) return d; if(d.length<=6) return d.slice(0,3)+'-'+d.slice(3); if(d.length<=10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6); return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7); }
     function fmtBiz(v){ var d = String(v).replace(/\D/g,''); return d.length===10 ? d.replace(/(\d{3})(\d{2})(\d{5})/,'$1-$2-$3') : String(v).trim(); }
     // 작성 완료: 서버(Firestore)에 저장 → 폼 초기화(상담자 유지) → 완료 페이지
     function archive(){
