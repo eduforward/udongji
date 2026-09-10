@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v41 · 2026-09-10';
+  const VERSION = 'v42 · 2026-09-10';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가
   const HISTORY = [
+    { v: 42, d: '2026-09-10', c: ['상단 메뉴를 항목별 버튼으로 분리하고 아이콘 추가 — 현재 페이지는 파란 채움, 관리자 메뉴는 점선 테두리', '홈 업무 카드 아이콘을 메뉴와 통일, 카드에 녹아드는 큰 워터마크 스타일로'] },
     { v: 41, d: '2026-09-10', c: ['지도 버튼: 매장명만으로 네이버 지도 검색 (주소를 같이 넣어 검색이 어긋나던 문제 수정)'] },
     { v: 40, d: '2026-09-10', c: ['연락처 입력 시 하이픈 자동 삽입 · 숫자 11자 제한 (010-0000-0000, 02-123-2020, 031-123-4567 모두 인식)', '고객 목록 수정란에도 동일 적용'] },
     { v: 39, d: '2026-09-10', c: ['계약 업무 마지막 단계 명칭을 "커넥트 설치 완료" → "커넥트 배송 완료"로 변경 (설치 여부는 확인 불가, 배송까지만 추적)'] },
@@ -18,7 +19,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 41;
+  const PAGE_V = 42;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -28,6 +29,8 @@
     { key: 'hours', label: '상담시간', file: '우동지 상담시간.dc.html', dep: 'hours.html', admin: true }
   ];
   const ADMIN_PAGE = { key: 'admin', label: '관리자', file: '우동지 관리자.dc.html', dep: 'admin.html' };
+  const NAV_ICONS = {"home":"<path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V21h14V9.5\"/><path d=\"M10 21v-6h4v6\"/>","consult":"<path d=\"M4 13a8 8 0 0 1 16 0\"/><path d=\"M4 13v4a2 2 0 0 0 2 2h1v-6H4z\"/><path d=\"M20 13v4a2 2 0 0 1-2 2h-1v-6h3z\"/><path d=\"M17 19v1a2 2 0 0 1-2 2h-3\"/>","recall":"<path d=\"M21 12a9 9 0 1 1-3-6.7\"/><path d=\"M21 3v5h-5\"/><path d=\"M12 8v4l3 2\"/>","contract":"<path d=\"M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z\"/><path d=\"M14 3v6h6\"/><path d=\"M8 17c1-1.5 2-1.5 3 0s2 1.5 3 0\"/>","customers":"<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20a6.5 6.5 0 0 1 13 0\"/><path d=\"M16 4.5a3.5 3.5 0 0 1 0 7\"/><path d=\"M17.5 14a6.5 6.5 0 0 1 4 6\"/>","hours":"<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3.5 2\"/>","admin":"<path d=\"M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z\"/><path d=\"m9 12 2 2 4-4\"/>"};
+  const icon = k => NAV_ICONS[k] ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${NAV_ICONS[k]}</svg>` : '';
   const ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3D5AF1"/><path d="M20 14v24a12 12 0 0 0 24 0V14" fill="none" stroke="#fff" stroke-width="10"/><circle cx="46" cy="16" r="11" fill="#3D5AF1"/><circle cx="46" cy="16" r="7" fill="#FF4D5E"/></svg>');
   const isDeploy = !/\.dc\.html$/.test(location.pathname) && !/\.dc\.html/.test(decodeURIComponent(location.pathname));
   const css = `
@@ -36,11 +39,20 @@
     .in { max-width: 1400px; margin: 0 auto; padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 4px; }
     a.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #171C2B; font-weight: 800; font-size: 15px; margin-right: 14px; white-space: nowrap; }
     a.brand .mark { width: 28px; height: 28px; display: block; }
-    nav { display: flex; gap: 2px; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    nav { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    nav .grp { display: flex; gap: 6px; flex: none; }
+    nav .grp[hidden] { display: none; }
+    nav .sep { width: 1px; height: 22px; background: #E4E8F0; flex: none; }
+    nav .sep[hidden] { display: none; }
     nav::-webkit-scrollbar { display: none; }
-    nav a { text-decoration: none; color: #58627A; font-size: 13.5px; font-weight: 600; padding: 7px 12px; border-radius: 8px; white-space: nowrap; transition: background .12s, color .12s; }
-    nav a:hover { background: #F6F8FC; color: #171C2B; }
-    nav a.on { background: #EEF1FE; color: #3D5AF1; font-weight: 700; }
+    nav a svg { width: 15px; height: 15px; flex: none; opacity: .7; }
+    nav a.on svg { opacity: 1; }
+    nav a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #58627A; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 8px; border: 1px solid #E4E8F0; background: #fff; white-space: nowrap; transition: background .12s, color .12s, border-color .12s; }
+    nav a:hover { background: #F6F8FC; color: #171C2B; border-color: #C9D0DE; }
+    nav a.on { background: #3D5AF1; border-color: #3D5AF1; color: #fff; font-weight: 700; }
+    nav a.on svg { opacity: 1; }
+    nav .adm a { color: #8C95A8; border-style: dashed; }
+    nav .adm a.on { background: #D93A4A; border-color: #D93A4A; border-style: solid; color: #fff; }
     .right { margin-left: auto; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
     .who { font-size: 12.5px; color: #8C95A8; font-weight: 500; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
     button { font: inherit; font-size: 12.5px; font-weight: 600; color: #58627A; background: none; border: 1px solid #E4E8F0; border-radius: 8px; padding: 5px 10px; cursor: pointer; }
@@ -71,7 +83,7 @@
       const href = p => isDeploy ? p.dep : p.file;
       root.innerHTML = `<style>${css}</style><div class="bar"><div class="in">
         <a class="brand" href="${href(PAGES[0])}"><img class="mark" src="${ICON}" alt=""><span>우동지CRM</span></a>
-        <nav>${PAGES.map(p => `<a href="${href(p)}" class="${p.key === cur ? 'on' : ''}" ${p.admin ? 'data-admin hidden' : ''}>${p.label}</a>`).join('')}<a id="adm" href="${href(ADMIN_PAGE)}" class="${ADMIN_PAGE.key === cur ? 'on' : ''}" hidden style="color:#D93A4A">${ADMIN_PAGE.label}</a></nav>
+        <nav><div class="grp">${PAGES.filter(p => !p.admin).map(p => `<a href="${href(p)}" class="${p.key === cur ? 'on' : ''}">${icon(p.key)}${p.label}</a>`).join('')}</div><span class="sep" data-admin hidden></span><div class="grp adm" data-admin hidden>${PAGES.filter(p => p.admin).map(p => `<a href="${href(p)}" class="${p.key === cur ? 'on' : ''}">${icon(p.key)}${p.label}</a>`).join('')}<a id="adm" href="${href(ADMIN_PAGE)}" class="${ADMIN_PAGE.key === cur ? 'on' : ''}">${icon('admin')}${ADMIN_PAGE.label}</a></div></nav>
         <div class="right"><span class="ver" id="ver" title="배포 이력 보기" role="button" tabindex="0">${VERSION}</span><span class="who" id="who"></span><button type="button" id="out" hidden>로그아웃</button></div>
       </div></div>
       <div class="hb" id="hb"><div class="hp" role="dialog" aria-label="배포 이력">
