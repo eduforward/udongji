@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=63"></script>
+  <script src="./udongji-nav.js?v=64"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -105,6 +105,16 @@
     .pcard .pa { display: flex; gap: 4px; padding: 6px 8px 8px; }
     .pcard .pa .btn { padding: 5px 8px; font-size: 11.5px; flex: 1; text-align: center; }
     .pcard .pa .btn.done { color: var(--green); border-color: var(--green-3); background: var(--green-2); }
+    .pcard.sel { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue-3); }
+    .pcard .pk { position: absolute; top: 6px; left: 6px; width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--line); background: #fff; cursor: pointer; display: grid; place-items: center; color: #fff; font-size: 13px; font-weight: 800; }
+    .pcard.sel .pk { background: var(--blue); border-color: var(--blue); }
+    .pcard { position: relative; }
+    .pcard[draggable] .th { cursor: grab; }
+    .dragbar { display: flex; gap: 10px; align-items: center; margin: 8px 0 4px; padding: 12px 14px; border: 2px dashed var(--blue-3); border-radius: 12px; background: var(--blue-2); cursor: grab; user-select: none; }
+    .dragbar:active { cursor: grabbing; }
+    .dragbar b { font-size: 14px; color: var(--blue); }
+    .dragbar span { font-size: 12.5px; color: var(--text-2); }
+    .dragbar .btn { margin-left: auto; padding: 5px 10px; font-size: 12px; }
     .up { position: relative; overflow: hidden; }
     .up input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
     .note { font-size: 12.5px; color: var(--text-3); margin-top: 8px; }
@@ -143,7 +153,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="63"></udongji-nav>
+<udongji-nav current="contract" page-v="64"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>계약 업무</b><small>수취자료 → 페이앤 접수 → 서명 → 배송</small></div></div>
@@ -244,12 +254,14 @@
       </div>
       <div class="sec">
         <h3>서류 사진 · 페이앤 업로드용 <span class="pill">{{ sel.photoN }}장</span></h3>
-        <div class="note" style="margin-top:0"><b>복사</b>를 누른 뒤 페이앤 폼의 파일 칸에서 붙여넣기(⌘V / Ctrl+V). 안 되는 칸은 <b>다운로드</b>로 받아 첨부. 사진을 누르면 크게 봅니다.</div>
+        <div class="note" style="margin-top:0">사진을 선택하고 아래 <b>드래그 바</b>를 페이앤 파일 칸으로 끌어다 놓으면 한 번에 첨부돼요. 사진 한 장을 바로 끌어다 놓아도 됩니다. <b>복사</b>는 붙여넣기(⌘V)용, 안 되면 <b>다운로드</b>.</div>
+        <sc-if value="{{ hasPhotoSel }}" hint-placeholder-val="{{ false }}"><div class="dragbar" draggable="true" onDragStart="{{ dragSel }}"><b>☰ 선택한 {{ photoSelN }}장 끌어다 놓기</b><span>{{ photoSelInfo }}</span><button type="button" class="btn" onClick="{{ clearPhotoSel }}">선택 해제</button></div></sc-if>
+        <sc-if value="{{ noPhotoSel }}" hint-placeholder-val="{{ false }}"><div class="note"><button type="button" class="btn" onClick="{{ selectAllPhotos }}">전체 선택 ({{ sel.photoN }}장)</button></div></sc-if>
         <sc-for list="{{ photoGroups }}" as="g" hint-placeholder-count="0">
           <div class="pf-sec">{{ g.name }} <span style="font-weight:500;text-transform:none;letter-spacing:0">· {{ g.n }}장</span></div>
           <div class="pgrid">
             <sc-for list="{{ g.files }}" as="p" hint-placeholder-count="0">
-              <div class="pcard"><a class="th" href="{{ p.url }}" target="_blank" rel="noopener"><img src="{{ p.url }}" alt="{{ p.name }}" loading="lazy"></a><div class="pn">{{ p.seq }}</div><div class="pm" title="{{ p.name }}">{{ p.name }}</div><div class="pa"><button type="button" class="btn {{ p.cpCls }}" onClick="{{ p.copy }}">{{ p.cpLabel }}</button><button type="button" class="btn" onClick="{{ p.download }}">다운로드</button></div></div>
+              <div class="pcard {{ p.selCls }}" draggable="true" onDragStart="{{ p.drag }}" onMouseEnter="{{ p.prefetch }}"><button type="button" class="pk" onClick="{{ p.toggle }}" title="선택">{{ p.mark }}</button><a class="th" href="{{ p.url }}" target="_blank" rel="noopener"><img src="{{ p.url }}" alt="{{ p.name }}" loading="lazy"></a><div class="pn">{{ p.seq }}</div><div class="pm" title="{{ p.name }}">{{ p.name }}</div><div class="pa"><button type="button" class="btn {{ p.cpCls }}" onClick="{{ p.copy }}">{{ p.cpLabel }}</button><button type="button" class="btn" onClick="{{ p.download }}">다운로드</button></div></div>
             </sc-for>
           </div>
         </sc-for>
@@ -369,7 +381,7 @@ class Component extends DCLogic {
       return prev && stageDone(d, prev.key) ? { cls: 'next', t: '대기' } : { cls: 'wait', t: '—' };
     };
     const rows = list.map(it => { const d = it.data, c = STAGES.map(s => cell(d, s.key)); return {
-      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => { const firstOpen = STAGES.find(s => !stageDone(d, s.key)); this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', pfDraft: {}, seq: 0, copied: {}, tab: firstOpen ? firstOpen.key : 'install' }); },
+      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => { const firstOpen = STAGES.find(s => !stageDone(d, s.key)); this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', pfDraft: {}, seq: 0, copied: {}, photoSel: {}, tab: firstOpen ? firstOpen.key : 'install' }); },
       store: V(d, '매장명') || '(매장명 없음)', who: [V(d, '고객명'), V(d, '연락처')].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '—', date: V(d, '상담일').slice(5), agent: V(d, '상담자'), memo: V(d, lib ? lib.PROGRESS_NOTE_COL : '진행 메모'),
       s0: c[0] ? c[0].cls : '', s0t: c[0] ? c[0].t : '', s1: c[1] ? c[1].cls : '', s1t: c[1] ? c[1].t : '', s2: c[2] ? c[2].cls : '', s2t: c[2] ? c[2].t : '', s3: c[3] ? c[3].cls : '', s3t: c[3] ? c[3].t : ''
     }; });
@@ -400,7 +412,19 @@ class Component extends DCLogic {
         } catch (e) { this.toast('사진 복사 실패 — 다운로드로 받아 첨부하세요'); }
       };
       const downloadImage = async f => { try { const blob = await (await fetch(f.url, { mode: 'cors' })).blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { window.open(f.url, '_blank'); } };
-      const photoGroups = req.map(x => { const mine = fl.filter(f => f.doc === x.id); return mine.length ? { name: x.name, n: mine.length, files: mine.map((f, i) => ({ url: f.url, name: f.name, seq: x.name + ' ' + (i + 1), cpCls: pcopied[f.id] ? 'done' : '', cpLabel: pcopied[f.id] ? '✓ 복사됨' : '복사', copy: () => copyImage(f), download: () => downloadImage(f) })) } : null; }).filter(Boolean);
+      // 드래그로 페이앤 파일 칸에 넣기: File 객체를 미리 받아두고 dragstart에 dataTransfer.items에 담는다 (Chrome)
+      this._blobs = this._blobs || {};
+      const prefetch = f => { if (this._blobs[f.id] || this._blobs[f.id + ':p']) return; this._blobs[f.id + ':p'] = true; fetch(f.url, { mode: 'cors' }).then(r => r.blob()).then(b => { this._blobs[f.id] = new File([b], f.name, { type: b.type || 'image/jpeg' }); if (this.state.photoSel && this.state.photoSel[f.id]) this.forceUpdate(); }).catch(() => { delete this._blobs[f.id + ':p']; }); };
+      const putFiles = (e, files) => { const dt = e.dataTransfer; if (!dt) return; try { dt.clearData(); } catch (er) {} let n = 0; files.forEach(file => { if (file) { try { dt.items.add(file); n++; } catch (er) {} } }); if (!n) { e.preventDefault(); this.toast('사진을 아직 불러오는 중 — 잠시 후 다시'); return; } dt.effectAllowed = 'copy'; };
+      const photoSel = this.state.photoSel || {};
+      const allPhotoFiles = fl.slice();
+      const selFiles = allPhotoFiles.filter(f => photoSel[f.id]);
+      selFiles.forEach(prefetch);
+      const readyN = selFiles.filter(f => this._blobs[f.id]).length;
+      const photoGroups = req.map(x => { const mine = fl.filter(f => f.doc === x.id); return mine.length ? { name: x.name, n: mine.length, files: mine.map((f, i) => ({ url: f.url, name: f.name, seq: x.name + ' ' + (i + 1), cpCls: pcopied[f.id] ? 'done' : '', cpLabel: pcopied[f.id] ? '✓ 복사됨' : '복사', copy: () => copyImage(f), download: () => downloadImage(f),
+        selCls: photoSel[f.id] ? 'sel' : '', mark: photoSel[f.id] ? '✓' : '', toggle: () => { const s = Object.assign({}, this.state.photoSel || {}); if (s[f.id]) delete s[f.id]; else { s[f.id] = true; prefetch(f); } this.setState({ photoSel: s }); },
+        prefetch: () => prefetch(f), drag: e => putFiles(e, [this._blobs[f.id]]) })) } : null; }).filter(Boolean);
+      this._photoDrag = { selFiles, readyN };
       const photoN = fl.length;
       const valOf = f => String(f.k in pfDraft ? pfDraft[f.k] : lib.paynValue(d, f) || '');
       const copyField = (f, i) => { const v = valOf(f).trim(); this.copy(v, f.label); this.setState({ copied: Object.assign({}, this.state.copied, { [f.k]: true }), seq: Math.max(this.state.seq, i + 1) }); };
@@ -480,6 +504,10 @@ class Component extends DCLogic {
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, pf, photoGroups: this._pg || [], noPhotos: !!rec && !(this._pg || []).length,
+      hasPhotoSel: !!(this._photoDrag && this._photoDrag.selFiles.length), noPhotoSel: !!rec && !!(this._pg || []).length && !(this._photoDrag && this._photoDrag.selFiles.length), photoSelN: this._photoDrag ? this._photoDrag.selFiles.length : 0,
+      photoSelInfo: this._photoDrag ? (this._photoDrag.readyN < this._photoDrag.selFiles.length ? '사진 불러오는 중 ' + this._photoDrag.readyN + '/' + this._photoDrag.selFiles.length : '준비됨 — 이 바를 잡고 페이앤 파일 칸에 놓으세요') : '',
+      dragSel: e => { const p = this._photoDrag; if (!p) return; const files = p.selFiles.map(f => this._blobs[f.id]).filter(Boolean); const dt = e.dataTransfer; if (!dt) return; try { dt.clearData(); } catch (er) {} let n = 0; files.forEach(file => { try { dt.items.add(file); n++; } catch (er) {} }); if (!n) { e.preventDefault(); this.toast('사진을 아직 불러오는 중'); return; } dt.effectAllowed = 'copy'; },
+      clearPhotoSel: () => this.setState({ photoSel: {} }), selectAllPhotos: () => { const s = {}; const d0 = rec ? lib.parseDocFiles(rec.data[lib.DOC_FILES_COL]) : []; d0.forEach(f => { s[f.id] = true; }); this.setState({ photoSel: s }); },
       tabDocs: this.state.tab === 'docs', tabHandoff: this.state.tab === 'handoff', tabSign: this.state.tab === 'sign', tabInstall: this.state.tab === 'install',
       completeSign: () => { const s = steps.find(x => x.key === 'sign'); if (s) s.complete(); },
       undoDocs: () => { const s = steps.find(x => x.key === 'docs'); if (s) s.undo(); }, undoHandoff: () => { const s = steps.find(x => x.key === 'handoff'); if (s) s.undo(); }, undoSign: () => { const s = steps.find(x => x.key === 'sign'); if (s) s.undo(); }, undoInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.undo(); },
