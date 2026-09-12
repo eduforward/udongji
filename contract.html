@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=60"></script>
+  <script src="./udongji-nav.js?v=61"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -143,7 +143,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="60"></udongji-nav>
+<udongji-nav current="contract" page-v="61"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>계약 업무</b><small>수취자료 → 페이앤 접수 → 서명 → 배송</small></div></div>
@@ -201,7 +201,7 @@
             <div><div class="n">{{ d.name }}<span class="tag {{ d.tagCls }}">{{ d.tag }}</span></div><div class="h">{{ d.hint }}</div>
               <div class="files"><sc-for list="{{ d.files }}" as="f" hint-placeholder-count="0"><a class="file" href="{{ f.url }}" target="_blank" rel="noopener"><span>{{ f.name }}</span><button type="button" onClick="{{ f.remove }}" title="삭제">×</button></a></sc-for></div>
             </div>
-            <label class="btn up">{{ d.upLabel }}<input type="file" multiple accept="image/*,.pdf,.heic,.heif" onChange="{{ d.upload }}"></label>
+            <label class="btn up">{{ d.upLabel2 }}<input type="file" multiple="{{ d.multi }}" accept="image/*,.pdf,.heic,.heif" onChange="{{ d.upload }}"></label>
           </div>
         </sc-for>
         <div class="note"><b>필수</b>는 이 고객 유형(개인/법인 · 단독/공동)에 꼭 필요한 서류, <b>해당 시</b>는 업종·상황에 따라 받는 서류예요. {{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번.jpg</b>로 자동 정리 — PDF·PNG는 JPG로 변환. 업로드하면 자동으로 받음 체크.</div>
@@ -295,7 +295,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {}, seq: 0, copied: {}, tab: 'docs', scope: 'mine', me: null };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=16'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=17'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me();
       this.setState({ lib, me }, () => this.load(true));
@@ -439,9 +439,11 @@ class Component extends DCLogic {
       docs = req.map(x => { const on = !!chk[x.id], myFiles = fl.filter(f => f.doc === x.id); return {
         cls: 'doc' + (on ? ' on' : ''), mark: on ? '✓' : '', name: x.name, hint: x.hint, upLabel: busy ? '업로드 중…' : '업로드', tag: x.cond ? '해당 시' : on ? '받음' : '필수', tagCls: x.cond ? 'opt' : '',
         toggle: () => { const n = Object.assign({}, chk); if (on) delete n[x.id]; else n[x.id] = true; this.patch(rec, { [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, on ? '받음 해제' : '받음 체크'); },
-        files: myFiles.map(f => ({ name: f.name, url: f.url, remove: async e => { e.preventDefault(); e.stopPropagation(); if (!confirm('"' + f.name + '" 파일을 삭제할까요?')) return; try { await lib.deleteFile(f.id); } catch (er) {} const nf = fl.filter(z => z.id !== f.id); await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(nf) }, '파일 삭제'); } })),
+        files: myFiles.map(f => ({ name: f.name, url: f.url, remove: async e => { e.preventDefault(); e.stopPropagation(); if (!confirm('"' + f.name + '" 파일을 삭제할까요?')) return; try { await lib.deleteFile(f.id); } catch (er) {} const nf = fl.filter(z => z.id !== f.id); const patch = { [lib.DOC_FILES_COL]: JSON.stringify(nf) }; if (!nf.some(z => z.doc === x.id) && chk[x.id]) { const n = Object.assign({}, chk); delete n[x.id]; patch[lib.DOC_CHECK_COL] = Object.keys(n).join(','); } await this.patch(rec, patch, '파일 삭제' + (patch[lib.DOC_CHECK_COL] !== undefined ? ' · 받음 체크 해제' : '')); } })),
+        single: !!x.single, multi: !x.single, hasFile: myFiles.length > 0, upLabel2: busy ? '업로드 중…' : myFiles.length ? '교체' : '업로드',
         upload: async e => {
           const list2 = Array.from(e.target.files || []); e.target.value = ''; if (!list2.length) return;
+          if (x.single && list2.length > 1) { this.toast('이 항목은 사진 1장만 — 한 장씩 올려주세요'); return; }
           this.setState({ busy: true });
           try {
             const folder = await lib.ensureCustomerFolder(label, rec.row);
@@ -452,7 +454,9 @@ class Component extends DCLogic {
               for (const p of parts) { seq++; const nm = lib.docFileName(d, x.name, seq, p.ext); const r = await lib.uploadFile(p.blob, folder, nm); added.push({ id: r.id, name: nm, url: r.webViewLink, doc: x.id, at: today }); }
             }
             const n = Object.assign({}, chk, { [x.id]: true });
-            await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(fl.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, added.length + '개 파일 업로드' + (converted ? ' (JPG 변환 ' + converted + '건)' : '') + ' · 받음 체크');
+            let keep = fl;
+            if (x.single && myFiles.length) { for (const old of myFiles) { try { await lib.deleteFile(old.id); } catch (er) {} } keep = fl.filter(z => z.doc !== x.id); }
+            await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(keep.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, (x.single && myFiles.length ? '사진 교체' : added.length + '개 파일 업로드') + (converted ? ' (JPG 변환 ' + converted + '건)' : '') + ' · 받음 체크');
           } catch (er) { this.toast('업로드 실패: ' + er.message); }
           this.setState({ busy: false });
         }

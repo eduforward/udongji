@@ -106,14 +106,18 @@ export function requiredDocs(d) {
     { id: 'poa', name: '위임장', hint: '대표자 외 신청 시만', cond: true },
   ];
   // 매장사진: 간판 유무에 따라 구성이 다름 (기본 = 간판 있음)
+  // 한 항목 = 사진 한 장 (single: true) — 페이앤 양식대로 장수만큼 따로 받는다
   if (v('간판 유무') === '없음') list.push(
-    { id: 'photo_bldg', name: '매장사진 ① 건물 외부', hint: '사업자등록증 주소지 건물 외부 1매' },
-    { id: 'photo_entry', name: '매장사진 ② 입구', hint: '실내가 보이게 입구에서 1매' },
-    { id: 'photo_addr', name: '매장사진 ③ 도로명주소 표지판', hint: '표지판이 또렷하게 1매' },
-    { id: 'photo_in', name: '매장사진 ④ 내부 전체', hint: '내부 전체가 보이게 2매' }
+    { id: 'photo_bldg', name: '매장사진 1/5 · 건물 외부', hint: '사업자등록증 주소지 건물 외부', single: true },
+    { id: 'photo_entry', name: '매장사진 2/5 · 입구', hint: '실내가 보이게 입구에서', single: true },
+    { id: 'photo_addr', name: '매장사진 3/5 · 도로명주소 표지판', hint: '표지판이 또렷하게', single: true },
+    { id: 'photo_in', name: '매장사진 4/5 · 내부 전체 (1)', hint: '내부 전체가 보이게', single: true },
+    { id: 'photo_in2', name: '매장사진 5/5 · 내부 전체 (2)', hint: '다른 각도에서', single: true }
   ); else list.push(
-    { id: 'photo_out', name: '매장사진 ① 간판 포함 외관', hint: '간판이 나오게 바깥에서 2매' },
-    { id: 'photo_in', name: '매장사진 ② 내부 전체', hint: '내부 전체가 보이게 2매' }
+    { id: 'photo_out', name: '매장사진 1/4 · 간판 포함 외관 (1)', hint: '간판이 나오게 바깥에서', single: true },
+    { id: 'photo_out2', name: '매장사진 2/4 · 간판 포함 외관 (2)', hint: '다른 각도에서', single: true },
+    { id: 'photo_in', name: '매장사진 3/4 · 내부 전체 (1)', hint: '내부 전체가 보이게', single: true },
+    { id: 'photo_in2', name: '매장사진 4/4 · 내부 전체 (2)', hint: '다른 각도에서', single: true }
   );
   if (corp) list.push(
     { id: 'corp_reg', name: '법인등기부등본', hint: '3개월 이내' },
