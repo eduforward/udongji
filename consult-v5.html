@@ -162,6 +162,7 @@
         <span class="rec req {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
         <span class="rec req {{ f.store }}">매장명 <input value="{{ v.store }}" onInput="{{ set.store }}" placeholder="지도 검색용"></span>
         <span class="rec req {{ f.biz }}">업종 <select value="{{ v.biz }}" onChange="{{ set.biz }}"><option value="">선택</option><option>카페</option><option>음식점</option><option>미용·뷰티</option><option>의류·잡화</option><option>학원·교육</option><option>기타</option></select></span>
+        <span class="rec req {{ f.bizEtc }}" hidden="{{ hideBizEtc }}">업종 직접 입력 <input value="{{ v.bizEtc }}" onInput="{{ set.bizEtc }}" placeholder="예: 세탁소, 꽃집"></span>
         <span class="rec opt {{ f.addr }}">매장 주소 (선택) <input class="wide" value="{{ v.addr }}" onInput="{{ set.addr }}" placeholder="사업자등록증으로 대체"></span>
       </div>
       <p class="note"><b>바뀐 점</b> — 매장 주소·사업자번호·생년월일·이메일은 필수에서 제외. 매장명은 지도 검색·기록 식별용으로만.</p>
@@ -272,7 +273,7 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;agentName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;이일광&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;상담&quot;}}">
 class Component extends DCLogic {
   state = { v: JSON.parse(localStorage.getItem('udj_v5_draft') || '{}'), modal: null };
-  TEXT = ['name','phone','store','biz','addr','openDate','pos','term','bundle','category','naver','email','recallDate','memo'];
+  TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','naver','email','recallDate','memo'];
   OPTS = { mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','nonet'], link:['yes','no'], color:['white','black'], optin:['yes','no'], status:['go','recall','reject'], netReq:['yes'] };
   LBL = { mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'3억 모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',nonet:'인터넷 없음'} };
   LINKS = { 'fresh|person|single':'841963','fresh|person|joint':'841961','fresh|corp|single':'841955','fresh|corp|joint':'841952','existing|person|single':'841968','existing|person|joint':'841965','existing|corp|single':'841959','existing|corp|joint':'841957' };
@@ -297,6 +298,8 @@ class Component extends DCLogic {
     const noNet = v.lan === 'nonet';
     let daysToOpen = null; if (v.openDate) daysToOpen = Math.round((new Date(v.openDate) - new Date().setHours(0,0,0,0)) / 864e5);
     const req = ['name','phone','store','biz','mode','entity','owners','large'];
+    const bizEtc = v.biz === '기타'; if (bizEtc) req.push('bizEtc');
+    const bizLabel = bizEtc ? (v.bizEtc || '기타') : (v.biz || '-');
     if (isNew) req.push('reg'); if (isNew && !noReg) req.push('openDate');
     if (!noReg) { req.push('pos','lan'); if (!noNet) { req.push('bundle','color','category','naver'); if (posHas && v.bundle && v.bundle !== 'cat') req.push('link'); } }
     req.push('optin','status'); if (v.status === 'recall') req.push('recallDate');
@@ -322,7 +325,7 @@ class Component extends DCLogic {
     sms += `\n\n서류 접수 후 페이앤에서 전자계약서가 카톡(알림톡)으로 가고, 서명하시면 완료됩니다.${isJoint ? ' 공동대표님도 함께 서명하셔야 해요.' : ''}\n\n궁금한 점은 이 번호로 카톡 주시면 바로 답드릴게요.\n감사합니다.`;
     if (v.status === 'recall') sms = `[우동지] ${name}, 우동지 ${agent}입니다.\n오늘 통화 감사합니다. ${v.recallDate ? v.recallDate + '에' : '말씀해주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증 나오시면 바로 진행할게요.' : ''}\n\n궁금한 점은 이 번호로 카톡 주시면 바로 답드릴게요.\n감사합니다.`;
     if (v.status === 'reject') sms = `[우동지] ${name}, 우동지 ${agent}입니다.\n오늘 시간 내주셔서 감사합니다. 나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.\n감사합니다.`;
-    const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${v.biz || '-'} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
+    const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
     const ready = reqDone === reqTotal;
     const hideIf = (k, val) => v[k] ? (v[k] === val ? 'pick' : 'hide') : '';
@@ -346,10 +349,10 @@ class Component extends DCLogic {
       v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent,
       ch: { mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
       typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
-      hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
+      hideBizEtc: !bizEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
       hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, hideEmail: v.optin !== 'yes', hideRecall: v.status !== 'recall',
       br: { ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
-      p1: prog(['name','phone','store','biz']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan']), p5: prog(['bundle','link','color','category','naver']), p7: prog(['optin']), p8: prog(['status','recallDate']),
+      p1: prog(['name','phone','store','biz','bizEtc']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan']), p5: prog(['bundle','link','color','category','naver']), p7: prog(['optin']), p8: prog(['status','recallDate']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
       dnCls: ready ? '' : 'bad', dnTxt: ready ? '필수 항목 모두 입력됨 — 시안이라 저장은 되지 않아요' : `필수 ${reqTotal - reqDone}개 남음`, notReady: !ready,
       copySms: copy(sms), copyForm: copy(form),
