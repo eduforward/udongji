@@ -263,12 +263,14 @@ export async function updateRecord(id, d) {
 }
 export async function updateCells(id, obj) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, COL, id), Object.assign(cleanIn(obj), { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true }); }
 export async function setCell(id, k, v) { return updateCells(id, { [k]: v }); }
-// 삭제: 원본을 deleted/{id}에 그대로 보관(누가·언제) 후 customers에서 제거. 첨부 파일은 복구를 위해 남긴다.
-export async function deleteRow(id) {
+// 삭제: 원본을 deleted/{id}에 그대로 보관(누가·언제·사유) 후 customers에서 제거. 첨부 파일은 복구를 위해 남긴다.
+export async function whoAmI() { const nm = await myName().catch(() => ''); return nm ? nm + '(' + userEmail() + ')' : userEmail(); }
+export async function deleteRow(id, reason) {
   await init(); need(); const { fs } = _mods;
+  reason = String(reason || '').trim(); if (!reason) throw new Error('삭제 사유를 입력하세요');
   const ref = fs.doc(_db, COL, id); const cur = await fs.getDoc(ref); const data = cur.exists() ? cur.data() : {};
-  const now = new Date().toISOString();
-  await fs.setDoc(fs.doc(_db, 'deleted', id + '_' + now.replace(/[:.]/g, '')), { recordId: id, data, deletedAt: now, deletedBy: userEmail(), store: String(data['매장명'] || ''), customer: String(data['고객명'] || ''), phone: String(data['연락처'] || ''), ua: navigator.userAgent.slice(0, 200) });
+  const now = new Date().toISOString(); const who = await whoAmI();
+  await fs.setDoc(fs.doc(_db, 'deleted', id + '_' + now.replace(/[:.]/g, '')), { recordId: id, data, deletedAt: now, deletedBy: userEmail(), deletedByName: who, reason, store: String(data['매장명'] || ''), customer: String(data['고객명'] || ''), phone: String(data['연락처'] || ''), ua: navigator.userAgent.slice(0, 200) });
   await fs.deleteDoc(ref);
 }
 // ── 삭제 로그 (Firestore: deleted/{logId}) — 슈퍼관리자만 조회·복구, 삭제 불가 ──
@@ -278,7 +280,7 @@ export async function restoreDeleted(logId) {
   const s = await fs.getDoc(fs.doc(_db, 'deleted', logId)); if (!s.exists()) throw new Error('로그를 찾을 수 없어요');
   const L = s.data(); const now = new Date().toISOString();
   await fs.setDoc(fs.doc(_db, COL, L.recordId), Object.assign({}, L.data, { _updatedAt: now, _updatedBy: userEmail(), _restoredAt: now, _restoredBy: userEmail() }), { merge: true });
-  await fs.setDoc(fs.doc(_db, 'deleted', logId), { restoredAt: now, restoredBy: userEmail() }, { merge: true });
+  await fs.setDoc(fs.doc(_db, 'deleted', logId), { restoredAt: now, restoredBy: await whoAmI() }, { merge: true });
 }
 // ── 관리자 (Firestore: admins/{email}) — 구버전 호환용. 지금은 users/{email}.role 이 기준 ──
 export const ROLES = [{ key: 'consult', label: '구성원 · 상담' }, { key: 'sales', label: '구성원 · 영업' }, { key: 'admin', label: '관리자' }, { key: 'super', label: '슈퍼관리자' }];

@@ -3,11 +3,47 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function email() { return request.auth != null ? request.auth.token.email.lower() : ''; }
     function isRoot() { return email() == 'daylightism@gmail.com'; }
-    function isAdmin() { return isRoot() || exists(/databases/$(database)/documents/admins/$(email())); }
-    function isUser() { return isAdmin() || exists(/databases/$(database)/documents/users/$(email())); }
+    function hasUser() { return request.auth != null && exists(/databases/$(database)/documents/users/$(email())); }
+    function udata() { return get(/databases/$(database)/documents/users/$(email())).data; }
+    // 역할: super > admin > consult / sales. users.role 없으면 (구) admins 문서 → admin, 아니면 구성원
+    function role() { return isRoot() ? 'super' : (hasUser() && udata().get('role', '') != '' ? udata().get('role', '') : (request.auth != null && exists(/databases/$(database)/documents/admins/$(email())) ? 'admin' : (hasUser() ? 'consult' : ''))); }
+    function isSuper() { return role() == 'super'; }
+    function isAdmin() { return role() in ['admin', 'super']; }
+    function isUser() { return role() != ''; }
 
-    match /customers/{id} { allow read, write: if isUser(); }
-    match /admins/{e} { allow read: if isUser(); allow write: if isAdmin(); }
-    match /users/{e} { allow read: if isUser(); allow write: if isAdmin(); }
+    function myName() { return hasUser() ? udata().get('name', '') : ''; }
+    // 상담자 칸은 본인 등록 이름과 같거나(이름 미등록이면 보낸 값 불가), 관리자 이상만 자유 수정
+    function agentOk() {
+      return isAdmin()
+        || !('상담자' in request.resource.data)
+        || (resource != null && request.resource.data['상담자'] == resource.data.get('상담자', ''))
+        || request.resource.data['상담자'] == myName();
+    }
+    function privileged(r) { return r in ['admin', 'super']; }
+
+    match /customers/{id} { allow read: if isUser(); allow delete: if isAdmin(); allow create, update: if isUser() && agentOk(); }
+    // 삭제 로그: 사용자 기록만 가능, 열람·복구는 관리자 이상, 삭제는 아무도 불가
+    match /deleted/{logId} {
+      allow create: if isUser() && request.resource.data.deletedBy == email();
+      allow read: if isAdmin();
+      allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['restoredAt', 'restoredBy']);
+      allow delete: if false;
+    }
+    // (구) 관리자 목록 — 호환용. 슈퍼관리자만 수정
+    match /admins/{e} { allow read: if isUser(); allow write: if isSuper(); }
+    // 연동 설정(웹훅 URL·시크릿): 사용자 읽기(전송에 필요), 관리자 이상 수정
+    match /config/{k} { allow read: if isUser(); allow write: if isAdmin(); }
+    // 뉴스레터 전송 로그: 사용자 기록, 관리자 이상 열람, 삭제 불가
+    match /newsletter_log/{id} { allow create: if isUser() && request.resource.data.by == email(); allow read: if isAdmin(); allow update, delete: if false; }
+    // 계정: 관리자는 구성원(consult/sales)만 추가·수정·제거, 관리자/슈퍼관리자 역할 부여·변경·제거는 슈퍼관리자만
+    match /users/{e} {
+      allow read: if isUser();
+      allow create: if isSuper() || (isAdmin() && !privileged(request.resource.data.get('role', '')));
+      allow update: if isSuper() || (isAdmin() && !privileged(request.resource.data.get('role', '')) && !privileged(resource.data.get('role', '')));
+      allow delete: if isSuper() || (isAdmin() && !privileged(resource.data.get('role', '')));
+    }
+    // 공개 설정(홈페이지 상담시간): 로그인 없이 누구나 읽기(랜딩페이지·Apps Script), 관리자 이상 수정. 비밀값 넣지 말 것
+    match /public/{k} { allow read: if true; allow write: if isAdmin(); }
   }
 }
+// v10 — 2026-09-12: 고객 삭제는 관리자 이상만. 삭제 로그에 사유(reason)·이름(deletedByName) 기록.
