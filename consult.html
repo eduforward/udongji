@@ -175,7 +175,7 @@
       <div class="fgrid">
         <span class="rec req {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
         <span class="rec req {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
-        <span class="rec req {{ f.store }}">매장명 <input value="{{ v.store }}" onInput="{{ set.store }}" placeholder="지도 검색용"></span>
+        <span class="rec req {{ f.store }}">매장명 <input value="{{ v.store }}" onInput="{{ set.store }}" placeholder="지도 검색용"><a href="{{ mapHref }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:7px;background:var(--green-2);color:var(--green);text-decoration:none;white-space:nowrap">지도</a></span>
         <span class="rec req {{ f.biz }}">업종 <select value="{{ v.biz }}" onChange="{{ set.biz }}"><option value="">선택</option><option>카페</option><option>음식점</option><option>미용·뷰티</option><option>의류·잡화</option><option>학원·교육</option><option>기타</option></select></span>
         <span class="rec req {{ f.bizEtc }}" hidden="{{ hideBizEtc }}">업종 직접 입력 <input value="{{ v.bizEtc }}" onInput="{{ set.bizEtc }}" placeholder="예: 세탁소, 꽃집"></span>
         <span class="rec req {{ f.sign }}">매장 간판 <span class="seg"><button class="{{ on.sign.yes }}" onClick="{{ pick.sign.yes }}">있음</button><button class="{{ on.sign.no }}" onClick="{{ pick.sign.no }}">없음</button></span></span>
@@ -431,7 +431,7 @@ class Component extends DCLogic {
     const needBasic = () => !v.name || !v.phone ? '고객명과 연락처는 있어야 저장할 수 있어요.' : '';
     const conn = this.state.conn;
     return {
-      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead,
+      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
       ch: { channel: v.channel ? 'ok' : '', mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
