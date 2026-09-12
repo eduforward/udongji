@@ -178,7 +178,7 @@
 
     <section class="step" id="s1" data-screen-label="1 인사">
       <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. Out(접수 고객)은 통화 전 네이버 지도로 매장을 봐두고 확인만, Call-In·Chat-In은 매장명·업종을 직접 물어요.</small></div></div>
-      <div class="say"><span class="who">상담원</span>안녕하세요, 우동지 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"접수 도와드리기 전에, 먼저 궁금하신 부분 있으실까요?"</span> <small style="color:#666">→ 질문 있으면 답하고(5단계 FAQ), 없으면 "{{ greetAsk }}"로 접수 시작.</small></div>
+      <div class="say"><span class="who">상담사</span>안녕하세요, 우동지 상담사 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"접수 도와드리기 전에, 먼저 궁금하신 부분 있으실까요?"</span> <small style="color:#666">→ 질문 있으면 답하고(5단계 FAQ), 없으면 "{{ greetAsk }}"로 접수 시작.</small></div>
       <div class="fgrid">
         <span class="rec must {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
         <span class="rec must {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
@@ -193,64 +193,64 @@
 
     <section class="step" id="s2" data-screen-label="2 유형">
       <div class="step-h"><div class="no">2</div><div class="t">유형 판별 — 질문 3개로 8유형 확정<small>운영 여부 → 개인/법인 → 공동대표. 여기서 접수 링크·서류 목록·이후 단계가 전부 정해져요.</small></div></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"지금 운영 중이세요, 아니면 오픈 준비 중이세요?"</span> <span class="rec req {{ f.mode }}">매장 구분 <span class="seg"><button class="{{ on.mode.existing }}" onClick="{{ pick.mode.existing }}">기존 운영</button><button class="{{ on.mode.fresh }}" onClick="{{ pick.mode.fresh }}">신규 오픈</button></span></span></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"개인사업자세요, 법인이세요?"</span> <span class="rec req {{ f.entity }}">사업자 형태 <span class="seg"><button class="{{ on.entity.person }}" onClick="{{ pick.entity.person }}">개인</button><button class="{{ on.entity.corp }}" onClick="{{ pick.entity.corp }}">법인</button></span></span></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"대표님 혼자 명의세요, 공동대표 계세요?"</span> <span class="rec req {{ f.owners }}">대표 구성 <span class="seg"><button class="{{ on.owners.single }}" onClick="{{ pick.owners.single }}">단독</button><button class="{{ on.owners.joint }}" onClick="{{ pick.owners.joint }}">공동대표</button></span></span></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"연매출이 3억 넘으세요? 조건이 조금 달라져서 여쭤봐요."</span> <span class="rec req {{ f.large }}">연매출 3억 <span class="seg"><button class="{{ on.large.under }}" onClick="{{ pick.large.under }}">3억 미만</button><button class="{{ on.large.over }}" onClick="{{ pick.large.over }}">3억 이상</button><button class="{{ on.large.unknown }}" onClick="{{ pick.large.unknown }}">모름</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"지금 운영 중이세요, 아니면 오픈 준비 중이세요?"</span> <span class="rec req {{ f.mode }}">매장 구분 <span class="seg"><button class="{{ on.mode.existing }}" onClick="{{ pick.mode.existing }}">기존 운영</button><button class="{{ on.mode.fresh }}" onClick="{{ pick.mode.fresh }}">신규 오픈</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"개인사업자세요, 법인이세요?"</span> <span class="rec req {{ f.entity }}">사업자 형태 <span class="seg"><button class="{{ on.entity.person }}" onClick="{{ pick.entity.person }}">개인</button><button class="{{ on.entity.corp }}" onClick="{{ pick.entity.corp }}">법인</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"대표님 혼자 명의세요, 공동대표 계세요?"</span> <span class="rec req {{ f.owners }}">대표 구성 <span class="seg"><button class="{{ on.owners.single }}" onClick="{{ pick.owners.single }}">단독</button><button class="{{ on.owners.joint }}" onClick="{{ pick.owners.joint }}">공동대표</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"연매출이 3억 넘으세요? 조건이 조금 달라져서 여쭤봐요."</span> <span class="rec req {{ f.large }}">연매출 3억 <span class="seg"><button class="{{ on.large.under }}" onClick="{{ pick.large.under }}">3억 미만</button><button class="{{ on.large.over }}" onClick="{{ pick.large.over }}">3억 이상</button><button class="{{ on.large.unknown }}" onClick="{{ pick.large.unknown }}">모름</button></span></span></div>
       <div class="warn" hidden="{{ hideLarge }}"><b>3억 이상 → 중고 단말기 990원 고지 필수.</b> "대형 가맹점은 리베이트 규정 때문에 커넥트·단말기가 <b>중고(거의 새것)</b>로 월 990원에 나가요. 새 제품 원하시면 월 6,600원이에요." 미고지 시 박스 받고 철회하는 사례 있음. 모름이면 페이앤이 사업자번호로 판별해 채널톡으로 알려줌.</div>
       <p class="note">확정된 유형은 상단 배지와 오른쪽 패널에 표시. 페이앤 접수 링크 번호(payn.channel.io/workflows/…)도 자동으로 붙어요.</p>
     </section>
 
     <section class="step {{ s3cls }}" id="s3" data-screen-label="3 신규">
       <div class="step-h"><div class="no">3</div><div class="t">신규 오픈만 — 사업자등록증 · 오픈 예정일<small>미발급이면 진행 불가. 오픈이 2~3일 뒤면 출고를 못 맞춰요.</small></div></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"사업자등록증은 나오셨어요?"</span> <span class="rec req {{ f.reg }}">사업자등록증 <span class="seg"><button class="{{ on.reg.done }}" onClick="{{ pick.reg.done }}">발급 완료</button><button class="{{ on.reg.pending }}" onClick="{{ pick.reg.pending }}">발급 예정</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"사업자등록증은 나오셨어요?"</span> <span class="rec req {{ f.reg }}">사업자등록증 <span class="seg"><button class="{{ on.reg.done }}" onClick="{{ pick.reg.done }}">발급 완료</button><button class="{{ on.reg.pending }}" onClick="{{ pick.reg.pending }}">발급 예정</button></span></span></div>
       <div class="warn stop" hidden="{{ hideNoReg }}">발급 예정 → 오늘은 여기까지. <span class="q">"카드 가맹 심사가 사업자등록증 기준이라 나오시면 그때 바로 진행할게요. 언제쯤 나올까요?"</span> → 하단 <b>재연락</b> 버튼으로 저장. 등록증 나오는 시점에 다시 세일즈.</div>
-      <div class="say"><span class="who">상담원</span><span class="q">"오픈은 언제쯤이세요?"</span> <span class="rec req {{ f.openDate }}">오픈 예정일 <input type="date" value="{{ v.openDate }}" onInput="{{ set.openDate }}"></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"오픈은 언제쯤이세요?"</span> <span class="rec req {{ f.openDate }}">오픈 예정일 <input type="date" value="{{ v.openDate }}" onInput="{{ set.openDate }}"></span></div>
       <div class="warn" hidden="{{ hideSoon }}">오픈이 <b>{{ daysToOpen }}일</b> 뒤 — 카드 가맹·밴 전산 등록·전자서명·출고까지 최소 3~4일. <span class="q">"오픈 당일은 어려울 수 있어서 며칠 여유를 두고 잡아드릴게요."</span></div>
       <p class="note">인터넷은 보통 인테리어 때 같이 들어가니 신규는 4번의 인터넷 질문을 가볍게.</p>
     </section>
 
     <section class="step" id="s4" data-screen-label="4 환경">
       <div class="step-h"><div class="no">4</div><div class="t">매장 환경 — 포스 · 약정 · 인터넷<small>여기서 구성(5번)과 설치 방식(자가/현장)이 정해져요. 밴사·밴 조회는 언급하지 않습니다.</small></div></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"지금 포스는 어떤 거 쓰세요? 포스기, 태블릿, 노트북 중에요."</span> <span class="rec req {{ f.pos }}">현재 포스 <select value="{{ v.pos }}" onChange="{{ set.pos }}"><option value="">선택</option><option value="none">없음 (신규·카드단말기만)</option><option value="pc">PC 포스</option><option value="android">안드로이드 태블릿</option><option value="ios">아이패드 (iOS)</option><option value="laptop">노트북 포스</option><option value="unknown">모름</option></select></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"지금 포스는 어떤 거 쓰세요? 포스기, 태블릿, 노트북 중에요."</span> <span class="rec req {{ f.pos }}">현재 포스 <select value="{{ v.pos }}" onChange="{{ set.pos }}"><option value="">선택</option><option value="none">없음 (신규·카드단말기만)</option><option value="pc">PC 포스</option><option value="android">안드로이드 태블릿</option><option value="ios">아이패드 (iOS)</option><option value="laptop">노트북 포스</option><option value="unknown">모름</option></select></span></div>
       <ul class="branch">
-        <li class="{{ br.ios }}"><span class="if">아이패드</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>아이패드는 저희 포스 프로그램이 안 올라가요. 커넥트랑 카드단말기만 옆에 두고 쓰시거나, 안드로이드 태블릿·PC 포스로 바꾸셔야 해요.</div></li>
-        <li class="{{ br.laptop }}"><span class="if">노트북</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>노트북은 연결 선이 복잡해서 연동은 안 해드려요. 커넥트+카드단말기만 따로 쓰시는 걸로 안내드릴게요. 매출은 밴사 앱으로 볼 수 있어요.</div></li>
+        <li class="{{ br.ios }}"><span class="if">아이패드</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>아이패드는 저희 포스 프로그램이 안 올라가요. 커넥트랑 카드단말기만 옆에 두고 쓰시거나, 안드로이드 태블릿·PC 포스로 바꾸셔야 해요.</div></li>
+        <li class="{{ br.laptop }}"><span class="if">노트북</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>노트북은 연결 선이 복잡해서 연동은 안 해드려요. 커넥트+카드단말기만 따로 쓰시는 걸로 안내드릴게요. 매출은 밴사 앱으로 볼 수 있어요.</div></li>
         <li class="{{ br.pc }}"><span class="if">PC 포스 · 안드로이드</span><span class="arrow">→</span>연동 가능. 5번에서 "포스 연동 필요" 체크 → <b>현장 설치</b>.</li>
       </ul>
       <div class="say" hidden="{{ hideExisting }}"><span class="who">상담원 · 기존만</span><span class="q">"지금 단말기 약정은 얼마나 남으셨어요? 계약서 보시면 나와 있어요."</span> <span class="rec opt {{ f.term }}">약정 잔여 <select value="{{ v.term }}" onChange="{{ set.term }}"><option value="">모름</option><option value="none">없음·만료</option><option value="short">10개월 미만</option><option value="long">10개월 이상</option></select></span></div>
       <ul class="branch" hidden="{{ hideExisting }}">
-        <li class="{{ br.termShort }}"><span class="if">10개월 미만·만료</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>남은 위약금이 크지 않으시면 커넥트 0원으로 갈아타시는 게 이득이에요. 월 납부금이랑 남은 개월만 알려주시면 제가 바로 계산해 드릴게요.</div></li>
-        <li class="{{ br.termLong }}"><span class="if">10개월 이상</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>위약금이 아직 크시니까 지금 단말기는 그대로 두시고, 커넥트를 옆에 놓고 같이 쓰시면 돼요. 월 0원이라 부담 없어요.</div><p class="note">대리점에 위약금 전화하라고 하지 않기(방어 들어옴). 기존 대리점 문제 생기면 페이앤이 빠지는 조건.</p></li>
+        <li class="{{ br.termShort }}"><span class="if">10개월 미만·만료</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>남은 위약금이 크지 않으시면 커넥트 0원으로 갈아타시는 게 이득이에요. 월 납부금이랑 남은 개월만 알려주시면 제가 바로 계산해 드릴게요.</div></li>
+        <li class="{{ br.termLong }}"><span class="if">10개월 이상</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>위약금이 아직 크시니까 지금 단말기는 그대로 두시고, 커넥트를 옆에 놓고 같이 쓰시면 돼요. 월 0원이라 부담 없어요.</div><p class="note">대리점에 위약금 전화하라고 하지 않기(방어 들어옴). 기존 대리점 문제 생기면 페이앤이 빠지는 조건.</p></li>
       </ul>
-      <div class="say"><span class="who">상담원</span><span class="q">"카드단말기 놓을 자리까지 인터넷 랜선이 나와 있나요? 커넥트는 와이파이로 되는데 단말기는 랜선이 꼭 필요해요."</span> <span class="rec req {{ f.lan }}">랜선 <span class="seg"><button class="{{ on.lan.yes }}" onClick="{{ pick.lan.yes }}">있음</button><button class="{{ on.lan.no }}" onClick="{{ pick.lan.no }}">없음</button><button class="{{ on.lan.unknown }}" onClick="{{ pick.lan.unknown }}">모름</button><button class="{{ on.lan.nonet }}" onClick="{{ pick.lan.nonet }}">인터넷 자체 없음</button></span></span></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"매장에 와이파이는 되시죠? 커넥트는 와이파이로 연결돼요."</span> <span class="rec req {{ f.wifi }}">와이파이 <span class="seg"><button class="{{ on.wifi.yes }}" onClick="{{ pick.wifi.yes }}">가능</button><button class="{{ on.wifi.no }}" onClick="{{ pick.wifi.no }}">불가</button><button class="{{ on.wifi.unknown }}" onClick="{{ pick.wifi.unknown }}">모름</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"카드단말기 놓을 자리까지 인터넷 랜선이 나와 있나요? 커넥트는 와이파이로 되는데 단말기는 랜선이 꼭 필요해요."</span> <span class="rec req {{ f.lan }}">랜선 <span class="seg"><button class="{{ on.lan.yes }}" onClick="{{ pick.lan.yes }}">있음</button><button class="{{ on.lan.no }}" onClick="{{ pick.lan.no }}">없음</button><button class="{{ on.lan.unknown }}" onClick="{{ pick.lan.unknown }}">모름</button><button class="{{ on.lan.nonet }}" onClick="{{ pick.lan.nonet }}">인터넷 자체 없음</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"매장에 와이파이는 되시죠? 커넥트는 와이파이로 연결돼요."</span> <span class="rec req {{ f.wifi }}">와이파이 <span class="seg"><button class="{{ on.wifi.yes }}" onClick="{{ pick.wifi.yes }}">가능</button><button class="{{ on.wifi.no }}" onClick="{{ pick.wifi.no }}">불가</button><button class="{{ on.wifi.unknown }}" onClick="{{ pick.wifi.unknown }}">모름</button></span></span></div>
       <ul class="branch">
-        <li class="{{ br.wifiUnknown }}"><span class="if">와이파이 모름</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>휴대폰 와이파이 목록에 매장 이름이 뜨는지 한번 봐주시고, 모르시면 설치 전에 확인 부탁드릴게요. 서류 문자에 같이 적어드릴게요.</div></li>
-        <li class="{{ br.lanUnknown }}"><span class="if">랜선 모름</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>인터넷 공유기(모뎀)에서 카드단말기 놓을 자리까지 선이 나와 있는지 봐주시면 돼요. 없으면 연장선 하나만 준비하시면 됩니다.</div></li>
-        <li class="{{ br.wifiNo }}"><span class="if">와이파이 불가</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>커넥트는 와이파이가 꼭 필요해요. 공유기가 있으면 와이파이 켜 두시고, 없으면 인터넷 업체에 공유기 요청해 주세요. 랜선을 커넥트에 직접 꽂는 방법도 있어요.</div></li>
-        <li class="{{ br.lanNo }}"><span class="if">랜선 없음</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>단말기 자리까지 랜선만 하나 빼주셔야 해요. 연장선은 다이소·온라인에서 몇 천 원이면 돼요. 타공·배선은 인테리어나 인터넷 업체에 요청하셔야 해요.</div></li>
+        <li class="{{ br.wifiUnknown }}"><span class="if">와이파이 모름</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>휴대폰 와이파이 목록에 매장 이름이 뜨는지 한번 봐주시고, 모르시면 설치 전에 확인 부탁드릴게요. 서류 문자에 같이 적어드릴게요.</div></li>
+        <li class="{{ br.lanUnknown }}"><span class="if">랜선 모름</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>인터넷 공유기(모뎀)에서 카드단말기 놓을 자리까지 선이 나와 있는지 봐주시면 돼요. 없으면 연장선 하나만 준비하시면 됩니다.</div></li>
+        <li class="{{ br.wifiNo }}"><span class="if">와이파이 불가</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>커넥트는 와이파이가 꼭 필요해요. 공유기가 있으면 와이파이 켜 두시고, 없으면 인터넷 업체에 공유기 요청해 주세요. 랜선을 커넥트에 직접 꽂는 방법도 있어요.</div></li>
+        <li class="{{ br.lanNo }}"><span class="if">랜선 없음</span><span class="arrow">→</span><div class="say"><span class="who">상담사</span>단말기 자리까지 랜선만 하나 빼주셔야 해요. 연장선은 다이소·온라인에서 몇 천 원이면 돼요. 타공·배선은 인테리어나 인터넷 업체에 요청하셔야 해요.</div></li>
         <li class="{{ br.lanNonet }}"><span class="if">인터넷 없음</span><span class="arrow">→</span>진행 불가. <span class="q">"인터넷 신규 가입이 먼저 필요해서 페이앤 쪽에서 인터넷 상담 연락드리게 할게요."</span> → 마무리에서 <b>페이앤 인터넷 상담 요청</b> 체크. 우리가 인터넷 영업하지 않음.</li>
       </ul>
     </section>
 
     <section class="step" id="s5" data-screen-label="5 구성">
       <div class="step-h"><div class="no">5</div><div class="t">구성 · 색상 · 청약 정보<small>이번 단계 상품은 커넥트+카드단말기 0원만. 포스 신규는 조합가표 받은 뒤 추가.</small></div></div>
-      <div class="say"><span class="who">상담원</span>기본은 <b>커넥트 + 카드단말기</b>, 월 0원이에요. 배송으로 보내드리고 전원·랜선만 꽂으시면 돼요. <span class="rec req {{ f.bundle }}">구성 <select value="{{ v.bundle }}" onChange="{{ set.bundle }}"><option value="">선택</option><option value="cat">커넥트 + 카드단말기</option><option value="printer">커넥트 + 유선 프린터 (포스 있음)</option><option value="only">커넥트만</option></select></span></div>
+      <div class="say"><span class="who">상담사</span>기본은 <b>커넥트 + 카드단말기</b>, 월 0원이에요. 배송으로 보내드리고 전원·랜선만 꽂으시면 돼요. <span class="rec req {{ f.bundle }}">구성 <select value="{{ v.bundle }}" onChange="{{ set.bundle }}"><option value="">선택</option><option value="cat">커넥트 + 카드단말기</option><option value="printer">커넥트 + 유선 프린터 (포스 있음)</option><option value="only">커넥트만</option></select></span></div>
       <div class="say" hidden="{{ hidePosLink }}"><span class="who">상담원 · 포스 있음</span><span class="q">"쓰시는 포스 화면에서 결제 바로 넘기게 연동해 드릴까요?"</span> <span class="rec req {{ f.link }}">포스 연동 <span class="seg"><button class="{{ on.link.yes }}" onClick="{{ pick.link.yes }}">필요 → 현장 설치</button><button class="{{ on.link.no }}" onClick="{{ pick.link.no }}">불필요 → 자가 설치</button></span></span></div>
       <ul class="branch" hidden="{{ hidePosLink }}">
         <li><span class="if">배달앱</span><span class="arrow">→</span>위젯만 띄워 쓰면 연동과 무관. 매출 합산 연동(배달매니저 등)을 원하면 <b>월 이용료 별도</b>라고만 안내, 현장 설치.</li>
       </ul>
-      <div class="say"><span class="who">상담원</span><span class="q">"기기 색상은 화이트, 블랙 중에 어떤 게 좋으세요?"</span> <span class="rec req {{ f.color }}">색상 <span class="seg"><button class="{{ on.color.white }}" onClick="{{ pick.color.white }}">화이트</button><button class="{{ on.color.black }}" onClick="{{ pick.color.black }}">블랙</button></span></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"기기 색상은 화이트, 블랙 중에 어떤 게 좋으세요?"</span> <span class="rec req {{ f.color }}">색상 <span class="seg"><button class="{{ on.color.white }}" onClick="{{ pick.color.white }}">화이트</button><button class="{{ on.color.black }}" onClick="{{ pick.color.black }}">블랙</button></span></span></div>
       <p class="note">커넥트·프린터·금전함은 화이트/블랙 선택. 포스는 단일색이라 묻지 않음.</p>
-      <div class="say"><span class="who">상담원</span>네이버페이 청약에 들어가는 두 가지만 여쭐게요. <span class="q">"주로 뭘 판매하세요? 음식, 화장품, 옷 이렇게 크게만요."</span> <span class="rec req {{ f.category }}">판매 카테고리 <select value="{{ v.category }}" onChange="{{ set.category }}"><option value="">선택</option><option>음식·음료</option><option>미용</option><option>의류·잡화</option><option>화장품</option><option>교육</option><option>기타</option></select></span> <span class="rec req {{ f.categoryEtc }}" hidden="{{ hideCatEtc }}">직접 입력 <input value="{{ v.categoryEtc }}" onInput="{{ set.categoryEtc }}" placeholder="예: 꽃, 반려동물용품"></span></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"네이버 아이디 알려주시겠어요? 대표님 개인 명의 계정이요. 비밀번호는 필요 없어요."</span> 커넥트를 대표님 네이버 계정에 연결하는 데 쓰이고, 설치 후 우동지 플레이스 활용 가이드도 <b>이 네이버 이메일(아이디@naver.com)</b>로 보내드려요. <span class="rec req {{ f.naver }}">네이버 ID <input value="{{ v.naver }}" onInput="{{ set.naver }}" placeholder="아이디만"></span></div>
+      <div class="say"><span class="who">상담사</span>네이버페이 청약에 들어가는 두 가지만 여쭐게요. <span class="q">"주로 뭘 판매하세요? 음식, 화장품, 옷 이렇게 크게만요."</span> <span class="rec req {{ f.category }}">판매 카테고리 <select value="{{ v.category }}" onChange="{{ set.category }}"><option value="">선택</option><option>음식·음료</option><option>미용</option><option>의류·잡화</option><option>화장품</option><option>교육</option><option>기타</option></select></span> <span class="rec req {{ f.categoryEtc }}" hidden="{{ hideCatEtc }}">직접 입력 <input value="{{ v.categoryEtc }}" onInput="{{ set.categoryEtc }}" placeholder="예: 꽃, 반려동물용품"></span></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"네이버 아이디 알려주시겠어요? 대표님 개인 명의 계정이요. 비밀번호는 필요 없어요."</span> 커넥트를 대표님 네이버 계정에 연결하는 데 쓰이고, 설치 후 우동지 플레이스 활용 가이드도 <b>이 네이버 이메일(아이디@naver.com)</b>로 보내드려요. <span class="rec req {{ f.naver }}">네이버 ID <input value="{{ v.naver }}" onInput="{{ set.naver }}" placeholder="아이디만"></span></div>
       <p class="note">이메일은 따로 묻지 않음 — 네이버 ID로 <b>{{ naverEmail }}</b> 자동 생성. 다른 이메일을 원하면 7번에서 수정.</p>
     </section>
 
     <section class="step" id="s6" data-screen-label="6 서류">
       <div class="step-h"><div class="no">6</div><div class="t">서류 안내 — 우리가 접수<small>유형에 따라 목록이 자동으로 바뀌어요. 점주에게 페이앤 링크를 보내지 않고 카톡으로 받아서 우리가 올립니다.</small></div></div>
-      <div class="say"><span class="who">상담원</span>서류는 카톡으로 저한테 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 걸로 충분해요. 통화 끝나고 목록 문자로 보내드릴게요.</div>
+      <div class="say"><span class="who">상담사</span>서류는 카톡으로 저한테 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 걸로 충분해요. 통화 끝나고 목록 문자로 보내드릴게요.</div>
       <ul class="doclist">
         <sc-for list="{{ docs }}" as="d" hint-placeholder-count="4"><li class="{{ d.cls }}"><span class="n">{{ d.no }}</span><div>{{ d.t }}<small>{{ d.s }}</small></div></li></sc-for>
       </ul>
@@ -261,14 +261,14 @@
 
     <section class="step" id="s7" data-screen-label="7 우동지">
       <div class="step-h"><div class="no">7</div><div class="t">우동지 솔루션 안내<small>이메일은 5번 네이버 ID에서 이미 안내. 커넥트 배송 완료 후 활용 가이드 자동 발송.</small></div></div>
-      <div class="say"><span class="who">상담원</span>저희 우동지는 커넥트 설치 이후에 네이버 플레이스 순위·리뷰 관리를 도와드리는 팀이에요. 배송되면 활용 가이드를 카톡과 네이버 이메일로 보내드릴게요.</div>
+      <div class="say"><span class="who">상담사</span>저희 우동지는 커넥트 설치 이후에 네이버 플레이스 순위·리뷰 관리를 도와드리는 팀이에요. 배송되면 활용 가이드를 카톡과 네이버 이메일로 보내드릴게요.</div>
       <div class="fgrid"><span class="rec opt {{ f.email }}">발송 이메일 (기본 {{ naverEmail }}) <input class="wide" value="{{ v.email }}" onInput="{{ set.email }}" placeholder="{{ naverEmail }}"></span></div>
       <p class="note">비워두면 네이버 이메일로 저장돼요. 고객이 다른 주소를 원할 때만 입력.</p>
     </section>
 
     <section class="step" id="s8" data-screen-label="8 마무리">
       <div class="step-h"><div class="no">8</div><div class="t">마무리 — 복창 후 상태 결정<small>진행할 고객이면 "계약 업무로". 권장 항목이 비어 있어도 넘길 수 있고, 빠진 값은 계약 업무 기본정보에서 채워요.</small></div></div>
-      <div class="say"><span class="who">상담원</span>정리할게요. <b>{{ summary }}</b> 서류 사진 보내주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.</div>
+      <div class="say"><span class="who">상담사</span>정리할게요. <b>{{ summary }}</b> 서류 사진 보내주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.</div>
       <div class="fgrid">
         <span class="rec req {{ f.status }}">상태 <span class="seg"><button class="{{ on.status.go }}" onClick="{{ pick.status.go }}">상담 진행</button><button class="warn2" onClick="{{ openRecall }}">재연락…</button><button class="danger2" onClick="{{ openDrop }}">고객 포기…</button></span></span>
         <span class="rec opt {{ f.netReq }}">페이앤 인터넷 상담 요청 <span class="seg"><button class="{{ on.netReq.yes }}" onClick="{{ pick.netReq.yes }}">요청</button></span></span>
@@ -432,7 +432,7 @@ class Component extends DCLogic {
     if (v.biz === '음식점' || v.biz === '카페') docs.push({ cls: 'cond', t: '영업신고증', s: '음식점·카페 업종. 페이앤이 추가 요청하면 그때 받아도 됨', m: '음식점·카페 업종은 영업신고증이 필요합니다.' });
     docs.forEach((d, i) => { d.no = i + 1; d.cls = d.cls || ''; });
     const name = v.name ? v.name + ' 대표님' : '대표님';
-    const head = `[우동지] ${name}, 우동지 ${agent}입니다.\n`, tail = `\n\n궁금한 점은 이 번호로 카카오톡 메시지 주시면 바로 답변드리겠습니다.\n감사합니다.`;
+    const head = `[우동지] ${name}, 우동지 상담사 ${agent}입니다.\n`, tail = `\n\n궁금한 점은 이 번호로 카카오톡 메시지 주시면 바로 답변드리겠습니다.\n감사합니다.`;
     const summary = [L.bundle, L.color && L.color + ' 색상', v.bundle && '월 0원', v.bundle && installLabel].filter(Boolean).join(', ') || '(구성 선택 후 표시)';
     const docLine = d => `${d.no}. ${d.t.replace(/^(법인|공동대표): /, '$1 서류: ')}\n   ${d.m}`;
     let sms = head + `오늘 통화 감사합니다. 아래 서류를 이 번호로 카카오톡 또는 문자로 보내주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 촬영한 사진으로 충분합니다.\n\n` + docs.map(docLine).join('\n');

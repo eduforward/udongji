@@ -41,7 +41,7 @@ export function buildPayn(d) {
 export function buildSMS(d) {
   const v = k => val(d, k);
   const name = v('고객명') ? v('고객명') + ' 대표님' : '대표님', agent = v('상담자') || '담당자';
-  const head = '[우동지] ' + name + ', 우동지 ' + agent + '입니다.', tail = '\n\n궁금한 점은 이 번호로 카카오톡 메시지 주시면 바로 답변드리겠습니다.\n감사합니다.';
+  const head = '[우동지] ' + name + ', 우동지 상담사 ' + agent + '입니다.', tail = '\n\n궁금한 점은 이 번호로 카카오톡 메시지 주시면 바로 답변드리겠습니다.\n감사합니다.';
   const r = v('상담 결과');
   if (r === '상담 거부') return { kind: '상담 거부 · 마무리 인사', text: head + '\n오늘 시간 내주셔서 감사합니다.\n이후 네이버 플레이스나 결제 관련 도움이 필요하시면 언제든 이 번호로 연락 주시기 바랍니다.' + tail };
   if (r === '상담 연기' || r === '상담 불가' || v('상태') === '재연락 예정') { const when = v('다음 액션 · 일시') || '○월 ○일'; return { kind: '재연락 안내', text: head + '\n오늘 통화 감사합니다. 말씀해 주신 대로 ' + when + '에 다시 연락드리겠습니다.\n그 전에 준비되시면 미리 보내주셔도 됩니다.' + tail }; }
