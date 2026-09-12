@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=47"></script>
+  <script src="./udongji-nav.js?v=48"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -133,11 +133,12 @@
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="47"></udongji-nav>
+<udongji-nav current="consult" page-v="48"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="단계">
     <div class="k">상담 흐름 v5</div>
     <div class="conn {{ connCls }}">{{ connTxt }}</div>
+    <a href="#s0"><span class="n">0</span><span class="t">유입 경로</span><span class="prog {{ p0.cls }}">{{ p0.txt }}</span></a>
     <a href="#s1"><span class="n">1</span><span class="t">인사 · 기본정보</span><span class="prog {{ p1.cls }}">{{ p1.txt }}</span></a>
     <a href="#s2"><span class="n">2</span><span class="t">유형 판별</span><span class="prog {{ p2.cls }}">{{ p2.txt }}</span></a>
     <a href="#s3"><span class="n">3</span><span class="t">신규 · 사업자·오픈일</span><span class="prog {{ p3.cls }}">{{ p3.txt }}</span></a>
@@ -156,9 +157,21 @@
     </header>
     <div class="prevbar" hidden="{{ hidePrev }}">재연락 상담 — {{ prevTxt }} · 작성 완료하면 같은 고객 기록이 갱신돼요.</div>
 
+    <section class="step" id="s0" data-screen-label="0 경로">
+      <div class="step-h"><div class="no">0</div><div class="t">유입 경로 — 시작 전에 먼저<small>Call-In 전화 문의 · Chat-In 채팅(카톡·채널톡) 문의 · Out 접수된 고객에게 우리가 연락. 인사말과 KPI 집계가 여기서 갈려요.</small></div></div>
+      <div class="fgrid" style="padding-top:6px">
+        <span class="rec req {{ f.channel }}">경로 <span class="seg"><button class="{{ on.channel.callin }}" onClick="{{ pick.channel.callin }}">Call-In</button><button class="{{ on.channel.chatin }}" onClick="{{ pick.channel.chatin }}">Chat-In</button><button class="{{ on.channel.out }}" onClick="{{ pick.channel.out }}">Out</button></span></span>
+      </div>
+      <ul class="branch">
+        <li class="{{ br.callin }}"><span class="if">Call-In</span><span class="arrow">→</span>고객이 먼저 전화. 바로 1번 인사로.</li>
+        <li class="{{ br.chatin }}"><span class="if">Chat-In</span><span class="arrow">→</span>채팅으로 들어온 문의. 통화 가능한지 먼저 묻고, 안 되면 채팅으로 1~2번 유형 판별까지만 진행.</li>
+        <li class="{{ br.out }}"><span class="if">Out</span><span class="arrow">→</span>홈페이지·랜딩 접수 고객에게 우리가 전화. <span class="q">"○○에 남겨주신 커넥트 문의 보고 연락드렸어요"</span>로 시작.</li>
+      </ul>
+    </section>
+
     <section class="step" id="s1" data-screen-label="1 인사">
       <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. 업종은 통화 전 네이버 지도로 봐둔 걸 확인만.</small></div></div>
-      <div class="say"><span class="who">상담원</span>안녕하세요, 우동지 {{ agentName }}입니다. 네이버 커넥트 문의 주셔서 연락드렸어요. 통화 품질을 위해 녹음됩니다. <span class="q">"○○ 하시는 매장 맞으시죠?"</span></div>
+      <div class="say"><span class="who">상담원</span>안녕하세요, 우동지 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"○○ 하시는 매장 맞으시죠?"</span></div>
       <div class="fgrid">
         <span class="rec req {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
         <span class="rec req {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
@@ -253,7 +266,7 @@
   </div>
 
   <aside class="side">
-    <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>접수 링크</dt><dd>{{ linkNo }}</dd><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매</dt><dd>{{ v.category }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
+    <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.channel }}">{{ L.channel }}</span><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>접수 링크</dt><dd>{{ linkNo }}</dd><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매</dt><dd>{{ v.category }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
     <div class="card"><h4>① 고객 안내 문자 <button onClick="{{ copySms }}">복사</button></h4><pre>{{ sms }}</pre></div>
     <div class="card"><h4>② 페이앤 접수 양식 <button onClick="{{ copyForm }}">복사</button></h4><pre>{{ form }}</pre></div>
   </aside>
@@ -275,14 +288,14 @@ class Component extends DCLogic {
   state = { v: this.loadDraft(), modal: null, lib: null, agent: '', saving: false, conn: 'wait' };
   KEY = 'udj_v5_draft';
   TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','naver','email','memo'];
-  OPTS = { mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','nonet'], link:['yes','no'], color:['white','black'], optin:['yes','no'], status:['go'], netReq:['yes'] };
-  LBL = { mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',nonet:'인터넷 없음'} };
+  OPTS = { channel:['callin','chatin','out'], mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','nonet'], link:['yes','no'], color:['white','black'], optin:['yes','no'], status:['go'], netReq:['yes'] };
+  LBL = { channel:{callin:'Call-In',chatin:'Chat-In',out:'Out'}, mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',nonet:'인터넷 없음'} };
   LINKS = { 'fresh|person|single':'841963','fresh|person|joint':'841961','fresh|corp|single':'841955','fresh|corp|joint':'841952','existing|person|single':'841968','existing|person|joint':'841965','existing|corp|single':'841959','existing|corp|joint':'841957' };
   BIZ = ['카페','음식점','미용·뷰티','의류·잡화','학원·교육'];
   loadDraft() { try { return JSON.parse(localStorage.getItem('udj_v5_draft') || '{}') || {}; } catch (e) { return {}; } }
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=8'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=9'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const agent = await lib.myName().catch(() => '');
       this.setState({ lib, agent, conn: 'ok' });
@@ -303,7 +316,7 @@ class Component extends DCLogic {
   // Firestore 기록 → 폼 값
   fromRecord(it) {
     const d = it.data, g = k => String(d[k] || '').trim(), v = {};
-    v.name = g('고객명'); v.phone = g('연락처'); v.store = g('매장명'); v.addr = g('매장 주소');
+    v.channel = this.inv('channel', g('유입 경로')); v.name = g('고객명'); v.phone = g('연락처'); v.store = g('매장명'); v.addr = g('매장 주소');
     const biz = g('업종'); if (biz) { if (this.BIZ.includes(biz)) v.biz = biz; else { v.biz = '기타'; v.bizEtc = biz; } }
     v.mode = g('매장 구분') === '신규 오픈' ? 'fresh' : g('매장 구분') === '기존 운영' ? 'existing' : '';
     v.entity = g('대형/개인/법인') === '법인' ? 'corp' : g('대형/개인/법인') ? 'person' : '';
@@ -323,7 +336,7 @@ class Component extends DCLogic {
   toRecord(v, L, ctx, kind, extra) {
     const O = (a, b) => v[a] ? (v[a] === b ? 'O' : 'X') : '';
     const r = {
-      '고객명': v.name || '', '연락처': v.phone || '', '매장명': v.store || '', '매장 주소': v.addr || '', '업종': v.biz === '기타' ? (v.bizEtc || '기타') : (v.biz || ''), '판매 물품': v.category || '',
+      '유입 경로': L.channel || '', '고객명': v.name || '', '연락처': v.phone || '', '매장명': v.store || '', '매장 주소': v.addr || '', '업종': v.biz === '기타' ? (v.bizEtc || '기타') : (v.biz || ''), '판매 물품': v.category || '',
       '매장 구분': v.mode === 'fresh' ? '신규 오픈' : v.mode === 'existing' ? '기존 운영' : '', '상담일': this.today(), '상담자': this.state.agent || '',
       '대형/개인/법인': v.entity === 'corp' ? '법인' : v.entity === 'person' ? '개인' : '', '단독/공동': v.owners === 'joint' ? '공동' : v.owners === 'single' ? '단독' : '', '연매출 3억': L.large || '',
       '서류 분류': ctx.typed ? `${L.mode}·${L.entity}·${v.owners === 'joint' ? '공동' : '단독'}` : '', '페이앤 접수 링크': ctx.linkNo !== '—' ? ctx.linkNo : '',
@@ -375,7 +388,8 @@ class Component extends DCLogic {
     const noReg = isNew && v.reg === 'pending';
     const noNet = v.lan === 'nonet';
     let daysToOpen = null; if (v.openDate) daysToOpen = Math.round((new Date(v.openDate) - new Date().setHours(0,0,0,0)) / 864e5);
-    const req = ['name','phone','store','biz','mode','entity','owners','large'];
+    const req = ['channel','name','phone','store','biz','mode','entity','owners','large'];
+    const greetLead = v.channel === 'out' ? '남겨주신 네이버 커넥트 문의 보고 연락드렸어요.' : v.channel === 'chatin' ? '채팅으로 문의 주신 네이버 커넥트 건으로 전화드렸어요.' : '네이버 커넥트 문의 주셔서 연락드렸어요.';
     const bizEtc = v.biz === '기타'; if (bizEtc) req.push('bizEtc');
     const bizLabel = bizEtc ? (v.bizEtc || '기타') : (v.biz || '-');
     if (isNew) req.push('reg'); if (isNew && !noReg) req.push('openDate');
@@ -404,7 +418,7 @@ class Component extends DCLogic {
     sms += `\n\n서류 접수 후 페이앤에서 전자계약서가 카톡(알림톡)으로 가고, 서명하시면 완료됩니다.${isJoint ? ' 공동대표님도 함께 서명하셔야 해요.' : ''}` + tail;
     const smsRecall = when => head + `오늘 통화 감사합니다. ${when ? when + '에' : '말씀해주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증 나오시면 바로 진행할게요.' : ''}` + tail;
     const smsDrop = head + `오늘 시간 내주셔서 감사합니다. 나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.\n감사합니다.`;
-    const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
+    const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
     this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop };
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
     const ready = reqDone === reqTotal && !!this.state.lib && !this.state.saving;
@@ -414,15 +428,15 @@ class Component extends DCLogic {
     const needBasic = () => !v.name || !v.phone ? '고객명과 연락처는 있어야 저장할 수 있어요.' : '';
     const conn = this.state.conn;
     return {
-      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent,
+      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead,
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
-      ch: { mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
+      ch: { channel: v.channel ? 'ok' : '', mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
       typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
       hideBizEtc: !bizEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
       hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, hideEmail: v.optin !== 'yes',
-      br: { ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
-      p1: prog(['name','phone','store','biz','bizEtc']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan']), p5: prog(['bundle','link','color','category','naver']), p7: prog(['optin']), p8: prog(['status']),
+      br: { callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
+      p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan']), p5: prog(['bundle','link','color','category','naver']), p7: prog(['optin']), p8: prog(['status']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
       dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : reqDone === reqTotal ? (this.state.lib ? '필수 항목 모두 입력됨 — 작성 완료를 누르면 저장돼요' : '서버 연결 대기 중') : `필수 ${reqTotal - reqDone}개 남음 · 재연락·고객 포기는 지금도 저장 가능`,
       notReady: !ready, finishLabel: this.state.saving ? '저장 중…' : '작성 완료', finish: () => ready && this.save('go'),
