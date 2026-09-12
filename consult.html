@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=74"></script>
+  <script src="./udongji-nav.js?v=75"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -85,7 +85,7 @@
     .rec.opt input, .rec.opt select { border-color: var(--line); }
     .rec.opt.filled { background: var(--green-2); color: var(--green); }
     .rec.req { border: 1px solid var(--red); box-shadow: 0 0 0 3px rgba(217,58,74,.12); padding-left: 5px; }
-    .rec.req::before { content: "필수"; font-size: 10px; font-weight: 800; color: #fff; background: var(--red); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
+    .rec.req::before { content: "권장"; font-size: 10px; font-weight: 800; color: #fff; background: var(--red); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
     .rec.req.filled { border-color: var(--green); box-shadow: none; }
     .rec.req.filled::before { content: "완료"; background: var(--green); }
     .seg { display: inline-flex; gap: 4px; }
@@ -133,7 +133,7 @@
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="74"></udongji-nav>
+<udongji-nav current="consult" page-v="75"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="단계">
     <div class="k">상담 흐름 v5</div>
@@ -147,7 +147,7 @@
     <a href="#s6"><span class="n">6</span><span class="t">서류 안내</span><span class="prog skip">안내</span></a>
     <a href="#s7"><span class="n">7</span><span class="t">우동지 솔루션</span><span class="prog skip">안내</span></a>
     <a href="#s8"><span class="n">8</span><span class="t">마무리</span><span class="prog {{ p8.cls }}">{{ p8.txt }}</span></a>
-    <div class="tot">필수 {{ reqDone }} / {{ reqTotal }}<div class="bar"><i style="width: {{ reqPct }}%"></i></div></div>
+    <div class="tot">권장 {{ reqDone }} / {{ reqTotal }}<div class="bar"><i style="width: {{ reqPct }}%"></i></div></div>
   </nav>
 
   <div class="main">
@@ -155,7 +155,7 @@
       <div><div class="kicker">우동지 · 네이버페이 커넥트 상담 스크립트 <b style="color:var(--purple)">v5</b></div><h1>상담 업무</h1><p>말풍선을 읽으며 진행하고, <b style="color:var(--red)">빨간 칸</b>만 채우면 됩니다. 매장 주소·사업자번호·생년월일·이메일은 <b>묻지 않아요</b> — 서류(사업자등록증·신분증·통장)에 다 있어요. 밴사도 언급하지 않습니다.</p></div>
       <div class="typebadge"><span class="tb {{ typeCls }}">{{ typeLabel }}</span><small>접수 링크 <b>{{ linkNo }}</b></small><small>{{ installLabel }}</small></div>
     </header>
-    <div class="prevbar" hidden="{{ hidePrev }}">재연락 상담 — {{ prevTxt }} · 작성 완료하면 같은 고객 기록이 갱신돼요.</div>
+    <div class="prevbar" hidden="{{ hidePrev }}">재연락 상담 — {{ prevTxt }} · "계약 업무로" 넘기면 같은 고객 기록이 갱신돼요.</div>
 
     <section class="step" id="s0" data-screen-label="0 경로">
       <div class="step-h"><div class="no">0</div><div class="t">유입 경로 — 시작 전에 먼저<small>Call-In 전화 문의 · Chat-In 채팅(카톡·채널톡) 문의 · Out 접수된 고객에게 우리가 연락. 인사말과 KPI 집계가 여기서 갈려요.</small></div></div>
@@ -260,7 +260,7 @@
     </section>
 
     <section class="step" id="s8" data-screen-label="8 마무리">
-      <div class="step-h"><div class="no">8</div><div class="t">마무리 — 복창 후 상태 결정<small>상담 진행이면 작성 완료. 재연락·고객 포기는 필수 항목이 비어 있어도 바로 저장돼요.</small></div></div>
+      <div class="step-h"><div class="no">8</div><div class="t">마무리 — 복창 후 상태 결정<small>진행할 고객이면 "계약 업무로". 권장 항목이 비어 있어도 넘길 수 있고, 빠진 값은 계약 업무 기본정보에서 채워요.</small></div></div>
       <div class="say"><span class="who">상담원</span>정리할게요. <b>{{ summary }}</b> 서류 사진 보내주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.</div>
       <div class="fgrid">
         <span class="rec req {{ f.status }}">상태 <span class="seg"><button class="{{ on.status.go }}" onClick="{{ pick.status.go }}">상담 진행</button><button class="warn2" onClick="{{ openRecall }}">재연락…</button><button class="danger2" onClick="{{ openDrop }}">고객 포기…</button></span></span>
@@ -436,7 +436,7 @@ class Component extends DCLogic {
     const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'} / 와이파이: ${L.wifi || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
     this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop, emailFinal, catLabel };
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
-    const ready = reqDone === reqTotal && !!this.state.lib && !this.state.saving;
+    const ready = !!this.state.lib && !this.state.saving && !!(v.name && v.phone);
     const hideIf = (k, val) => v[k] ? (v[k] === val ? 'pick' : 'hide') : '';
     const modal = this.state.modal, who = v.store || v.name || '(고객명 미입력)';
     const setM = p => this.setState({ modal: Object.assign({}, this.state.modal, { err: '' }, p) });
@@ -485,8 +485,8 @@ class Component extends DCLogic {
       br: { wifiNo: hideIf('wifi','no'), wifiUnknown: hideIf('wifi','unknown'), lanUnknown: hideIf('lan','unknown'), callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
       p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc','sign']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan','wifi']), p5: prog(['bundle','link','color','category','categoryEtc','naver']), p8: prog(['status']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
-      dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : reqDone === reqTotal ? (this.state.lib ? '필수 항목 모두 입력됨 — 작성 완료를 누르면 저장돼요' : '서버 연결 대기 중') : `필수 ${reqTotal - reqDone}개 남음 · 재연락·고객 포기는 지금도 저장 가능`,
-      notReady: !ready, finishLabel: this.state.saving ? '저장 중…' : '작성 완료', finish: () => ready && this.save('go'),
+      dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : !this.state.lib ? '서버 연결 대기 중' : !(v.name && v.phone) ? '고객명·연락처는 있어야 넘길 수 있어요' : reqDone === reqTotal ? '권장 항목 모두 입력됨' : `권장 ${reqTotal - reqDone}개 미입력 — 그래도 넘길 수 있어요 (계약 업무 기본정보에서 보완)`,
+      notReady: !ready, finishLabel: this.state.saving ? '저장 중…' : '계약 업무로 →', finish: () => { if (!ready) return; if (reqDone < reqTotal && !confirm('권장 항목 ' + (reqTotal - reqDone) + '개가 비어 있어요. 그래도 계약 업무로 넘길까요?')) return; this.save('go'); },
       copySms: copy(sms), copyForm: copy(form),
       reset: () => { if (Object.keys(v).length && !confirm('입력 중인 내용을 지우고 새 상담을 시작할까요?')) return; localStorage.removeItem(this.KEY); this.setState({ v: {} }); },
       saving: this.state.saving,
