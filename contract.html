@@ -212,8 +212,7 @@
           </sc-for>
         </sc-for>
         <div class="pf-foot"><button type="button" class="btn primary" onClick="{{ savePayn }}" disabled="{{ sel.pfSaveOff }}">{{ sel.pfSaveLabel }}</button><button type="button" class="btn ok" onClick="{{ completeHandoff }}" disabled="{{ sel.handoffDone }}">{{ sel.handoffBtn }}</button><span class="{{ sel.pfMissCls }}">{{ sel.pfMissTxt }}</span></div>
-        <div class="note">전체를 한 번에 붙이려면 아래 탭 구분 2열 텍스트. 페이앤 전산에 다 입력했으면 <b>이관 완료 처리</b>.</div>
-        <div class="tbox"><h4>페이앤 접수 양식 (엑셀 붙이기용) <button type="button" class="btn" onClick="{{ copyPayn }}">복사</button></h4><textarea readonly value="{{ sel.payn }}"></textarea></div>
+        <div class="note">페이앤 전산에 다 입력했으면 <b>이관 완료 처리</b>.</div>
         <div class="tbox"><h4>고객 안내 문자 <button type="button" class="btn" onClick="{{ copySms }}">복사</button></h4><textarea readonly value="{{ sel.sms }}"></textarea></div>
       </div>
 
