@@ -83,25 +83,76 @@ export const STAGES = [
 export const NEWSLETTER_COL = '뉴스레터 등록일';
 // 고객 조건에 따라 필요 서류 목록
 export function requiredDocs(d) {
-  const v = k => val(d, k), corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동', isNew = v('매장 구분') === '신규 오픈', isOld = v('매장 구분') === '기존 운영';
-  const food = /음식|식당|카페|주점|치킨|피자|분식|베이카리|제과|호프|술|구이|횟집|국수|돈까스|버거|토스트|떡|디저트/.test(v('업종'));
+  const v = k => val(d, k), corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동';
+  // 페이앤 8케이스 접수 양식 기준 — 기본 6 + 법인 6 + 공동대표 4 (신규/기존은 서류 차이 없음)
   const list = [
     { id: 'biz', name: '사업자등록증', hint: '최근 발급본, 가리는 곳 없이' },
-    { id: 'idcard', name: '대표 신분증', hint: '주민등록증 또는 운전면허증 (여관 불가)' },
-    { id: 'bank', name: '정산 통장 사본', hint: corp ? '예금주 = 법인명' : '모바일 캡처 가능' },
-    { id: 'photo_out', name: '매장 바깥 사진 2장', hint: '간판 나오게 (간판 없으면 건물 바깥 1 + 입구 1 + 도로명주소 표지판 1)' },
-    { id: 'photo_in', name: '매장 안쪽 사진 2장', hint: '전체가 보이게' }
+    { id: 'idcard', name: '대표자 신분증', hint: '주민등록증 또는 운전면허증 (여권 불가)' },
+    { id: 'bank', name: '통장 사본 (정산계좌)', hint: corp ? '예금주 = 법인명 표기까지 완전 일치' : '예금주 = 대표 본인, 모바일 캡처 가능' },
+    { id: 'license', name: '영업신고증 / 인허가증', hint: '요식업·병원·학원·통신판매 등 해당 업종만' },
+    { id: 'poa', name: '위임장', hint: '대표자 외 신청 시만' },
+    { id: 'photo', name: '매장사진', hint: '간판 있으면 4매: 간판 포함 외관 2 + 내부 전체 2 / 간판 없으면 5매: 건물 외부 1 + 실내 보이는 입구 1 + 도로명주소 표지판 1 + 내부 전체 2' }
   ];
-  if (food) list.push({ id: 'food', name: '영업신고증', hint: '음식점' });
-  if (corp) list.push({ id: 'corp', name: '법인 서류', hint: '등기부등본 · 인감증명서(3개월) · 주주명부 · 소유지배자 확인서 (사용인감계)' });
-  if (joint) list.push({ id: 'joint', name: '공동대표 서류', hint: '가입 동의·위임장 · 결제계좌 동의서 · 공동대표 신분증·연락처' });
-  if (isOld && (v('기존 장비 모델명') || v('현재 단말기·POS'))) list.push({ id: 'device', name: '기존 장비 사진', hint: '포스기·프린터 뒷면 모델명' });
-  if (!v('네이버 ID')) list.push({ id: 'naver', name: '네이버 아이디', hint: '대표 개인 명의 계정 (텍스트로 받음)' });
-  if (isNew && !corp && !v('영문 성함')) list.push({ id: 'engname', name: '영문 성함', hint: '여관 기준 (텍스트)' });
+  if (corp) list.push(
+    { id: 'corp_reg', name: '법인등기부등본', hint: '3개월 이내' },
+    { id: 'corp_seal', name: '법인 인감증명서', hint: '3개월 이내' },
+    { id: 'corp_share', name: '주주명부', hint: '' },
+    { id: 'corp_owner', name: '법인 소유지배자 확인서', hint: '서식은 우리가 보내드림' },
+    { id: 'corp_doc', name: '공문 / 정관 / 회칙', hint: '해당 업종만' },
+    { id: 'corp_useseal', name: '사용인감계', hint: '사용인감 사용 시만' }
+  );
+  if (joint) list.push(
+    { id: 'joint_poa', name: '공동대표자 가맹점 가입 동의 및 위임장', hint: '서식은 우리가 보내드림' },
+    { id: 'joint_acct', name: '공동대표자 결제계좌 이용 신청 동의서', hint: '' },
+    { id: 'joint_id', name: '공동대표자 신분증', hint: '' },
+    { id: 'joint_phone', name: '공동대표자 명의 연락처', hint: '텍스트로 받음' }
+  );
   return list;
 }
-export function parseDocCheck(s) { const o = {}; String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { o[x] = true; }); return o; }
-export function parseDocFiles(s) { try { const j = JSON.parse(s || '[]'); return Array.isArray(j) ? j : []; } catch (e) { return []; } }
+// ── 페이앤 가맹점 접수 폼 (8케이스 단일 양식) — 값은 'PA·라벨' 열에 저장, 미입력이면 상담 기록에서 미리 채움 ──
+export const PAYN_PREFIX = 'PA·';
+export const PAYN_DEALER_PHONES = { '이일광': '010-9992-5432' };
+const NA = '해당사항없음';
+export const PAYN_FIELDS = [
+  { k: 'dealer', sec: 'A. 딜러 정보', label: '딜러사 소속/담당자성명', ro: true, src: d => '우동지/' + (val(d, '상담자') || '') },
+  { k: 'dealerPhone', sec: 'A. 딜러 정보', label: '딜러 담당자 연락처', mono: true, src: d => PAYN_DEALER_PHONES[val(d, '상담자')] || '' },
+  { k: 'phone', sec: 'B. 가맹점 정보', label: '가맹점 대표자 연락처', mono: true, src: d => val(d, '연락처') },
+  { k: 'name', sec: 'B. 가맹점 정보', label: '가맹점 대표자 성명', src: d => val(d, '고객명') },
+  { k: 'store', sec: 'B. 가맹점 정보', label: '가맹점 상호명', src: d => val(d, '매장명') },
+  { k: 'email', sec: 'B. 가맹점 정보', label: '가맹점 대표자 이메일', src: d => val(d, '이메일') },
+  { k: 'bizno', sec: 'B. 가맹점 정보', label: '가맹점 사업자번호', mono: true, hint: '하이픈 없이 숫자 10자리', src: d => String(d['사업자번호'] || '').replace(/\D/g, '') },
+  { k: 'goods', sec: 'B. 가맹점 정보', label: '판매 물품', hint: '예: 의류, 요식업', src: d => val(d, '판매 물품') || val(d, '업종') },
+  { k: 'naver', sec: 'B. 가맹점 정보', label: '네이버 ID', hint: '대표자 명의만', src: d => val(d, '네이버 ID') },
+  { k: 'corpno', sec: 'B. 가맹점 정보', label: '가맹점 법인등록번호', mono: true, hint: '하이픈 없이', cond: 'corp', src: d => '' },
+  { k: 'joint', sec: 'B. 가맹점 정보', label: '공동 대표자 성함/연락처', hint: '예: 토세토/010-9292-0202', cond: 'joint', src: d => '' },
+  { k: 'engname', sec: 'B. 가맹점 정보', label: '가맹점 대표자 영문 성명', hint: '반드시 여권상 성함과 일치', cond: 'newperson', src: d => val(d, '영문 성함') },
+  { k: 'bank', sec: 'C. 자동이체 정보', label: '자동이체 은행명', src: d => '' },
+  { k: 'acct', sec: 'C. 자동이체 정보', label: '자동이체 계좌번호', mono: true, src: d => '' },
+  { k: 'holder', sec: 'C. 자동이체 정보', label: '자동이체 예금주명', src: d => val(d, '대형/개인/법인') === '법인' ? val(d, '매장명') : val(d, '고객명') },
+  { k: 'holderRel', sec: 'C. 자동이체 정보', label: '자동이체 예금주와의 관계', src: d => '본인' },
+  { k: 'holderPhone', sec: 'C. 자동이체 정보', label: '자동이체 예금주 연락처', mono: true, src: d => val(d, '연락처') },
+  { k: 'holderBirth', sec: 'C. 자동이체 정보', label: '자동이체 예금주 생년월일', mono: true, hint: '6자리, 예: 890330', src: d => '' },
+  { k: 'color', sec: 'D. 단말·설치', label: '커넥트 색상', opts: ['화이트', '블랙'], src: d => val(d, '기기 색상') },
+  { k: 'cat', sec: 'D. 단말·설치', label: '캣단말기 여부', opts: ['O', 'X'], src: d => val(d, '안내한 상품 구성') ? (/카드단말기|캣/.test(val(d, '안내한 상품 구성')) ? 'O' : 'X') : '' },
+  { k: 'installWhen', sec: 'D. 단말·설치', label: '설치 일정 (대략적인)', src: d => val(d, '오픈 예정일') },
+  { k: 'pos', sec: 'E. 부가장비 신청', label: '포스기', opts: [NA, '윈도우', '태블릿'], src: d => NA },
+  { k: 'printer', sec: 'E. 부가장비 신청', label: '영수증 프린터', opts: [NA, '유선 화이트', '유선 블랙', '무선'], src: d => /프린터/.test(val(d, '안내한 상품 구성')) ? ('유선 ' + (val(d, '기기 색상') || '화이트')) : NA },
+  { k: 'drawer', sec: 'E. 부가장비 신청', label: '금전함', opts: [NA, '화이트', '블랙'], src: d => NA },
+  { k: 'kiosk', sec: 'E. 부가장비 신청', label: '키오스크', opts: [NA, '단품', '스탠드', '베리어프리'], src: d => NA },
+  { k: 'note', sec: 'F. 기타', label: '특이사항 (페이앤 전달용)', multi: true, opt: true, src: d => val(d, '특이사항') }
+];
+export function paynCase(d) { const v = k => val(d, k); return { corp: v('대형/개인/법인') === '법인', joint: v('단독/공동') === '공동', isNew: v('매장 구분') === '신규 오픈' }; }
+export function paynActive(d) { const c = paynCase(d); return PAYN_FIELDS.filter(f => !f.cond || (f.cond === 'corp' && c.corp) || (f.cond === 'joint' && c.joint) || (f.cond === 'newperson' && c.isNew && !c.corp)); }
+// 저장값 있으면 저장값, 없으면 상담 기록에서 미리 채움 (ro 필드는 항상 계산값)
+export function paynValue(d, f) { if (f.ro) return f.src(d); const saved = String(d[PAYN_PREFIX + f.label] || '').trim(); return saved || f.src(d); }
+export function paynMissing(d) { return paynActive(d).filter(f => !f.opt && !String(paynValue(d, f) || '').trim()); }
+// 엑셀 원본이 '항목명 / 값' 2열이므로 탭 구분 2열. 해당 케이스에 없는 항목은 줄 자체를 뺀다.
+export function buildPaynTSV(d) { return paynActive(d).map(f => f.label + '\t' + String(paynValue(d, f) || '').replace(/[\t\r\n]+/g, ' ').trim()).join('\n'); }
+// 구 서류 id → 새 id (기존 고객의 체크·파일 유지)
+const DOC_ALIAS = { photo_out: 'photo', photo_in: 'photo', food: 'license', corp: 'corp_reg', joint: 'joint_poa', device: 'photo', naver: 'poa', engname: 'poa' };
+const docAlias = id => DOC_ALIAS[id] || id;
+export function parseDocCheck(s) { const o = {}; String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { o[docAlias(x)] = true; }); return o; }
+export function parseDocFiles(s) { try { const j = JSON.parse(s || '[]'); return Array.isArray(j) ? j.map(f => Object.assign({}, f, { doc: docAlias(f.doc) })) : []; } catch (e) { return []; } }
 
 export function safeName(s) { return String(s || '').replace(/[\/\\:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim(); }
 // 업로드 전 변환: PNG/WebP/HEIC → JPG, PDF → 페이지별 JPG. 반환: [{blob, ext:'jpg', page}] (이미 JPG면 그대로)
@@ -191,7 +242,7 @@ export async function readAll() {
   const items = snap.docs.map((d, i) => { const data = d.data(); const clean = {}; Object.keys(data).forEach(k => { if (k[0] !== '_') clean[k] = data[k] == null ? '' : String(data[k]); }); clean[ID_COL] = d.id; return { row: d.id, id: d.id, data: clean, _createdAt: data._createdAt || '', _updatedAt: data._updatedAt || '' }; });
   return { header: FULL_HEADER(), items };
 }
-export const FULL_HEADER = () => COLS.map(c => c.name).concat([ID_COL, REG_COL]);
+export const FULL_HEADER = () => COLS.map(c => c.name).concat([ID_COL, REG_COL]).concat(PAYN_FIELDS.filter(f => !f.ro).map(f => PAYN_PREFIX + f.label));
 function cleanIn(d) { const o = {}; Object.keys(d || {}).forEach(k => { if (k[0] !== '_' && k !== ID_COL) o[k] = d[k] == null ? '' : String(d[k]); }); return o; }
 export async function findRowById(id) { await init(); need(); const { fs } = _mods; const s = await fs.getDoc(fs.doc(_db, COL, id)); return s.exists() ? id : null; }
 export async function appendRecord(d, id) {
