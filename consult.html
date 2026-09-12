@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=70"></script>
+  <script src="./udongji-nav.js?v=71"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -133,7 +133,7 @@
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="70"></udongji-nav>
+<udongji-nav current="consult" page-v="71"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="단계">
     <div class="k">상담 흐름 v5</div>
@@ -216,9 +216,11 @@
         <li class="{{ br.termShort }}"><span class="if">10개월 미만·만료</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>남은 위약금이 크지 않으시면 커넥트 0원으로 갈아타시는 게 이득이에요. 월 납부금이랑 남은 개월만 알려주시면 제가 바로 계산해 드릴게요.</div></li>
         <li class="{{ br.termLong }}"><span class="if">10개월 이상</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>위약금이 아직 크시니까 지금 단말기는 그대로 두시고, 커넥트를 옆에 놓고 같이 쓰시면 돼요. 월 0원이라 부담 없어요.</div><p class="note">대리점에 위약금 전화하라고 하지 않기(방어 들어옴). 기존 대리점 문제 생기면 페이앤이 빠지는 조건.</p></li>
       </ul>
-      <div class="say"><span class="who">상담원</span><span class="q">"카드단말기 놓을 자리까지 인터넷 랜선이 나와 있나요? 커넥트는 와이파이로 되는데 단말기는 랜선이 꼭 필요해요."</span> <span class="rec req {{ f.lan }}">랜선 <span class="seg"><button class="{{ on.lan.yes }}" onClick="{{ pick.lan.yes }}">있음</button><button class="{{ on.lan.no }}" onClick="{{ pick.lan.no }}">없음·모름</button><button class="{{ on.lan.nonet }}" onClick="{{ pick.lan.nonet }}">인터넷 자체 없음</button></span></span></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"매장에 와이파이는 되시죠? 커넥트는 와이파이로 연결돼요."</span> <span class="rec req {{ f.wifi }}">와이파이 <span class="seg"><button class="{{ on.wifi.yes }}" onClick="{{ pick.wifi.yes }}">가능</button><button class="{{ on.wifi.no }}" onClick="{{ pick.wifi.no }}">불가·모름</button></span></span></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"카드단말기 놓을 자리까지 인터넷 랜선이 나와 있나요? 커넥트는 와이파이로 되는데 단말기는 랜선이 꼭 필요해요."</span> <span class="rec req {{ f.lan }}">랜선 <span class="seg"><button class="{{ on.lan.yes }}" onClick="{{ pick.lan.yes }}">있음</button><button class="{{ on.lan.no }}" onClick="{{ pick.lan.no }}">없음</button><button class="{{ on.lan.unknown }}" onClick="{{ pick.lan.unknown }}">모름</button><button class="{{ on.lan.nonet }}" onClick="{{ pick.lan.nonet }}">인터넷 자체 없음</button></span></span></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"매장에 와이파이는 되시죠? 커넥트는 와이파이로 연결돼요."</span> <span class="rec req {{ f.wifi }}">와이파이 <span class="seg"><button class="{{ on.wifi.yes }}" onClick="{{ pick.wifi.yes }}">가능</button><button class="{{ on.wifi.no }}" onClick="{{ pick.wifi.no }}">불가</button><button class="{{ on.wifi.unknown }}" onClick="{{ pick.wifi.unknown }}">모름</button></span></span></div>
       <ul class="branch">
+        <li class="{{ br.wifiUnknown }}"><span class="if">와이파이 모름</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>휴대폰 와이파이 목록에 매장 이름이 뜨는지 한번 봐주시고, 모르시면 설치 전에 확인 부탁드릴게요. 서류 문자에 같이 적어드릴게요.</div></li>
+        <li class="{{ br.lanUnknown }}"><span class="if">랜선 모름</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>인터넷 공유기(모뎀)에서 카드단말기 놓을 자리까지 선이 나와 있는지 봐주시면 돼요. 없으면 연장선 하나만 준비하시면 됩니다.</div></li>
         <li class="{{ br.wifiNo }}"><span class="if">와이파이 불가</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>커넥트는 와이파이가 꼭 필요해요. 공유기가 있으면 와이파이 켜 두시고, 없으면 인터넷 업체에 공유기 요청해 주세요. 랜선을 커넥트에 직접 꽂는 방법도 있어요.</div></li>
         <li class="{{ br.lanNo }}"><span class="if">랜선 없음</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>단말기 자리까지 랜선만 하나 빼주셔야 해요. 연장선은 다이소·온라인에서 몇 천 원이면 돼요. 타공·배선은 인테리어나 인터넷 업체에 요청하셔야 해요.</div></li>
         <li class="{{ br.lanNonet }}"><span class="if">인터넷 없음</span><span class="arrow">→</span>진행 불가. <span class="q">"인터넷 신규 가입이 먼저 필요해서 페이앤 쪽에서 인터넷 상담 연락드리게 할게요."</span> → 마무리에서 <b>페이앤 인터넷 상담 요청</b> 체크. 우리가 인터넷 영업하지 않음.</li>
@@ -292,14 +294,14 @@ class Component extends DCLogic {
   state = { v: this.loadDraft(), modal: null, lib: null, agent: '', saving: false, conn: 'wait' };
   KEY = 'udj_v5_draft';
   TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','naver','email','memo'];
-  OPTS = { sign:['yes','no'], channel:['callin','chatin','out'], mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','nonet'], wifi:['yes','no'], link:['yes','no'], color:['white','black'], status:['go'], netReq:['yes'] };
-  LBL = { channel:{callin:'Call-In',chatin:'Chat-In',out:'Out'}, mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',nonet:'인터넷 없음'} };
+  OPTS = { sign:['yes','no'], channel:['callin','chatin','out'], mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','unknown','nonet'], wifi:['yes','no','unknown'], link:['yes','no'], color:['white','black'], status:['go'], netReq:['yes'] };
+  LBL = { channel:{callin:'Call-In',chatin:'Chat-In',out:'Out'}, mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',unknown:'모름',nonet:'인터넷 없음'}, wifi:{yes:'가능',no:'불가',unknown:'모름'} };
   LINKS = { 'fresh|person|single':'841963','fresh|person|joint':'841961','fresh|corp|single':'841955','fresh|corp|joint':'841952','existing|person|single':'841968','existing|person|joint':'841965','existing|corp|single':'841959','existing|corp|joint':'841957' };
   BIZ = ['카페','음식점','미용·뷰티','의류·잡화','학원·교육'];
   loadDraft() { try { return JSON.parse(localStorage.getItem('udj_v5_draft') || '{}') || {}; } catch (e) { return {}; } }
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=24'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=25'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const meR = await lib.me().catch(() => ({})); if (meR.close) { location.replace('contract.html'); return; }
       const agent = await lib.myName().catch(() => '');
@@ -328,8 +330,8 @@ class Component extends DCLogic {
     v.owners = g('단독/공동') === '공동' ? 'joint' : g('단독/공동') === '단독' ? 'single' : '';
     v.large = this.inv('large', g('연매출 3억')); v.reg = g('사업자등록증 발급') === '발급 완료' ? 'done' : g('사업자등록증 발급') === '발급 예정' ? 'pending' : '';
     v.openDate = g('오픈 예정일'); v.pos = this.inv('pos', g('현재 포스')); v.term = this.inv('term', g('약정 잔여 개월'));
-    v.lan = g('인터넷 변경/신규 필요') === '필요' ? 'nonet' : g('인터넷 회선(랜선) 보유') === 'O' ? 'yes' : g('인터넷 회선(랜선) 보유') === 'X' ? 'no' : '';
-    v.link = g('포스 연동') === '필요' ? 'yes' : g('포스 연동') === '불필요' ? 'no' : ''; v.wifi = g('와이파이 가능') === 'O' ? 'yes' : g('와이파이 가능') === 'X' ? 'no' : '';
+    v.lan = g('인터넷 변경/신규 필요') === '필요' ? 'nonet' : g('인터넷 회선(랜선) 보유') === 'O' ? 'yes' : g('인터넷 회선(랜선) 보유') === '모름' ? 'unknown' : g('인터넷 회선(랜선) 보유') === 'X' ? 'no' : '';
+    v.link = g('포스 연동') === '필요' ? 'yes' : g('포스 연동') === '불필요' ? 'no' : ''; v.wifi = g('와이파이 가능') === 'O' ? 'yes' : g('와이파이 가능') === 'X' ? 'no' : g('와이파이 가능') === '모름' ? 'unknown' : '';
     v.bundle = this.inv('bundle', g('안내한 상품 구성')); v.color = this.inv('color', g('기기 색상'));
     v.category = g('판매 물품'); v.naver = g('네이버 ID'); v.email = g('이메일');
     v.memo = g('특이사항');
@@ -347,7 +349,7 @@ class Component extends DCLogic {
       '서류 분류': ctx.typed ? `${L.mode}·${L.entity}·${v.owners === 'joint' ? '공동' : '단독'}` : '', '페이앤 접수 링크': ctx.linkNo !== '—' ? ctx.linkNo : '',
       '사업자등록증 발급': v.reg === 'done' ? '발급 완료' : v.reg === 'pending' ? '발급 예정' : '', '오픈 예정일': v.openDate || '',
       '현재 포스': L.pos || '', '약정 잔여 개월': L.term || '', '포스 연동': v.link === 'yes' ? '필요' : v.link === 'no' ? '불필요' : '',
-      '와이파이 가능': v.wifi === 'yes' ? 'O' : v.wifi === 'no' ? 'X' : '', '인터넷 회선(랜선) 보유': v.lan === 'yes' ? 'O' : v.lan ? 'X' : '', '랜선 직접 준비 안내': v.lan === 'no' ? 'O' : v.lan ? 'X' : '', '인터넷 변경/신규 필요': v.lan === 'nonet' ? '필요' : v.lan ? '불필요' : '', '인터넷 상담 요청 일정': v.netReq ? '페이앤 인터넷 상담 요청' : '',
+      '와이파이 가능': v.wifi === 'yes' ? 'O' : v.wifi === 'no' ? 'X' : v.wifi === 'unknown' ? '모름' : '', '인터넷 회선(랜선) 보유': v.lan === 'yes' ? 'O' : v.lan === 'unknown' ? '모름' : v.lan ? 'X' : '', '랜선 직접 준비 안내': (v.lan === 'no' || v.lan === 'unknown') ? 'O' : v.lan ? 'X' : '', '인터넷 변경/신규 필요': v.lan === 'nonet' ? '필요' : v.lan ? '불필요' : '', '인터넷 상담 요청 일정': v.netReq ? '페이앤 인터넷 상담 요청' : '',
       '안내한 상품 구성': L.bundle || '', '월 이용요금': v.bundle ? '0' : '', '기기 색상': L.color || '', '설치 방식': v.bundle ? (v.link === 'yes' ? '현장 설치' : '자가 설치') : '',
       '네이버 ID': v.naver || '', '이메일': ctx.emailFinal || '', '우동지 수신 동의': 'O', '특이사항': v.memo || '',
       '상담 결과': kind === 'go' ? '상담 진행' : kind === 'recall' ? '상담 연기' : '상담 거부', '상태': kind === 'go' ? '상담 중' : kind === 'recall' ? '재연락 예정' : '종료',
@@ -419,12 +421,12 @@ class Component extends DCLogic {
     const head = `[우동지] ${name}, 우동지 ${agent}입니다.\n`, tail = `\n\n궁금한 점은 이 번호로 카톡 주시면 바로 답드릴게요.\n감사합니다.`;
     const summary = [L.bundle, L.color && L.color + ' 색상', v.bundle && '월 0원', v.bundle && installLabel].filter(Boolean).join(', ') || '(구성 선택 후 표시)';
     let sms = head + `오늘 통화 감사합니다. 아래 서류를 이 번호로 카톡/문자로 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 사진으로 충분합니다.\n\n` + docs.map(d => `${d.no}. ${d.t}\n   (${d.s})`).join('\n');
-    if (v.bundle) sms += `\n\n오늘 정리된 내용\n- 구성: ${L.bundle} / 월 0원${L.color ? '\n- 색상: ' + L.color : ''}\n- 설치: ${installLabel}${v.lan === 'no' ? '\n- 카드단말기 자리까지 랜선 준비 부탁드려요 (연장선 다이소·온라인 몇 천 원)' : ''}`;
+    if (v.bundle) sms += `\n\n오늘 정리된 내용\n- 구성: ${L.bundle} / 월 0원${L.color ? '\n- 색상: ' + L.color : ''}\n- 설치: ${installLabel}${v.lan === 'no' ? '\n- 카드단말기 자리까지 랜선 준비 부탁드려요 (연장선 다이소·온라인 몇 천 원)' : v.lan === 'unknown' ? '\n- 카드단말기 놓을 자리까지 랜선이 나와 있는지 확인 부탁드려요 (없으면 연장선 준비)' : ''}${v.wifi === 'no' ? '\n- 커넥트는 와이파이가 필요해요. 공유기 와이파이를 켜 두시거나 인터넷 업체에 요청해 주세요' : v.wifi === 'unknown' ? '\n- 매장 와이파이가 되는지 확인 부탁드려요 (커넥트 연결용)' : ''}`;
     if (v.large === 'over') sms += `\n\n※ 연매출 3억 이상 매장은 규정상 중고(거의 새것) 단말기로 월 990원에 나갑니다. 새 제품은 월 6,600원이에요.`;
     sms += `\n\n서류 접수 후 페이앤에서 전자계약서가 카톡(알림톡)으로 가고, 서명하시면 완료됩니다.${isJoint ? ' 공동대표님도 함께 서명하셔야 해요.' : ''}` + tail;
     const smsRecall = when => head + `오늘 통화 감사합니다. ${when ? when + '에' : '말씀해주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증 나오시면 바로 진행할게요.' : ''}` + tail;
     const smsDrop = head + `오늘 시간 내주셔서 감사합니다. 나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.\n감사합니다.`;
-    const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'} / 와이파이: ${v.wifi === 'yes' ? '가능' : v.wifi === 'no' ? '불가' : '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
+    const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'} / 와이파이: ${L.wifi || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
     this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop, emailFinal };
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
     const ready = reqDone === reqTotal && !!this.state.lib && !this.state.saving;
@@ -441,7 +443,7 @@ class Component extends DCLogic {
       typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
       hideBizEtc: !bizEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
       hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, naverEmail,
-      br: { wifiNo: hideIf('wifi','no'), callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
+      br: { wifiNo: hideIf('wifi','no'), wifiUnknown: hideIf('wifi','unknown'), lanUnknown: hideIf('lan','unknown'), callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
       p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc','sign']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan','wifi']), p5: prog(['bundle','link','color','category','naver']), p8: prog(['status']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
       dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : reqDone === reqTotal ? (this.state.lib ? '필수 항목 모두 입력됨 — 작성 완료를 누르면 저장돼요' : '서버 연결 대기 중') : `필수 ${reqTotal - reqDone}개 남음 · 재연락·고객 포기는 지금도 저장 가능`,
