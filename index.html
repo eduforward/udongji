@@ -190,7 +190,7 @@ class Component extends DCLogic {
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); }
   async load() {
     const lib = this.state.lib; let draft = null;
-    try { draft = JSON.parse(localStorage.getItem('udongji-script-draft-v1') || 'null'); } catch (e) {}
+    try { draft = JSON.parse(localStorage.getItem('udj_v5_draft') || 'null'); } catch (e) {}
     if (!(lib && lib.isSignedIn())) { this.setState({ records: [], draft, signedIn: false, email: '' }); return; }
     try {
       const { items } = await lib.readAll();
@@ -219,7 +219,7 @@ class Component extends DCLogic {
     const todayRecs = records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr);
     const myToday = todayRecs.filter(mine).length;
     const docsWait = goRecs.filter(r => { const d = r.data || {}; return !String(d['수취 완료일'] || '').trim() && !String(d['설치일'] || '').trim(); }).length;
-    const hasDraft = !!draft && Object.keys(draft).some(k => k !== '상담일' && k !== '상담자' && k[0] !== '_' && String(draft[k] || '').trim());
+    const hasDraft = !!draft && Object.keys(draft).some(k => k[0] !== '_' && String(draft[k] || '').trim());
     const recent = records.slice(0, 6).map(r => {
       const d = r.data || {}, res = d['상담 결과'] || '상담 진행';
       const tag = r.registered ? '등록 완료' : res !== '상담 진행' ? res : (d['상태'] || '미등록');
@@ -234,7 +234,7 @@ class Component extends DCLogic {
       today: `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())}`,
       todayCount: todayRecs.length, myToday,
       totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0, dueCount, hasDue: dueCount > 0, inProgress, myProgress, myCall, docsWait, hasDocsWait: docsWait > 0,
-      hasDraft, draftName: hasDraft ? (draft['매장명'] || draft['고객명'] || '이름 미입력') : '',
+      hasDraft, draftName: hasDraft ? (draft.store || draft.name || '이름 미입력') : '',
       recent, noRecent: recent.length === 0, sourceLabel: '회사 서버',
       locked: !unlocked, unlocked, signedIn, gridCls: unlocked ? '' : 'locked', busy, hasMsg: !!msg || deniedMsg,
       statusCls, statusText, msg: deniedMsg ? '이 계정(' + email + ')은 아직 사용자로 등록되지 않았어요. 관리자에게 등록을 요청하세요.' : msg, msgCls: deniedMsg ? 'err' : msgCls,
