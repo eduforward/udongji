@@ -114,7 +114,7 @@
     <table style="margin-top:12px">
       <thead><tr>
         <th>상담자</th>
-        <th class="c">신규 고객</th><th class="c">수취자료</th><th class="c">페이앤 이관</th><th class="c">전자서명 완료</th><th class="c">커넥트 배송 완료</th>
+        <th class="c">신규 고객</th><th class="c">수취자료·기본정보</th><th class="c">페이앤 이관</th><th class="c">전자서명 완료</th><th class="c">커넥트 배송 완료</th>
         <th>최종 전환</th>
         <th>진행 상황</th>
       </tr></thead>
@@ -185,13 +185,13 @@ class Component extends DCLogic {
     const { lib, items, loading, err, period, from, to, rateBase, delayDays, drill } = this.state;
     const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
     const SC = lib ? lib.STAGE_COLS : { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
-    const STAGES = [{ key: 'new', label: '신규 고객' }, { key: 'docs', label: '수취자료', col: SC.docs }, { key: 'handoff', label: '페이앤 이관', col: SC.handoff }, { key: 'sign', label: '전자서명 완료', col: SC.sign }, { key: 'install', label: '커넥트 배송 완료', col: SC.install }];
+    const STAGES = [{ key: 'new', label: '신규 고객' }, { key: 'docs', label: '수취자료·기본정보', cols: [SC.docs, SC.info || '기본정보 완료일'] }, { key: 'handoff', label: '페이앤 이관', col: SC.handoff }, { key: 'sign', label: '전자서명 완료', col: SC.sign }, { key: 'install', label: '커넥트 배송 완료', col: SC.install }];
     const today = this.ymd(new Date());
     // 기간 필터 (상담일 기준). 상담일이 없으면 생성일로.
     const inRange = it => { const d = this.norm(V(it.data, '상담일')) || String(it._createdAt || '').slice(0, 10); if (!d) return period === 'all'; return (!from || d >= from) && (!to || d <= to); };
     const list = items.filter(inRange).filter(it => (it.data['상담 결과'] || '상담 진행') !== '상담 거부').filter(it => !this.state.channel || V(it.data, '유입 경로') === this.state.channel).filter(it => { const m = this.state.me || {}; return !m.admin || this.state.scope === 'all' || !m.name || V(it.data, '상담자') === m.name; });
     // 각 고객의 도달 단계 인덱스 + 도달일
-    const info = it => { const d = it.data; let idx = 0, at = this.norm(V(d, '상담일')) || String(it._createdAt || '').slice(0, 10); for (let i = 1; i < STAGES.length; i++) { const v = this.norm(d[STAGES[i].col]); if (v) { idx = i; at = v; } else break; } return { idx, at, stale: idx < STAGES.length - 1 && at && this.days(at, today) > delayDays }; };
+    const info = it => { const d = it.data; let idx = 0, at = this.norm(V(d, '상담일')) || String(it._createdAt || '').slice(0, 10); for (let i = 1; i < STAGES.length; i++) { const s = STAGES[i]; let v; if (s.cols) { const vs = s.cols.map(c => this.norm(d[c])); v = vs.every(Boolean) ? vs.sort().pop() : ''; } else v = this.norm(d[s.col]); if (v) { idx = i; at = v; } else break; } return { idx, at, stale: idx < STAGES.length - 1 && at && this.days(at, today) > delayDays }; };
     const enriched = list.map(it => Object.assign({ it }, info(it)));
     const agents = [...new Set(list.map(it => V(it.data, '상담자') || '(상담자 없음)'))].sort();
     const pct = (n, b) => b ? Math.round(n / b * 100) + '%' : '—';
