@@ -106,18 +106,19 @@ export function requiredDocs(d) {
     { id: 'poa', name: '위임장', hint: '대표자 외 신청 시만', cond: true },
   ];
   // 매장사진: 간판 유무에 따라 구성이 다름 (기본 = 간판 있음)
-  // 한 항목 = 사진 한 장 (single: true) — 페이앤 양식대로 장수만큼 따로 받는다
+  // 한 항목 = 사진 한 장 (single: true) — 페이앤 촬영 가이드 기준
   if (v('간판 유무') === '없음') list.push(
-    { id: 'photo_bldg', name: '매장사진 1/5 · 건물 외부', hint: '사업자등록증 주소지 건물 외부', single: true },
-    { id: 'photo_entry', name: '매장사진 2/5 · 입구', hint: '실내가 보이게 입구에서', single: true },
-    { id: 'photo_addr', name: '매장사진 3/5 · 도로명주소 표지판', hint: '표지판이 또렷하게', single: true },
-    { id: 'photo_in', name: '매장사진 4/5 · 내부 전체 (1)', hint: '내부 전체가 보이게', single: true },
-    { id: 'photo_in2', name: '매장사진 5/5 · 내부 전체 (2)', hint: '다른 각도에서', single: true }
+    { id: 'photo_bldg', name: '매장사진 1/5 · 매장 외관', hint: '간판이 없는 매장 외관 전체가 나오게', single: true },
+    { id: 'photo_entry', name: '매장사진 2/5 · 실내가 보이는 입구', hint: '출입문을 열어 내부가 보이도록', single: true },
+    { id: 'photo_addr', name: '매장사진 3/5 · 도로명주소', hint: '건물 도로명주소 표지판이 또렷하게 (확인 불가 시 임대차계약서 제출)', single: true },
+    { id: 'photo_in', name: '매장사진 4/5 · 매장 내부 전체', hint: '매장 내부 전체가 나오도록', single: true },
+    { id: 'photo_biz', name: '매장사진 5/5 · 업종 확인', hint: '판매상품 · 테이블 · 계산대 등', single: true },
+    { id: 'lease', name: '임대차계약서', hint: '도로명주소 확인이 불가한 경우에만', cond: true }
   ); else list.push(
-    { id: 'photo_out', name: '매장사진 1/4 · 간판 포함 외관 (1)', hint: '간판이 나오게 바깥에서', single: true },
-    { id: 'photo_out2', name: '매장사진 2/4 · 간판 포함 외관 (2)', hint: '다른 각도에서', single: true },
-    { id: 'photo_in', name: '매장사진 3/4 · 내부 전체 (1)', hint: '내부 전체가 보이게', single: true },
-    { id: 'photo_in2', name: '매장사진 4/4 · 내부 전체 (2)', hint: '다른 각도에서', single: true }
+    { id: 'photo_out', name: '매장사진 1/4 · 간판 포함 매장 외관', hint: '사업자등록증 상 상호명이 보이도록', single: true },
+    { id: 'photo_entry', name: '매장사진 2/4 · 실내가 보이는 입구', hint: '출입문을 열어 내부가 보이도록', single: true },
+    { id: 'photo_in', name: '매장사진 3/4 · 매장 내부 전체', hint: '매장 내부 전체가 나오도록', single: true },
+    { id: 'photo_biz', name: '매장사진 4/4 · 업종 확인', hint: '판매상품 · 테이블 · 계산대 등', single: true }
   );
   if (corp) list.push(
     { id: 'corp_reg', name: '법인등기부등본', hint: '3개월 이내' },
@@ -180,7 +181,7 @@ export function requiredDocsMust(d) { return requiredDocs(d).filter(x => !x.cond
 // 엑셀 원본이 '항목명 / 값' 2열이므로 탭 구분 2열. 해당 케이스에 없는 항목은 줄 자체를 뺀다.
 export function buildPaynTSV(d) { return paynActive(d).map(f => f.label + '\t' + String(paynValue(d, f) || '').replace(/[\t\r\n]+/g, ' ').trim()).join('\n'); }
 // 구 서류 id → 새 id (기존 고객의 체크·파일 유지)
-const DOC_ALIAS = { photo: 'photo_out', food: 'license', corp: 'corp_reg', joint: 'joint_poa', device: 'photo_out', naver: 'poa', engname: 'poa' };
+const DOC_ALIAS = { photo: 'photo_out', photo_out2: 'photo_entry', photo_in2: 'photo_biz', food: 'license', corp: 'corp_reg', joint: 'joint_poa', device: 'photo_out', naver: 'poa', engname: 'poa' };
 const docAlias = id => DOC_ALIAS[id] || id;
 export function parseDocCheck(s) { const o = {}; String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { o[docAlias(x)] = true; }); return o; }
 export function parseDocFiles(s) { try { const j = JSON.parse(s || '[]'); return Array.isArray(j) ? j.map(f => Object.assign({}, f, { doc: docAlias(f.doc) })) : []; } catch (e) { return []; } }

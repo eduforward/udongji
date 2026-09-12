@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v65 · 2026-09-13 00:01';
+  const VERSION = 'v66 · 2026-09-13 00:13';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 66, d: '2026-09-13', t: '00:13', c: ['매장사진 항목을 페이앤 촬영 가이드대로 교체 — 간판 있음 4컷: 간판 포함 외관 · 실내 보이는 입구 · 내부 전체 · 업종 확인 / 없음 5컷: 외관 · 입구 · 도로명주소 · 내부 전체 · 업종 확인 (+도로명 확인 불가 시 임대차계약서)', '상담 스크립트 고객 안내 문자의 사진 목록도 동일하게', '진행 메모 1초 자동 저장, 매장명 옆 지도 버튼'] },
     { v: 65, d: '2026-09-13', t: '00:01', c: ['수취자료 탭: 올린 사진을 항목 아래 썸네일로 바로 확인 (클릭하면 크게), 문제 있으면 ×로 지우고 다시 업로드', '페이앤 이관 탭 사진: 드래그 대신 선택 N장 일괄 다운로드 (브라우저 제약)'] },
     { v: 64, d: '2026-09-12', t: '23:48', c: ['페이앤 이관 탭 서류 사진: 여러 장 선택 → "끌어다 놓기" 바를 페이앤 파일 칸에 드롭하면 한 번에 첨부 (Chrome), 사진 한 장을 바로 드래그해도 됨', '받음 체크 해제 시 올린 파일도 확인 후 함께 삭제'] },
     { v: 63, d: '2026-09-12', t: '23:40', c: ['버그 수정: 서류 업로드·삭제 직후 창이 닫히거나 고객이 목록에서 사라지던 문제, 체크가 새로고침 전까지 안 보이던 문제 (창이 열려 있을 땐 자동 새로고침 안 함, 저장 중 옛 데이터로 덮어쓰지 않음)'] },
@@ -42,7 +43,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 65;
+  const PAGE_V = 66;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -123,7 +124,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=19';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=20';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; if (await m.isAdmin(m.userEmail())) { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } } }).catch(() => {});
     }
   }
