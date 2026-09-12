@@ -15,134 +15,211 @@
   <script src="./udongji-nav.js?v=45"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
+    :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
     html { color-scheme: light; }
     body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
     a { color: var(--blue); } a:hover { color: var(--blue-d); }
-    button, input { font-family: inherit; }
+    button, input, select { font-family: inherit; }
     :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-    .page { max-width: 900px; margin: 0 auto; padding: 20px 20px 60px; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 20px 20px 60px; }
     .bar { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--text); }
+    .brand .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--text); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
     .brand b { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; display: block; line-height: 1.2; }
     .brand small { font-size: 11.5px; color: var(--text-3); font-weight: 500; }
+    .seg { display: flex; background: var(--card-2); border-radius: 9px; padding: 3px; gap: 2px; }
+    .seg button { border: 0; background: transparent; font-size: 12.5px; font-weight: 600; color: var(--text-2); padding: 6px 10px; border-radius: 7px; white-space: nowrap; cursor: pointer; font-variant-numeric: tabular-nums; }
+    .seg button.on { background: var(--card); color: var(--text); box-shadow: 0 1px 2px rgba(20,27,45,.08); }
+    .f { font: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text-2); }
     .btn { font: inherit; font-size: 13px; font-weight: 700; padding: 8px 13px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; text-decoration: none; white-space: nowrap; }
     .btn:hover { background: var(--card-2); color: var(--text); }
-    .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; } .btn.primary:hover { background: var(--blue-d); }
-    .btn:disabled { opacity: .45; cursor: default; }
-    .status { font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: var(--green-2); color: var(--green); }
-    .status.off { background: var(--amber-2); color: var(--amber); }
-    .status.big { font-size: 15px; font-weight: 800; padding: 6px 12px; }
-    .card { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px 24px; }
-    .card h3 { font-size: 13px; font-weight: 700; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; }
-    .gs-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .gs-head .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
-    .hint { font-size: 13px; color: var(--text-2); margin-top: 6px; }
-    .frm { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-    .frm input { font: inherit; font-size: 13.5px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
-    .msg { font-size: 13px; margin-top: 10px; color: var(--text-2); min-height: 1.2em; } .msg.err { color: var(--red); font-weight: 600; } .msg.ok { color: var(--green); font-weight: 600; }
-    .hrs { margin-top: 12px; border-top: 1px solid var(--line); }
-    .hrow { display: grid; grid-template-columns: 56px 64px 1fr; align-items: center; gap: 14px; padding: 8px 0; border-bottom: 1px solid var(--line-2); font-size: 13.5px; }
-    .hrow b { font-weight: 700; } .hrow.off b { color: var(--text-3); }
-    .hrow .tm { display: flex; align-items: center; gap: 8px; color: var(--text-3); flex-wrap: wrap; }
-    .hrow input[type=time] { font: inherit; font-size: 13.5px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); font-variant-numeric: tabular-nums; }
-    .hrow input[type=time]:disabled { opacity: .4; }
-    .sw { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13.5px; font-weight: 600; user-select: none; }
-    .sw input { position: absolute; opacity: 0; width: 0; height: 0; }
-    .sw .tk { width: 40px; height: 22px; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; flex: none; }
-    .sw .tk::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: left .15s; }
-    .sw input:checked + .tk { background: var(--blue); } .sw input:checked + .tk::after { left: 21px; }
-    .sw.danger input:checked + .tk { background: var(--red); }
-    .sw input:focus-visible + .tk { outline: 2px solid var(--blue); outline-offset: 2px; }
-    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
-    .chip button { border: 0; background: none; color: var(--text-3); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; } .chip button:hover { color: var(--red); }
-    .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; word-break: break-all; color: var(--text-2); }
-    .gate { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 40px 20px; text-align: center; color: var(--text-2); }
-    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: all .2s; pointer-events: none; z-index: 30; }
-    .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .cnt { font-size: 12.5px; color: var(--text-3); font-variant-numeric: tabular-nums; margin-left: auto; white-space: nowrap; }
+    .cnt.err { color: var(--red); font-weight: 600; }
+    .cards { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-top: 14px; }
+    .card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px 18px; display: grid; gap: 8px; align-content: start; position: relative; overflow: hidden; }
+    .card .k { font-size: 12px; font-weight: 700; color: var(--text-2); display: flex; justify-content: space-between; align-items: center; }
+    .card .step { width: 22px; height: 22px; border-radius: 7px; background: var(--blue-2); color: var(--blue); display: grid; place-items: center; font-size: 11.5px; font-weight: 800; }
+    .card .n { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .card .n small { font-size: 13px; font-weight: 600; color: var(--text-3); margin-left: 6px; letter-spacing: 0; }
+    .card .track { height: 6px; background: var(--line-2); border-radius: 999px; overflow: hidden; }
+    .card .fill { height: 100%; background: var(--blue); border-radius: 999px; }
+    .card .sub { font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .card .sub.hot { color: var(--red); font-weight: 600; }
+    .tw { margin-top: 14px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: auto; }
+    .th { padding: 14px 18px 0; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .th b { font-size: 15px; font-weight: 800; }
+    .th span { font-size: 12.5px; color: var(--text-3); }
+    table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 900px; font-size: 13.5px; }
+    thead th { background: var(--card-2); text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); padding: 10px 12px; border-bottom: 1px solid var(--line); border-top: 1px solid var(--line); white-space: nowrap; }
+    thead th.c { text-align: center; }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line-2); vertical-align: middle; white-space: nowrap; }
+    tbody tr.tot td { background: var(--card-2); font-weight: 700; }
+    td.agent { font-weight: 700; }
+    td.agent small { display: block; font-weight: 500; color: var(--text-3); font-size: 11.5px; }
+    .cell { display: inline-flex; flex-direction: column; align-items: center; min-width: 74px; padding: 5px 8px; border-radius: 9px; border: 1px solid transparent; background: transparent; cursor: pointer; font: inherit; color: var(--text); line-height: 1.2; }
+    .cell:hover { background: var(--blue-2); border-color: var(--blue-3); }
+    .cell.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .cell .v { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .cell .r { font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; margin-top: 1px; }
+    .cell.on .r { color: rgba(255,255,255,.75); }
+    .cell .d { font-size: 11px; color: var(--red); font-weight: 700; margin-top: 1px; }
+    .cell.on .d { color: #FFD1D6; }
+    td.c { text-align: center; }
+    .arrow { color: var(--text-3); font-size: 12px; text-align: center; padding: 0 2px; }
+    .bar2 { display: flex; gap: 2px; height: 8px; width: 160px; }
+    .bar2 i { display: block; height: 100%; border-radius: 2px; background: var(--blue); opacity: .25; }
+    .bar2 i.f { opacity: 1; }
+    .pill { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--card-2); color: var(--text-2); white-space: nowrap; }
+    .pill.ok { background: var(--green-2); color: var(--green); } .pill.hot { background: var(--red-2); color: var(--red); } .pill.amber { background: var(--amber-2); color: var(--amber); } .pill.blue { background: var(--blue-2); color: var(--blue); }
+    .drill thead th { border-top: 0; }
+    .drill tbody tr { cursor: pointer; } .drill tbody tr:hover td { background: var(--blue-2); }
+    .drill td.dim { color: var(--text-3); } .drill td.num { font-variant-numeric: tabular-nums; }
+    .drill td.store { font-weight: 700; }
+    .empty { padding: 40px 20px; text-align: center; color: var(--text-3); }
+    .x { margin-left: auto; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-3); border: 0; background: none; cursor: pointer; }
+    .x:hover { color: var(--text); }
+    @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, minmax(0,1fr)); } }
   </style>
 </helmet>
-<udongji-nav current="hours" page-v="45"></udongji-nav>
+<udongji-nav current="kpi" page-v="45"></udongji-nav>
 <div class="page">
   <div class="bar">
-    <div class="brand"><span class="mark">時</span><div><b>홈페이지 상담시간</b><small>랜딩페이지 전화·채팅 버튼 운영 시간</small></div></div>
-    <span class="status big {{ liveCls }}" style="margin-left:auto">{{ liveText }}</span>
-    <button type="button" class="btn primary" onClick="{{ save }}" disabled="{{ saveDisabled }}">{{ saveLabel }}</button>
-  </div>
-  <sc-if value="{{ denied }}" hint-placeholder-val="{{ false }}"><div class="gate">상담시간 설정은 관리자 이상만 바꿀 수 있어요.</div></sc-if>
-  <sc-if value="{{ ok }}" hint-placeholder-val="{{ true }}">
-  <div class="card">
-    <div class="gs-head"><h3>지금 상태</h3><span class="hint" style="margin:0">{{ why }}</span></div>
-    <p class="hint">랜딩페이지의 <b>전화 연결 · 채팅 연결</b> 버튼이 이 설정을 1분마다 읽어 켜지고 꺼져요. 한국 시간 기준. 마지막 저장 {{ updated }}</p>
-    <div class="hrs" style="margin-top:14px;padding-top:14px">
-      <label class="sw danger"><input type="checkbox" checked="{{ force }}" onChange="{{ onForce }}"><span class="tk"></span>지금 즉시 상담 끄기 <span style="color:var(--text-3);font-weight:500">— 시간표·요일과 무관하게 바로 비활성. 다시 끄면 시간표대로 복귀</span></label>
+    <div class="brand"><div class="mark">우</div><div><b>KPI 대시보드</b><small>상담사별 단계 전환율</small></div></div>
+    <div class="seg">
+      <sc-for list="{{ periods }}" as="p" hint-placeholder-count="5"><button type="button" class="{{ p.cls }}" onClick="{{ p.go }}">{{ p.label }}</button></sc-for>
     </div>
+    <input class="f" type="date" value="{{ from }}" onChange="{{ onFrom }}">
+    <span style="color:var(--text-3)">–</span>
+    <input class="f" type="date" value="{{ to }}" onChange="{{ onTo }}">
+    <select class="f" value="{{ rateBase }}" onChange="{{ onRateBase }}"><option value="step">전환율: 직전 단계 대비</option><option value="first">전환율: 신규 고객 대비</option></select>
+    <select class="f" value="{{ delayDays }}" onChange="{{ onDelay }}"><option value="5">지연 기준 5일</option><option value="3">지연 기준 3일</option><option value="7">지연 기준 7일</option><option value="14">지연 기준 14일</option></select>
+    <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
+    <span class="cnt {{ cntCls }}">{{ cntText }}</span>
   </div>
-  <div class="card">
-    <div class="gs-head"><h3>요일별 운영 시간</h3></div>
-    <div class="hrs">
-      <sc-for list="{{ days }}" as="d" hint-placeholder-count="7"><div class="hrow {{ d.cls }}"><b>{{ d.label }}</b><label class="sw"><input type="checkbox" checked="{{ d.on }}" onChange="{{ d.toggle }}"><span class="tk"></span>{{ d.onText }}</label><div class="tm"><input type="time" step="600" value="{{ d.start }}" disabled="{{ d.dis }}" onChange="{{ d.setStart }}">~<input type="time" step="600" value="{{ d.end }}" disabled="{{ d.dis }}" onChange="{{ d.setEnd }}"><span>{{ d.len }}</span></div></div></sc-for>
+
+  <div class="cards">
+    <sc-for list="{{ total }}" as="s" hint-placeholder-count="5">
+      <div class="card">
+        <div class="k"><span>{{ s.label }}</span><span class="step">{{ s.no }}</span></div>
+        <div class="n">{{ s.n }}<small>{{ s.rate }}</small></div>
+        <div class="track"><div class="fill" style="width:{{ s.w }}"></div></div>
+        <div class="sub {{ s.subCls }}">{{ s.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div class="tw">
+    <div class="th"><b>상담사별</b><span>{{ rangeText }} · 상담일 기준 · 칸을 누르면 해당 고객 목록이 아래에 열립니다 · 빨간 글씨 = {{ delayDays }}일 넘게 다음 단계로 못 간 건</span></div>
+    <table style="margin-top:12px">
+      <thead><tr>
+        <th>상담자</th>
+        <th class="c">신규 고객</th><th class="c">수취자료</th><th class="c">페이앤 이관</th><th class="c">전자서명 완료</th><th class="c">커넥트 배송 완료</th>
+        <th>최종 전환</th>
+        <th>진행 상황</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+          <tr class="{{ r.cls }}">
+            <td class="agent">{{ r.agent }}<small>{{ r.sub }}</small></td>
+            <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+              <td class="c"><button type="button" class="cell {{ c.cls }}" onClick="{{ c.pick }}"><span class="v">{{ c.n }}</span><span class="r">{{ c.rate }}</span><sc-if value="{{ c.hasDelay }}" hint-placeholder-val="{{ false }}"><span class="d">{{ c.delay }}</span></sc-if></button></td>
+            </sc-for>
+            <td><span class="pill {{ r.finalCls }}">{{ r.final }}</span></td>
+            <td><div class="bar2"><sc-for list="{{ r.segs }}" as="g" hint-placeholder-count="4"><i class="{{ g }}" style="flex:1"></i></sc-for></div></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}"><div class="empty">{{ emptyMsg }}</div></sc-if>
+  </div>
+
+  <sc-if value="{{ hasDrill }}" hint-placeholder-val="{{ false }}">
+    <div class="tw">
+      <div class="th"><b>{{ drill.title }}</b><span>{{ drill.sub }}</span><button type="button" class="x" onClick="{{ closeDrill }}">닫기 ×</button></div>
+      <table class="drill" style="margin-top:12px">
+        <thead><tr><th>상담일</th><th>매장명</th><th>고객명</th><th>연락처</th><th>매장 구분</th><th>현재 단계</th><th>단계 도달일</th><th>경과</th><th>상담자</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ drill.rows }}" as="d" hint-placeholder-count="0">
+            <tr onClick="{{ d.open }}">
+              <td class="num dim">{{ d.date }}</td><td class="store">{{ d.store }}</td><td>{{ d.name }}</td><td class="num">{{ d.phone }}</td>
+              <td><span class="pill blue">{{ d.mode }}</span></td><td><span class="pill {{ d.stCls }}">{{ d.stage }}</span></td>
+              <td class="num dim">{{ d.at }}</td><td class="num {{ d.elCls }}">{{ d.elapsed }}</td><td class="dim">{{ d.agent }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <sc-if value="{{ drill.empty }}" hint-placeholder-val="{{ false }}"><div class="empty">해당 고객이 없어요.</div></sc-if>
     </div>
-  </div>
-  <div class="card">
-    <div class="gs-head"><h3>휴무일</h3><span class="hint" style="margin:0">해당 날짜는 종일 꺼져요</span></div>
-    <div class="frm"><input type="date" style="flex:0 1 200px" value="{{ newHoliday }}" onInput="{{ onNewHoliday }}"><button type="button" class="btn primary" onClick="{{ addHoliday }}" disabled="{{ addHolidayDisabled }}">추가</button></div>
-    <div class="chips"><sc-for list="{{ holidays }}" as="h" hint-placeholder-count="0"><span class="chip">{{ h.label }}<button type="button" title="삭제" onClick="{{ h.remove }}">×</button></span></sc-for><sc-if value="{{ noHolidays }}" hint-placeholder-val="{{ true }}"><span class="hint" style="margin:0">등록된 휴무일이 없어요.</span></sc-if></div>
-    <div class="msg {{ msgCls }}">{{ msg }}</div>
-  </div>
-  <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
-  <div class="card">
-    <div class="gs-head"><h3>공개 JSON 주소 (랜딩페이지용)</h3></div>
-    <p class="hint">서버가 한국 시간으로 <code>live</code>를 계산해 내려줘요. 저장 후 30초~1분 안에 반영.</p>
-    <div class="code">{{ scriptUrl }}</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><a class="btn" href="{{ scriptUrl }}" target="_blank" rel="noopener">응답 열어보기</a><a class="btn" href="{{ rawUrl }}" target="_blank" rel="noopener">Firestore 원본</a></div>
-  </div>
   </sc-if>
-  </sc-if>
-  <div class="{{ toastCls }}">{{ toastMsg }}</div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, ok: false, denied: false, isAdmin: false, hr: null, saved: '', updatedAt: '', newHoliday: '', busy: false, msg: '', msgCls: '', toast: '', toastOn: false, tick: 0, scriptUrl: 'https://script.google.com/macros/s/AKfycbzYuxZuF9Wrd4BBLPtK2UFiuVbCP94Ydr5nmhLzk5OMysh-PMnefofxSW5CaHchWmfn/exec' };
+  state = { lib: null, items: [], loading: true, err: '', period: 'month', from: '', to: '', rateBase: 'step', delayDays: 5, drill: null };
+  PERIODS = [['today','오늘'],['week','이번 주'],['month','이번 달'],['last','지난 달'],['all','전체']];
   async componentDidMount() {
+    this.setPeriod('month');
     try {
       const lib = await import('./udongji-fb.js?v=6'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
-      const email = lib.userEmail(); const ok = await lib.isAdmin(email);
-      if (!ok) { this.setState({ lib, denied: true }); return; }
-      const [H, isSuper, nl] = await Promise.all([lib.getConsultHours(), lib.isSuper(email), lib.getNewsletterConfig().catch(() => ({}))]);
-      this.setState({ lib, ok, isAdmin: isSuper, hr: H.cfg, saved: JSON.stringify(H.cfg), updatedAt: H.updatedAt, scriptUrl: (nl && nl.url) || this.state.scriptUrl });
-      this._tick = setInterval(() => this.setState({ tick: Date.now() }), 30000);
+      this.setState({ lib }, () => this.load());
     } catch (e) { location.replace('index.html#login'); }
+    this._on = () => this.load(); window.addEventListener('focus', this._on);
   }
-  componentWillUnmount() { clearInterval(this._tick); }
-  toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1800); }
+  componentWillUnmount() { window.removeEventListener('focus', this._on); }
+  async load() { const lib = this.state.lib; if (!lib) return; this.setState({ loading: true }); try { const { items } = await lib.readAll(); this.setState({ items, loading: false, err: '' }); } catch (e) { this.setState({ loading: false, err: e.message }); } }
+  ymd(d) { const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  setPeriod(p) {
+    const t = new Date(); let from = '', to = '';
+    if (p === 'today') from = to = this.ymd(t);
+    else if (p === 'week') { const d = new Date(t); d.setDate(t.getDate() - ((t.getDay() + 6) % 7)); from = this.ymd(d); to = this.ymd(t); }
+    else if (p === 'month') { from = this.ymd(new Date(t.getFullYear(), t.getMonth(), 1)); to = this.ymd(t); }
+    else if (p === 'last') { from = this.ymd(new Date(t.getFullYear(), t.getMonth() - 1, 1)); to = this.ymd(new Date(t.getFullYear(), t.getMonth(), 0)); }
+    this.setState({ period: p, from, to, drill: null });
+  }
+  // 날짜 문자열 정규화: 2026-09-10 / 2026.9.10 / 9/10 등 → YYYY-MM-DD
+  norm(s) { s = String(s || '').trim(); if (!s) return ''; let m = s.match(/(\d{4})[.\-\/]\s*(\d{1,2})[.\-\/]\s*(\d{1,2})/); if (m) return m[1] + '-' + m[2].padStart(2, '0') + '-' + m[3].padStart(2, '0'); m = s.match(/^(\d{1,2})[.\/](\d{1,2})/); if (m) return new Date().getFullYear() + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0'); return ''; }
+  days(a, b) { return Math.floor((new Date(b) - new Date(a)) / 86400000); }
   renderVals() {
-    const { lib, ok, denied, isAdmin, hr, saved, updatedAt, newHoliday, busy, msg, msgCls, toast, toastOn, scriptUrl } = this.state;
-    const H = hr || (lib ? lib.DEFAULT_HOURS() : { force: false, days: {}, holidays: [] });
-    const patch = fn => { const n = JSON.parse(JSON.stringify(H)); fn(n); this.setState({ hr: n }); };
-    const liveR = lib && hr ? lib.computeLive(H) : { live: false, why: '불러오는 중…' };
-    const dirty = !!hr && JSON.stringify(H) !== saved;
-    const DAYN = ['일', '월', '화', '수', '목', '금', '토'];
-    const mins = s => { const m = /^(\d{2}):(\d{2})$/.exec(s || ''); return m ? +m[1] * 60 + +m[2] : 0; };
-    const fmt = iso => { if (!iso) return ''; const d = new Date(iso); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); };
-    const days = [1, 2, 3, 4, 5, 6, 0].map(i => { const d = H.days[String(i)] || { on: false, start: '13:00', end: '21:00' }; const L = mins(d.end) - mins(d.start); return {
-      label: DAYN[i] + '요일', on: d.on, dis: !d.on, cls: d.on ? '' : 'off', onText: d.on ? '운영' : '휴무', start: d.start, end: d.end,
-      len: d.on ? (L > 0 ? Math.floor(L / 60) + '시간' + (L % 60 ? ' ' + (L % 60) + '분' : '') : '종료가 시작보다 빨라요') : '',
-      toggle: e => patch(n => { n.days[String(i)].on = e.target.checked; }), setStart: e => patch(n => { n.days[String(i)].start = e.target.value || d.start; }), setEnd: e => patch(n => { n.days[String(i)].end = e.target.value || d.end; }) }; });
-    const holidays = (H.holidays || []).slice().sort().map(h => ({ label: h + ' (' + DAYN[new Date(h + 'T00:00:00+09:00').getUTCDay()] + ')', remove: () => patch(n => { n.holidays = n.holidays.filter(x => x !== h); }) }));
-    const badTime = days.some(d => d.on && mins(d.end) <= mins(d.start));
+    const { lib, items, loading, err, period, from, to, rateBase, delayDays, drill } = this.state;
+    const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
+    const SC = lib ? lib.STAGE_COLS : { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
+    const STAGES = [{ key: 'new', label: '신규 고객' }, { key: 'docs', label: '수취자료', col: SC.docs }, { key: 'handoff', label: '페이앤 이관', col: SC.handoff }, { key: 'sign', label: '전자서명 완료', col: SC.sign }, { key: 'install', label: '커넥트 배송 완료', col: SC.install }];
+    const today = this.ymd(new Date());
+    // 기간 필터 (상담일 기준). 상담일이 없으면 생성일로.
+    const inRange = it => { const d = this.norm(V(it.data, '상담일')) || String(it._createdAt || '').slice(0, 10); if (!d) return period === 'all'; return (!from || d >= from) && (!to || d <= to); };
+    const list = items.filter(inRange).filter(it => (it.data['상담 결과'] || '상담 진행') !== '상담 거부');
+    // 각 고객의 도달 단계 인덱스 + 도달일
+    const info = it => { const d = it.data; let idx = 0, at = this.norm(V(d, '상담일')) || String(it._createdAt || '').slice(0, 10); for (let i = 1; i < STAGES.length; i++) { const v = this.norm(d[STAGES[i].col]); if (v) { idx = i; at = v; } else break; } return { idx, at, stale: idx < STAGES.length - 1 && at && this.days(at, today) > delayDays }; };
+    const enriched = list.map(it => Object.assign({ it }, info(it)));
+    const agents = [...new Set(list.map(it => V(it.data, '상담자') || '(상담자 없음)'))].sort();
+    const pct = (n, b) => b ? Math.round(n / b * 100) + '%' : '—';
+    const funnel = rows => STAGES.map((s, i) => { const reached = rows.filter(r => r.idx >= i); const stuck = rows.filter(r => r.idx === i && r.stale); const base = i === 0 ? 0 : rateBase === 'step' ? rows.filter(r => r.idx >= i - 1).length : rows.length; return { i, label: s.label, n: reached.length, base, rate: i === 0 ? '' : pct(reached.length, base), stuck: stuck.length, reached, stuckRows: stuck }; });
+    const tf = funnel(enriched);
+    const total = tf.map((s, i) => ({ no: i + 1, label: s.label, n: s.n, rate: s.rate, w: (tf[0].n ? Math.round(s.n / tf[0].n * 100) : 0) + '%', sub: i === 0 ? (enriched.length ? '기간 내 상담 ' + enriched.length + '건' : '기간 내 상담 없음') : s.stuck ? '지연 ' + s.stuck + '건 (' + delayDays + '일↑ 정지)' : '지연 없음', subCls: s.stuck ? 'hot' : '' }));
+    const mkRow = (agent, rows, isTot) => { const f = funnel(rows); return {
+      agent, sub: isTot ? agents.length + '명' : rows.length + '건', cls: isTot ? 'tot' : '',
+      cells: f.map(s => ({ n: s.n, rate: s.rate, hasDelay: s.stuck > 0, delay: '지연 ' + s.stuck, cls: drill && drill.agent === agent && drill.i === s.i ? 'on' : '', pick: () => this.setState({ drill: drill && drill.agent === agent && drill.i === s.i ? null : { agent, i: s.i } }) })),
+      final: pct(f[4].n, f[0].n), finalCls: !f[0].n ? '' : f[4].n / f[0].n >= .5 ? 'ok' : f[4].n / f[0].n >= .25 ? 'amber' : 'hot',
+      segs: f.slice(1).map(s => f[0].n && s.n / f[0].n >= .5 ? 'f' : '')
+    }; };
+    const rows = agents.map(a => mkRow(a, enriched.filter(r => (V(r.it.data, '상담자') || '(상담자 없음)') === a))).concat(agents.length > 1 ? [mkRow('전체', enriched, true)] : []);
+    let dr = null;
+    if (drill) { const src = drill.agent === '전체' ? enriched : enriched.filter(r => (V(r.it.data, '상담자') || '(상담자 없음)') === drill.agent); const reached = src.filter(r => r.idx >= drill.i);
+      dr = { title: drill.agent + ' · ' + STAGES[drill.i].label + ' 도달 ' + reached.length + '명', sub: '현재 단계·도달일·경과일 순으로 확인', empty: !reached.length,
+        rows: reached.sort((a, b) => a.idx - b.idx || (a.at < b.at ? -1 : 1)).map(r => { const d = r.it.data, el = r.at ? this.days(r.at, today) : null, done = r.idx === 4; return {
+          date: (this.norm(V(d, '상담일')) || '').slice(5), store: V(d, '매장명') || '(매장명 없음)', name: V(d, '고객명'), phone: V(d, '연락처'), mode: V(d, '매장 구분') || '—', agent: V(d, '상담자'),
+          stage: STAGES[r.idx].label, stCls: done ? 'ok' : r.stale ? 'hot' : 'blue', at: r.at.slice(5), elapsed: done ? '완료' : el == null ? '—' : el + '일', elCls: r.stale ? 'hot' : '',
+          open: () => { location.href = 'contract.html#' + r.it.row; }
+        }; }) }; }
     return {
-      ok, denied, isAdmin, liveText: liveR.live ? '상담 가능' : '상담 불가', liveCls: liveR.live ? '' : 'off', why: liveR.why + (dirty ? ' · 저장 전 미리보기' : ''),
-      updated: updatedAt ? fmt(updatedAt) : '없음 (기본값 사용 중)', force: !!H.force, onForce: e => patch(n => { n.force = e.target.checked; }),
-      days, holidays, noHolidays: holidays.length === 0, newHoliday, onNewHoliday: e => this.setState({ newHoliday: e.target.value }), addHolidayDisabled: !/^\d{4}-\d{2}-\d{2}$/.test(newHoliday),
-      addHoliday: () => { if (!/^\d{4}-\d{2}-\d{2}$/.test(newHoliday)) return; patch(n => { if (!n.holidays.includes(newHoliday)) n.holidays.push(newHoliday); }); this.setState({ newHoliday: '' }); },
-      saveDisabled: busy || !dirty || badTime, saveLabel: badTime ? '시간을 확인하세요' : dirty ? '저장' : '저장됨',
-      save: async () => { if (!lib || !dirty) return; this.setState({ busy: true, msg: '' }); try { const c = await lib.setConsultHours(H); this.setState({ hr: c, saved: JSON.stringify(c), updatedAt: c.updatedAt }); this.toast('저장했어요 — 랜딩페이지는 1분 안에 반영'); } catch (e) { this.setState({ msg: '저장 실패: ' + e.message, msgCls: 'err' }); } this.setState({ busy: false }); },
-      msg, msgCls, scriptUrl, rawUrl: lib ? lib.hoursPublicUrl() : '', toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
+      periods: this.PERIODS.map(([k, label]) => ({ label, cls: period === k ? 'on' : '', go: () => this.setPeriod(k) })),
+      from, to, onFrom: e => this.setState({ from: e.target.value, period: 'custom', drill: null }), onTo: e => this.setState({ to: e.target.value, period: 'custom', drill: null }),
+      rateBase, onRateBase: e => this.setState({ rateBase: e.target.value }), delayDays: String(delayDays), onDelay: e => this.setState({ delayDays: Number(e.target.value) }),
+      reload: () => this.load(), cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : enriched.length + ' / ' + items.length + '건',
+      rangeText: period === 'all' ? '전체 기간' : (from || '…') + ' ~ ' + (to || '…'),
+      total, heads: STAGES.map(s => s.label), rows, noRows: !loading && !rows.length, emptyMsg: err ? '데이터를 읽지 못했어요.' : '기간 안에 상담 기록이 없어요.',
+      hasDrill: !!dr, drill: dr || { rows: [] }, closeDrill: () => this.setState({ drill: null })
     };
   }
 }

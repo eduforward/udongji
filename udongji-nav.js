@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v44 · 2026-09-10';
+  const VERSION = 'v45 · 2026-09-12';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가
   const HISTORY = [
+    { v: 45, d: '2026-09-12', c: ['KPI 대시보드 신설: 상담사별 신규 고객 → 수취자료 → 페이앤 이관 → 전자서명 → 커넥트 배송 전환율', '기간·전환율 기준·지연 기준 선택, 칸을 누르면 해당 고객 목록 표시'] },
     { v: 44, d: '2026-09-10', c: ['홈의 상담 업무 카드를 파란 그라데이션으로 강조 — 주 업무가 한눈에 보이도록'] },
     { v: 43, d: '2026-09-10', c: ['상단 메뉴에 "사용법" 추가 — 로그인부터 상담·재연락·계약·고객 목록·상담시간까지 업무별 안내와 자주 묻는 질문'] },
     { v: 42, d: '2026-09-10', c: ['상단 메뉴를 항목별 버튼으로 분리하고 아이콘 추가 — 현재 페이지는 파란 채움, 관리자 메뉴는 점선 테두리', '홈 업무 카드 아이콘을 메뉴와 통일, 카드에 녹아드는 큰 워터마크 스타일로'] },
@@ -21,18 +22,20 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 44;
+  const PAGE_V = 45;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
     { key: 'recall', label: '재연락', file: '우동지 재연락.dc.html', dep: 'recall.html' },
     { key: 'contract', label: '계약 업무', file: '우동지 계약 업무.dc.html', dep: 'contract.html' },
     { key: 'customers', label: '고객 목록', file: '우동지 고객 목록.dc.html', dep: 'customers.html' },
+    { key: 'kpi', label: 'KPI', file: '우동지 KPI 대시보드.dc.html', dep: 'kpi.html' },
     { key: 'hours', label: '상담시간', file: '우동지 상담시간.dc.html', dep: 'hours.html', admin: true },
     { key: 'guide', label: '사용법', file: '우동지 사용법.dc.html', dep: 'guide.html', help: true }
   ];
   const ADMIN_PAGE = { key: 'admin', label: '관리자', file: '우동지 관리자.dc.html', dep: 'admin.html' };
   const NAV_ICONS = {"home":"<path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V21h14V9.5\"/><path d=\"M10 21v-6h4v6\"/>","consult":"<path d=\"M4 13a8 8 0 0 1 16 0\"/><path d=\"M4 13v4a2 2 0 0 0 2 2h1v-6H4z\"/><path d=\"M20 13v4a2 2 0 0 1-2 2h-1v-6h3z\"/><path d=\"M17 19v1a2 2 0 0 1-2 2h-3\"/>","recall":"<path d=\"M21 12a9 9 0 1 1-3-6.7\"/><path d=\"M21 3v5h-5\"/><path d=\"M12 8v4l3 2\"/>","contract":"<path d=\"M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z\"/><path d=\"M14 3v6h6\"/><path d=\"M8 17c1-1.5 2-1.5 3 0s2 1.5 3 0\"/>","customers":"<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20a6.5 6.5 0 0 1 13 0\"/><path d=\"M16 4.5a3.5 3.5 0 0 1 0 7\"/><path d=\"M17.5 14a6.5 6.5 0 0 1 4 6\"/>","hours":"<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3.5 2\"/>","admin":"<path d=\"M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z\"/><path d=\"m9 12 2 2 4-4\"/>"};
+  NAV_ICONS.kpi = '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-8"/><path d="M22 20H2"/>';
   NAV_ICONS.guide = '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><path d="M12 17h.01"/>';
   const icon = k => NAV_ICONS[k] ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${NAV_ICONS[k]}</svg>` : '';
   const ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3D5AF1"/><path d="M20 14v24a12 12 0 0 0 24 0V14" fill="none" stroke="#fff" stroke-width="10"/><circle cx="46" cy="16" r="11" fill="#3D5AF1"/><circle cx="46" cy="16" r="7" fill="#FF4D5E"/></svg>');
