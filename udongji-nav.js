@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v66 · 2026-09-13 00:13';
+  const VERSION = 'v67 · 2026-09-13 00:29';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 67, d: '2026-09-13', t: '00:29', c: ['새 역할 "마감 담당": 수취자료가 완료된 고객만 조회 (서버 규칙), 홈·메뉴에 마감 업무 카드만 표시', '마감 업무 = 계약 업무 화면에서 페이앤 접수 → 전자서명 → 커넥트 배송 완료까지 처리. 관리자 > 계정 관리에서 역할을 "마감 담당"으로 지정'] },
     { v: 66, d: '2026-09-13', t: '00:13', c: ['매장사진 항목을 페이앤 촬영 가이드대로 교체 — 간판 있음 4컷: 간판 포함 외관 · 실내 보이는 입구 · 내부 전체 · 업종 확인 / 없음 5컷: 외관 · 입구 · 도로명주소 · 내부 전체 · 업종 확인 (+도로명 확인 불가 시 임대차계약서)', '상담 스크립트 고객 안내 문자의 사진 목록도 동일하게', '진행 메모 1초 자동 저장, 매장명 옆 지도 버튼'] },
     { v: 65, d: '2026-09-13', t: '00:01', c: ['수취자료 탭: 올린 사진을 항목 아래 썸네일로 바로 확인 (클릭하면 크게), 문제 있으면 ×로 지우고 다시 업로드', '페이앤 이관 탭 사진: 드래그 대신 선택 N장 일괄 다운로드 (브라우저 제약)'] },
     { v: 64, d: '2026-09-12', t: '23:48', c: ['페이앤 이관 탭 서류 사진: 여러 장 선택 → "끌어다 놓기" 바를 페이앤 파일 칸에 드롭하면 한 번에 첨부 (Chrome), 사진 한 장을 바로 드래그해도 됨', '받음 체크 해제 시 올린 파일도 확인 후 함께 삭제'] },
@@ -43,7 +44,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 66;
+  const PAGE_V = 67;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -124,8 +125,8 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=20';
-      import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; if (await m.isAdmin(m.userEmail())) { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } } }).catch(() => {});
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=21';
+      import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
   if (!customElements.get('udongji-nav')) customElements.define('udongji-nav', UNav);

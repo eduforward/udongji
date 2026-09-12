@@ -10,6 +10,7 @@ service cloud.firestore {
     function isSuper() { return role() == 'super'; }
     function isAdmin() { return role() in ['admin', 'super']; }
     function isUser() { return role() != ''; }
+    function isClose() { return role() == 'close'; }
 
     function myName() { return hasUser() ? udata().get('name', '') : ''; }
     // 상담자 칸은 본인 등록 이름과 같거나(이름 미등록이면 보낸 값 불가), 관리자 이상만 자유 수정
@@ -22,7 +23,8 @@ service cloud.firestore {
     function privileged(r) { return r in ['admin', 'super']; }
 
     // 조회: 관리자 이상은 전체, 구성원은 본인 이름이 상담자인 기록만 (목록 쿼리도 where('상담자','==',내 이름) 필요)
-    match /customers/{id} { allow read: if isAdmin() || (isUser() && myName() != '' && resource.data.get('상담자', '') == myName()); allow delete: if isAdmin(); allow create, update: if isUser() && agentOk(); }
+    // 마감 담당(close)은 수취 완료일이 찍힌 고객만 (목록 쿼리도 where('수취 완료일','>','') 필요)
+    match /customers/{id} { allow read: if isAdmin() || (isClose() && resource.data['수취 완료일'] > '') || (isUser() && !isClose() && myName() != '' && resource.data.get('상담자', '') == myName()); allow delete: if isAdmin(); allow create, update: if isUser() && agentOk(); }
     // 삭제 로그: 사용자 기록만 가능, 열람·복구는 관리자 이상, 삭제는 아무도 불가
     match /deleted/{logId} {
       allow create: if isUser() && request.resource.data.deletedBy == email();
@@ -54,4 +56,4 @@ service cloud.firestore {
     match /public/{k} { allow read: if true; allow write: if isAdmin(); }
   }
 }
-// v12 — 2026-09-12: 고객 이관(transfers) 추가. 구성원은 본인 상담 고객만 조회.
+// v13 — 2026-09-13: 마감 담당(close) 역할 — 수취 완료 고객만 조회·처리. 이관(transfers). 구성원은 본인 상담 고객만.

@@ -270,12 +270,13 @@ const COL = 'customers';
 function need() { if (!_user) throw new Error('로그인이 필요해요. 홈에서 구글 계정으로 로그인하세요.'); }
 // 내 정보(역할·이름) 캐시 — 구성원(consult/sales)은 본인 상담 고객만 조회 가능
 let _me = null;
-export async function me(force) { if (_me && !force) return _me; await init(); const email = userEmail(); const role = await roleOf(email); const name = await myName(); _me = { email, role, name, admin: isAdminRole(role) }; return _me; }
+export async function me(force) { if (_me && !force) return _me; await init(); const email = userEmail(); const role = await roleOf(email); const name = await myName(); _me = { email, role, name, admin: isAdminRole(role), close: isCloseRole(role) }; return _me; }
 export async function readAll(opts) {
   await init(); need(); const { fs } = _mods; opts = opts || {};
   const m = await me();
   let q;
   if (m.admin || opts.all) q = fs.collection(_db, COL);
+  else if (m.close) q = fs.query(fs.collection(_db, COL), fs.where(STAGE_COLS.docs, '>', '')); // 마감 담당: 수취자료 완료 고객만
   else if (m.name) q = fs.query(fs.collection(_db, COL), fs.where('상담자', '==', m.name));
   else return { header: FULL_HEADER(), items: [] };
   const snap = await fs.getDocs(q);
@@ -324,7 +325,8 @@ export async function restoreDeleted(logId) {
   await fs.setDoc(fs.doc(_db, 'deleted', logId), { restoredAt: now, restoredBy: await whoAmI() }, { merge: true });
 }
 // ── 관리자 (Firestore: admins/{email}) — 구버전 호환용. 지금은 users/{email}.role 이 기준 ──
-export const ROLES = [{ key: 'consult', label: '구성원 · 상담' }, { key: 'sales', label: '구성원 · 영업' }, { key: 'admin', label: '관리자' }, { key: 'super', label: '슈퍼관리자' }];
+export const ROLES = [{ key: 'consult', label: '상담 담당' }, { key: 'sales', label: '구성원 · 영업' }, { key: 'close', label: '마감 담당' }, { key: 'admin', label: '관리자' }, { key: 'super', label: '슈퍼관리자' }];
+export function isCloseRole(r) { return r === 'close'; }
 export function roleLabel(r) { return (ROLES.find(x => x.key === r) || ROLES[0]).label; }
 export function isAdminRole(r) { return r === 'admin' || r === 'super'; }
 export async function listAdmins() { await init(); if (!_user) return []; const { fs } = _mods; try { const s = await fs.getDocs(fs.collection(_db, 'admins')); return s.docs.map(d => ({ email: d.id, at: d.data().at || '', by: d.data().by || '' })); } catch (e) { return []; } }
