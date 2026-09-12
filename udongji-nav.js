@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v61 · 2026-09-12 23:21';
+  const VERSION = 'v62 · 2026-09-12 23:27';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 62, d: '2026-09-12', t: '23:27', c: ['페이앤 이관 탭 상단에 "페이앤 접수창 열기" 버튼 — 고객 유형(신규/기존 · 개인/법인 · 단독/공동)에 맞는 8케이스 접수 링크로 바로 이동, 유형 미확정이면 경고'] },
     { v: 61, d: '2026-09-12', t: '23:21', c: ['매장사진을 한 장씩 별도 항목으로 (간판 있음 4칸 / 없음 5칸), 칸당 1장만 — 다시 올리면 교체', '사진을 ×로 지우면 그 항목의 받음 체크도 자동 해제'] },
     { v: 60, d: '2026-09-12', t: '23:12', c: ['매장사진을 간판 유무에 따라 항목 분리 — 있음: 간판 외관 2 + 내부 2 / 없음: 건물 외부 1 + 입구 1 + 도로명 표지판 1 + 내부 2, 항목별로 업로드', '상담 스크립트 1단계에 "매장 간판 있음/없음" 질문 추가, 계약 업무 수취자료 탭에서도 전환 가능'] },
     { v: 59, d: '2026-09-12', t: '23:03', c: ['페이앤 이관 탭 아래에 업로드한 서류 사진 모아보기 — "복사" 후 페이앤 파일 칸에 붙여넣기(⌘V), 안 되면 다운로드'] },
@@ -38,7 +39,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 61;
+  const PAGE_V = 62;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -119,7 +120,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=17';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=18';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; if (await m.isAdmin(m.userEmail())) { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } } }).catch(() => {});
     }
   }

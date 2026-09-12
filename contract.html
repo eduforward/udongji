@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=61"></script>
+  <script src="./udongji-nav.js?v=62"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -143,7 +143,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="61"></udongji-nav>
+<udongji-nav current="contract" page-v="62"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>계약 업무</b><small>수취자료 → 페이앤 접수 → 서명 → 배송</small></div></div>
@@ -217,6 +217,8 @@
       <sc-if value="{{ tabHandoff }}" hint-placeholder-val="{{ false }}">
       <div class="savebar">
         <span class="pill purple">{{ sel.caseLabel }}</span><span class="pill">입력 {{ sel.pfFilled }} / {{ sel.pfTotal }}</span>
+        <sc-if value="{{ sel.hasLink }}" hint-placeholder-val="{{ false }}"><a class="btn" style="background:var(--purple-2);color:var(--purple);border-color:transparent" href="{{ sel.linkUrl }}" target="_blank" rel="noopener" title="{{ sel.linkTitle }}">페이앤 접수창 열기 ↗ {{ sel.linkNo }}</a></sc-if>
+        <sc-if value="{{ sel.noLink }}" hint-placeholder-val="{{ false }}"><span class="pill hot" title="신규/기존 · 개인/법인 · 단독/공동이 다 있어야 링크가 정해져요">접수 링크 미확정 — 고객 유형 확인</span></sc-if>
         <span class="{{ sel.pfMissCls }}" style="font-size:12px">{{ sel.pfMissTxt }}</span>
         <button type="button" class="btn primary" onClick="{{ savePayn }}" disabled="{{ sel.pfSaveOff }}" style="margin-left:auto">{{ sel.pfSaveLabel }}</button>
         <button type="button" class="btn ok" onClick="{{ completeHandoff }}" disabled="{{ sel.handoffDone }}">{{ sel.handoffBtn }}</button>
@@ -295,7 +297,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {}, seq: 0, copied: {}, tab: 'docs', scope: 'mine', me: null };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=17'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=18'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me();
       this.setState({ lib, me }, () => this.load(true));
@@ -410,6 +412,7 @@ class Component extends DCLogic {
         pfFilled, pfTotal: active.length, pfMissCls: pfMiss.length ? 'miss' : 'ok', pfMissTxt: pfMiss.length ? '미입력·오류 ' + pfMiss.length + '칸 (' + pfMiss.slice(0, 3).map(f => f.label).join(', ') + (pfMiss.length > 3 ? ' …' : '') + ')' : '전부 입력됨',
         pfDirty: dirtyKeys.length > 0, pfDirtyN: dirtyKeys.length, pfSaveOff: !dirtyKeys.length || busy, pfSaveLabel: busy ? '저장 중…' : dirtyKeys.length ? '저장 (' + dirtyKeys.length + '칸)' : '저장됨',
         docGot: mustN - miss, docTotal: mustN, photoN,
+        hasLink: !!lib.paynLink(d), noLink: !lib.paynLink(d), linkUrl: (lib.paynLink(d) || {}).url || '#', linkNo: (lib.paynLink(d) || {}).no || '', linkTitle: '페이앤 채널톡 접수 — ' + ((lib.paynLink(d) || {}).label || ''),
         signYesCls: V(d, '간판 유무') !== '없음' ? 'on' : '', signNoCls: V(d, '간판 유무') === '없음' ? 'on' : '',
         seqLabel: curF ? '다음 복사: ' + curF.label : '순서대로 복사 완료', seqInfo: curF ? (seq + 1) + ' / ' + active.length + (valOf(curF).trim() ? ' → “' + valOf(curF).trim().slice(0, 30) + '”' : ' · 값 없음 (건너뜀)') : active.length + '칸 전부 복사함', seqCopy: () => { if (!curF) return; if (!valOf(curF).trim()) { this.setState({ seq: seq + 1 }); return; } copyField(curF, seq); }, seqReset: () => this.setState({ seq: 0, copied: {} }),
         docPill: miss ? '아직 ' + miss + '개 못 받음' : '전부 받음', docPillCls: miss ? 'hot' : 'ok', docsDone: stageDone(d, 'docs') || busy, docsBtn: stageDone(d, 'docs') ? '✓ 수취 완료됨' : miss ? '수취 완료 처리 (' + miss + '개 남음)' : '수취 완료 처리',
