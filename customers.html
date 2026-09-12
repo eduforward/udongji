@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=56"></script>
+  <script src="./udongji-nav.js?v=57"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -101,16 +101,17 @@
     .vcap a { color: #fff; } .vcap button { border: 0; background: transparent; color: #FF8A94; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
   </style>
 </helmet>
-<udongji-nav current="customers" page-v="56"></udongji-nav>
+<udongji-nav current="customers" page-v="57"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>고객 목록</b><small>전체 상담 기록</small></div></div>
     <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 · 사업자번호 · 업종 검색" value="{{ query }}" onInput="{{ onQuery }}">
     <div class="seg">
       <button type="button" class="{{ fAllCls }}" onClick="{{ setAll }}">전체 {{ nAll }}</button>
-      <button type="button" class="{{ fPendCls }}" onClick="{{ setPend }}">미등록 {{ nPend }}</button>
-      <button type="button" class="{{ fDoneCls }}" onClick="{{ setDone }}">등록 완료 {{ nDone }}</button>
       <button type="button" class="{{ fCallCls }}" onClick="{{ setCall }}">재연락 {{ nCall }}</button>
+      <button type="button" class="{{ fPendCls }}" onClick="{{ setPend }}">진행 중 {{ nPend }}</button>
+      <button type="button" class="{{ fDoneCls }}" onClick="{{ setDone }}">완료 {{ nDone }}</button>
+      <button type="button" class="{{ fDropCls }}" onClick="{{ setDrop }}">포기 {{ nDrop }}</button>
     </div>
     <select class="f" value="{{ mode }}" onChange="{{ onMode }}"><option value="">구분 전체</option><option value="신규 오픈">신규 오픈</option><option value="기존 운영">기존 운영</option></select>
     <sc-if value="{{ isAdminUser }}" hint-placeholder-val="{{ false }}"><select class="f" value="{{ agent }}" onChange="{{ onAgent }}"><option value="">상담자 전체</option><sc-for list="{{ agents }}" as="a" hint-placeholder-count="0"><option value="{{ a }}">{{ a }}</option></sc-for></select></sc-if>
@@ -134,7 +135,6 @@
             <td>{{ r.biz }}</td>
             <td><span class="pill blue">{{ r.mode }}</span></td>
             <td>{{ r.plan }}</td>
-            <td>{{ r.status }}</td>
             <td><span class="pill {{ r.regCls }}">{{ r.regTag }}</span></td>
             <td class="dim">{{ r.agent }}</td>
             <td class="dim">{{ r.next }}</td>
@@ -148,7 +148,7 @@
   <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><div class="scrim" onClick="{{ close }}"></div></sc-if>
   <aside class="drawer {{ drawerCls }}">
     <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
-    <div class="dtags"><span class="pill blue">{{ sel.mode }}</span><span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span><span class="pill">상태 · {{ sel.status }}</span><span class="pill">{{ sel.agent }}</span></div>
+    <div class="dtags"><span class="pill blue">{{ sel.mode }}</span><span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span><span class="pill">{{ sel.agent }}</span></div>
     <div class="dacts">
       <sc-if value="{{ notEditing }}" hint-placeholder-val="{{ true }}">
         <a class="btn primary" href="{{ sel.regHref }}">계약 업무에서 열기 →</a>
@@ -201,7 +201,7 @@
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'all', mode: '', agent: '', sortKey: '상담일', sortDir: -1, selRow: null, toast: '', toastOn: false, editing: false, draft: null, saving: false };
-  COLS = [['상담일','date'],['매장명','store'],['고객명','name'],['연락처','phone'],['업종','biz'],['매장 구분','mode'],['안내한 상품 구성','plan'],['상태','status'],['페이앤 등록','reg'],['상담자','agent'],['다음 액션 · 일시','next']];
+  COLS = [['상담일','date'],['매장명','store'],['고객명','name'],['연락처','phone'],['업종','biz'],['매장 구분','mode'],['안내한 상품 구성','plan'],['진행 상태','reg'],['상담자','agent'],['다음 액션 · 일시','next']];
   GROUPS = [
     ['고객 기본정보', ['유입 경로','고객명','연락처','이메일','영문 성함','매장명','매장 주소','업종','판매 물품','매장 구분','네이버 ID']],
     ['사업자·심사', ['사업자번호','대형/개인/법인','단독/공동','개인정보 제3자 제공 동의','우동지 수신 동의']],
@@ -213,7 +213,7 @@ class Component extends DCLogic {
   ];
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=13'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=14'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me(); this.setState({ lib, isAdmin: me.admin, agent: me.admin && me.name ? me.name : '' }, () => this.load());
     } catch (e) { location.replace('index.html#login'); }
@@ -240,21 +240,24 @@ class Component extends DCLogic {
     const isGo = d => (d['상담 결과'] || '상담 진행') === '상담 진행';
     const isReg = d => !!String(d[REG] || '').trim();
     const isCall = d => d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
+    const SO = d => lib ? lib.statusOf(d) : { key: 'docs', label: '—', cls: '' };
     const agents = [...new Set(items.map(it => V(it.data, '상담자')).filter(Boolean))].sort();
     const q = query.trim().toLowerCase();
     const base = items.filter(it => (!mode || it.data['매장 구분'] === mode) && (!agent || V(it.data, '상담자') === agent));
     let list = items.filter(it => {
       const d = it.data;
-      if (filter === 'pending' && (isReg(d) || !isGo(d))) return false;
-      if (filter === 'done' && !isReg(d)) return false;
-      if (filter === 'call' && !isCall(d)) return false;
+      if (filter === 'pending' && !['docs','handoff','sign','install'].includes(SO(d).key)) return false;
+      if (filter === 'done' && SO(d).key !== 'done') return false;
+      if (filter === 'call' && SO(d).key !== 'recall') return false;
+      if (filter === 'drop' && SO(d).key !== 'drop') return false;
       if (mode && d['매장 구분'] !== mode) return false;
       if (agent && V(d, '상담자') !== agent) return false;
       if (q && !['매장명','고객명','연락처','사업자번호','업종','매장 주소','특이사항'].some(k => V(d, k).toLowerCase().includes(q))) return false;
       return true;
     });
-    list.sort((a, b) => { const x = V(a.data, sortKey), y = V(b.data, sortKey); if (x === y) return (b.row - a.row); return (x < y ? -1 : 1) * sortDir; });
-    const regInfo = d => isReg(d) ? { tag: '등록 완료 ' + String(d[REG]).slice(5, 10), cls: 'ok' } : !isGo(d) ? { tag: d['상담 결과'] || '—', cls: '' } : isCall(d) ? { tag: '재연락', cls: 'amber' } : { tag: '미등록', cls: 'hot' };
+    const SV = (d, k) => k === '진행 상태' ? SO(d).label : V(d, k);
+    list.sort((a, b) => { const x = SV(a.data, sortKey), y = SV(b.data, sortKey); if (x === y) return (b.row - a.row); return (x < y ? -1 : 1) * sortDir; });
+    const regInfo = d => { const s = SO(d); return { tag: s.label, cls: s.cls }; };
     const rows = list.map(it => { const d = it.data, ri = regInfo(d); return {
       cls: it.row === selRow ? 'on' : '', open: () => this.setState({ selRow: it.row }),
       date: V(d, '상담일').slice(5), store: V(d, '매장명') || '(매장명 없음)', name: V(d, '고객명'), phone: V(d, '연락처'), biz: V(d, '업종'), mode: V(d, '매장 구분') || '—',
@@ -305,9 +308,9 @@ class Component extends DCLogic {
     const setF = f => () => this.setState({ filter: f });
     return {
       query, onQuery: e => this.setState({ query: e.target.value }), mode, onMode: e => this.setState({ mode: e.target.value }), agent, onAgent: e => this.setState({ agent: e.target.value }), agents, isAdminUser: !!this.state.isAdmin,
-      nAll: base.length, nPend: base.filter(it => !isReg(it.data) && isGo(it.data)).length, nDone: base.filter(it => isReg(it.data)).length, nCall: base.filter(it => isCall(it.data)).length,
-      fAllCls: filter === 'all' ? 'on' : '', fPendCls: filter === 'pending' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fCallCls: filter === 'call' ? 'on' : '',
-      setAll: setF('all'), setPend: setF('pending'), setDone: setF('done'), setCall: setF('call'),
+      nAll: base.length, nPend: base.filter(it => ['docs','handoff','sign','install'].includes(SO(it.data).key)).length, nDone: base.filter(it => SO(it.data).key === 'done').length, nCall: base.filter(it => SO(it.data).key === 'recall').length, nDrop: base.filter(it => SO(it.data).key === 'drop').length,
+      fAllCls: filter === 'all' ? 'on' : '', fPendCls: filter === 'pending' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fCallCls: filter === 'call' ? 'on' : '', fDropCls: filter === 'drop' ? 'on' : '',
+      setAll: setF('all'), setPend: setF('pending'), setDone: setF('done'), setCall: setF('call'), setDrop: setF('drop'),
       reload: () => this.load(), exportTsv: () => lib && this.copy(lib.buildExportTSV(items), '전체 ' + items.length + '건 (엑셀에 붙이기)'),
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + ' / ' + base.length + '건',
       cols, rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : items.length === 0 ? '아직 상담 기록이 없어요.' : '조건에 맞는 건이 없어요.',

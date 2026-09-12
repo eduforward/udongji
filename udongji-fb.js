@@ -81,6 +81,19 @@ export const STAGES = [
   { key: 'install', label: '커넥트 배송 완료' }
 ];
 export const NEWSLETTER_COL = '뉴스레터 등록일';
+// 진행 상태 (계약 단계·상담 결과에서 파생) — 포기 / 재연락 / 수취자료진행 / 페이앤진행 / 전자서명진행 / 커넥트진행 / 완료
+export const STATUS_FLOW = ['수취자료진행', '페이앤진행', '전자서명진행', '커넥트진행', '완료'];
+export function statusOf(d) {
+  d = d || {}; const has = k => !!String(d[k] || '').trim();
+  const r = String(d['상담 결과'] || '').trim(), st = String(d['상태'] || '').trim();
+  if (r === '상담 거부' || st === '종료') return { key: 'drop', label: '포기', cls: 'hot' };
+  if (r === '상담 연기' || r === '상담 불가' || st === '재연락 예정' || st === '보류') return { key: 'recall', label: '재연락', cls: 'amber' };
+  if (has(STAGE_COLS.install)) return { key: 'done', label: '완료', cls: 'ok' };
+  if (has(STAGE_COLS.sign)) return { key: 'install', label: '커넥트진행', cls: 'blue' };
+  if (has(STAGE_COLS.handoff) || has(REG_COL)) return { key: 'sign', label: '전자서명진행', cls: 'blue' };
+  if (has(STAGE_COLS.docs)) return { key: 'handoff', label: '페이앤진행', cls: 'blue' };
+  return { key: 'docs', label: '수취자료진행', cls: 'blue' };
+}
 // 고객 조건에 따라 필요 서류 목록
 export function requiredDocs(d) {
   const v = k => val(d, k), corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동';
