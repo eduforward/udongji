@@ -161,15 +161,6 @@
     </a>
   </div>
 
-  <sc-if value="{{ unlocked }}" hint-placeholder-val="{{ false }}">
-  <div class="card recent">
-    <h3>최근 상담 <span style="font-weight:500;text-transform:none;letter-spacing:0">· {{ sourceLabel }}</span></h3>
-    <sc-for list="{{ recent }}" as="r" hint-placeholder-count="0">
-      <a class="row" href="{{ r.href }}"><b>{{ r.store }}</b><span class="m">{{ r.meta }}</span><span class="pill {{ r.cls }}">{{ r.tag }}</span><span class="d">{{ r.date }}</span></a>
-    </sc-for>
-    <sc-if value="{{ noRecent }}" hint-placeholder-val="{{ false }}"><div class="empty">아직 완료된 상담이 없어요. 상담 업무에서 작성 완료하면 여기에 쌓여요.</div></sc-if>
-  </div>
-  </sc-if>
 
 </div>
 </x-dc>
