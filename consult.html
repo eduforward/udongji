@@ -12,786 +12,433 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=46"></script>
+  <script src="./udongji-nav.js?v=47"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #F2F4F8; --card: #FFFFFF; --card-2: #F6F8FC; --line: #E4E8F0; --line-2: #EEF1F6;
-      --text: #171C2B; --text-2: #58627A; --text-3: #8C95A8;
-      --blue: #3D5AF1; --blue-d: #2E48D6; --blue-2: #EEF1FE; --blue-3: #D6DDFC;
-      --green: #1E9E66; --green-2: #E5F6EE; --green-3: #BFE6D2;
-      --red: #D93A4A; --red-2: #FDECEE; --red-3: #F5BDC4;
-      --amber: #B7791F; --amber-2: #FFF5E0;
-      --form: var(--red); --form-2: var(--red-2); --form-3: var(--red-3);
-      --shadow: 0 1px 2px rgba(20,27,45,.04), 0 6px 20px rgba(20,27,45,.05);
-      --shadow-lg: 0 8px 30px rgba(20,27,45,.16);
-      --r: 14px; --r-s: 9px; --r-xs: 7px;
-      --sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-    }
+    :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
     html { color-scheme: light; scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
-    a { color: var(--blue); } a:hover { color: var(--blue-d); }
+    a { color: var(--blue); text-decoration: none; } a:hover { color: var(--blue-d); }
     button, input, select, textarea { font-family: inherit; }
-    :focus { outline: none; }
-    :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-
-    .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px 96px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; }
-    @media (max-width: 880px) { .page { grid-template-columns: 1fr; padding: 16px 12px 72px; } }
-
-    /* 사이드바 */
-    nav.toc { position: sticky; top: 68px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px 10px 12px; }
-    nav.toc .logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 14px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
-    nav.toc a.home { color: var(--text-3); font-size: 12.5px; }
-    nav.toc a.home .n { background: transparent; color: var(--text-3); }
-    nav.toc .gs { display: block; font-size: 11.5px; font-weight: 600; padding: 5px 10px; margin: 0 0 4px; border-radius: 7px; }
-    nav.toc .gs::before { content: "● "; font-size: 8px; vertical-align: 1px; }
-    nav.toc .gs.off { color: var(--text-3); background: var(--card-2); }
-    nav.toc .gs.warn { color: var(--amber); background: var(--amber-2); }
-    nav.toc .gs.on { color: var(--green); background: var(--green-2); }
-    nav.toc .logo .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; letter-spacing: 0; }
-    nav.toc .logo .name { font-weight: 800; font-size: 16px; color: var(--text); letter-spacing: -0.02em; line-height: 1.2; display: block; }
-    nav.toc .logo .sub { font-size: 11px; color: var(--text-3); display: block; font-weight: 500; }
-    nav.toc .k { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); padding: 8px 10px 4px; }
-    nav.toc a { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-2); font-size: 13.5px; font-weight: 500; padding: 7px 10px; border-radius: var(--r-s); transition: background .15s, color .15s; }
+    :focus { outline: none; } :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .page { max-width: 1240px; margin: 0 auto; padding: 24px 24px 96px; display: grid; grid-template-columns: 220px minmax(0,1fr) 300px; gap: 20px; align-items: start; }
+    @media (max-width: 1100px) { .page { grid-template-columns: 200px minmax(0,1fr); } aside.side { grid-column: 1 / -1; position: static; } }
+    @media (max-width: 800px) { .page { grid-template-columns: 1fr; padding: 14px 12px 72px; } nav.toc { position: static; } }
+    nav.toc { position: sticky; top: 68px; background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 14px 10px 12px; }
+    nav.toc .k { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); padding: 6px 10px 6px; }
+    nav.toc a { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-size: 13.5px; font-weight: 500; padding: 7px 10px; border-radius: var(--r-s); }
     nav.toc a:hover { background: var(--card-2); color: var(--text); }
-    nav.toc a.active { background: var(--blue-2); color: var(--blue); font-weight: 600; }
-    nav.toc a .n { width: 22px; height: 22px; border-radius: 7px; background: var(--card-2); color: var(--text-2); font-size: 11.5px; font-weight: 700; display: grid; place-items: center; flex: 0 0 auto; font-variant-numeric: tabular-nums; transition: background .15s, color .15s; }
-    nav.toc a.active .n { background: var(--blue); color: #fff; }
-    nav.toc a.q .n { background: var(--amber-2); color: var(--amber); }
-    nav.toc a .t { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    nav.toc a .prog { flex: 0 0 auto; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-    nav.toc a .prog:empty { display: none; }
-    nav.toc a .prog.todo { background: var(--form-2); color: var(--form); }
+    nav.toc a .n { width: 22px; height: 22px; border-radius: 7px; background: var(--card-2); color: var(--text-2); font-size: 11.5px; font-weight: 700; display: grid; place-items: center; flex: none; }
+    nav.toc a .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    nav.toc a .prog { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+    nav.toc a .prog.todo { background: var(--red-2); color: var(--red); }
     nav.toc a .prog.done { background: var(--green-2); color: var(--green); }
-    nav.toc a .prog.skip { background: var(--card-2); color: var(--text-3); font-weight: 600; }
-    nav.toc a.active .prog.todo { background: #fff; }
-    nav.toc a.active .prog.done { background: #fff; }
-    nav.toc .tot { margin: 10px 10px 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--text-3); font-weight: 600; font-variant-numeric: tabular-nums; }
+    nav.toc a .prog.skip { background: var(--card-2); color: var(--text-3); }
+    nav.toc .tot { margin: 10px 10px 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--text-3); font-weight: 600; }
     nav.toc .tot .bar { height: 4px; background: var(--line-2); border-radius: 2px; margin-top: 6px; overflow: hidden; }
-    nav.toc .tot .bar i { display: block; height: 100%; width: 0; background: var(--green); border-radius: 2px; transition: width .25s; }
-    nav.toc .tot.bad .bar i { background: var(--form); }
-    @media (max-width: 880px) { nav.toc .tot { flex-basis: 100%; } }
-    @media (max-width: 880px) { nav.toc { position: static; display: flex; flex-wrap: wrap; gap: 2px; padding: 12px; } nav.toc .logo { flex-basis: 100%; padding-bottom: 10px; } nav.toc .k { display: none; } nav.toc a { padding: 6px 8px; } }
-
-    .recall { background: var(--amber-2); border: 1px solid #F0D9A6; color: #7A4F0E; border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
-    .recall[hidden] { display: none; }
-    /* 헤더 */
-    header.doc { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 26px 28px; display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
-    header.doc h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
-    header.doc .kicker { font-size: 12px; color: var(--text-3); font-weight: 600; margin-bottom: 8px; letter-spacing: -0.005em; }
-    header.doc p { font-size: 14px; color: var(--text-2); margin-top: 10px; max-width: 62ch; text-wrap: pretty; }
-    header.doc p b { color: var(--text); font-weight: 600; }
-    .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .pills .rec.agent { margin: 0 6px 0 0; }
-    .pills .rec.agent input { min-width: 110px; }
-    .pill { font-size: 12px; font-weight: 600; padding: 6px 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); white-space: nowrap; }
-    .pill.blue { background: var(--blue); color: #fff; border-color: var(--blue); }
-
-    /* 섹션 */
-    section.step { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 22px 28px 26px; margin-top: 14px; scroll-margin-top: 20px; transition: opacity .2s; }
-    .step-h { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
-    .step-h .no { width: 34px; height: 34px; border-radius: 10px; background: var(--blue-2); color: var(--blue); font-weight: 800; font-size: 14px; display: grid; place-items: center; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
-    .step-h .t { font-size: 17.5px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.3; padding-top: 5px; }
-    .step-h .t small { display: block; font-size: 13px; font-weight: 400; color: var(--text-2); margin-top: 4px; line-height: 1.55; letter-spacing: -0.01em; }
-
-    h3.sub { font-size: 14.5px; font-weight: 700; margin: 24px 0 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; letter-spacing: -0.02em; }
-    h3.sub .circ { width: 22px; height: 22px; border-radius: 50%; background: var(--text); color: #fff; font-size: 11px; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
-    section.step { counter-reset: sub; }
-    h3.sub .circ::before { counter-increment: sub; content: counter(sub); }
-
-    /* 말하기 블록 */
-    .say { background: var(--card); border: 1px solid var(--blue-3); border-radius: 12px; padding: 14px 18px 14px 22px; margin: 12px 0; font-size: 17px; font-weight: 500; line-height: 1.7; color: var(--text); position: relative; letter-spacing: -0.012em; text-wrap: pretty; }
+    nav.toc .tot .bar i { display: block; height: 100%; background: var(--green); border-radius: 2px; transition: width .25s; }
+    .conn { margin: 0 10px 8px; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: var(--r-xs); background: var(--green-2); color: var(--green); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .conn.off { background: var(--amber-2); color: var(--amber); }
+    header.doc { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 22px 26px; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    header.doc h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+    header.doc .kicker { font-size: 12px; color: var(--text-3); font-weight: 600; margin-bottom: 6px; }
+    header.doc p { font-size: 13.5px; color: var(--text-2); margin-top: 8px; max-width: 60ch; text-wrap: pretty; }
+    .typebadge { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .typebadge .tb { font-size: 14px; font-weight: 800; padding: 8px 14px; border-radius: 10px; background: var(--purple-2); color: var(--purple); }
+    .typebadge .tb.empty { background: var(--card-2); color: var(--text-3); font-weight: 600; }
+    .typebadge small { font-size: 12px; color: var(--text-3); font-weight: 600; }
+    .typebadge small b { color: var(--blue); }
+    .prevbar { margin-top: 14px; background: var(--amber-2); border-radius: var(--r-s); padding: 10px 14px; font-size: 13.5px; color: #7A4F0E; font-weight: 600; }
+    .prevbar[hidden] { display: none; }
+    section.step { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px 26px 24px; margin-top: 14px; scroll-margin-top: 70px; }
+    section.step.off { display: none; }
+    .step-h { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+    .step-h .no { width: 34px; height: 34px; border-radius: 10px; background: var(--blue-2); color: var(--blue); font-weight: 800; font-size: 14px; display: grid; place-items: center; flex: none; }
+    .step-h .t { font-size: 17px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.3; padding-top: 5px; }
+    .step-h .t small { display: block; font-size: 13px; font-weight: 400; color: var(--text-2); margin-top: 3px; line-height: 1.55; }
+    .say { background: var(--card); border: 1px solid var(--blue-3); border-radius: 12px; padding: 12px 18px 12px 22px; margin: 12px 0; font-size: 16.5px; font-weight: 500; line-height: 1.7; position: relative; text-wrap: pretty; }
     .say::before { content: ""; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 3px 3px 0; background: var(--blue); }
-    .say .who { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); display: block; margin-bottom: 4px; }
-    .say.consent { background: var(--blue-2); border-color: var(--blue-3); font-weight: 600; }
-    .say.consent .who::after { content: " · 그대로 읽기"; color: var(--text-2); text-transform: none; letter-spacing: 0; font-weight: 600; }
-    .q { font-weight: 600; color: var(--text); background: var(--blue-2); border-radius: 5px; padding: 1px 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-    .say .note { font-size: 12.5px; }
-
-
-    /* 분기 */
+    .say .who { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); display: block; margin-bottom: 3px; }
+    .say[hidden] { display: none; }
+    .q { font-weight: 600; background: var(--blue-2); border-radius: 5px; padding: 1px 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
     .branch { list-style: none; margin: 8px 0 8px 12px; padding-left: 16px; border-left: 2px solid var(--line); }
-    .branch > li { position: relative; padding: 5px 0 5px 6px; font-size: 13.5px; line-height: 1.65; color: var(--text-2); }
+    .branch[hidden] { display: none; }
+    .branch > li { padding: 5px 0 5px 6px; font-size: 13.5px; line-height: 1.65; color: var(--text-2); }
+    .branch > li.hide { display: none; }
+    .branch > li.pick .if { background: var(--blue); color: #fff; border-color: var(--blue); }
     .branch .if { font-weight: 600; color: var(--text); background: var(--card-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 8px; font-size: 12.5px; white-space: nowrap; }
     .branch .arrow { color: var(--text-3); margin: 0 6px; }
-    .branch .say { margin: 8px 0 4px; font-size: 16px; }
-    .branch ul.branch { margin-top: 4px; }
-
+    .branch .say { margin: 8px 0 4px; font-size: 15.5px; }
     .note { font-size: 12.5px; color: var(--text-3); padding: 6px 0; line-height: 1.55; }
     .note b { color: var(--text-2); font-weight: 600; }
     .warn { font-size: 13.5px; color: #B12A39; background: var(--red-2); border-radius: var(--r-s); padding: 10px 14px; margin: 10px 0; font-weight: 500; line-height: 1.6; }
-    .dotline { display: flex; gap: 10px; align-items: center; font-size: 14px; margin: 8px 0; padding: 9px 12px; border-radius: var(--r-s); background: var(--card-2); flex-wrap: wrap; }
-    .dot { width: 18px; height: 18px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; }
-    .dot.g { background: var(--green-2); } .dot.g::after { content: "✓"; color: var(--green); font-size: 11px; font-weight: 800; }
-    .dot.y { background: var(--amber-2); } .dot.y::after { content: "?"; color: var(--amber); font-size: 11px; font-weight: 800; }
-
-    /* 표 */
-    .tscroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; margin-top: 10px; }
-    table.qa { width: 100%; border-collapse: collapse; font-size: 14px; }
-    table.qa th { text-align: left; padding: 10px 14px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); background: var(--card-2); border-bottom: 1px solid var(--line); }
-    table.qa td { padding: 11px 14px; font-size: 14.5px; border-bottom: 1px solid var(--line-2); vertical-align: top; line-height: 1.6; }
-    table.qa tr:last-child td { border-bottom: none; }
-    table.qa td:first-child { font-weight: 600; width: 30%; color: var(--text-2); font-size: 13.5px; }
-    table.qa td.say-cell { font-weight: 500; color: var(--text); }
-    table.qa td.mono { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--blue); }
-
-    footer.doc { margin-top: 20px; font-size: 12.5px; color: var(--text-3); text-align: center; }
-
-    /* 입력칸 */
-    .rec { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 3px 4px 3px 9px; border-radius: var(--r-s); background: var(--form-2); color: var(--form); margin: 3px 6px 3px 0; vertical-align: middle; white-space: nowrap; font-weight: 700; letter-spacing: -0.01em; transition: background .15s, border-color .15s; }
-    .rec.missing { outline: 2px solid var(--form); outline-offset: 2px; }
-    .rec input, .rec select { font: inherit; font-size: 13.5px; font-weight: 500; color: var(--text); background: var(--card); border: 1px solid var(--form-3); border-radius: var(--r-xs); padding: 4px 8px; min-width: 120px; height: 30px; letter-spacing: -0.01em; }
-    .rec select { padding-right: 6px; }
-    .rec input.wide { min-width: 240px; }
-    .rec input:focus-visible, .rec select:focus-visible { outline: 2px solid var(--form); outline-offset: 1px; border-color: var(--form); }
+    .warn.stop { font-weight: 700; }
+    .warn[hidden], .info[hidden], .rec[hidden] { display: none; }
+    .info { font-size: 13.5px; color: #24369E; background: var(--blue-2); border-radius: var(--r-s); padding: 10px 14px; margin: 10px 0; line-height: 1.6; }
+    .rec { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 3px 4px 3px 9px; border-radius: var(--r-s); background: var(--red-2); color: var(--red); margin: 3px 6px 3px 0; vertical-align: middle; white-space: nowrap; font-weight: 700; }
+    .rec input, .rec select { font: inherit; font-size: 13.5px; font-weight: 500; color: var(--text); background: var(--card); border: 1px solid var(--red-3); border-radius: var(--r-xs); padding: 4px 8px; min-width: 120px; height: 30px; }
+    .rec input.wide { min-width: 220px; }
     .rec input::placeholder { color: var(--text-3); font-weight: 400; }
-    .rec button.tog { font: inherit; font-size: 13px; font-weight: 700; height: 30px; padding: 0 12px; border-radius: var(--r-xs); border: 1px solid var(--form-3); background: var(--card); color: var(--form); cursor: pointer; transition: background .15s, color .15s; }
-    .rec button.tog:hover { background: var(--form-2); }
-    .rec button.tog.on { background: var(--green); color: #fff; border-color: var(--green); }
-    .rec button.tog.map { color: #03C75A; border-color: #B9EBCD; background: #fff; font-weight: 800; }
-    .rec button.tog.map:hover { background: #E9F9EF; }
-    .rec.filled button.tog.map { border-color: #B9EBCD; }
     .rec.filled { background: var(--green-2); color: var(--green); }
     .rec.filled input, .rec.filled select { border-color: var(--green-3); }
-    .rec.filled input:focus-visible, .rec.filled select:focus-visible { outline-color: var(--green); border-color: var(--green); }
-    .say .rec { margin-top: 8px; font-weight: 600; }
-    section.basic .fgrid { display: flex; flex-wrap: wrap; gap: 6px 10px; padding-top: 12px; }
-    section.basic .rec input { min-width: 170px; }
-
-    /* 필수 */
-    .rec.req { border: 1px solid var(--form); box-shadow: 0 0 0 3px rgba(217,58,74,.12); padding-left: 5px; }
-    .rec.req::before { content: "필수"; font-size: 10px; font-weight: 800; color: #fff; background: var(--form); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
+    .rec.opt { background: var(--card-2); color: var(--text-2); }
+    .rec.opt input, .rec.opt select { border-color: var(--line); }
+    .rec.opt.filled { background: var(--green-2); color: var(--green); }
+    .rec.req { border: 1px solid var(--red); box-shadow: 0 0 0 3px rgba(217,58,74,.12); padding-left: 5px; }
+    .rec.req::before { content: "필수"; font-size: 10px; font-weight: 800; color: #fff; background: var(--red); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
     .rec.req.filled { border-color: var(--green); box-shadow: none; }
     .rec.req.filled::before { content: "완료"; background: var(--green); }
-
-    /* 신규/기존 건너뛰기 */
-    .skip { display: none !important; }
-    ul.branch:not(:has(> li:not(.skip))) { display: none; }
-    .gated:not(.open), .gated-go:not(.open) { display: none; }
-    ul.result-branch:not(.picked) { display: none; }
-    li[data-result].off { display: none; }
-    ul.issue-branch:not(.picked) { display: none; }
-    li[data-issue].off { display: none; }
-    li[data-issue].pick > .if { background: var(--blue); color: #fff; border-color: var(--blue); }
-    li[data-result].pick > .if { background: var(--blue); color: #fff; border-color: var(--blue); }
-    .modetag { display: none; }
-    .modetag.on { display: inline-flex; }
-
-    /* 하단 바 */
-    .donebar { position: sticky; bottom: 14px; margin-top: 20px; background: rgba(255,255,255,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-lg); padding: 10px 12px 10px 16px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; z-index: 5; }
-    .donebar-note { font-size: 13px; color: var(--text-3); margin-right: auto; font-weight: 500; font-variant-numeric: tabular-nums; }
-    .donebar-note.bad { color: var(--form); font-weight: 600; }
-    .donebar-note.save { margin-right: 4px; color: var(--green); font-weight: 600; }
-    .donebar-note.save::before { content: "● "; font-size: 9px; vertical-align: 1px; }
-    .donebar-note.save.bad { color: var(--form); }
-    .donebar-note.save:empty { display: none; }
-    .btn { font: inherit; font-size: 14px; font-weight: 700; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; letter-spacing: -0.01em; transition: background .15s, border-color .15s; }
-    .btn:hover { background: var(--blue-d); border-color: var(--blue-d); }
+    .seg { display: inline-flex; gap: 4px; }
+    .seg button { font: inherit; font-size: 13px; font-weight: 700; height: 30px; padding: 0 12px; border-radius: var(--r-xs); border: 1px solid var(--red-3); background: var(--card); color: var(--text-2); cursor: pointer; }
+    .seg button.on { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .seg button.warn2 { color: var(--amber); border-color: #F0D9A6; } .seg button.danger2 { color: var(--red); }
+    .rec.filled .seg button { border-color: var(--green-3); }
+    .rec.filled .seg button.on { background: var(--green); border-color: var(--green); }
+    .fgrid { display: flex; flex-wrap: wrap; gap: 6px 10px; padding-top: 10px; }
+    .doclist { list-style: none; margin: 10px 0 0; display: grid; gap: 6px; }
+    .doclist li { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; border-radius: var(--r-s); background: var(--card-2); font-size: 14px; line-height: 1.55; }
+    .doclist li .n { width: 20px; height: 20px; border-radius: 50%; background: var(--text); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; flex: none; margin-top: 2px; }
+    .doclist li.cond { background: var(--purple-2); }
+    .doclist li.cond .n { background: var(--purple); }
+    .doclist li small { display: block; color: var(--text-3); font-size: 12.5px; }
+    .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 13.5px; margin-top: 8px; }
+    .kv dt { color: var(--text-3); font-weight: 600; } .kv dd { color: var(--text); font-weight: 600; }
+    aside.side { position: sticky; top: 68px; display: grid; gap: 12px; }
+    .card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px 18px; }
+    .card h4 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .card h4 button { font: inherit; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--blue); cursor: pointer; }
+    .card pre { white-space: pre-wrap; font: inherit; font-size: 12.5px; line-height: 1.6; color: var(--text-2); background: var(--card-2); border-radius: var(--r-s); padding: 10px 12px; max-height: 300px; overflow: auto; }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip { font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 7px; background: var(--card-2); color: var(--text-2); border: 1px solid var(--line); }
+    .chip.on { background: var(--purple-2); color: var(--purple); border-color: transparent; }
+    .chip.bad { background: var(--red-2); color: var(--red); border-color: transparent; }
+    .chip.ok { background: var(--green-2); color: var(--green); border-color: transparent; }
+    .donebar { position: sticky; bottom: 14px; margin-top: 20px; background: rgba(255,255,255,.86); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-lg); padding: 10px 12px 10px 16px; display: flex; gap: 10px; align-items: center; z-index: 5; flex-wrap: wrap; }
+    .donebar .dn { font-size: 13px; color: var(--text-3); margin-right: auto; font-weight: 500; }
+    .donebar .dn.bad { color: var(--red); font-weight: 600; }
+    .btn { font: inherit; font-size: 14px; font-weight: 700; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
     .btn.ghost { background: var(--card); color: var(--text-2); border-color: var(--line); }
-    .btn.ghost:hover { background: var(--card-2); color: var(--text); }
-    .btn.warn { background: var(--amber-2); color: var(--amber); border-color: #F0D9A6; }
-    .btn.warn:hover { background: #FBE9BE; }
-    /* 일시 종료 모달 */
-    .pscrim { position: fixed; inset: 0; background: rgba(23,28,43,.35); z-index: 60; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .pscrim.open { display: flex; }
-    .pmodal { width: min(440px, 100%); background: var(--card); border-radius: 16px; box-shadow: 0 8px 30px rgba(20,27,45,.2); padding: 22px 24px; }
-    .pmodal h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
-    .pmodal p { font-size: 13.5px; color: var(--text-2); margin-bottom: 14px; }
-    .pmodal .opt { display: flex; gap: 6px; margin-bottom: 12px; }
-    .pmodal .opt button { flex: 1; font: inherit; font-size: 13.5px; font-weight: 700; padding: 9px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; }
-    .pmodal .opt button.on { background: var(--blue-2); border-color: var(--blue); color: var(--blue); }
-    /* 1단계: 종류 (큰 카드) */
-    .pmodal .kind { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-    .pmodal .kind button { font: inherit; text-align: left; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
-    .pmodal .kind button b { font-size: 14.5px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
-    .pmodal .kind button small { font-size: 12px; color: var(--text-3); }
-    .pmodal .kind button.on { border-color: var(--blue); background: var(--blue-2); } .pmodal .kind button.on b { color: var(--blue); }
-    .pmodal .kind button.on.reject { border-color: var(--red); background: var(--red-2); } .pmodal .kind button.on.reject b { color: var(--red); }
-    /* 2단계: 재연락 시기 (하위 패널) */
-    .pmodal .sub { background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
-    .pmodal .sub .lab { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; }
-    .pmodal .sub .opt { margin-bottom: 10px; } .pmodal .sub .opt button { font-size: 13px; padding: 8px; }
-    .pmodal .sub .dt { margin-bottom: 0; } .pmodal .sub .miss { margin: 6px 0 0; }
-    .pmodal .dt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .pmodal .dt input { font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); width: 100%; }
-    .pmodal .dt[hidden] { display: none; }
-    .pmodal textarea { width: 100%; min-height: 56px; font: inherit; font-size: 13.5px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; resize: vertical; margin-bottom: 14px; }
-    .pmodal .acts { display: flex; gap: 8px; justify-content: flex-end; }
-    .pmodal .miss { font-size: 12.5px; color: var(--form); font-weight: 600; margin: -8px 0 10px; min-height: 1em; }
-
-    @media print {
-      body { background: #fff; font-size: 12px; }
-      .page { grid-template-columns: 1fr; padding: 0; }
-      nav.toc, .donebar { display: none !important; }
-      section.step, header.doc { box-shadow: none; border: 1px solid var(--line); }
-      section.step, .say { break-inside: avoid; }
-      .rec input, .rec select { border: none; background: transparent; }
-    }
+    .btn.warn { background: var(--card); color: var(--amber); border-color: #F0D9A6; }
+    .btn.danger { background: var(--card); color: var(--red); border-color: var(--red-3); }
+    .scrim { position: fixed; inset: 0; background: rgba(23,28,43,.3); z-index: 19; }
+    .modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(460px, 92vw); background: var(--card); border-radius: 16px; box-shadow: var(--shadow-lg); padding: 22px 24px; z-index: 20; }
+    .modal h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .modal p { font-size: 13.5px; color: var(--text-2); margin-bottom: 12px; }
+    .modal label { display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin: 10px 0 5px; }
+    .modal label b { color: var(--red); }
+    .modal input, .modal textarea, .modal select { width: 100%; font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
+    .modal .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+    .modal .row .btn { padding: 8px 14px; font-size: 13px; }
+    .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="46"></udongji-nav>
+<udongji-nav current="consult" page-v="47"></udongji-nav>
 <div class="page">
-  <nav class="toc" aria-label="목차">
-    <div class="logo"><div class="mark">우</div><div><span class="name">상담 업무</span><span class="sub">스크립트 v4</span></div></div>
-    <span class="gs off" id="gs-status" style="display:block">연결 확인 중…</span>
-    <div class="k">단계</div>
-    <a href="#basic"><span class="n">✎</span><span class="t">기본정보</span></a>
-    <a href="#s0"><span class="n">0</span><span class="t">본론 전환</span></a>
-    <a href="#sm"><span class="n">1</span><span class="t">매장 구분</span></a>
-    <a href="#s1"><span class="n">2</span><span class="t">사전 확인</span></a>
-    <a href="#s2"><span class="n">2</span><span class="t">동의 → 밴 조회</span></a>
-    <a href="#s3"><span class="n">3</span><span class="t">구성 잡기</span></a>
-    <a href="#s4"><span class="n">4</span><span class="t">설치 관문</span></a>
-    <a href="#s5"><span class="n">5</span><span class="t">제3자 제공 동의</span></a>
-    <a href="#s6"><span class="n">6</span><span class="t">서류 안내</span></a>
-    <a href="#s7"><span class="n">7</span><span class="t">우동지 솔루션</span></a>
-    <a href="#s8"><span class="n">8</span><span class="t">마무리</span></a>
-    <a href="#s9"><span class="n">9</span><span class="t">자주 나오는 반응</span></a>
-    <div class="tot" id="tot"><span id="tot-text"></span><div class="bar"><i id="tot-bar"></i></div></div>
+  <nav class="toc" aria-label="단계">
+    <div class="k">상담 흐름 v5</div>
+    <div class="conn {{ connCls }}">{{ connTxt }}</div>
+    <a href="#s1"><span class="n">1</span><span class="t">인사 · 기본정보</span><span class="prog {{ p1.cls }}">{{ p1.txt }}</span></a>
+    <a href="#s2"><span class="n">2</span><span class="t">유형 판별</span><span class="prog {{ p2.cls }}">{{ p2.txt }}</span></a>
+    <a href="#s3"><span class="n">3</span><span class="t">신규 · 사업자·오픈일</span><span class="prog {{ p3.cls }}">{{ p3.txt }}</span></a>
+    <a href="#s4"><span class="n">4</span><span class="t">매장 환경</span><span class="prog {{ p4.cls }}">{{ p4.txt }}</span></a>
+    <a href="#s5"><span class="n">5</span><span class="t">구성 · 색상 · 청약정보</span><span class="prog {{ p5.cls }}">{{ p5.txt }}</span></a>
+    <a href="#s6"><span class="n">6</span><span class="t">서류 안내</span><span class="prog skip">안내</span></a>
+    <a href="#s7"><span class="n">7</span><span class="t">우동지 솔루션</span><span class="prog {{ p7.cls }}">{{ p7.txt }}</span></a>
+    <a href="#s8"><span class="n">8</span><span class="t">마무리</span><span class="prog {{ p8.cls }}">{{ p8.txt }}</span></a>
+    <div class="tot">필수 {{ reqDone }} / {{ reqTotal }}<div class="bar"><i style="width: {{ reqPct }}%"></i></div></div>
   </nav>
 
-  <main>
-    <div class="recall" id="recall-banner" hidden></div>
+  <div class="main">
     <header class="doc">
-      <div>
-        <div class="kicker">우동지 × Npay 커넥트 · 인바운드 / 아웃바운드 공통 · 우리 소개는 항상 "우동지"</div>
-        <h1>상담 대응 스크립트</h1>
-        <p>인사·아이스브레이킹이 끝난 시점부터. 말은 짧게, 하나 묻고 하나 적기. 빨간 입력칸이 고객 목록에 저장될 값, <b>필수</b> 표시는 반드시. 다 채우고 <b>작성 완료</b>를 누르면 시트에 저장되고 안내 문자가 나온다.</p>
-      </div>
-      <div class="pills"><span class="rec agent" data-col="상담자" data-val=""></span><span class="pill">v4 · 2026-09</span><span class="pill">동의는 유선 녹취</span><span class="pill blue">작성 완료 시 자동 저장</span><span class="pill modetag" id="modetag"></span></div>
+      <div><div class="kicker">우동지 · 네이버페이 커넥트 상담 스크립트 <b style="color:var(--purple)">v5</b></div><h1>상담 업무</h1><p>말풍선을 읽으며 진행하고, <b style="color:var(--red)">빨간 칸</b>만 채우면 됩니다. 매장 주소·사업자번호·생년월일·이메일은 <b>묻지 않아요</b> — 서류(사업자등록증·신분증·통장)에 다 있어요. 밴사도 언급하지 않습니다.</p></div>
+      <div class="typebadge"><span class="tb {{ typeCls }}">{{ typeLabel }}</span><small>접수 링크 <b>{{ linkNo }}</b></small><small>{{ installLabel }}</small></div>
     </header>
+    <div class="prevbar" hidden="{{ hidePrev }}">재연락 상담 — {{ prevTxt }} · 작성 완료하면 같은 고객 기록이 갱신돼요.</div>
 
-    <section class="step basic" id="basic" data-screen-label="기본정보">
-      <div class="step-h"><div class="no">✎</div><div class="t">기본정보 <small>통화 시작하면서 먼저 적기. 나머지는 대화 흐름 안의 빨간 칸에.</small></div></div>
+    <section class="step" id="s1" data-screen-label="1 인사">
+      <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. 업종은 통화 전 네이버 지도로 봐둔 걸 확인만.</small></div></div>
+      <div class="say"><span class="who">상담원</span>안녕하세요, 우동지 {{ agentName }}입니다. 네이버 커넥트 문의 주셔서 연락드렸어요. 통화 품질을 위해 녹음됩니다. <span class="q">"○○ 하시는 매장 맞으시죠?"</span></div>
       <div class="fgrid">
-        <span class="rec" data-col="고객명" data-val=""></span>
-        <span class="rec" data-col="연락처" data-val=""></span>
-        <span class="rec" data-col="매장명" data-val=""></span>
-        <span class="rec" data-col="매장 주소" data-val=""></span>
-        <span class="rec" data-col="상담일" data-val=""></span>
+        <span class="rec req {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
+        <span class="rec req {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
+        <span class="rec req {{ f.store }}">매장명 <input value="{{ v.store }}" onInput="{{ set.store }}" placeholder="지도 검색용"></span>
+        <span class="rec req {{ f.biz }}">업종 <select value="{{ v.biz }}" onChange="{{ set.biz }}"><option value="">선택</option><option>카페</option><option>음식점</option><option>미용·뷰티</option><option>의류·잡화</option><option>학원·교육</option><option>기타</option></select></span>
+        <span class="rec req {{ f.bizEtc }}" hidden="{{ hideBizEtc }}">업종 직접 입력 <input value="{{ v.bizEtc }}" onInput="{{ set.bizEtc }}" placeholder="예: 세탁소, 꽃집"></span>
+        <span class="rec opt {{ f.addr }}">매장 주소 (선택) <input class="wide" value="{{ v.addr }}" onInput="{{ set.addr }}" placeholder="사업자등록증으로 대체"></span>
+      </div>
+      <p class="note"><b>바뀐 점</b> — 매장 주소·사업자번호·생년월일·이메일은 필수에서 제외. 매장명은 지도 검색·기록 식별용으로만.</p>
+    </section>
+
+    <section class="step" id="s2" data-screen-label="2 유형">
+      <div class="step-h"><div class="no">2</div><div class="t">유형 판별 — 질문 3개로 8유형 확정<small>운영 여부 → 개인/법인 → 공동대표. 여기서 접수 링크·서류 목록·이후 단계가 전부 정해져요.</small></div></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"지금 운영 중이세요, 아니면 오픈 준비 중이세요?"</span> <span class="rec req {{ f.mode }}">매장 구분 <span class="seg"><button class="{{ on.mode.existing }}" onClick="{{ pick.mode.existing }}">기존 운영</button><button class="{{ on.mode.fresh }}" onClick="{{ pick.mode.fresh }}">신규 오픈</button></span></span></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"개인사업자세요, 법인이세요?"</span> <span class="rec req {{ f.entity }}">사업자 형태 <span class="seg"><button class="{{ on.entity.person }}" onClick="{{ pick.entity.person }}">개인</button><button class="{{ on.entity.corp }}" onClick="{{ pick.entity.corp }}">법인</button></span></span></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"대표님 혼자 명의세요, 공동대표 계세요?"</span> <span class="rec req {{ f.owners }}">대표 구성 <span class="seg"><button class="{{ on.owners.single }}" onClick="{{ pick.owners.single }}">단독</button><button class="{{ on.owners.joint }}" onClick="{{ pick.owners.joint }}">공동대표</button></span></span></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"연매출이 3억 넘으세요? 조건이 조금 달라져서 여쭤봐요."</span> <span class="rec req {{ f.large }}">연매출 3억 <span class="seg"><button class="{{ on.large.under }}" onClick="{{ pick.large.under }}">3억 미만</button><button class="{{ on.large.over }}" onClick="{{ pick.large.over }}">3억 이상</button><button class="{{ on.large.unknown }}" onClick="{{ pick.large.unknown }}">모름</button></span></span></div>
+      <div class="warn" hidden="{{ hideLarge }}"><b>3억 이상 → 중고 단말기 990원 고지 필수.</b> "대형 가맹점은 리베이트 규정 때문에 커넥트·단말기가 <b>중고(거의 새것)</b>로 월 990원에 나가요. 새 제품 원하시면 월 6,600원이에요." 미고지 시 박스 받고 철회하는 사례 있음. 모름이면 페이앤이 사업자번호로 판별해 채널톡으로 알려줌.</div>
+      <p class="note">확정된 유형은 상단 배지와 오른쪽 패널에 표시. 페이앤 접수 링크 번호(payn.channel.io/workflows/…)도 자동으로 붙어요.</p>
+    </section>
+
+    <section class="step {{ s3cls }}" id="s3" data-screen-label="3 신규">
+      <div class="step-h"><div class="no">3</div><div class="t">신규 오픈만 — 사업자등록증 · 오픈 예정일<small>미발급이면 진행 불가. 오픈이 2~3일 뒤면 출고를 못 맞춰요.</small></div></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"사업자등록증은 나오셨어요?"</span> <span class="rec req {{ f.reg }}">사업자등록증 <span class="seg"><button class="{{ on.reg.done }}" onClick="{{ pick.reg.done }}">발급 완료</button><button class="{{ on.reg.pending }}" onClick="{{ pick.reg.pending }}">발급 예정</button></span></span></div>
+      <div class="warn stop" hidden="{{ hideNoReg }}">발급 예정 → 오늘은 여기까지. <span class="q">"카드 가맹 심사가 사업자등록증 기준이라 나오시면 그때 바로 진행할게요. 언제쯤 나올까요?"</span> → 하단 <b>재연락</b> 버튼으로 저장. 등록증 나오는 시점에 다시 세일즈.</div>
+      <div class="say"><span class="who">상담원</span><span class="q">"오픈은 언제쯤이세요?"</span> <span class="rec req {{ f.openDate }}">오픈 예정일 <input type="date" value="{{ v.openDate }}" onInput="{{ set.openDate }}"></span></div>
+      <div class="warn" hidden="{{ hideSoon }}">오픈이 <b>{{ daysToOpen }}일</b> 뒤 — 카드 가맹·밴 전산 등록·전자서명·출고까지 최소 3~4일. <span class="q">"오픈 당일은 어려울 수 있어서 며칠 여유를 두고 잡아드릴게요."</span></div>
+      <p class="note">인터넷은 보통 인테리어 때 같이 들어가니 신규는 4번의 인터넷 질문을 가볍게.</p>
+    </section>
+
+    <section class="step" id="s4" data-screen-label="4 환경">
+      <div class="step-h"><div class="no">4</div><div class="t">매장 환경 — 포스 · 약정 · 인터넷<small>여기서 구성(5번)과 설치 방식(자가/현장)이 정해져요. 밴사·밴 조회는 언급하지 않습니다.</small></div></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"지금 포스는 어떤 거 쓰세요? 포스기, 태블릿, 노트북 중에요."</span> <span class="rec req {{ f.pos }}">현재 포스 <select value="{{ v.pos }}" onChange="{{ set.pos }}"><option value="">선택</option><option value="none">없음 (신규·카드단말기만)</option><option value="pc">PC 포스</option><option value="android">안드로이드 태블릿</option><option value="ios">아이패드 (iOS)</option><option value="laptop">노트북 포스</option><option value="unknown">모름</option></select></span></div>
+      <ul class="branch">
+        <li class="{{ br.ios }}"><span class="if">아이패드</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>아이패드는 저희 포스 프로그램이 안 올라가요. 커넥트랑 카드단말기만 옆에 두고 쓰시거나, 안드로이드 태블릿·PC 포스로 바꾸셔야 해요.</div></li>
+        <li class="{{ br.laptop }}"><span class="if">노트북</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>노트북은 연결 선이 복잡해서 연동은 안 해드려요. 커넥트+카드단말기만 따로 쓰시는 걸로 안내드릴게요. 매출은 밴사 앱으로 볼 수 있어요.</div></li>
+        <li class="{{ br.pc }}"><span class="if">PC 포스 · 안드로이드</span><span class="arrow">→</span>연동 가능. 5번에서 "포스 연동 필요" 체크 → <b>현장 설치</b>.</li>
+      </ul>
+      <div class="say" hidden="{{ hideExisting }}"><span class="who">상담원 · 기존만</span><span class="q">"지금 단말기 약정은 얼마나 남으셨어요? 계약서 보시면 나와 있어요."</span> <span class="rec opt {{ f.term }}">약정 잔여 <select value="{{ v.term }}" onChange="{{ set.term }}"><option value="">모름</option><option value="none">없음·만료</option><option value="short">10개월 미만</option><option value="long">10개월 이상</option></select></span></div>
+      <ul class="branch" hidden="{{ hideExisting }}">
+        <li class="{{ br.termShort }}"><span class="if">10개월 미만·만료</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>남은 위약금이 크지 않으시면 커넥트 0원으로 갈아타시는 게 이득이에요. 계약서 사진 보내주시면 제가 계산해 드릴게요.</div></li>
+        <li class="{{ br.termLong }}"><span class="if">10개월 이상</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>위약금이 아직 크시니까 지금 단말기는 그대로 두시고, 커넥트를 옆에 놓고 같이 쓰시면 돼요. 월 0원이라 부담 없어요.</div><p class="note">대리점에 위약금 전화하라고 하지 않기(방어 들어옴). 기존 대리점 문제 생기면 페이앤이 빠지는 조건.</p></li>
+      </ul>
+      <div class="say"><span class="who">상담원</span><span class="q">"카드단말기 놓을 자리까지 인터넷 랜선이 나와 있나요? 커넥트는 와이파이로 되는데 단말기는 랜선이 꼭 필요해요."</span> <span class="rec req {{ f.lan }}">랜선 <span class="seg"><button class="{{ on.lan.yes }}" onClick="{{ pick.lan.yes }}">있음</button><button class="{{ on.lan.no }}" onClick="{{ pick.lan.no }}">없음·모름</button><button class="{{ on.lan.nonet }}" onClick="{{ pick.lan.nonet }}">인터넷 자체 없음</button></span></span></div>
+      <ul class="branch">
+        <li class="{{ br.lanNo }}"><span class="if">랜선 없음</span><span class="arrow">→</span><div class="say"><span class="who">상담원</span>단말기 자리까지 랜선만 하나 빼주셔야 해요. 연장선은 다이소·온라인에서 몇 천 원이면 돼요. 타공·배선은 인테리어나 인터넷 업체에 요청하셔야 해요.</div></li>
+        <li class="{{ br.lanNonet }}"><span class="if">인터넷 없음</span><span class="arrow">→</span>진행 불가. <span class="q">"인터넷 신규 가입이 먼저 필요해서 페이앤 쪽에서 인터넷 상담 연락드리게 할게요."</span> → 마무리에서 <b>페이앤 인터넷 상담 요청</b> 체크. 우리가 인터넷 영업하지 않음.</li>
+      </ul>
+    </section>
+
+    <section class="step" id="s5" data-screen-label="5 구성">
+      <div class="step-h"><div class="no">5</div><div class="t">구성 · 색상 · 청약 정보<small>이번 단계 상품은 커넥트+카드단말기 0원만. 포스 신규는 조합가표 받은 뒤 추가.</small></div></div>
+      <div class="say"><span class="who">상담원</span>기본은 <b>커넥트 + 카드단말기</b>, 월 0원이에요. 배송으로 보내드리고 전원·랜선만 꽂으시면 돼요. <span class="rec req {{ f.bundle }}">구성 <select value="{{ v.bundle }}" onChange="{{ set.bundle }}"><option value="">선택</option><option value="cat">커넥트 + 카드단말기</option><option value="printer">커넥트 + 유선 프린터 (포스 있음)</option><option value="only">커넥트만</option></select></span></div>
+      <div class="say" hidden="{{ hidePosLink }}"><span class="who">상담원 · 포스 있음</span><span class="q">"쓰시는 포스 화면에서 결제 바로 넘기게 연동해 드릴까요?"</span> <span class="rec req {{ f.link }}">포스 연동 <span class="seg"><button class="{{ on.link.yes }}" onClick="{{ pick.link.yes }}">필요 → 현장 설치</button><button class="{{ on.link.no }}" onClick="{{ pick.link.no }}">불필요 → 자가 설치</button></span></span></div>
+      <ul class="branch" hidden="{{ hidePosLink }}">
+        <li><span class="if">배달앱</span><span class="arrow">→</span>위젯만 띄워 쓰면 연동과 무관. 매출 합산 연동(배달매니저 등)을 원하면 <b>월 이용료 별도</b>라고만 안내, 현장 설치.</li>
+      </ul>
+      <div class="say"><span class="who">상담원</span><span class="q">"기기 색상은 화이트, 블랙 중에 어떤 게 좋으세요?"</span> <span class="rec req {{ f.color }}">색상 <span class="seg"><button class="{{ on.color.white }}" onClick="{{ pick.color.white }}">화이트</button><button class="{{ on.color.black }}" onClick="{{ pick.color.black }}">블랙</button></span></span></div>
+      <p class="note">커넥트·프린터·금전함은 화이트/블랙 선택. 포스는 단일색이라 묻지 않음.</p>
+      <div class="say"><span class="who">상담원</span>네이버페이 청약에 들어가는 두 가지만 여쭐게요. <span class="q">"주로 뭘 판매하세요? 음식, 화장품, 옷 이렇게 크게만요."</span> <span class="rec req {{ f.category }}">판매 카테고리 <select value="{{ v.category }}" onChange="{{ set.category }}"><option value="">선택</option><option>음식·음료</option><option>미용</option><option>의류·잡화</option><option>화장품</option><option>교육</option><option>기타</option></select></span></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"네이버 아이디 알려주시겠어요? 대표님 개인 명의 계정이요. 비밀번호는 필요 없어요."</span> <span class="rec req {{ f.naver }}">네이버 ID <input value="{{ v.naver }}" onInput="{{ set.naver }}" placeholder="이메일 대체"></span></div>
+    </section>
+
+    <section class="step" id="s6" data-screen-label="6 서류">
+      <div class="step-h"><div class="no">6</div><div class="t">서류 안내 — 우리가 접수<small>유형에 따라 목록이 자동으로 바뀌어요. 점주에게 페이앤 링크를 보내지 않고 카톡으로 받아서 우리가 올립니다.</small></div></div>
+      <div class="say"><span class="who">상담원</span>서류는 카톡으로 저한테 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 걸로 충분해요. 통화 끝나고 목록 문자로 보내드릴게요.</div>
+      <ul class="doclist">
+        <sc-for list="{{ docs }}" as="d" hint-placeholder-count="4"><li class="{{ d.cls }}"><span class="n">{{ d.no }}</span><div>{{ d.t }}<small>{{ d.s }}</small></div></li></sc-for>
+      </ul>
+      <div class="info" hidden="{{ hideCorpNote }}"><b>법인: 통장 예금주 = 사업자등록증 상호 완전 일치</b> — "주식회사 ○○" vs "(주)○○" 표기까지 같아야 함.</div>
+      <p class="note">영업신고증·인허가증(학원 등)은 페이앤이 채널톡에서 추가 요청하면 그때 받음.</p>
+      <p class="note">개인정보 제3자 제공 동의 단계는 삭제(페이앤: 불필요). 접수 후 전자계약서는 모두싸인 알림톡(카톡)으로 발송. 공동대표는 두 분 모두 서명.</p>
+    </section>
+
+    <section class="step" id="s7" data-screen-label="7 우동지">
+      <div class="step-h"><div class="no">7</div><div class="t">우동지 솔루션 + 정보 수신 동의<small>기존과 동일. 커넥트 배송 완료 후 뉴스레터 자동 발송.</small></div></div>
+      <div class="say"><span class="who">상담원</span>저희 우동지는 커넥트 설치 이후에 네이버 플레이스 순위·리뷰 관리를 도와드리는 팀이에요. 배송되면 활용 가이드를 카톡·이메일로 보내드릴게요. <span class="q">"받아보시겠어요?"</span> <span class="rec req {{ f.optin }}">수신 동의 <span class="seg"><button class="{{ on.optin.yes }}" onClick="{{ pick.optin.yes }}">동의</button><button class="{{ on.optin.no }}" onClick="{{ pick.optin.no }}">거절</button></span></span></div>
+      <div class="say" hidden="{{ hideEmail }}"><span class="who">상담원</span><span class="q">"가이드 받으실 이메일 하나 알려주세요."</span> <span class="rec opt {{ f.email }}">이메일 <input value="{{ v.email }}" onInput="{{ set.email }}" placeholder="네이버 ID@naver.com"></span></div>
+    </section>
+
+    <section class="step" id="s8" data-screen-label="8 마무리">
+      <div class="step-h"><div class="no">8</div><div class="t">마무리 — 복창 후 상태 결정<small>상담 진행이면 작성 완료. 재연락·고객 포기는 필수 항목이 비어 있어도 바로 저장돼요.</small></div></div>
+      <div class="say"><span class="who">상담원</span>정리할게요. <b>{{ summary }}</b> 서류 사진 보내주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.</div>
+      <div class="fgrid">
+        <span class="rec req {{ f.status }}">상태 <span class="seg"><button class="{{ on.status.go }}" onClick="{{ pick.status.go }}">상담 진행</button><button class="warn2" onClick="{{ openRecall }}">재연락…</button><button class="danger2" onClick="{{ openDrop }}">고객 포기…</button></span></span>
+        <span class="rec opt {{ f.netReq }}">페이앤 인터넷 상담 요청 <span class="seg"><button class="{{ on.netReq.yes }}" onClick="{{ pick.netReq.yes }}">요청</button></span></span>
+        <span class="rec opt {{ f.memo }}">메모 <input class="wide" value="{{ v.memo }}" onInput="{{ set.memo }}" placeholder="특이사항"></span>
       </div>
     </section>
 
-    <section class="step" id="s0" data-screen-label="0 본론 전환">
-      <div class="step-h"><div class="no">0</div><div class="t">본론 전환</div></div>
-      <div class="say"><span class="who">상담원</span>네, 그럼 매장 상황 몇 가지만 여쭤보고 거기에 맞는 구성으로 안내드릴게요. 한 5분이면 돼요.</div>
-      <p class="note">아웃바운드(문의 남긴 분께 우리가 거는 전화)일 때는 앞에 한 줄 더.</p>
-      <div class="say"><span class="who">상담원 · 아웃바운드</span>우동지 광고 보시고 커넥트 상담 남겨주셔서 연락드렸어요. 지금 잠깐 통화 괜찮으세요?</div>
-      <p class="note">고객이 지금 통화가 어렵거나 거절하면 → 하단 <b>일시 종료</b> 버튼(상담 연기 · 상담 거부). 이어가면 아래 매장 구분으로.</p>
-      <ul class="branch result-branch" style="display:none">
-        <li data-result="상담 진행"><span class="if">상담 진행</span><span class="arrow">→</span>아래 매장 구분으로 이어서</li>
-        <li data-result="상담 연기"><span class="if">상담 연기 · 지금 통화 어려움</span><span class="arrow">→</span><div class="say">언제가 편하세요? 그때 다시 연락드릴게요.<br><span class="rec" data-col="상태" data-val="재연락 예정"></span><span class="rec" data-col="다음 액션·일시" data-val=""></span></div><span class="note">고객명·연락처만 채우고 <b>일시 종료</b> 버튼 → 재연락 시기 입력.</span></li>
-        <li data-result="상담 거부"><span class="if">상담 거부</span><span class="arrow">→</span><div class="say">네, 알겠습니다. 시간 내주셔서 감사해요.<br><span class="rec" data-col="상태" data-val="종료"></span><span class="rec" data-col="특이사항" data-val=""></span></div><span class="note">바로 작성 완료.</span></li>
-      </ul>
-    </section>
+    <div class="donebar"><span class="dn {{ dnCls }}">{{ dnTxt }}</span><button class="btn ghost" onClick="{{ reset }}">새 상담</button><button class="btn warn" onClick="{{ openRecall }}">재연락</button><button class="btn danger" onClick="{{ openDrop }}">고객 포기</button><button class="btn" disabled="{{ notReady }}" onClick="{{ finish }}">{{ finishLabel }}</button></div>
+  </div>
 
-    <section class="step gated-go" id="sm" data-screen-label="매장 구분">
-      <div class="step-h"><div class="no">1</div><div class="t">매장 구분 <small>여기서 고르는 대로 아래 폼이 신규용 / 기존용으로 열린다.</small></div></div>
-      <div class="say"><span class="who">상담원</span>매장은 새로 오픈하시는 거예요, 아니면 지금 운영 중이세요?<br><span class="rec" data-col="매장 구분" data-val=""></span></div>
-    </section>
+  <aside class="side">
+    <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>접수 링크</dt><dd>{{ linkNo }}</dd><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매</dt><dd>{{ v.category }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
+    <div class="card"><h4>① 고객 안내 문자 <button onClick="{{ copySms }}">복사</button></h4><pre>{{ sms }}</pre></div>
+    <div class="card"><h4>② 페이앤 접수 양식 <button onClick="{{ copyForm }}">복사</button></h4><pre>{{ form }}</pre></div>
+  </aside>
 
-    <section class="step gated" id="s1" data-screen-label="사전 확인">
-      <div class="step-h"><div class="no">2</div><div class="t">사전 확인 <small>구성 설명 들어가기 전. 여기서 걸리면 뒤에 설명 다 해봤자 소모.</small></div></div>
-      <h3 class="sub"><span class="circ"></span> 업종</h3>
-      <div class="say"><span class="who">상담원</span>혹시 업종이 어떻게 되시나요?<span class="note"> 통화 전에 네이버 지도로 봐뒀으면 <span class="q">"○○ 카페 하시는 거 맞으시죠?"</span>로 확인만.</span><br><span class="rec" data-col="업종" data-val=""></span></div>
-      <h3 class="sub" data-only="신규 오픈"><span class="circ"></span> 오픈 일정·사업자등록증</h3>
-      <ul class="branch">
-        <li data-only="신규 오픈"><span class="if">신규</span><span class="arrow">→</span><span class="q">"오픈은 언제쯤이세요? 사업자등록증은 나오셨고요?"</span> <span class="rec" data-col="오픈 예정일" data-val=""></span><span class="rec" data-col="사업자등록증 발급" data-val=""></span>
-          <ul class="branch issue-branch">
-            <li data-issue="발급 완료"><span class="if">이번 달 안 + 발급 완료</span><span class="arrow">→</span>계속 진행</li>
-            <li data-issue="발급 예정"><span class="if">몇 달 뒤 / 미발급</span><span class="arrow">→</span>
-              <div class="say">카드사 심사가 사업자등록증 나오고 인테리어 마무리된 뒤에 들어가서요. 그 시점 맞춰서 제가 다시 연락드릴게요. 언제쯤이 좋을까요?</div>
-              <span class="rec" data-col="상태" data-val="재연락 예정"></span><span class="rec" data-col="다음 액션·일시" data-val=""></span> → 마무리로 (우동지 솔루션은 안내)</li>
-          </ul>
-        </li>
-      </ul>
-      <h3 class="sub" data-only="기존 운영"><span class="circ"></span> 지금 쓰는 단말기·포스</h3>
-      <div class="say"><span class="who">상담원</span>지금은 홀 위주세요, 배달도 같이 하세요?<br><span class="rec" data-col="현재 운영 방식" data-val=""></span></div>
-      <div class="say"><span class="who">상담원</span>카드 단말기나 포스는 어디 거 쓰세요? 약정은 남으셨어요?<br><span class="rec" data-col="현재 단말기·POS" data-val=""></span><span class="rec" data-col="약정 잔여 개월" data-val=""></span><span class="rec" data-col="월 납부금" data-val=""></span></div>
-      <ul class="branch">
-        <li><span class="if">모른다</span><span class="arrow">→</span><div class="say">괜찮아요. 기존 대리점에 한 번 물어보시면 잔여 개월이랑 위약금 나와요. 그건 나중에 알려주셔도 되고, 오늘은 견적부터 봐드릴게요.</div></li>
-        <li><span class="if">위약금 있다</span><span class="arrow">→</span><div class="say">위약금은 저희가 대신 내드리진 못해요. 대신 남은 위약금이랑 저희 월 비용 합친 게 지금 내시는 것보다 적으면 바꾸시는 게 맞고, 아니면 만료 시점에 다시 연락드리는 게 나아요.</div><span class="note">무리하게 해지 유도 금지.</span></li>
-      </ul>
-
-      <h3 class="sub"><span class="circ"></span> 인터넷·랜선</h3>
-      <div class="say"><span class="who">상담원</span>매장에 인터넷은 들어와 있으세요?<br><span class="rec" data-col="인터넷 회선(랜선) 보유" data-val=""></span><span class="rec" data-col="인터넷 변경·신규 필요" data-val=""></span></div>
-      <ul class="branch">
-        <li><span class="if">있다</span><span class="arrow">→</span><span class="q">"카운터에, 그러니까 단말기 놓으실 자리에 랜선 꽂는 데가 나와 있나요?"</span>
-          <ul class="branch">
-            <li><span class="if">나와 있다</span><span class="arrow">→</span>O</li>
-            <li><span class="if">안 나와 있다</span><span class="arrow">→</span><div class="say">커넥트만 쓰시면 와이파이로 돼요. 포스나 프린터도 같이 하시면 선을 끌어와야 하는데, 인테리어 타공은 가능하세요?</div><span class="rec" data-col="인테리어 타공" data-val=""></span></li>
-          </ul>
-        </li>
-        <li><span class="if">없다 / 바꿔야 한다</span><span class="arrow">→</span><div class="say">인터넷은 꼭 필요해서요. 신규 오픈이시면 인터넷 신청이랑 같이 일정 잡는 게 제일 깔끔해요. 원하시면 저희 쪽에서 인터넷 상담도 연결해드릴 수 있는데, 그러려면 주소랑 편한 일정 알려주세요.</div><span class="rec" data-col="인터넷 상담 요청 일정" data-val=""></span> <span class="note" style="display:inline">주소는 위 기본정보 칸에</span></li>
-      </ul>
-
-      <h3 class="sub"><span class="circ"></span> 연매출 3억</h3>
-      <div class="say"><span class="who">상담원</span>혹시 연매출이 3억 넘으세요? 3억 기준으로 프로모션 조건이 달라져서 여쭤봐요.<br><span class="rec" data-col="대형/개인/법인" data-val=""></span></div>
-      <ul class="branch">
-        <li><span class="if">이하</span><span class="arrow">→</span>0원 프로모션 안내 가능</li>
-        <li><span class="if">초과</span><span class="arrow">→</span><div class="say">그러면 무료 프로모션은 법적으로 적용이 안 되고, 중고 장비 기준 월 비용으로 안내드려야 해요. 그래도 괜찮으세요?</div></li>
-        <li><span class="if">모름</span><span class="arrow">→</span>일단 3억 이하로 안내하되 <span class="q">"사업자번호로 조회해보고 다르면 다시 말씀드릴게요"</span></li>
-      </ul>
-
-      <h3 class="sub"><span class="circ"></span> 지금 쓰는 프로그램</h3>
-      <div class="say"><span class="who">상담원</span>예약이나 배달, 고객관리 프로그램 쓰시는 거 있으세요? 배민·쿠팡이츠, 네이버 예약, 미용실이면 핸드SOS 같은 거요.<br><span class="rec" data-col="POS 프로그램" data-val=""></span><span class="rec" data-col="배달 필요 여부" data-val=""></span><span class="rec" data-col="기타 상담 내용" data-val=""></span></div>
-      <ul class="branch">
-        <li><span class="if">배달</span><span class="arrow">→</span><div class="say">배달 주문을 포스 매출이랑 합쳐서 보고 싶으세요, 아니면 배달앱은 지금처럼 따로 두셔도 돼요?</div><span class="note">합친다 = 매출연동 → 오케이포스 확정 / 따로 = 위젯만</span></li>
-        <li><span class="if">치과·학원·핸드SOS 등</span><span class="arrow">→</span><div class="say">그 프로그램이랑 연동되는지는 제가 확인하고 알려드려야 해요. 오늘은 나머지 먼저 보고요.</div><span class="rec" data-col="특이사항" data-val=""></span></li>
-      </ul>
-    </section>
-
-    <section class="step gated" id="s2" data-only="기존 운영" data-screen-label="2 기존 동의·밴 조회">
-      <div class="step-h"><div class="no">2</div><div class="t">제3자 제공 동의 → 사업자번호 → 밴 조회 <small>밴 등록 상태에 따라 진행 자체가 갈리니 구성 설명 전에 조회를 걸어놓는다.</small></div></div>
-      <div class="say"><span class="who">상담원</span>기존 매장은 지금 등록돼 있는 밴사 상태를 먼저 조회해야 진행이 되는지 알 수 있어요. 그래서 동의 하나만 먼저 받을게요.</div>
-      <div class="say consent"><span class="who">동의 문장</span>대표님 성함, 연락처, 이메일, 사업자번호, 매장 정보, 그리고 접수 서류인 사업자등록증·신분증·통장 사본·매장 사진을 저희 제휴사인 페이앤스토어랑 가맹 등록하는 밴사, NICE·KIS에 전달합니다. 카드 가맹 심사랑 밴 등록 조회, 장비 설치에만 쓰이고, 계약 안 하시면 상담 끝나고 파기돼요. 동의 안 하셔도 되는데 그러면 커넥트 진행은 어렵고요. 동의하시겠어요?</div>
-      <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="개인정보 제3자 제공 동의" data-val="O"></span></div>
-      <div class="say"><span class="who">상담원</span>사업자번호 불러주시겠어요? 개인사업자세요, 법인이세요? 혼자 명의세요, 공동대표세요?<br><span class="rec" data-col="사업자번호" data-val=""></span><span class="rec" data-col="대형/개인/법인" data-val=""></span><span class="rec" data-col="단독/공동" data-val=""></span></div>
-      <div class="say"><span class="who">상담원</span>조회는 보통 하루 정도 걸려요. 결과 나오면 제가 바로 연락드릴게요. 그동안 구성은 미리 봐드릴게요.</div>
-      <p class="note">사업자번호는 통화 끝나고 페이앤 관리자에게 보낸다. 작성 완료 화면에서 접수 양식을 복사해 보내면서 <b>관리자 전달</b>을 체크.</p>
-    </section>
-
-    <section class="step gated" id="s3" data-screen-label="3 구성 잡기">
-      <div class="step-h"><div class="no">3</div><div class="t">구성 잡기</div></div>
-
-      <h3 class="sub">POS 필요 여부</h3>
-      <div class="say"><span class="who">상담원</span>카드결제만 받으시면 돼요, 아니면 메뉴·주문·매출 관리하는 포스도 필요하세요?<br><span class="rec" data-col="POS 프로그램" data-val=""></span></div>
-      <ul class="branch">
-        <li><span class="if">결제만</span><span class="arrow">→</span><div class="say">그럼 커넥트에 카드단말기 하나 붙이는 구성이에요. 3억 이하면 지금 월 0원이고요.</div>→ 설치 관문으로</li>
-        <li><span class="if">포스 필요</span><span class="arrow">→</span>아래 세 개만 더</li>
-      </ul>
-      <div class="say"><span class="who">상담원</span>선불이세요, 후불이세요?<span class="note"> 후불이면 태블릿 불가 → 윈도우 포스</span></div>
-      <div class="say"><span class="who">상담원</span>카운터 자리는 좀 넓어요? PC포스 놓을 공간이 되는지요.<span class="note"> 협소하면 태블릿</span></div>
-      <div class="say"><span class="who">상담원</span>지금 갖고 계신 태블릿이나 포스기 있으세요? 있으면 어떤 거예요?<br><span class="rec" data-col="기존 장비 모델명" data-val=""></span></div>
-      <ul class="branch">
-        <li><span class="if">아이패드</span><span class="arrow">→</span><div class="say">아이패드는 저희 앱이 안 올라가서요. 안드로이드 태블릿이나 윈도우 포스로 가야 해요.</div></li>
-        <li><span class="if">안드로이드 태블릿(14 이상·10인치 이상) / 윈도우 포스기(10 이상)</span><span class="arrow">→</span>보유 세트로 안내</li>
-        <li><span class="if">모델을 모른다 + 살려서 쓰고 싶다</span><span class="arrow">→</span><div class="say">기기 뒷면 라벨 사진 한 장만 통화 끝나고 카톡으로 보내주시면 제가 확인할게요.</div><span class="note">사진 수취는 통화 후 시트에서 체크.</span></li>
-      </ul>
-
-      <h3 class="sub">음식점이면 추가로</h3>
-      <div class="say"><span class="who">상담원</span>주방에 주문서 프린터 필요하세요? 주방까지 랜선이 가나요?<span class="note"> 안 가면 무선 프린터, 간섭 점검</span></div>
-      <div class="say"><span class="who">상담원</span>현금도 받으시면 금전함도 넣어드릴까요?</div>
-
-      <h3 class="sub">구성 안내</h3>
-      <div class="say"><span class="who">상담원</span>그럼 정리하면 커넥트 + ○○ + CAT단말기 구성이고, 월 ○○원이에요. 밴사는 NICE로 잡을게요. NICE면 커넥트를 키오스크처럼 쓰는 기능도 되고요.<br><span class="rec" data-col="안내한 상품 구성" data-val=""></span><span class="rec" data-col="월 이용요금" data-val=""></span><span class="rec" data-col="VAN" data-val=""></span></div>
-      <div class="warn">가격은 반드시 최신 렌탈표로. 안 맞는 조합(배달 매출연동 + 네이버 예약, 후불 + 태블릿 등)이 나오면 <span class="q">"이 둘은 한 대로는 안 돼서요, 어느 게 더 중요하세요?"</span> 하고 점주가 고르게.</div>
-    </section>
-
-    <section class="step gated" id="s4" data-screen-label="4 설치 관문">
-      <div class="step-h"><div class="no">4</div><div class="t">설치 관문 <small>랜선 직접 준비 안내 · 기기 색상 · 특이사항</small></div></div>
-      <div class="say"><span class="who">상담원</span>설치는 기본이 자가설치예요. 택배로 받으시면 꽂기만 하면 되는데, 랜선 케이블은 직접 준비해주셔야 해요. 다이소나 인터넷에서 몇 천 원이에요.<br><span class="rec" data-col="랜선 직접 준비 안내" data-val="O"></span></div>
-      <div class="say"><span class="who">상담원</span>기기 색상은 블랙이랑 화이트 중에 뭐로 드릴까요?<br><span class="rec" data-col="기기 색상" data-val=""></span></div>
-      <div class="warn">커넥트·금전함·유선프린터 색상. 여기서 정확히 적기 — 잘못 가면 재발송 비용.</div>
-      <p class="note">기존 포스에 연동해야 하면:</p>
-      <div class="say"><span class="who">상담원</span>지금 쓰시는 포스에 연동해야 해서 이건 기사님이 방문하실 거예요. 제가 그렇게 접수해둘게요.<br><span class="rec" data-col="특이사항" data-val="기존 포스 연동 필요"></span></div>
-    </section>
-
-    <section class="step gated" id="s5" data-only="신규 오픈" data-screen-label="5 신규 동의">
-      <div class="step-h"><div class="no">5</div><div class="t">제3자 제공 동의 <small>구성·설치 안내가 끝난 뒤 받는다.</small></div></div>
-      <div class="say"><span class="who">상담원</span>진행하려면 동의 하나 받을게요.</div>
-      <div class="say consent"><span class="who">동의 문장</span>대표님 성함, 연락처, 이메일, 사업자번호, 매장 정보, 그리고 접수 서류인 사업자등록증·신분증·통장 사본·매장 사진을 저희 제휴사인 페이앤스토어랑 가맹 등록하는 밴사, NICE·KIS에 전달합니다. 카드 가맹 심사랑 밴 등록, 장비 설치에만 쓰이고, 계약 안 하시면 상담 끝나고 파기돼요. 동의 안 하셔도 되는데 그러면 커넥트 진행은 어렵고요. 동의하시겠어요?</div>
-      <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="개인정보 제3자 제공 동의" data-val="O"></span></div>
-      <div class="say"><span class="who">상담원</span>사업자번호 불러주시겠어요? 개인사업자세요, 법인이세요? 혼자 명의세요, 공동대표세요?<br><span class="rec" data-col="사업자번호" data-val=""></span><span class="rec" data-col="대형/개인/법인" data-val=""></span><span class="rec" data-col="단독/공동" data-val=""></span></div>
-      <p class="note">녹취 파일이 동의 증빙. 녹취 보관.</p>
-    </section>
-
-    <section class="step gated" id="s6" data-screen-label="6 서류·접수">
-      <div class="step-h"><div class="no">6</div><div class="t">서류 안내 <small>1차 통화에서는 안내만. 서류는 통화 뒤 카톡으로 받고, 수취·접수는 계약 업무에서 체크한다. 점주에게 페이앤 링크는 보내지 않는다.</small></div></div>
-
-      <div class="say"><span class="who">상담원</span>서류는 통화 끝나고 카톡으로 저한테 보내주시면 제가 접수까지 다 넣어드릴게요. 휴대폰으로 찍으신 걸로 돼요. 준비하실 게 몇 개 있어요.</div>
-      <div class="say"><span class="who">상담원 · 준비물</span>사업자등록증 최근 발급본이요, 가리는 데 없이요. 대표님 신분증은 주민등록증이나 운전면허증만 돼요, 여권은 안 되고요. 정산받으실 통장 사본, 모바일 캡처도 돼요. 음식점이시면 영업신고증도요. 매장 사진은 간판 나오는 바깥 사진 두 장, 안쪽 전체 사진 두 장이요.</div>
-      <ul class="branch">
-        <li><span class="if">간판이 없다</span><span class="arrow">→</span><span class="q">"그러면 건물 바깥 사진 한 장, 입구에서 안이 보이게 한 장, 도로명주소 표지판 한 장, 안쪽 전체 두 장이요."</span></li>
-        <li><span class="if">법인</span><span class="arrow">→</span><span class="q">"법인은 등기부등본이랑 인감증명서 3개월 이내 것, 주주명부, 소유지배자 확인서가 더 들어가요. 통장은 예금주가 법인명이랑 같아야 하고요. 사용인감 쓰시면 사용인감계도요."</span></li>
-        <li><span class="if">공동대표</span><span class="arrow">→</span><span class="q">"공동대표님은 가입 동의·위임장이랑 결제계좌 동의서, 신분증, 연락처가 다 들어가요. 서식은 제가 같이 보내드릴게요."</span></li>
-        <li><span class="if">개명 이력 / 외국인 대표</span><span class="arrow">→</span>개명은 3개월 이내 주민등록초본(뒷자리 포함), 외국인은 외국인등록증·영주증 앞뒷면 컬러</li>
-        <li><span class="if">기존 · 장비 살릴 때만</span><span class="arrow">→</span><span class="q">"지금 쓰시는 포스기랑 프린터 사진도요. 뒷면 모델명 보이게요."</span></li>
-      </ul>
-
-      <h3 class="sub">접수에 들어가는 정보 — 통화에서 받기</h3>
-      <div class="say"><span class="who">상담원</span>접수에 들어가는 것 몇 개만 더 여쭐게요. 주로 파시는 게 뭐예요? 한 줄로요.<br><span class="rec" data-col="판매 물품" data-val=""></span></div>
-      <div class="say"><span class="who">상담원</span>네이버 아이디도요. 대표님 개인 명의 계정이어야 해요, 매장 공용 계정은 안 되고요.<br><span class="rec" data-col="네이버 ID" data-val=""></span></div>
-      <ul class="branch">
-        <li><span class="if">신규 · 개인</span><span class="arrow">→</span><span class="q">"성함 영문으로는 어떻게 쓰세요? 여권에 있는 대로요."</span> <span class="rec" data-col="영문 성함" data-val=""></span></li>
-        <li><span class="if">네이버 아이디가 없다</span><span class="arrow">→</span><span class="q">"하나 만드셔야 해요. 커넥트가 네이버 리뷰·적립이랑 붙는 거라서요. 만드시면 카톡으로 알려주세요."</span></li>
-      </ul>
-
-      <div class="say"><span class="who">상담원</span>접수 넣으면 페이앤에서 전자계약서가 카톡으로 갈 거예요. 거기 서명하시면 끝이에요. 공동대표시면 두 분 다 서명하셔야 하고요.</div>
-    </section>
-
-    <section class="step gated" id="s7" data-screen-label="7 우동지 솔루션">
-      <div class="step-h"><div class="no">7</div><div class="t">우동지 솔루션 + 정보 수신 동의 <small>커넥트 얘기가 정리된 뒤에. 팔지 말고 챙겨드리는 톤.</small></div></div>
-      <div class="say"><span class="who">상담원</span>그리고 저희 우동지는 원래 네이버 플레이스 쪽 하는 팀이에요. 커넥트 설치하시는 분들께는 플레이스 리뷰 늘리는 가이드랑 플레이스 최적화 가이드, 강의 영상, 사장님 커뮤니티를 무료로 드리고 있어요. 30일 프로그램인데 커넥트 리뷰 기능이랑 같이 쓰시면 효과가 커서요.</div>
-      <div class="say"><span class="who">상담원</span>자료와 뉴스레터는 이메일로 드릴 거라, 자주 보시는 이메일 하나 알려주세요.<br><span class="rec" data-col="이메일" data-val=""></span></div>
-      <div class="say"><span class="who">상담원</span>그리고 30일 뉴스레터가 하나 있어요. 사장님들 바쁘시니까 하루에 딱 하나씩, '오늘 플레이스에서 이거 하나만 바꿔보세요' 하는 걸 메일로 보내드리는 거예요. 30일이면 플레이스가 한 바퀴 정리돼요. 아까 알려주신 메일로 보내드릴게요.</div>
-      <div class="say consent"><span class="who">동의 문장</span>자료랑 뉴스레터 보내드리려면 정보 수신 동의가 필요해요. 광고 뿌리는 건 아니고, 저희 솔루션 자료랑 30일 뉴스레터, 프로그램 안내용이에요. 성함, 연락처, 이메일, 매장명만 쓰고 카톡이랑 메일로 가요. 언제든 '그만 보내주세요' 하시면 바로 중단되고요. 동의하시겠어요?</div>
-      <div class="dotline"><span class="dot g"></span><span class="q">"네, 동의합니다"</span> 녹취 <span class="rec" data-col="우동지 수신 동의" data-val="O"></span></div>
-      <p class="note">페이앤 동의와 별개라 <span class="q">"동의하시겠어요?"</span>를 따로 묻고 따로 답을 받는다. <span class="q">"다 동의하시죠?"</span>로 뭉뚱그리지 않기. 이 동의는 페이앤에 넘기지 않는다.</p>
-    </section>
-
-    <section class="step gated" id="s8" data-screen-label="8 마무리">
-      <div class="step-h"><div class="no">8</div><div class="t">마무리 <small>복창 한 번, 다음 액션은 세 갈래 중 하나로.</small></div></div>
-      <div class="say"><span class="who">상담원</span>정리할게요. ○○ 구성에 월 ○○원, 색상은 블랙, 밴은 NICE. 사진 보내주시면 제가 접수 넣고요.</div>
-      <ul class="branch">
-        <li><span class="if">바로 진행</span><span class="arrow">→</span><span class="q">"사진 오는 대로 접수 넣고, 전자계약서 가면 문자 드릴게요."</span> <span class="rec" data-col="상태" data-val="서류 발송"></span></li>
-        <li><span class="if">기존 · 밴 조회 대기</span><span class="arrow">→</span><span class="q">"조회 결과 나오면 내일 이 시간쯤 다시 전화드릴게요."</span> <span class="rec" data-col="상태" data-val="밴 조회 대기"></span></li>
-        <li><span class="if">보류 · 재연락</span><span class="arrow">→</span><span class="q">"그럼 ○월 ○일쯤 다시 연락드릴게요. 그 전에 궁금한 거 있으면 이 번호로 카톡 주세요."</span> <span class="rec" data-col="상태" data-val="재연락 예정"></span></li>
-      </ul>
-      <div class="say"><span class="who">상담원</span>오늘 말씀 감사해요. 우동지 자료는 오늘 저녁에 카톡으로 먼저 보내드리고, 뉴스레터는 내일부터 메일로 갈 거예요.</div>
-    </section>
-
-    <section class="step gated" id="s9" data-screen-label="9 자주 나오는 반응">
-      <div class="step-h"><div class="no">9</div><div class="t">자주 나오는 반응 <small>한 줄 응대</small></div></div>
-      <div class="tscroll"><table class="qa">
-        <thead><tr><th>점주</th><th>응대</th></tr></thead>
-        <tbody>
-          <tr><td>"이미 쓰는 포스 있어서 괜찮아요"</td><td class="say-cell">지금 포스는 그대로 두셔도 돼요. 커넥트는 결제 옆에 붙어서 네이버 리뷰랑 적립을 자동으로 돌리는 기기라 바꾸실 게 없어요.</td></tr>
-          <tr><td>"월 비용이 부담돼요"</td><td class="say-cell">결제만 필요하시면 지금 월 0원 구성이 있어요. 부담 없이 써보시고 나중에 포스 붙이셔도 돼요.</td></tr>
-          <tr><td>"리뷰까진 필요 없어요"</td><td class="say-cell">리뷰 자체보다, 결제 끝나고 3초 만에 리뷰가 쌓이면 플레이스 노출이 올라가요. 그게 재방문으로 이어지는 거라 같이 챙겨드리는 거예요.</td></tr>
-          <tr><td>"나중에 생각해볼게요"</td><td class="say-cell">천천히 보셔도 돼요. 다만 프로모션 가격이 시점마다 바뀌어서, 언제쯤 다시 연락드리면 될까요? → 날짜 받기</td></tr>
-          <tr><td>"사업자번호는 왜 필요해요?"</td><td class="say-cell">소상공인 조회랑 밴 등록 상태 확인용이에요. 그게 돼야 무료 조건 적용이 되는지 알 수 있어서요.</td></tr>
-        </tbody>
-      </table></div>
-    </section>
-
-    <footer class="doc">우동지 상담 스크립트 v4 · 가격·정책은 2026-07 페이앤 렌탈표 기준. 확인 안 된 조건은 임의로 약속하지 않기.</footer>
-    <div class="donebar"><button type="button" class="btn ghost" id="btn-reset">새 상담</button><span class="donebar-note" id="fillcount"></span><span class="donebar-note save" id="savenote"></span><button type="button" class="btn warn" id="btn-pause">일시 종료</button><button type="button" class="btn" id="btn-done">작성 완료</button></div>
-    <div class="pscrim" id="pause">
-      <div class="pmodal" role="dialog" aria-labelledby="pause-h">
-        <h3 id="pause-h">일시 종료</h3>
-        <p>고객이 바빠서 끊었거나 거절했을 때. 지금까지 입력한 내용은 그대로 저장돼요.</p>
-        <div class="kind"><button type="button" id="pause-kind-delay" class="on"><b>상담 연기</b><small>나중에 다시 연락 → 재연락 목록</small></button><button type="button" id="pause-kind-reject" class="reject"><b>상담 거부</b><small>종료 · 더 연락 안 함</small></button></div>
-        <div id="pause-when" class="sub">
-          <div class="lab">재연락 시기</div>
-          <div class="opt"><button type="button" id="pause-tbd">미정</button><button type="button" id="pause-sched" class="on">날짜 지정</button></div>
-          <div class="dt" id="pause-dt"><input type="date" id="pause-date"><input type="time" id="pause-time" step="600"></div>
-          <div class="miss" id="pause-miss"></div>
-        </div>
-        <textarea id="pause-memo" placeholder="메모 (예: 점심 장사 중, 오후 3시 이후 가능 / 거부 사유)"></textarea>
-        <div class="acts"><button type="button" class="btn ghost" id="pause-cancel">돌아가기</button><button type="button" class="btn" id="pause-ok">종료 완료</button></div>
-      </div>
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" onClick="{{ closeModal }}"></div>
+    <div class="modal">
+      <h3>{{ modal.title }}</h3><p>{{ modal.sub }}</p>
+      <sc-if value="{{ modal.isRecall }}" hint-placeholder-val="{{ true }}"><label>다음 연락 일시 <b>*</b></label><input type="text" placeholder="예: 9/15 오후 2시" value="{{ modal.when }}" onInput="{{ onModalWhen }}"><label>메모 (선택)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="부재중 · 사업자등록증 나오면 등"></textarea></sc-if>
+      <sc-if value="{{ modal.isDrop }}" hint-placeholder-val="{{ false }}"><label>포기 이유 <b>* 필수</b></label><select value="{{ modal.reason }}" onChange="{{ onModalReason }}"><option value="">선택하세요</option><option>타사 계약·이미 사용 중</option><option>조건 불만족 (수수료·약정·위약금)</option><option>인터넷·설치 환경 불가</option><option>사업자등록증 미발급·폐업</option><option>연락 두절 (3회 이상 부재)</option><option>관심 없음·거부</option><option>기타</option></select><label>상세 (선택 · 기타면 필수)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="어떤 말씀을 하셨는지 한 줄"></textarea></sc-if>
+      <sc-if value="{{ modal.hasErr }}" hint-placeholder-val="{{ false }}"><div class="err">{{ modal.err }}</div></sc-if>
+      <div class="row"><button type="button" class="btn ghost" onClick="{{ closeModal }}">취소</button><button type="button" class="btn {{ modal.okCls }}" onClick="{{ saveModal }}" disabled="{{ saving }}">{{ modal.ok }}</button></div>
     </div>
-  </main>
-
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  renderVals() { return {}; }
-  componentDidMount() {
-    import('./udongji-fb.js?v=7').then(async mod => {
-      this.lib = mod; await mod.init();
-      if (!mod.isSignedIn()) { location.replace('index.html#login'); return; }
-      // 재연락: ?id=… 로 들어오면 그 고객 기록을 폼에 불러와 이어서 상담 (작성 완료 시 같은 기록 갱신)
+  state = { v: this.loadDraft(), modal: null, lib: null, agent: '', saving: false, conn: 'wait' };
+  KEY = 'udj_v5_draft';
+  TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','naver','email','memo'];
+  OPTS = { mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','nonet'], link:['yes','no'], color:['white','black'], optin:['yes','no'], status:['go'], netReq:['yes'] };
+  LBL = { mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',nonet:'인터넷 없음'} };
+  LINKS = { 'fresh|person|single':'841963','fresh|person|joint':'841961','fresh|corp|single':'841955','fresh|corp|joint':'841952','existing|person|single':'841968','existing|person|joint':'841965','existing|corp|single':'841959','existing|corp|joint':'841957' };
+  BIZ = ['카페','음식점','미용·뷰티','의류·잡화','학원·교육'];
+  loadDraft() { try { return JSON.parse(localStorage.getItem('udj_v5_draft') || '{}') || {}; } catch (e) { return {}; } }
+  async componentDidMount() {
+    try {
+      const lib = await import('./udongji-fb.js?v=8'); await lib.init();
+      if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
+      const agent = await lib.myName().catch(() => '');
+      this.setState({ lib, agent, conn: 'ok' });
+      // 재연락: ?id=… → 기록을 폼에 불러와 이어서 상담 (저장 시 같은 기록 갱신)
       const m = /[?&]id=([^&]+)/.exec(location.search);
       if (m) {
-        try {
-          const { items } = await mod.readAll(); const it = items.find(x => x.id === decodeURIComponent(m[1]));
-          if (it) {
-            const d = Object.assign({}, it.data); delete d[mod.ID_COL];
-            const agent = (() => { try { return (JSON.parse(localStorage.getItem('udongji-script-draft-v1') || '{}') || {})['상담자'] || ''; } catch (e) { return ''; } })();
-            const p = String(d['상담일'] || '').trim();
-            d._id = it.id; d._prev = { 결과: d['상담 결과'] || '', 상태: d['상태'] || '', 일시: d['다음 액션 · 일시'] || '', 상담일: p };
-            d['상담 결과'] = ''; d['상태'] = ''; d['다음 액션 · 일시'] = ''; d['상담일'] = new Date().toISOString().slice(0, 10); if (agent) d['상담자'] = agent;
-            localStorage.setItem('udongji-script-draft-v1', JSON.stringify(d));
-          }
-        } catch (e) {}
+        try { const { items } = await lib.readAll(); const it = items.find(x => x.id === decodeURIComponent(m[1])); if (it) this.setDraft(this.fromRecord(it)); } catch (e) {}
         try { history.replaceState(null, '', location.pathname); } catch (e) {}
       }
-      this.myName = await mod.myName().catch(() => '');
-      this.boot();
-    }, () => { location.replace('index.html#login'); });
+    } catch (e) { this.setState({ conn: 'off' }); }
   }
-  boot() {
-    var page = document.querySelector('.page'); if (!page || page.dataset.booted) return; page.dataset.booted = '1';
-    var LIB = this.lib || null;
-    var COLS = [{"g":"식별","name":"고객번호","opts":null},{"g":"식별","name":"고객명","opts":null},{"g":"고객 기본정보","name":"연락처","opts":null},{"g":"고객 기본정보","name":"이메일","opts":null},{"g":"고객 기본정보","name":"영문 성함","opts":null},{"g":"고객 기본정보","name":"매장명","opts":null},{"g":"고객 기본정보","name":"매장 주소","opts":null},{"g":"고객 기본정보","name":"업종","opts":null},{"g":"고객 기본정보","name":"판매 물품","opts":null},{"g":"고객 기본정보","name":"매장 구분","opts":["신규 오픈","기존 운영"]},{"g":"고객 기본정보","name":"상담일","opts":null},{"g":"고객 기본정보","name":"상담자","opts":null},{"g":"공통","name":"인터넷 회선(랜선) 보유","opts":["O","X"]},{"g":"공통","name":"랜선 직접 준비 안내","opts":["O","X"]},{"g":"공통","name":"인터넷 변경/신규 필요","opts":["필요","불필요"]},{"g":"공통","name":"인터넷 상담 요청 일정","opts":null},{"g":"공통","name":"인테리어 타공","opts":["O","X","해당없음"]},{"g":"공통","name":"사업자번호","opts":null},{"g":"공통","name":"대형/개인/법인","opts":["대형","개인","법인"]},{"g":"공통","name":"단독/공동","opts":["단독","공동"]},{"g":"공통","name":"배달 필요 여부","opts":["없음","위젯만","매출연동"]},{"g":"공통","name":"POS 프로그램","opts":["사용 안 함","페이앤","오케이","기타"]},{"g":"공통","name":"안내한 상품 구성","opts":null},{"g":"공통","name":"월 이용요금","opts":null},{"g":"공통","name":"VAN","opts":["NICE","KIS"]},{"g":"공통","name":"기기 색상","opts":["블랙","화이트"]},{"g":"공통","name":"특이사항","opts":null},{"g":"공통","name":"기타 상담 내용","opts":null},{"g":"공통","name":"개인정보 제3자 제공 동의","opts":["O","X"]},{"g":"공통","name":"우동지 수신 동의","opts":["O","X"]},{"g":"공통","name":"네이버 ID","opts":null},{"g":"공통","name":"서류 분류","opts":["신규·개인·단독","신규·개인·공동","신규·법인·단독","신규·법인·공동","기존·개인·단독","기존·개인·공동","기존·법인·단독","기존·법인·공동"]},{"g":"공통","name":"서류 수취 완료","opts":["O","X"]},{"g":"공통","name":"링크 접수 완료","opts":["O","X"]},{"g":"신규 오픈","name":"오픈 예정일","opts":null},{"g":"신규 오픈","name":"사업자등록증 발급","opts":["발급 완료","발급 예정"]},{"g":"기존 운영","name":"현재 운영 방식","opts":null},{"g":"기존 운영","name":"현재 단말기·POS","opts":null},{"g":"기존 운영","name":"기존 장비 모델명","opts":null},{"g":"기존 운영","name":"장비 사진","opts":["O","X"]},{"g":"기존 운영","name":"약정 잔여 개월","opts":null},{"g":"기존 운영","name":"월 납부금","opts":null},{"g":"기존 운영","name":"VAN 유실적 — NICE","opts":["무실적","유실적","모름"]},{"g":"기존 운영","name":"VAN 유실적 — KIS","opts":["무실적","유실적","모름"]},{"g":"기존 운영","name":"관리자 전달","opts":["O","X"]},{"g":"진행","name":"상담 결과","opts":["상담 진행","상담 연기","상담 거부"]},{"g":"진행","name":"상태","opts":["상담 중","서류 발송","밴 조회 대기","서명 완료","재연락 예정","보류","종료"]},{"g":"진행","name":"다음 액션 · 일시","opts":null}];
-    var KEY = 'udongji-script-draft-v1';
-    var S = {};
-    var $ = function(id){ return document.getElementById(id); };
-    function norm(x){ return String(x).replace(/\s+/g,'').replace(/\//g,'·'); }
-    var byNorm = {}; COLS.forEach(function(c){ byNorm[norm(c.name)] = c; });
-    function colOf(name){ return byNorm[norm(name)] || null; }
-    // 저장: localStorage → sessionStorage → 쿠키 순으로 전부 시도, 읽을 때는 있는 것 중 첫 번째
-    function stPut(json){
-      var ok = false;
-      try { localStorage.setItem(KEY, json); ok = true; } catch(e){}
-      try { sessionStorage.setItem(KEY, json); ok = true; } catch(e){}
-      try { document.cookie = KEY + '=' + encodeURIComponent(json) + '; max-age=2592000; path=/; SameSite=Lax'; ok = true; } catch(e){}
-      return ok;
-    }
-    function stGet(){
-      var v = null;
-      try { v = localStorage.getItem(KEY); } catch(e){}
-      if(!v) try { v = sessionStorage.getItem(KEY); } catch(e){}
-      if(!v) try { var m = document.cookie.match(new RegExp('(?:^|; )' + KEY + '=([^;]*)')); if(m) v = decodeURIComponent(m[1]); } catch(e){}
-      return v;
-    }
-    var savedAt = null, saveTimer = null;
-    function save(){
-      var ok = stPut(JSON.stringify(S));
-      savedAt = ok ? new Date() : null;
-      clearTimeout(saveTimer); saveTimer = setTimeout(showSaved, 50);
-    }
-    function showSaved(){
-      var el = $('savenote'); if(!el) return;
-      if(savedAt){ el.textContent = '자동 저장 ' + String(savedAt.getHours()).padStart(2,'0') + ':' + String(savedAt.getMinutes()).padStart(2,'0'); el.classList.remove('bad'); }
-      else { el.textContent = '저장 불가 — 브라우저 저장소가 막혀 있어요'; el.classList.add('bad'); }
-    }
-    function today(){ var t=new Date(); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
-    try { var d = stGet(); if(d) S = JSON.parse(d) || {}; } catch(e){}
-    if(!S['상담일']) S['상담일'] = today();
-    // 상담자 = 관리자가 등록한 이름으로 강제 (본인 입력 불가)
-    var MY_NAME = this.myName || ''; if(MY_NAME) S['상담자'] = MY_NAME; else if(LIB) S['상담자'] = '';
-    // 상담 결과는 일시 종료 폼에서만 정해지므로, 남아 있는 임시 값은 지움
-    if(S['상담 결과'] === '상담 연기' || S['상담 결과'] === '상담 불가' || S['상담 결과'] === '상담 거부'){ delete S['상담 결과']; }
-    var hasDraft = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && k[0] !== '_' && (S[k]||'').toString().trim(); });
-    // 재연락 배너
-    (function(){ var b = $('recall-banner'); if(!b) return; var p = S._prev; if(!p){ b.hidden = true; return; } b.hidden = false; b.textContent = '재연락 상담 · 이전 ' + (p.상담일 || '') + ' ' + (p.결과 || '') + (p.일시 ? ' · 약속 ' + p.일시 : '') + ' — 상담 결과부터 다시 고르세요. 작성 완료하면 같은 고객 기록이 갱신돼요.'; })();
-    window.addEventListener('beforeunload', function(){ stPut(JSON.stringify(S)); });
-    window.addEventListener('pagehide', function(){ stPut(JSON.stringify(S)); });
-    document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') stPut(JSON.stringify(S)); });
-
-    var REQ_ALL = ['상담자','고객명','연락처','이메일','매장명','매장 구분','업종','인터넷 회선(랜선) 보유','랜선 직접 준비 안내','대형/개인/법인','단독/공동','사업자번호','개인정보 제3자 제공 동의','안내한 상품 구성','기기 색상','상태'];
-    var REQ_NEW = ['오픈 예정일','사업자등록증 발급'];
-    var REQ_OLD = ['현재 단말기·POS','약정 잔여 개월'];
-    function reqList(){
-      var r = S['상담 결과'] || '';
-      if(r === '상담 거부') return ['상담자','고객명','연락처'];
-      if(r === '상담 연기' || r === '상담 불가') return ['상담자','고객명','연락처','다음 액션 · 일시'];
-      if(S['상태']==='재연락 예정' || S['상태']==='보류' || S['상태']==='종료') return ['상담자','고객명','연락처','상태','다음 액션 · 일시'];
-      if(S['매장 구분']==='신규 오픈' && S['사업자등록증 발급']==='발급 예정') return ['상담자','고객명','연락처','매장 구분','업종','오픈 예정일','사업자등록증 발급','상태','다음 액션 · 일시'];
-      var m = S['매장 구분']; return [].concat(REQ_ALL, m==='신규 오픈'?REQ_NEW: m==='기존 운영'?REQ_OLD:[]);
-    }
-    function isReq(key){ return reqList().indexOf(key) !== -1; }
-    var fields = [];
-    document.querySelectorAll('.rec[data-col]').forEach(function(el){
-      var name = el.getAttribute('data-col'), preset = el.getAttribute('data-val') || '';
-      var col = colOf(name); var key = col ? col.name : name;
-      el.textContent = ''; var lab = document.createElement('span'); lab.textContent = key; el.appendChild(lab);
-      var ctrl;
-      if(preset){
-        ctrl = document.createElement('button'); ctrl.type='button'; ctrl.className='tog'; ctrl.textContent = preset;
-        ctrl.addEventListener('click', function(){ S[key] = (S[key] === preset) ? '' : preset; render(); save(); });
-      } else if(col && col.opts){
-        ctrl = document.createElement('select');
-        var o0 = document.createElement('option'); o0.value=''; o0.textContent='선택'; ctrl.appendChild(o0);
-        col.opts.forEach(function(v){ var o=document.createElement('option'); o.value=v; o.textContent=v; ctrl.appendChild(o); });
-        ctrl.addEventListener('change', function(){ S[key] = ctrl.value; render(); save(); });
-      } else if(key === '상담자'){
-        // 상담자는 슈퍼관리자가 등록한 이름으로 고정 — 본인이 고칠 수 없음
-        ctrl = document.createElement('input'); ctrl.type='text'; ctrl.readOnly = true; ctrl.placeholder='관리자가 이름 등록 필요'; ctrl.title='상담자 이름은 슈퍼관리자만 변경할 수 있어요'; ctrl.style.cssText='background:#F6F8FC;color:#58627A;cursor:not-allowed';
-      } else {
-        ctrl = document.createElement('input'); ctrl.type='text'; ctrl.placeholder='입력';
-        if(/기타 상담 내용|특이사항|안내한 상품 구성|매장 주소|이메일|기존 장비 모델명|현재 단말기/.test(key)) ctrl.className='wide';
-        if(key==='연락처'){ ctrl.type='tel'; ctrl.inputMode='tel'; ctrl.maxLength=13; ctrl.placeholder='010-0000-0000'; }
-        ctrl.addEventListener('input', function(){ if(key==='연락처'){ var f = fmtPhoneLive(ctrl.value); if(f !== ctrl.value){ ctrl.value = f; } } S[key] = ctrl.value; render(true); save(); });
-        if(key==='연락처' || key==='사업자번호') ctrl.addEventListener('blur', function(){ var f = key==='연락처' ? fmtPhone(ctrl.value) : fmtBiz(ctrl.value); S[key] = f; render(); save(); });
+  setDraft(v) { localStorage.setItem(this.KEY, JSON.stringify(v)); this.setState({ v }); }
+  updMany(o) { this.setDraft(Object.assign({}, this.state.v, o)); }
+  upd(k, val) { this.updMany({ [k]: k === 'phone' ? this.fmtPhone(val) : val }); }
+  fmtPhone(x) { let d = String(x||'').replace(/\D/g,'').slice(0,11); if(!d) return ''; if(d.startsWith('02')){ if(d.length<=2)return d; if(d.length<=5)return d.slice(0,2)+'-'+d.slice(2); if(d.length<=9)return d.slice(0,2)+'-'+d.slice(2,5)+'-'+d.slice(5); return d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6,10);} if(d.length<=3)return d; if(d.length<=6)return d.slice(0,3)+'-'+d.slice(3); if(d.length<=10)return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6); return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7); }
+  today() { return new Date().toISOString().slice(0, 10); }
+  inv(k, label) { const m = this.LBL[k]; for (const key in m) if (m[key] === label) return key; return ''; }
+  // Firestore 기록 → 폼 값
+  fromRecord(it) {
+    const d = it.data, g = k => String(d[k] || '').trim(), v = {};
+    v.name = g('고객명'); v.phone = g('연락처'); v.store = g('매장명'); v.addr = g('매장 주소');
+    const biz = g('업종'); if (biz) { if (this.BIZ.includes(biz)) v.biz = biz; else { v.biz = '기타'; v.bizEtc = biz; } }
+    v.mode = g('매장 구분') === '신규 오픈' ? 'fresh' : g('매장 구분') === '기존 운영' ? 'existing' : '';
+    v.entity = g('대형/개인/법인') === '법인' ? 'corp' : g('대형/개인/법인') ? 'person' : '';
+    v.owners = g('단독/공동') === '공동' ? 'joint' : g('단독/공동') === '단독' ? 'single' : '';
+    v.large = this.inv('large', g('연매출 3억')); v.reg = g('사업자등록증 발급') === '발급 완료' ? 'done' : g('사업자등록증 발급') === '발급 예정' ? 'pending' : '';
+    v.openDate = g('오픈 예정일'); v.pos = this.inv('pos', g('현재 포스')); v.term = this.inv('term', g('약정 잔여 개월'));
+    v.lan = g('인터넷 변경/신규 필요') === '필요' ? 'nonet' : g('인터넷 회선(랜선) 보유') === 'O' ? 'yes' : g('인터넷 회선(랜선) 보유') === 'X' ? 'no' : '';
+    v.link = g('포스 연동') === '필요' ? 'yes' : g('포스 연동') === '불필요' ? 'no' : '';
+    v.bundle = this.inv('bundle', g('안내한 상품 구성')); v.color = this.inv('color', g('기기 색상'));
+    v.category = g('판매 물품'); v.naver = g('네이버 ID'); v.email = g('이메일');
+    v.optin = g('우동지 수신 동의') === 'O' ? 'yes' : g('우동지 수신 동의') === 'X' ? 'no' : ''; v.memo = g('특이사항');
+    v.netReq = g('인터넷 상담 요청 일정') ? 'yes' : '';
+    v._id = it.id; v._prev = { 상담일: g('상담일'), 결과: g('상담 결과'), 일시: g('다음 액션 · 일시') };
+    return v;
+  }
+  // 폼 값 → Firestore 기록 (COLS 열 이름)
+  toRecord(v, L, ctx, kind, extra) {
+    const O = (a, b) => v[a] ? (v[a] === b ? 'O' : 'X') : '';
+    const r = {
+      '고객명': v.name || '', '연락처': v.phone || '', '매장명': v.store || '', '매장 주소': v.addr || '', '업종': v.biz === '기타' ? (v.bizEtc || '기타') : (v.biz || ''), '판매 물품': v.category || '',
+      '매장 구분': v.mode === 'fresh' ? '신규 오픈' : v.mode === 'existing' ? '기존 운영' : '', '상담일': this.today(), '상담자': this.state.agent || '',
+      '대형/개인/법인': v.entity === 'corp' ? '법인' : v.entity === 'person' ? '개인' : '', '단독/공동': v.owners === 'joint' ? '공동' : v.owners === 'single' ? '단독' : '', '연매출 3억': L.large || '',
+      '서류 분류': ctx.typed ? `${L.mode}·${L.entity}·${v.owners === 'joint' ? '공동' : '단독'}` : '', '페이앤 접수 링크': ctx.linkNo !== '—' ? ctx.linkNo : '',
+      '사업자등록증 발급': v.reg === 'done' ? '발급 완료' : v.reg === 'pending' ? '발급 예정' : '', '오픈 예정일': v.openDate || '',
+      '현재 포스': L.pos || '', '약정 잔여 개월': L.term || '', '포스 연동': v.link === 'yes' ? '필요' : v.link === 'no' ? '불필요' : '',
+      '인터넷 회선(랜선) 보유': v.lan === 'yes' ? 'O' : v.lan ? 'X' : '', '랜선 직접 준비 안내': v.lan === 'no' ? 'O' : v.lan ? 'X' : '', '인터넷 변경/신규 필요': v.lan === 'nonet' ? '필요' : v.lan ? '불필요' : '', '인터넷 상담 요청 일정': v.netReq ? '페이앤 인터넷 상담 요청' : '',
+      '안내한 상품 구성': L.bundle || '', '월 이용요금': v.bundle ? '0' : '', '기기 색상': L.color || '', '설치 방식': v.bundle ? (v.link === 'yes' ? '현장 설치' : '자가 설치') : '',
+      '네이버 ID': v.naver || '', '이메일': v.email || '', '우동지 수신 동의': O('optin', 'yes'), '특이사항': v.memo || '',
+      '상담 결과': kind === 'go' ? '상담 진행' : kind === 'recall' ? '상담 연기' : '상담 거부', '상태': kind === 'go' ? '상담 중' : kind === 'recall' ? '재연락 예정' : '종료',
+      '다음 액션 · 일시': kind === 'recall' ? extra.when : '', '포기 이유': kind === 'drop' ? extra.reason : ''
+    };
+    if (kind !== 'go' && extra.note) r['특이사항'] = (r['특이사항'] ? r['특이사항'] + ' / ' : '') + extra.note;
+    if (v._prev) { const p = v._prev, hist = '[재연락 ' + this.today() + '] 이전 ' + (p.상담일 || '') + ' ' + (p.결과 || '') + (p.일시 ? ' (약속 ' + p.일시 + ')' : ''); r['재연락 이력'] = hist; r['_addRecall'] = 1; }
+    return r;
+  }
+  async save(kind, extra) {
+    const { lib, v } = this.state; if (!lib) { alert('서버에 연결되지 않았어요. 홈에서 다시 로그인하세요.'); return; }
+    const ctx = this._ctx; const data = this.toRecord(v, ctx.L, ctx, kind, extra || {});
+    const id = v._id || 'r' + Date.now().toString(36);
+    this.setState({ saving: true });
+    let ok = true, err = '';
+    try {
+      const row = await lib.findRowById(id);
+      if (row) {
+        const cur = (await lib.readAll()).items.find(x => x.id === id); const old = cur ? cur.data : {};
+        if (data._addRecall) { data['재연락 이력'] = (old['재연락 이력'] ? old['재연락 이력'] + '\n' : '') + data['재연락 이력']; data['재연락 횟수'] = String((parseInt(old['재연락 횟수'] || '0', 10) || 0) + 1); }
+        delete data._addRecall; await lib.updateRecord(row, data);
+      } else { delete data._addRecall; await lib.appendRecord(data, id); }
+    } catch (e) { ok = false; err = e.message || String(e); delete data._addRecall; }
+    const sms = kind === 'go' ? ctx.sms : kind === 'recall' ? ctx.smsRecall(extra.when) : ctx.smsDrop;
+    try { localStorage.setItem('udongji-last-done', JSON.stringify({ id, data, sms, savedAt: new Date().toISOString(), synced: ok, err })); } catch (e) {}
+    localStorage.removeItem(this.KEY);
+    location.href = 'done.html';
+  }
+  renderVals() {
+    const v = Object.assign({}, this.state.v);
+    const set = {}, pick = {}, on = {}, f = {}, L = {};
+    for (const k of this.TEXT) set[k] = e => this.upd(k, e.target.value);
+    for (const k in this.OPTS) { pick[k] = {}; on[k] = {}; for (const o of this.OPTS[k]) { pick[k][o] = () => this.upd(k, k === 'netReq' && v[k] === o ? '' : o); on[k][o] = v[k] === o ? 'on' : ''; } }
+    for (const k in this.LBL) L[k] = (this.LBL[k][v[k]]) || '';
+    const agent = this.state.agent || this.props.agentName || '담당자';
+    const isNew = v.mode === 'fresh', isExisting = v.mode === 'existing', isCorp = v.entity === 'corp', isJoint = v.owners === 'joint';
+    const typed = !!(v.mode && v.entity && v.owners);
+    const typeLabel = typed ? `${L.mode} · ${L.entity} · ${L.owners}` : '유형 미확정';
+    const linkNo = this.LINKS[`${v.mode}|${v.entity}|${v.owners}`] || '—';
+    const posHas = v.pos === 'pc' || v.pos === 'android';
+    const needSite = v.link === 'yes';
+    const installLabel = v.bundle ? (needSite ? '현장 설치' : '자가 설치 (택배)') : '설치 방식 미정';
+    const noReg = isNew && v.reg === 'pending';
+    const noNet = v.lan === 'nonet';
+    let daysToOpen = null; if (v.openDate) daysToOpen = Math.round((new Date(v.openDate) - new Date().setHours(0,0,0,0)) / 864e5);
+    const req = ['name','phone','store','biz','mode','entity','owners','large'];
+    const bizEtc = v.biz === '기타'; if (bizEtc) req.push('bizEtc');
+    const bizLabel = bizEtc ? (v.bizEtc || '기타') : (v.biz || '-');
+    if (isNew) req.push('reg'); if (isNew && !noReg) req.push('openDate');
+    if (!noReg) { req.push('pos','lan'); if (!noNet) { req.push('bundle','color','category','naver'); if (posHas && v.bundle && v.bundle !== 'cat') req.push('link'); } }
+    req.push('optin','status');
+    for (const k of [...this.TEXT, ...Object.keys(this.OPTS)]) f[k] = v[k] ? 'filled' : '';
+    const reqDone = req.filter(k => v[k]).length, reqTotal = req.length;
+    const prog = keys => { const ks = keys.filter(k => req.includes(k)); if (!ks.length) return { cls: 'skip', txt: '건너뜀' }; const d = ks.filter(k => v[k]).length; return d === ks.length ? { cls: 'done', txt: '완료' } : { cls: 'todo', txt: `${ks.length - d} 남음` }; };
+    const docs = [
+      { t: '사업자등록증', s: '최근 발급본, 가리는 곳 없이' },
+      { t: '대표님 신분증', s: '주민등록증 또는 운전면허증 (여권 불가) — 생년월일·주소 여기서 확인' },
+      { t: '정산 통장 사본', s: isCorp ? '예금주 = 법인명 표기까지 완전 일치 (㈜/주식회사 구분)' : '예금주 = 대표님 본인, 모바일 캡처 가능' },
+      { t: '매장 사진', s: '간판 나오는 바깥 2장 · 안쪽 전체 2장 (간판 없으면 건물 바깥·입구·도로명 표지판·안쪽)' },
+    ];
+    if (isCorp) docs.push({ cls: 'cond', t: '법인: 등기부등본 · 인감증명서(3개월 이내) · 주주명부 · 소유지배자 확인서', s: '사용인감 쓰면 사용인감계도. 확인서 서식은 우리가 보내드림' });
+    if (isJoint) docs.push({ cls: 'cond', t: '공동대표: 가입 동의·위임장 · 결제계좌 동의서 · 공동대표님 신분증·연락처', s: '서식은 우리가 보내드림. 전자서명도 두 분 모두' });
+    if (v.biz === '음식점' || v.biz === '카페') docs.push({ cls: 'cond', t: '영업신고증', s: '음식점·카페 업종. 페이앤이 추가 요청하면 그때 받아도 됨' });
+    if (isExisting && (v.term === 'short' || v.term === 'long')) docs.push({ cls: 'cond', t: '기존 단말기 계약서 사진', s: '위약금 계산용 — 대리점에 직접 묻지 않기' });
+    docs.forEach((d, i) => { d.no = i + 1; d.cls = d.cls || ''; });
+    const name = v.name ? v.name + ' 대표님' : '대표님';
+    const head = `[우동지] ${name}, 우동지 ${agent}입니다.\n`, tail = `\n\n궁금한 점은 이 번호로 카톡 주시면 바로 답드릴게요.\n감사합니다.`;
+    const summary = [L.bundle, L.color && L.color + ' 색상', v.bundle && '월 0원', v.bundle && installLabel].filter(Boolean).join(', ') || '(구성 선택 후 표시)';
+    let sms = head + `오늘 통화 감사합니다. 아래 서류를 이 번호로 카톡/문자로 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 사진으로 충분합니다.\n\n` + docs.map(d => `${d.no}. ${d.t}\n   (${d.s})`).join('\n');
+    if (v.bundle) sms += `\n\n오늘 정리된 내용\n- 구성: ${L.bundle} / 월 0원${L.color ? '\n- 색상: ' + L.color : ''}\n- 설치: ${installLabel}${v.lan === 'no' ? '\n- 카드단말기 자리까지 랜선 준비 부탁드려요 (연장선 다이소·온라인 몇 천 원)' : ''}`;
+    if (v.large === 'over') sms += `\n\n※ 연매출 3억 이상 매장은 규정상 중고(거의 새것) 단말기로 월 990원에 나갑니다. 새 제품은 월 6,600원이에요.`;
+    sms += `\n\n서류 접수 후 페이앤에서 전자계약서가 카톡(알림톡)으로 가고, 서명하시면 완료됩니다.${isJoint ? ' 공동대표님도 함께 서명하셔야 해요.' : ''}` + tail;
+    const smsRecall = when => head + `오늘 통화 감사합니다. ${when ? when + '에' : '말씀해주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증 나오시면 바로 진행할게요.' : ''}` + tail;
+    const smsDrop = head + `오늘 시간 내주셔서 감사합니다. 나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.\n감사합니다.`;
+    const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
+    this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop };
+    const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
+    const ready = reqDone === reqTotal && !!this.state.lib && !this.state.saving;
+    const hideIf = (k, val) => v[k] ? (v[k] === val ? 'pick' : 'hide') : '';
+    const modal = this.state.modal, who = v.store || v.name || '(고객명 미입력)';
+    const setM = p => this.setState({ modal: Object.assign({}, this.state.modal, { err: '' }, p) });
+    const needBasic = () => !v.name || !v.phone ? '고객명과 연락처는 있어야 저장할 수 있어요.' : '';
+    const conn = this.state.conn;
+    return {
+      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent,
+      connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
+      hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
+      ch: { mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
+      typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
+      hideBizEtc: !bizEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
+      hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, hideEmail: v.optin !== 'yes',
+      br: { ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
+      p1: prog(['name','phone','store','biz','bizEtc']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan']), p5: prog(['bundle','link','color','category','naver']), p7: prog(['optin']), p8: prog(['status']),
+      reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
+      dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : reqDone === reqTotal ? (this.state.lib ? '필수 항목 모두 입력됨 — 작성 완료를 누르면 저장돼요' : '서버 연결 대기 중') : `필수 ${reqTotal - reqDone}개 남음 · 재연락·고객 포기는 지금도 저장 가능`,
+      notReady: !ready, finishLabel: this.state.saving ? '저장 중…' : '작성 완료', finish: () => ready && this.save('go'),
+      copySms: copy(sms), copyForm: copy(form),
+      reset: () => { if (Object.keys(v).length && !confirm('입력 중인 내용을 지우고 새 상담을 시작할까요?')) return; localStorage.removeItem(this.KEY); this.setState({ v: {} }); },
+      saving: this.state.saving,
+      hasModal: !!modal, modal: modal ? Object.assign({ hasErr: !!modal.err }, modal) : {}, closeModal: () => this.setState({ modal: null }),
+      openRecall: () => this.setState({ modal: { kind: 'recall', isRecall: true, isDrop: false, title: '재연락으로 저장', sub: who + ' — 지금까지 입력한 내용을 그대로 저장하고 상태를 "재연락 예정"으로 바꿔요. 재연락 목록에 올라갑니다.', when: '', note: '', ok: '재연락 저장', okCls: 'warn', err: '' } }),
+      openDrop: () => this.setState({ modal: { kind: 'drop', isRecall: false, isDrop: true, title: '고객 포기', sub: who + ' — 상담을 여기서 중단해요. 이유는 반드시 남겨야 하고, 고객 목록에는 남습니다.', reason: '', note: '', ok: '포기 처리', okCls: 'danger', err: '' } }),
+      onModalWhen: e => setM({ when: e.target.value }), onModalNote: e => setM({ note: e.target.value }), onModalReason: e => setM({ reason: e.target.value }),
+      saveModal: () => {
+        if (!modal || this.state.saving) return; const b = needBasic(); if (b) return setM({ err: b });
+        if (modal.kind === 'recall') { if (!modal.when.trim()) return setM({ err: '다음 연락 일시를 입력하세요.' }); this.save('recall', { when: modal.when.trim(), note: modal.note.trim() }); }
+        else { if (!modal.reason) return setM({ err: '포기 이유를 선택해야 저장할 수 있어요.' }); if (modal.reason === '기타' && !modal.note.trim()) return setM({ err: '"기타"는 상세 내용을 적어주세요.' }); this.save('drop', { reason: modal.reason + (modal.note.trim() ? ' — ' + modal.note.trim() : ''), note: '' }); }
       }
-      el.appendChild(ctrl);
-      if(key === '매장명'){
-        var mapBtn = document.createElement('button'); mapBtn.type='button'; mapBtn.className='tog map'; mapBtn.textContent='지도'; mapBtn.title='네이버 지도에서 매장명 검색 (새 탭)';
-        mapBtn.addEventListener('click', function(){
-          var q = (S['매장명']||'').trim(); if(!q){ ctrl.focus(); return; }
-          window.open('https://map.naver.com/p/search/' + encodeURIComponent(q), '_blank', 'noopener');
-        });
-        el.appendChild(mapBtn);
-      }
-      fields.push({el:el, key:key, preset:preset, ctrl:ctrl});
-    });
-
-    function applyMode(){
-      var r = S['상담 결과'] || '', go = !r || r === '상담 진행';
-      document.querySelectorAll('li[data-result]').forEach(function(li){
-        var v = li.getAttribute('data-result');
-        li.classList.toggle('off', !!r && r !== v);
-        li.classList.toggle('pick', !!r && r === v);
-      });
-      document.querySelectorAll('.result-branch').forEach(function(ul){ ul.classList.toggle('picked', !!r); });
-      var iss = S['사업자등록증 발급'] || '';
-      document.querySelectorAll('.issue-branch').forEach(function(ul){ ul.classList.toggle('picked', !!iss); });
-      document.querySelectorAll('li[data-issue]').forEach(function(li){ var v = li.getAttribute('data-issue'); li.classList.toggle('off', !!iss && iss !== v); li.classList.toggle('pick', !!iss && iss === v); });
-      document.querySelectorAll('.gated-go').forEach(function(el){ el.classList.toggle('open', go); });
-      var m = go ? (S['매장 구분'] || '') : '';
-      document.querySelectorAll('[data-only]').forEach(function(el){
-        var only = el.getAttribute('data-only');
-        el.classList.toggle('skip', !!m && m !== only);
-        el.classList.toggle('now', !!m && m === only);
-      });
-      document.querySelectorAll('.gated').forEach(function(el){ el.classList.toggle('open', !!m); });
-      var tag = $('modetag'); if(tag){ tag.textContent = m ? m + ' 폼' : ''; tag.classList.toggle('on', !!m); }
-      // 보이는 단계만 0부터 다시 번호 매기기 (목차 포함)
-      var n = 0;
-      ['s0','sm','s1','s2','s3','s4','s5','s6','s7','s8','s9'].forEach(function(id){
-        var sec = $(id); if(!sec) return;
-        var hidden = sec.classList.contains('skip') || ((sec.classList.contains('gated') || sec.classList.contains('gated-go')) && !sec.classList.contains('open'));
-        if(hidden) return;
-        var no = sec.querySelector('.step-h .no'); if(no) no.textContent = n;
-        var link = document.querySelector('nav.toc a[href="#'+id+'"] .n'); if(link) link.textContent = n;
-        n++;
-      });
-    }
-    function render(skipInputs){
-      applyMode();
-      var filled = 0, seen = {};
-      fields.forEach(function(f){
-        var v = S[f.key] || '';
-        if(f.preset){ f.ctrl.classList.toggle('on', v === f.preset); }
-        else if(f.ctrl.tagName === 'SELECT'){ f.ctrl.value = v; }
-        else if(!skipInputs && document.activeElement !== f.ctrl){ f.ctrl.value = v; }
-        f.el.classList.toggle('filled', !!v);
-        if(v && !seen[f.key]){ seen[f.key]=1; filled++; }
-      });
-      var req = reqList(), miss = req.filter(function(k){ return !(S[k]||'').toString().trim(); });
-      fields.forEach(function(f){ f.el.classList.toggle('req', isReq(f.key)); if(f.el.classList.contains('missing') && miss.indexOf(f.key)===-1) f.el.classList.remove('missing'); });
-      var fc = $('fillcount');
-      fc.textContent = filled + '개 입력 · 필수 ' + (req.length - miss.length) + '/' + req.length;
-      fc.classList.toggle('bad', miss.length > 0);
-      navProgress(req, miss);
-      if(typeof spyQ === 'function') spyQ();
-    }
-    function navProgress(req, miss){
-      navLinks.forEach(function(a){
-        var sec = document.querySelector(a.getAttribute('href')), p = a.querySelector('.prog');
-        if(!sec){ p.textContent=''; return; }
-        var hidden = sec.classList.contains('skip') || ((sec.classList.contains('gated') || sec.classList.contains('gated-go')) && !sec.classList.contains('open'));
-        a.style.display = hidden ? 'none' : '';
-        if(hidden){ p.textContent=''; return; }
-        var keys = {}, n = 0, left = 0;
-        fields.forEach(function(f){
-          if(!sec.contains(f.el) || f.el.closest('.skip, li.off, .result-branch:not(.picked), .issue-branch:not(.picked)') || keys[f.key] || req.indexOf(f.key) === -1) return;
-          keys[f.key] = 1; n++; if(miss.indexOf(f.key) !== -1) left++;
-        });
-        if(!n){ p.textContent=''; p.className='prog'; return; }
-        if(left){ p.textContent = left + '개 남음'; p.className = 'prog todo'; }
-        else { p.textContent = '완료'; p.className = 'prog done'; }
-      });
-      var tot = $('tot'); if(tot){
-        var done = req.length - miss.length;
-        $('tot-text').textContent = '필수 ' + done + ' / ' + req.length + (miss.length ? ' · ' + miss.length + '개 남음' : ' · 모두 완료');
-        $('tot-bar').style.width = (req.length ? Math.round(done / req.length * 100) : 0) + '%';
-        tot.classList.toggle('bad', miss.length > 0 && done === 0);
-      }
-    }
-    var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
-    navLinks.forEach(function(a){ if(!a.querySelector('.prog')){ var p = document.createElement('span'); p.className = 'prog'; a.appendChild(p); } });
-    render();
-    var gsEl = $('gs-status'); if(gsEl){ gsEl.textContent = '연결됨 · ' + (LIB ? LIB.userEmail() : ''); gsEl.className = 'gs on'; }
-    if(hasDraft){ savedAt = new Date(); var sn = $('savenote'); if(sn) sn.textContent = '이전 상담 내용 불러왔어요'; }
-
-    function fmtPhone(v){ var d = String(v).replace(/\D/g,''); if(d.length===11) return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3'); if(d.length===10) return d.slice(0,2)==='02' ? d.replace(/(\d{2})(\d{4})(\d{4})/,'$1-$2-$3') : d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3'); if(d.length===9 && d.slice(0,2)==='02') return d.replace(/(\d{2})(\d{3})(\d{4})/,'$1-$2-$3'); return String(v).trim(); }
-    function fmtPhoneLive(v){ var d = String(v||'').replace(/\D/g,'').slice(0,11); if(!d) return ''; if(d.slice(0,2)==='02'){ if(d.length<=2) return d; if(d.length<=5) return d.slice(0,2)+'-'+d.slice(2); if(d.length<=9) return d.slice(0,2)+'-'+d.slice(2,5)+'-'+d.slice(5); return d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6,10); } if(d.length<=3) return d; if(d.length<=6) return d.slice(0,3)+'-'+d.slice(3); if(d.length<=10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6); return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7); }
-    function fmtBiz(v){ var d = String(v).replace(/\D/g,''); return d.length===10 ? d.replace(/(\d{3})(\d{2})(\d{5})/,'$1-$2-$3') : String(v).trim(); }
-    // 작성 완료: 서버(Firestore)에 저장 → 폼 초기화(상담자 유지) → 완료 페이지
-    function archive(){
-      if(!S._id) S._id = 'r' + Date.now().toString(36);
-      var id = S._id, data = {}; Object.keys(S).forEach(function(k){ if(k[0] !== '_') data[k] = S[k]; });
-      if(S._prev){ var hist = '[재연락 ' + today() + '] 이전 ' + (S._prev.상담일 || '') + ' ' + (S._prev.결과 || '') + (S._prev.일시 ? ' (약속 ' + S._prev.일시 + ')' : ''); data['재연락 이력'] = ((data['재연락 이력'] || '') + (data['재연락 이력'] ? '\n' : '') + hist); data['재연락 횟수'] = String((parseInt(data['재연락 횟수'] || '0', 10) || 0) + 1); }
-      var done = function(ok, err){
-        try { localStorage.setItem('udongji-last-done', JSON.stringify({ id: id, data: data, savedAt: new Date().toISOString(), synced: !!ok, err: err || '' })); } catch(e){}
-        var agent = S['상담자'] || ''; S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent; save();
-        location.href = 'done.html';
-      };
-      if(!LIB){ done(false, '연결 안 됨'); return; }
-      LIB.findRowById(id).then(function(row){ return row ? LIB.updateRecord(row, data, id) : LIB.appendRecord(data, id); }).then(function(){ done(true); }, function(e){ done(false, e && e.message || String(e)); });
-    }
-    function scrollToEl(el){ var r = el.getBoundingClientRect(); window.scrollTo({ top: window.scrollY + r.top - window.innerHeight/2 + r.height/2, behavior: 'smooth' }); }
-    function isVisible(el){ return !!(el.offsetParent) && !el.closest('.skip, li.off, .result-branch:not(.picked), .issue-branch:not(.picked), .gated:not(.open), .gated-go:not(.open)'); }
-    function jumpTo(key){
-      var cands = fields.filter(function(x){ return x.key === key; });
-      var f = cands.filter(function(x){ return isVisible(x.el); })[0] || cands[0]; if(!f) return;
-      scrollToEl(f.el); f.el.classList.add('missing');
-      var c = f.ctrl; setTimeout(function(){ try { c.focus({preventScroll:true}); } catch(e){} }, 350);
-    }
-    $('btn-done').addEventListener('click', function(){
-      // 상담 연기/거부는 일시 종료 폼에서; 작성 완료 = 상담 진행
-      if(S['상담 결과'] === '상담 연기' && !(S['다음 액션 · 일시']||'').trim()){ openPause(); return; }
-      if(S['상담 결과'] !== '상담 연기' && S['상담 결과'] !== '상담 거부') S['상담 결과'] = '상담 진행';
-      var miss = reqList().filter(function(k){ return !(S[k]||'').toString().trim(); });
-      fields.forEach(function(f){ f.el.classList.toggle('missing', miss.indexOf(f.key) !== -1 && isVisible(f.el)); });
-      // 화면에 안 보이는 칸만 남은 필수가 있으면 안내
-      var unreachable = miss.filter(function(k){ return !fields.some(function(f){ return f.key === k && isVisible(f.el); }); });
-      if(miss.length){
-        // 화면 순서상 가장 위에 있는 빈 필수 칸으로 이동
-        var first = null, top = Infinity;
-        fields.forEach(function(f){
-          if(miss.indexOf(f.key) === -1 || !isVisible(f.el)) return;
-          var y = f.el.getBoundingClientRect().top + window.scrollY;
-          if(y < top){ top = y; first = f; }
-        });
-        if(first){ scrollToEl(first.el); setTimeout(function(){ try { first.ctrl.focus({preventScroll:true}); } catch(e){} }, 350); }
-        var fc = $('fillcount'); fc.textContent = '필수 ' + miss.length + '개 남음 — ' + miss.join(', ') + (unreachable.length ? ' (안 보이는 칸: ' + unreachable.join(', ') + ' — 위 선택 확인)' : ''); fc.classList.add('bad');
-        return;
-      }
-      $('btn-done').disabled = true; $('btn-done').textContent = '저장 중…';
-      archive();
-    });
-    // 일시 종료: 고객명·연락처만 확인 → 재연락 시기 입력 → 상담 연기로 저장
-    var pauseMode = 'sched', pauseKind = 'delay';
-    function setPauseKind(k){ pauseKind = k; $('pause-kind-delay').classList.toggle('on', k === 'delay'); $('pause-kind-reject').classList.toggle('on', k === 'reject'); $('pause-when').style.display = k !== 'delay' ? 'none' : ''; $('pause-ok').textContent = k === 'reject' ? '거부로 종료' : '종료 완료'; }
-    function setPauseMode(m){ pauseMode = m; $('pause-tbd').classList.toggle('on', m === 'tbd'); $('pause-sched').classList.toggle('on', m === 'sched'); $('pause-dt').style.display = m !== 'sched' ? 'none' : ''; }
-    function openPause(){
-      var need = ['고객명','연락처'].filter(function(k){ return !(S[k]||'').trim(); });
-      if(need.length){ var fc = $('fillcount'); fc.textContent = '일시 종료하려면 ' + need.join(', ') + '는 있어야 해요'; fc.classList.add('bad'); jumpTo(need[0]); return; }
-      var prev = (S['다음 액션 · 일시']||'').trim(), m = /(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}:\d{2}))?/.exec(prev);
-      if(prev === '미정') setPauseMode('tbd'); else { setPauseMode('sched'); if(m){ $('pause-date').value = m[1]+'-'+m[2]+'-'+m[3]; $('pause-time').value = m[4] || ''; } else { var t = new Date(Date.now() + 86400000); $('pause-date').value = t.toISOString().slice(0,10); $('pause-time').value = ''; } }
-      $('pause-memo').value = S['특이사항'] || ''; $('pause-miss').textContent = '';
-      setPauseKind(S['상담 결과'] === '상담 거부' ? 'reject' : 'delay');
-      $('pause').classList.add('open'); setTimeout(function(){ try { (pauseMode==='sched' ? $('pause-date') : $('pause-memo')).focus(); } catch(e){} }, 50);
-    }
-    $('btn-pause').addEventListener('click', openPause);
-    $('pause-kind-delay').addEventListener('click', function(){ setPauseKind('delay'); });
-    $('pause-kind-reject').addEventListener('click', function(){ setPauseKind('reject'); });
-    $('pause-tbd').addEventListener('click', function(){ setPauseMode('tbd'); });
-    $('pause-sched').addEventListener('click', function(){ setPauseMode('sched'); });
-    $('pause-cancel').addEventListener('click', function(){ $('pause').classList.remove('open'); });
-    $('pause').addEventListener('click', function(e){ if(e.target === $('pause')) $('pause').classList.remove('open'); });
-    $('pause-ok').addEventListener('click', function(){
-      var memo = $('pause-memo').value.trim(); if(memo) S['특이사항'] = memo;
-      if(pauseKind === 'reject'){ S['상담 결과'] = '상담 거부'; S['상태'] = '종료'; S['다음 액션 · 일시'] = ''; save(); $('pause').classList.remove('open'); $('pause-ok').disabled = true; $('pause-ok').textContent = '저장 중…'; archive(); return; }
-      var when;
-      if(pauseMode === 'tbd') when = '미정';
-      else { var dd = $('pause-date').value, tt = $('pause-time').value; if(!dd){ $('pause-miss').textContent = '날짜를 선택하세요 (또는 미정)'; return; } when = dd + (tt ? ' ' + tt : ''); }
-      S['상담 결과'] = '상담 연기'; S['상태'] = '재연락 예정'; S['다음 액션 · 일시'] = when;
-      save(); $('pause').classList.remove('open'); $('pause-ok').disabled = true; $('pause-ok').textContent = '저장 중…';
-      archive();
-    });
-    function resetForm(){
-      var agent = S['상담자'] || '';
-      S = {}; S['상담일'] = today(); if(agent) S['상담자'] = agent;
-      var rb = $('recall-banner'); if(rb) rb.hidden = true;
-      fields.forEach(function(f){ if(f.ctrl.tagName==='INPUT' && f.key !== '상담자') f.ctrl.value=''; });
-      render(); save(); window.scrollTo(0,0);
-    }
-    $('btn-reset').addEventListener('click', function(){
-      var has = Object.keys(S).some(function(k){ return k !== '상담일' && k !== '상담자' && (S[k]||'').toString().trim(); });
-      if(has && !window.confirm('지금 입력한 내용을 모두 지우고 새 상담을 시작할까요?\n(작성 완료를 안 했으면 저장되지 않아요)')) return;
-      resetForm();
-    });
-    // 완료 페이지에서 "새 상담 시작"으로 들어온 경우
-    if(/[?&]new=1/.test(location.search)){ resetForm(); try { history.replaceState(null, '', location.pathname); } catch(e){} }
-
-    // 목차 현재 위치 표시
-    var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
-    var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
-    function spy(){
-      var line = window.innerHeight * 0.35, cur = -1, best = Infinity;
-      secs.forEach(function(s, i){
-        if(!s || !s.offsetParent) return;
-        var r = s.getBoundingClientRect();
-        if(r.top <= line && r.bottom > line){ cur = i; best = -1; return; }
-        if(best !== -1){ var d = r.top > line ? r.top - line : line - r.bottom; if(d < best){ best = d; cur = i; } }
-      });
-      // 페이지 끝에 닿았으면 마지막 보이는 섹션
-      if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2){ for(var k = secs.length - 1; k >= 0; k--){ if(secs[k] && secs[k].offsetParent){ cur = k; break; } } }
-      links.forEach(function(a, i){ a.classList.toggle('active', i === cur); });
-    }
-    var spyRaf = null; function spyQ(){ if(spyRaf) return; spyRaf = requestAnimationFrame(function(){ spyRaf = null; spy(); }); }
-    window.addEventListener('scroll', spyQ, { passive: true });
-    document.addEventListener('scroll', spyQ, { passive: true, capture: true });
-    window.addEventListener('resize', spyQ);
-    requestAnimationFrame(spy); setTimeout(spy, 400); window.addEventListener('load', spy);
+    };
   }
 }
 </script>
