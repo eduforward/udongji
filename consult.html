@@ -160,7 +160,7 @@
   <div class="main">
     <header class="doc">
       <div><div class="kicker">우동지 · 네이버페이 커넥트 상담 스크립트 <b style="color:var(--purple)">v5</b></div><h1>상담 업무</h1><p>말풍선을 읽으며 진행하세요. <b style="color:var(--red)">필수</b>는 고객명·연락처 둘뿐이고, <b style="color:var(--amber)">권장</b> 칸은 채울 수 있는 만큼만 — 빠진 건 계약 업무에서 보완합니다. 매장 주소·사업자번호·생년월일·이메일은 <b>묻지 않아요</b> — 서류(사업자등록증·신분증·통장)에 다 있어요. 밴사도 언급하지 않습니다.</p></div>
-      <div class="typebadge"><span class="tb {{ typeCls }}">{{ typeLabel }}</span><small>접수 링크 <b>{{ linkNo }}</b></small><small>{{ installLabel }}</small></div>
+      <div class="typebadge"><span class="tb {{ typeCls }}">{{ typeLabel }}</span><small>{{ installLabel }}</small></div>
     </header>
     <div class="prevbar" hidden="{{ hidePrev }}">재연락 상담 — {{ prevTxt }} · "계약 업무로" 넘기면 같은 고객 기록이 갱신돼요.</div>
 
@@ -194,13 +194,13 @@
     </section>
 
     <section class="step" id="s2" data-screen-label="2 유형">
-      <div class="step-h"><div class="no">2</div><div class="t">유형 판별 — 질문 3개로 8유형 확정<small>운영 여부 → 개인/법인 → 공동대표. 여기서 접수 링크·서류 목록·이후 단계가 전부 정해져요.</small></div></div>
+      <div class="step-h"><div class="no">2</div><div class="t">유형 판별 — 질문 3개로 8유형 확정<small>운영 여부 → 개인/법인 → 공동대표. 여기서 서류 목록·이후 단계가 전부 정해져요.</small></div></div>
       <div class="say"><span class="who">상담사</span><span class="q">"지금 운영 중이세요, 아니면 오픈 준비 중이세요?"</span> <span class="rec req {{ f.mode }}">매장 구분 <span class="seg"><button class="{{ on.mode.existing }}" onClick="{{ pick.mode.existing }}">기존 운영</button><button class="{{ on.mode.fresh }}" onClick="{{ pick.mode.fresh }}">신규 오픈</button></span></span></div>
       <div class="say"><span class="who">상담사</span><span class="q">"개인사업자세요, 법인이세요?"</span> <span class="rec req {{ f.entity }}">사업자 형태 <span class="seg"><button class="{{ on.entity.person }}" onClick="{{ pick.entity.person }}">개인</button><button class="{{ on.entity.corp }}" onClick="{{ pick.entity.corp }}">법인</button></span></span></div>
       <div class="say"><span class="who">상담사</span><span class="q">"대표님 혼자 명의세요, 공동대표 계세요?"</span> <span class="rec req {{ f.owners }}">대표 구성 <span class="seg"><button class="{{ on.owners.single }}" onClick="{{ pick.owners.single }}">단독</button><button class="{{ on.owners.joint }}" onClick="{{ pick.owners.joint }}">공동대표</button></span></span></div>
       <div class="say"><span class="who">상담사</span><span class="q">"연매출이 3억 넘으세요? 조건이 조금 달라져서 여쭤봐요."</span> <span class="rec req {{ f.large }}">연매출 3억 <span class="seg"><button class="{{ on.large.under }}" onClick="{{ pick.large.under }}">3억 미만</button><button class="{{ on.large.over }}" onClick="{{ pick.large.over }}">3억 이상</button><button class="{{ on.large.unknown }}" onClick="{{ pick.large.unknown }}">모름</button></span></span></div>
       <div class="warn" hidden="{{ hideLarge }}"><b>3억 이상 → 중고 단말기 990원 고지 필수.</b> "대형 가맹점은 리베이트 규정 때문에 커넥트·단말기가 <b>중고(거의 새것)</b>로 월 990원에 나가요. 새 제품 원하시면 월 6,600원이에요." 미고지 시 박스 받고 철회하는 사례 있음. 모름이면 페이앤이 사업자번호로 판별해 채널톡으로 알려줌.</div>
-      <p class="note">확정된 유형은 상단 배지와 오른쪽 패널에 표시. 페이앤 접수 링크 번호(payn.channel.io/workflows/…)도 자동으로 붙어요.</p>
+      <p class="note">확정된 유형은 상단 배지와 오른쪽 패널에 표시. 페이앤 접수창은 계약 업무 → 페이앤 이관 탭에서 유형에 맞게 자동으로 열려요.</p>
     </section>
 
     <section class="step {{ s3cls }}" id="s3" data-screen-label="3 신규">
@@ -282,7 +282,7 @@
   </div>
 
   <aside class="side">
-    <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.channel }}">{{ L.channel }}</span><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>접수 링크</dt><dd>{{ linkNo }}</dd><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매</dt><dd>{{ catLabel }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
+    <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.channel }}">{{ L.channel }}</span><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매</dt><dd>{{ catLabel }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
     <div class="card"><h4>고객 안내 문자 <button onClick="{{ copySms }}">복사</button></h4><pre>{{ sms }}</pre></div>
   </aside>
 
