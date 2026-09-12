@@ -178,7 +178,9 @@
 
     <section class="step" id="s1" data-screen-label="1 인사">
       <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. Out(접수 고객)은 통화 전 네이버 지도로 매장을 봐두고 확인만, Call-In·Chat-In은 매장명·업종을 직접 물어요.</small></div></div>
-      <div class="say"><span class="who">상담사</span>안녕하세요, 우동지 상담사 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"접수 도와드리기 전에, 먼저 궁금하신 부분 있으실까요?"</span> <small style="color:#666">→ 질문 있으면 답하고(5단계 FAQ), 없으면 "{{ greetAsk }}"로 접수 시작.</small></div>
+      <div class="say"><span class="who">상담사</span>안녕하세요, 우동지 상담사 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"접수 도와드리기 전에, 먼저 궁금하신 부분 있으실까요?"</span></div>
+      <div class="say" style="background:#fafafa;border-left:3px solid #ddd"><span class="who" style="color:#888">진행</span><small style="color:#555;line-height:1.7">질문에 편하게 문답 (5단계 FAQ 참고). 상황에 따라 우동지 소개 — "저희는 네이버 커넥트 설치를 무료로 도와드리고, 서류 몇 가지만 주시면 접수부터 설치까지 제가 챙겨드려요." 고객이 접수 쪽으로 마음이 기울었다고 느껴지면 ↓</small></div>
+      <div class="say"><span class="who">상담사</span><span class="q">"그럼 접수 도와드려도 될까요?"</span> <small style="color:#666">→ 동의하면 각 잡고 접수 시작: "{{ greetAsk }}"</small></div>
       <div class="fgrid">
         <span class="rec must {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
         <span class="rec must {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
