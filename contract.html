@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=67"></script>
+  <script src="./udongji-nav.js?v=68"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -158,7 +158,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="67"></udongji-nav>
+<udongji-nav current="contract" page-v="68"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -217,6 +217,7 @@
               <div class="files"><sc-for list="{{ d.files }}" as="f" hint-placeholder-count="0"><div class="fthumb"><a href="{{ f.url }}" target="_blank" rel="noopener" title="크게 보기"><img src="{{ f.url }}" alt="{{ f.name }}" loading="lazy"></a><button type="button" class="fx" onClick="{{ f.remove }}" title="삭제">×</button><div class="fn" title="{{ f.name }}">{{ f.name }}</div></div></sc-for></div>
             </div>
             <label class="btn up">{{ d.upLabel2 }}<input type="file" multiple="{{ d.multi }}" accept="image/*,.pdf,.heic,.heif" onChange="{{ d.upload }}"></label>
+            <sc-if value="{{ d.canOcr }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" style="grid-column:3" onClick="{{ d.ocr }}" disabled="{{ ocrBusy }}">등록증 읽기</button></sc-if>
           </div>
         </sc-for>
         <div class="note"><b>필수</b>는 이 고객 유형(개인/법인 · 단독/공동)에 꼭 필요한 서류, <b>해당 시</b>는 업종·상황에 따라 받는 서류예요. {{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번.jpg</b>로 자동 정리 — PDF·PNG는 JPG로 변환. 업로드하면 자동으로 받음 체크.</div>
@@ -307,6 +308,22 @@
     </div>
   </aside>
   <div class="{{ toastCls }}">{{ toastMsg }}</div>
+  <sc-if value="{{ hasOcr }}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" style="z-index:70" onClick="{{ closeOcr }}"></div>
+    <div style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:90vh;overflow:auto;background:var(--card);border-radius:16px;box-shadow:var(--shadow-lg);padding:22px 24px;z-index:71">
+      <h3 style="font-size:17px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">사업자등록증에서 읽은 값</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:12px">{{ ocr.sub }}</p>
+      <sc-if value="{{ ocr.busy }}" hint-placeholder-val="{{ true }}"><div class="track" style="height:8px;background:var(--line-2);border-radius:999px;overflow:hidden"><div style="height:100%;background:var(--blue);border-radius:999px;width:{{ ocr.pct }}%"></div></div><div class="note">{{ ocr.status }} — 처음 한 번은 한글 인식 데이터(약 10MB)를 받아 좀 걸려요</div></sc-if>
+      <sc-if value="{{ ocr.ready }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ ocr.fields }}" as="f" hint-placeholder-count="0">
+          <div class="pf" style="grid-template-columns:22px 130px minmax(0,1fr)"><button type="button" class="cb" style="width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);background:{{ f.bg }};color:#fff;font-size:13px;font-weight:800;cursor:pointer" onClick="{{ f.toggle }}">{{ f.mark }}</button><label>{{ f.label }}<small>{{ f.hint }}</small></label><input class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}" placeholder="읽지 못함 — 직접 입력"></div>
+        </sc-for>
+        <details style="margin-top:10px"><summary style="font-size:12.5px;color:var(--text-3);cursor:pointer">인식된 원문 보기</summary><pre style="white-space:pre-wrap;font-size:11.5px;color:var(--text-3);background:var(--card-2);border-radius:8px;padding:8px 10px;max-height:160px;overflow:auto">{{ ocr.raw }}</pre></details>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button type="button" class="btn" onClick="{{ closeOcr }}">닫기</button><button type="button" class="btn primary" onClick="{{ applyOcr }}" disabled="{{ ocr.applyOff }}">{{ ocr.applyLabel }}</button></div>
+      </sc-if>
+      <sc-if value="{{ ocr.failed }}" hint-placeholder-val="{{ false }}"><div class="note" style="color:var(--red)">{{ ocr.err }}</div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button type="button" class="btn" onClick="{{ closeOcr }}">닫기</button></div></sc-if>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -314,7 +331,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {}, seq: 0, copied: {}, tab: 'docs', scope: 'mine', me: null };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=21'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=22'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me();
       this.setState({ lib, me }, () => this.load(true));
@@ -337,6 +354,38 @@ class Component extends DCLogic {
     } catch (e) { this.setState({ loading: false, err: e.message }); }
   }
   toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
+  // 사업자등록증 OCR → 확인 모달
+  // 모달 표시값
+  ocrView(rec) {
+    const o = this.state.ocr; if (!o) return {};
+    if (o.busy) return { busy: true, pct: o.pct || 0, status: o.status || '', sub: '업로드한 사업자등록증 사진을 이 브라우저에서 읽고 있어요 (서버로 보내지 않음).' };
+    if (o.failed) return { failed: true, err: o.err, sub: '' };
+    const lib = this.state.lib, d = rec ? rec.data : {}, V = k => lib ? lib.val(d, k) : '';
+    const defs = [
+      { k: 'bizno', label: '사업자번호', hint: '현재: ' + (V('사업자번호') || '없음'), digits: 10 },
+      { k: 'addr', label: '사업장 소재지 → 매장 주소', hint: '현재: ' + (V('매장 주소') || '없음') },
+      { k: 'corpno', label: '법인등록번호', hint: '법인만 · 페이앤 접수 칸에 들어가요', digits: 13 },
+      { k: 'store', label: '상호 → 매장명', hint: '현재: ' + (V('매장명') || '없음') + ' · 다르면 체크' },
+      { k: 'owner', label: '성명 → 고객명', hint: '현재: ' + (V('고객명') || '없음') },
+      { k: 'open', label: '개업연월일', hint: 'YYYY-MM-DD' }
+    ];
+    const fields = defs.map(f => { const v = String(o.vals[f.k] || ''), on = !!o.on[f.k]; return { label: f.label, hint: f.hint, value: v, cls: (f.digits ? 'mono ' : '') + (v ? '' : 'miss'), mark: on ? '✓' : '', bg: on ? 'var(--blue)' : '#fff',
+      toggle: () => this.setState({ ocr: Object.assign({}, this.state.ocr, { on: Object.assign({}, this.state.ocr.on, { [f.k]: !on }) }) }),
+      onInput: e => { let nv = e.target.value; if (f.digits) { nv = nv.replace(/\D/g, '').slice(0, f.digits); e.target.value = nv; } this.setState({ ocr: Object.assign({}, this.state.ocr, { vals: Object.assign({}, this.state.ocr.vals, { [f.k]: nv }), on: Object.assign({}, this.state.ocr.on, { [f.k]: !!nv }) }) }); } }; });
+    const n = defs.filter(f => o.on[f.k] && o.vals[f.k]).length;
+    return { ready: true, fields, raw: o.raw || '', sub: '체크된 항목만 고객 기록에 반영돼요. 잘못 읽은 값은 고치고, 반영하면 페이앤 접수 폼에도 바로 들어갑니다.', applyOff: !n, applyLabel: n ? n + '개 항목 반영' : '반영할 항목 없음' };
+  }
+  async runOcr(rec, blob) {
+    const lib = this.state.lib; if (!lib || !blob) return;
+    this.setState({ ocr: { busy: true, pct: 0, status: '준비 중…', recRow: rec.row } });
+    try {
+      const r = await lib.ocrBizReg(blob, m => { if (m && typeof m.progress === 'number') this.setState({ ocr: Object.assign({}, this.state.ocr, { pct: Math.round(m.progress * 100), status: m.status === 'recognizing text' ? '글자 인식 중' : m.status === 'loading language traineddata' ? '한글 인식 데이터 받는 중' : (m.status || '') }) }); });
+      const d = rec.data, V = k => lib.val(d, k);
+      const vals = { bizno: r.bizno, addr: r.addr, corpno: r.corpno, store: r.store, owner: r.owner, open: r.open };
+      const on = { bizno: !!r.bizno, addr: !!r.addr, corpno: !!r.corpno && (V('대형/개인/법인') === '법인' || r.isCorp), store: false, owner: false, open: false };
+      this.setState({ ocr: { busy: false, ready: true, recRow: rec.row, vals, on, raw: r.raw, isCorp: r.isCorp } });
+    } catch (e) { this.setState({ ocr: { failed: true, err: 'OCR 실패: ' + e.message, recRow: rec.row } }); }
+  }
   async saveMemoNow() {
     const { lib, items, selRow, memo } = this.state; const rec = items.find(it => it.row === selRow); if (!rec || !lib) return;
     if ((rec.data[lib.PROGRESS_NOTE_COL] || '') === memo) { this.setState({ memoDirty: false }); return; }
@@ -483,17 +532,19 @@ class Component extends DCLogic {
         cls: 'doc' + (on ? ' on' : ''), mark: on ? '✓' : '', name: x.name, hint: x.hint, upLabel: busy ? '업로드 중…' : '업로드', tag: x.cond ? '해당 시' : on ? '받음' : '필수', tagCls: x.cond ? 'opt' : '',
         toggle: async () => { const n = Object.assign({}, chk); if (on) { if (myFiles.length) { if (!confirm('"' + x.name + '" 체크를 풀면 올린 파일 ' + myFiles.length + '개도 함께 삭제돼요. 삭제할까요?')) return; for (const f of myFiles) { try { await lib.deleteFile(f.id); } catch (er) {} } delete n[x.id]; await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(fl.filter(z => z.doc !== x.id)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, '받음 해제 · 파일 ' + myFiles.length + '개 삭제'); return; } delete n[x.id]; } else n[x.id] = true; this.patch(rec, { [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, on ? '받음 해제' : '받음 체크'); },
         files: myFiles.map(f => ({ name: f.name, url: f.url, remove: async e => { e.preventDefault(); e.stopPropagation(); if (!confirm('"' + f.name + '" 파일을 삭제할까요?')) return; try { await lib.deleteFile(f.id); } catch (er) {} const nf = fl.filter(z => z.id !== f.id); const patch = { [lib.DOC_FILES_COL]: JSON.stringify(nf) }; if (!nf.some(z => z.doc === x.id) && chk[x.id]) { const n = Object.assign({}, chk); delete n[x.id]; patch[lib.DOC_CHECK_COL] = Object.keys(n).join(','); } await this.patch(rec, patch, '파일 삭제' + (patch[lib.DOC_CHECK_COL] !== undefined ? ' · 받음 체크 해제' : '')); } })),
-        single: !!x.single, multi: !x.single, hasFile: myFiles.length > 0, upLabel2: busy ? '업로드 중…' : myFiles.length ? '교체' : '업로드',
+        single: !!x.single, multi: !x.single, hasFile: myFiles.length > 0, canOcr: x.id === 'biz' && myFiles.length > 0, ocr: async () => { try { this.setState({ ocr: { busy: true, pct: 0, status: '사진 불러오는 중…', recRow: rec.row } }); const b = await (await fetch(myFiles[0].url, { mode: 'cors' })).blob(); await this.runOcr(rec, b); } catch (e) { this.setState({ ocr: { failed: true, err: '사진을 불러오지 못했어요: ' + e.message, recRow: rec.row } }); } }, upLabel2: busy ? '업로드 중…' : myFiles.length ? '교체' : '업로드',
         upload: async e => {
           const list2 = Array.from(e.target.files || []); e.target.value = ''; if (!list2.length) return;
           if (x.single && list2.length > 1) { this.toast('이 항목은 사진 1장만 — 한 장씩 올려주세요'); return; }
           this.setState({ busy: true });
+          const firstBlobRef = { b: null };
           try {
             const folder = await lib.ensureCustomerFolder(label, rec.row);
             const added = []; let seq = myFiles.length, converted = 0;
             for (const file of list2) {
               const parts = await lib.toJpgs(file);
               if (parts.length > 1 || parts[0].blob !== file) converted++;
+              if (!firstBlobRef.b) firstBlobRef.b = parts[0].blob;
               for (const p of parts) { seq++; const nm = lib.docFileName(d, x.name, seq, p.ext); const r = await lib.uploadFile(p.blob, folder, nm); added.push({ id: r.id, name: nm, url: r.webViewLink, doc: x.id, at: today }); }
             }
             const n = Object.assign({}, chk, { [x.id]: true });
@@ -502,6 +553,7 @@ class Component extends DCLogic {
             await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(keep.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, (x.single && myFiles.length ? '사진 교체' : added.length + '개 파일 업로드') + (converted ? ' (JPG 변환 ' + converted + '건)' : '') + ' · 받음 체크');
           } catch (er) { this.toast('업로드 실패: ' + er.message); }
           this.setState({ busy: false });
+          if (x.id === 'biz' && firstBlobRef.b) this.runOcr(rec, firstBlobRef.b);
         }
       }; });
     }
@@ -518,6 +570,8 @@ class Component extends DCLogic {
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, pf, photoGroups: this._pg || [], noPhotos: !!rec && !(this._pg || []).length,
+      ocrBusy: !!(this.state.ocr && this.state.ocr.busy), hasOcr: !!this.state.ocr, ocr: this.ocrView(rec), closeOcr: () => this.setState({ ocr: null }),
+      applyOcr: async () => { const o = this.state.ocr; if (!o || !o.ready || !rec || !lib) return; const patch = {}; if (o.on.bizno && o.vals.bizno) patch['사업자번호'] = o.vals.bizno; if (o.on.addr && o.vals.addr) patch['매장 주소'] = o.vals.addr; if (o.on.corpno && o.vals.corpno) patch[lib.PAYN_PREFIX + '가맹점 법인등록번호'] = o.vals.corpno; if (o.on.store && o.vals.store) patch['매장명'] = o.vals.store; if (o.on.owner && o.vals.owner) patch['고객명'] = o.vals.owner; if (o.on.open && o.vals.open) patch['개업일'] = o.vals.open; const n = Object.keys(patch).length; if (!n) { this.toast('반영할 항목이 없어요'); return; } const ok = await this.patch(rec, patch, n + '개 항목 반영 (등록증 OCR)'); if (ok) this.setState({ ocr: null }); },
       memoState: this.state.memoSaving ? '저장 중…' : this.state.memoDirty ? '입력 중 — 1초 후 자동 저장' : this.state.memoSavedAt ? '자동 저장 완료 ' + this.state.memoSavedAt : '자동 저장됨', memoCls: this.state.memoDirty || this.state.memoSaving ? 'amber' : 'ok',
       hasPhotoSel: !!(this._photoDrag && this._photoDrag.selFiles.length), noPhotoSel: !!rec && !!(this._pg || []).length && !(this._photoDrag && this._photoDrag.selFiles.length), photoSelN: this._photoDrag ? this._photoDrag.selFiles.length : 0,
       photoSelInfo: this._photoDrag ? (this._photoDrag.readyN < this._photoDrag.selFiles.length ? '사진 불러오는 중 ' + this._photoDrag.readyN + '/' + this._photoDrag.selFiles.length : '준비됨 — 다운로드 후 페이앤 파일 칸에서 여러 개 선택') : '',
