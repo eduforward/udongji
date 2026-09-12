@@ -282,9 +282,8 @@
     <div class="modal">
       <h3>{{ modal.title }}</h3><p>{{ modal.sub }}</p>
       <sc-if value="{{ modal.isRecall }}" hint-placeholder-val="{{ true }}"><label>다음 연락 <b>*</b></label>
-        <div class="seg" style="flex-wrap:wrap;gap:6px"><sc-for list="{{ quickDates }}" as="q" hint-placeholder-count="0"><button type="button" class="{{ q.cls }}" onClick="{{ q.pick }}" style="height:32px;padding:0 12px;border-color:var(--line)">{{ q.label }}</button></sc-for></div>
-        <sc-if value="{{ modal.isOther }}" hint-placeholder-val="{{ false }}"><label>말로 입력 — 자동으로 날짜 인식</label><input type="text" placeholder="예: 다음주 월요일 오후 2시 / 9월 20일 / 3일 뒤 / 다음달 초" value="{{ modal.free }}" onInput="{{ onModalFree }}"><label>또는 날짜 직접 선택</label><input type="date" value="{{ modal.date }}" onInput="{{ onModalDate }}"></sc-if>
-        <sc-if value="{{ modal.parseFail }}" hint-placeholder-val="{{ false }}"><div class="err">날짜를 인식하지 못했어요 — 다른 표현으로 쓰거나 아래에서 날짜를 직접 선택하세요.</div></sc-if>
+        <input type="text" placeholder="예: 내일 오후 2시 / 다음주 월요일 / 9월 20일 / 3일 뒤 / 다음달 초" value="{{ modal.free }}" onInput="{{ onModalFree }}">
+        <sc-if value="{{ modal.parseFail }}" hint-placeholder-val="{{ false }}"><div class="err">날짜를 인식하지 못했어요 — 예: 내일, 모레, 다음주 화요일, 9/20, 2주 뒤, 다음달 중순</div></sc-if>
         <sc-if value="{{ modal.hasPreview }}" hint-placeholder-val="{{ false }}"><div class="note" style="padding:6px 0 0;color:var(--green);font-weight:600">→ {{ modal.preview }}</div></sc-if>
         <label>메모 (선택)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="부재중 · 사업자등록증 나오면 등"></textarea></sc-if>
       <sc-if value="{{ modal.isDrop }}" hint-placeholder-val="{{ false }}"><label>포기 이유 <b>* 필수</b></label><select value="{{ modal.reason }}" onChange="{{ onModalReason }}"><option value="">선택하세요</option><option>타사 계약·이미 사용 중</option><option>조건 불만족 (수수료·약정·위약금)</option><option>인터넷·설치 환경 불가</option><option>사업자등록증 미발급·폐업</option><option>연락 두절 (3회 이상 부재)</option><option>관심 없음·거부</option><option>기타</option></select><label>상세 (선택 · 기타면 필수)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="어떤 말씀을 하셨는지 한 줄"></textarea></sc-if>
