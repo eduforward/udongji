@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=45"></script>
+  <script src="./udongji-nav.js?v=46"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -229,7 +229,7 @@
     }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="45"></udongji-nav>
+<udongji-nav current="consult" page-v="46"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="목차">
     <div class="logo"><div class="mark">우</div><div><span class="name">상담 업무</span><span class="sub">스크립트 v4</span></div></div>
@@ -480,7 +480,7 @@
 class Component extends DCLogic {
   renderVals() { return {}; }
   componentDidMount() {
-    import('./udongji-fb.js?v=6').then(async mod => {
+    import('./udongji-fb.js?v=7').then(async mod => {
       this.lib = mod; await mod.init();
       if (!mod.isSignedIn()) { location.replace('index.html#login'); return; }
       // 재연락: ?id=… 로 들어오면 그 고객 기록을 폼에 불러와 이어서 상담 (작성 완료 시 같은 기록 갱신)

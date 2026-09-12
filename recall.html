@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=45"></script>
+  <script src="./udongji-nav.js?v=46"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -58,13 +58,13 @@
     .modal h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
     .modal p { font-size: 13.5px; color: var(--text-2); margin-bottom: 12px; }
     .modal label { display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin: 10px 0 5px; }
-    .modal input, .modal textarea { width: 100%; font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
+    .modal input, .modal textarea, .modal select { width: 100%; font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); }
     .modal .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
     .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 30; }
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="recall" page-v="45"></udongji-nav>
+<udongji-nav current="recall" page-v="46"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>재연락</b><small>상담 연기 · 재연락 예정 고객</small></div></div>
@@ -87,7 +87,7 @@
           <a class="btn primary" href="{{ r.consultHref }}">이어서 상담 →</a>
           <button type="button" class="btn" onClick="{{ r.copySms }}">재연락 문자</button>
           <button type="button" class="btn" onClick="{{ r.reschedule }}">일정 변경</button>
-          <button type="button" class="btn danger" onClick="{{ r.close }}">종료</button>
+          <button type="button" class="btn danger" onClick="{{ r.close }}">고객 포기</button>
         </div>
       </div>
     </sc-for>
@@ -99,7 +99,8 @@
     <div class="modal">
       <h3>{{ modal.title }}</h3><p>{{ modal.sub }}</p>
       <sc-if value="{{ modal.isReschedule }}" hint-placeholder-val="{{ true }}"><label>다음 연락 일시</label><input type="text" placeholder="예: 9/15 오후 2시" value="{{ modal.when }}" onInput="{{ onModalWhen }}"></sc-if>
-      <label>메모 (선택)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="부재중 · 다음 주에 다시 등"></textarea>
+      <sc-if value="{{ modal.isDrop }}" hint-placeholder-val="{{ false }}"><label>포기 이유 <b style="color:var(--red)">* 필수</b></label><select value="{{ modal.reason }}" onChange="{{ onModalReason }}"><option value="">선택하세요</option><option>타사 계약·이미 사용 중</option><option>조건 불만족 (수수료·약정·위약금)</option><option>인터넷·설치 환경 불가</option><option>사업자등록증 미발급·폐업</option><option>연락 두절 (3회 이상 부재)</option><option>관심 없음·거부</option><option>기타</option></select></sc-if>
+      <label>{{ modal.noteLabel }}</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="{{ modal.notePh }}"></textarea>
       <div class="row"><button type="button" class="btn" onClick="{{ closeModal }}">취소</button><button type="button" class="btn primary" onClick="{{ saveModal }}" disabled="{{ busy }}">{{ modal.ok }}</button></div>
     </div>
   </sc-if>
@@ -111,7 +112,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'due', modal: null, busy: false, toast: '', toastOn: false };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=6'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=7'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       this.setState({ lib }, () => this.load());
     } catch (e) { location.replace('index.html#login'); }
@@ -164,8 +165,8 @@ class Component extends DCLogic {
         meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분'), V(d, '상담일') ? '상담 ' + V(d, '상담일') : '', V(d, '상담자'), n ? '재연락 ' + n + '회' : ''].filter(Boolean).join(' · '), hist,
         consultHref: 'consult.html?id=' + encodeURIComponent(it.id),
         copySms: () => { const name = V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님'; this.copy('[우동지] ' + name + ', 우동지 ' + (V(d, '상담자') || '담당자') + '입니다.\n말씀하신 대로 커넥트 상담 이어서 연락드렸는데 통화가 어려우신 것 같아요. 편한 시간 알려주시면 그때 다시 전화드릴게요.\n감사합니다.', '재연락 문자'); },
-        reschedule: () => this.setState({ modal: { id: it.id, kind: 'reschedule', title: '다음 연락 일정 변경', sub: (V(d, '매장명') || V(d, '고객명')) + ' · 지금: ' + (V(d, '다음 액션 · 일시') || '없음'), when: '', note: '', ok: '변경', isReschedule: true } }),
-        close: () => this.setState({ modal: { id: it.id, kind: 'close', title: '재연락 종료', sub: (V(d, '매장명') || V(d, '고객명')) + ' — 더 이상 연락하지 않음으로 처리해요. 고객 목록에는 남아요.', when: '', note: '', ok: '종료 처리', isReschedule: false } })
+        reschedule: () => this.setState({ modal: { id: it.id, kind: 'reschedule', title: '다음 연락 일정 변경', sub: (V(d, '매장명') || V(d, '고객명')) + ' · 지금: ' + (V(d, '다음 액션 · 일시') || '없음'), when: '', note: '', reason: '', ok: '변경', isReschedule: true, isDrop: false, noteLabel: '메모 (선택)', notePh: '부재중 · 다음 주에 다시 등' } }),
+        close: () => this.setState({ modal: { id: it.id, kind: 'close', title: '고객 포기', sub: (V(d, '매장명') || V(d, '고객명')) + ' — 더 이상 연락하지 않음으로 처리해요. 이유는 반드시 남겨야 하고, 고객 목록에는 남아요.', when: '', note: '', reason: '', ok: '포기 처리', isReschedule: false, isDrop: true, noteLabel: '상세 (선택 · 기타면 필수)', notePh: '어떤 말씀을 하셨는지 한 줄' } })
       };
     });
     const setF = f => () => this.setState({ filter: f });
@@ -178,14 +179,14 @@ class Component extends DCLogic {
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : rows.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '재연락할 고객이 없어요.' : filter === 'due' ? '오늘까지 연락할 고객이 없어요. "전체"에서 예정 건을 볼 수 있어요.' : '조건에 맞는 건이 없어요.',
       hasModal: !!modal, modal: modal || {}, busy, closeModal: () => this.setState({ modal: null }),
-      onModalWhen: e => this.setState({ modal: Object.assign({}, modal, { when: e.target.value }) }), onModalNote: e => this.setState({ modal: Object.assign({}, modal, { note: e.target.value }) }),
+      onModalWhen: e => this.setState({ modal: Object.assign({}, modal, { when: e.target.value }) }), onModalNote: e => this.setState({ modal: Object.assign({}, modal, { note: e.target.value }) }), onModalReason: e => this.setState({ modal: Object.assign({}, modal, { reason: e.target.value }) }),
       saveModal: async () => {
         if (!modal || !lib) return; const it = items.find(x => x.id === modal.id); if (!it) return; const d = it.data;
         this.setState({ busy: true });
         try {
           const stamp = '[' + lib.todayStr() + '] ';
           if (modal.kind === 'reschedule') { if (!modal.when.trim()) { this.setState({ busy: false }); this.toast('일시를 입력하세요'); return; } await lib.updateCells(it.id, { '다음 액션 · 일시': modal.when.trim(), '상태': '재연락 예정', '재연락 이력': (V(d, '재연락 이력') ? V(d, '재연락 이력') + '\n' : '') + stamp + '일정 변경 → ' + modal.when.trim() + (modal.note ? ' · ' + modal.note : '') }); this.toast('일정을 변경했어요'); }
-          else { await lib.updateCells(it.id, { '상태': '종료', '상담 결과': isPost(d) ? '상담 거부' : d['상담 결과'], '재연락 이력': (V(d, '재연락 이력') ? V(d, '재연락 이력') + '\n' : '') + stamp + '재연락 종료' + (modal.note ? ' · ' + modal.note : '') }); this.toast('종료 처리했어요'); }
+          else { if (!modal.reason) { this.setState({ busy: false }); this.toast('포기 이유를 선택하세요'); return; } if (modal.reason === '기타' && !modal.note.trim()) { this.setState({ busy: false }); this.toast('"기타"는 상세 내용을 적어주세요'); return; } const why = modal.reason + (modal.note.trim() ? ' — ' + modal.note.trim() : ''); await lib.updateCells(it.id, { '상태': '종료', '상담 결과': '상담 거부', '포기 이유': why, '재연락 이력': (V(d, '재연락 이력') ? V(d, '재연락 이력') + '\n' : '') + stamp + '고객 포기 · ' + why }); this.toast('고객 포기 처리했어요'); }
           this.setState({ modal: null, busy: false }); await this.load();
         } catch (e) { this.setState({ busy: false }); this.toast('저장 실패: ' + e.message); }
       },

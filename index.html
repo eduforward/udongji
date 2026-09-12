@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=45"></script>
+  <script src="./udongji-nav.js?v=46"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.14); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -119,7 +119,7 @@
     @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .row .m, .row .d { display: none; } }
   </style>
 </helmet>
-<udongji-nav current="home" page-v="45"></udongji-nav>
+<udongji-nav current="home" page-v="46"></udongji-nav>
 <div class="wrap">
   <div class="top">
     <img class="mark" src="favicon.svg" alt=""><div><h1>우동지CRM</h1><div class="sub">커넥트 상담 → 계약 → 배송</div></div>
@@ -184,7 +184,7 @@ class Component extends DCLogic {
   }
   async componentDidMount() {
     if (location.hash === '#admin') { location.replace('admin.html'); return; }
-    try { const lib = await import('./udongji-fb.js?v=6'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); lib.myName().then(n => this.setState({ myName: n || '' })).catch(() => {}); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-fb.js?v=7'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); lib.myName().then(n => this.setState({ myName: n || '' })).catch(() => {}); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); }
