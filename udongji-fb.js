@@ -274,7 +274,7 @@ export async function readAll(opts) {
   await init(); need(); const { fs } = _mods; opts = opts || {};
   const m = await me();
   let q;
-  if (m.admin || opts.all) q = fs.query(fs.collection(_db, COL), fs.orderBy('_createdAt', 'asc'));
+  if (m.admin || opts.all) q = fs.collection(_db, COL);
   else if (m.name) q = fs.query(fs.collection(_db, COL), fs.where('상담자', '==', m.name));
   else return { header: FULL_HEADER(), items: [] };
   const snap = await fs.getDocs(q);
