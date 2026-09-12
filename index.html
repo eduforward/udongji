@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=57"></script>
+  <script src="./udongji-nav.js?v=58"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.14); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -119,7 +119,7 @@
     @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .row .m, .row .d { display: none; } }
   </style>
 </helmet>
-<udongji-nav current="home" page-v="57"></udongji-nav>
+<udongji-nav current="home" page-v="58"></udongji-nav>
 <div class="wrap">
   <div class="top">
     <img class="mark" src="favicon.svg" alt=""><div><h1>우동지CRM</h1><div class="sub">커넥트 상담 → 계약 → 배송</div></div>
@@ -161,12 +161,29 @@
     </a>
   </div>
 
+  <sc-if value="{{ hasInbox }}" hint-placeholder-val="{{ false }}">
+  <div class="card" style="margin-top:14px;border:1px solid var(--amber-2)">
+    <sc-if value="{{ hasTrMsg }}" hint-placeholder-val="{{ false }}"><div class="msg {{ msgCls }}" style="margin:0 0 8px">{{ msg }}</div></sc-if>
+    <h3 style="display:flex;align-items:center;gap:10px">이관 요청 {{ inboxN }}건 <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--text-3)">· 수락하면 해당 고객의 상담자가 나로 바뀝니다</span><button type="button" class="pill purple" style="margin-left:auto;border:0;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;padding:6px 12px" onClick="{{ acceptAll }}" disabled="{{ busy }}">전부 수락</button></h3>
+    <sc-for list="{{ inbox }}" as="t" hint-placeholder-count="0">
+      <div class="row" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto auto;cursor:default"><b>{{ t.store }}</b><span class="m">{{ t.meta }}</span><button type="button" class="pill" style="border:1px solid var(--line);cursor:pointer;font:inherit;font-size:12px;font-weight:700" onClick="{{ t.reject }}" disabled="{{ busy }}">거절</button><button type="button" class="pill purple" style="border:0;cursor:pointer;font:inherit;font-size:12px;font-weight:700" onClick="{{ t.accept }}" disabled="{{ busy }}">수락</button></div>
+    </sc-for>
+  </div>
+  </sc-if>
+  <sc-if value="{{ hasOutbox }}" hint-placeholder-val="{{ false }}">
+  <div class="card" style="margin-top:14px">
+    <h3>내가 보낸 이관 · 수락 대기 {{ outboxN }}건</h3>
+    <sc-for list="{{ outbox }}" as="t" hint-placeholder-count="0">
+      <div class="row" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;cursor:default"><b>{{ t.store }}</b><span class="m">{{ t.meta }}</span><button type="button" class="pill" style="border:1px solid var(--line);cursor:pointer;font:inherit;font-size:12px;font-weight:700" onClick="{{ t.cancel }}" disabled="{{ busy }}">요청 취소</button></div>
+    </sc-for>
+  </div>
+  </sc-if>
 
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, records: [], draft: null, signedIn: false, email: '', msg: '', msgCls: '', busy: false, showAdmin: false, err: '', isAdmin: false, allowed: true, admins: [], users: [], newAdmin: '', newUser: '', newUserName: '' };
+  state = { lib: null, records: [], draft: null, signedIn: false, email: '', msg: '', msgCls: '', busy: false, showAdmin: false, err: '', isAdmin: false, allowed: true, admins: [], users: [], newAdmin: '', newUser: '', newUserName: '', transfers: [] };
   async refreshAdmin() {
     const lib = this.state.lib; if (!lib || !lib.isSignedIn()) { this.setState({ isAdmin: false, admins: [], users: [], showAdmin: false }); return; }
     const email = lib.userEmail(); const ok = await lib.isAdmin(email);
@@ -175,7 +192,7 @@ class Component extends DCLogic {
   }
   async componentDidMount() {
     if (location.hash === '#admin') { location.replace('admin.html'); return; }
-    try { const lib = await import('./udongji-fb.js?v=14'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); lib.myName().then(n => this.setState({ myName: n || '' })).catch(() => {}); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-fb.js?v=15'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); lib.myName().then(n => this.setState({ myName: n || '' })).catch(() => {}); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); }
@@ -187,6 +204,7 @@ class Component extends DCLogic {
       const { items } = await lib.readAll();
       const recs = items.map(it => ({ id: it.id, row: it.row, data: it.data, registered: !!String(it.data[lib.REG_COL] || '').trim(), savedAt: it.data['상담일'] || '' })).reverse();
       this.setState({ records: recs, draft, signedIn: true, email: lib.userEmail(), err: '', allowed: true });
+      try { const transfers = await lib.listTransfers(); this.setState({ transfers }); } catch (e) {}
     } catch (e) { const denied = /permission|insufficient/i.test(e.message); this.setState({ records: [], draft, err: denied ? '' : e.message, allowed: !denied, signedIn: lib.isSignedIn(), email: lib.userEmail() }); }
   }
   renderVals() {
@@ -196,6 +214,12 @@ class Component extends DCLogic {
     const userRows = ROOT.map(e => ({ email: e, name: (users.find(u => u.email === e) || {}).name || '', meta: '슈퍼관리자', removable: false, remove: () => {}, rename: rename(e, (users.find(u => u.email === e) || {}).name) })).concat(users.filter(u => !ROOT.includes(u.email)).map(u => ({ email: u.email, name: u.name || '(이름 없음)', rename: rename(u.email, u.name), meta: (admins.some(a => a.email === u.email) ? '관리자 · ' : '') + (u.at ? u.at + ' 추가' : ''), removable: true, remove: async () => { if (!confirm(u.email + ' 을(를) 사용자에서 제거할까요? 이후 로그인해도 데이터가 보이지 않아요.')) return; try { await lib.removeUser(u.email); this.setState({ msg: '제거했어요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ msg: '제거 실패: ' + e.message, msgCls: 'err' }); } } })));
     const adminRows = ROOT.map(e => ({ email: e, meta: '기본 관리자', removable: false, remove: () => {} })).concat(admins.map(a => ({ email: a.email, meta: (a.at ? a.at + ' 위임' : '') + (a.by ? ' · ' + a.by : ''), removable: true, remove: async () => { if (!confirm(a.email + ' 의 슈퍼관리자 권한을 해제할까요?')) return; try { await lib.removeAdmin(a.email); this.setState({ msg: '해제했어요.', msgCls: 'ok' }); this.refreshAdmin(); } catch (e) { this.setState({ msg: '해제 실패: ' + e.message, msgCls: 'err' }); } } })));
     const t = new Date(), pad = n => String(n).padStart(2, '0');
+    // 이관 요청 (받은 것 / 보낸 것)
+    const myEmail = (email || '').toLowerCase(), tr = this.state.transfers || [];
+    const act = (fn, okMsg) => async () => { this.setState({ busy: true }); try { await fn(); this.setState({ msg: okMsg, msgCls: 'ok' }); await this.load(); } catch (e) { this.setState({ msg: '실패: ' + e.message, msgCls: 'err' }); } this.setState({ busy: false }); };
+    const inboxRaw = tr.filter(x => x.status === 'pending' && x.toEmail === myEmail), outboxRaw = tr.filter(x => x.status === 'pending' && x.fromEmail === myEmail && x.toEmail !== myEmail);
+    const inbox = inboxRaw.map(x => ({ store: x.store || x.customer || '(매장명 없음)', meta: [x.customer, x.phone, x.from + ' 님이 보냄', String(x.at || '').slice(5, 10)].filter(Boolean).join(' · '), accept: act(() => lib.acceptTransfer(x), '이관을 수락했어요'), reject: act(() => lib.rejectTransfer(x), '거절했어요') }));
+    const outbox = outboxRaw.map(x => ({ store: x.store || x.customer || '(매장명 없음)', meta: [x.customer, x.to + ' 님에게', String(x.at || '').slice(5, 10)].filter(Boolean).join(' · '), cancel: act(() => lib.cancelTransfer(x), '요청을 취소했어요') }));
     const todayStr = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
     const isGo = r => ((r.data || {})['상담 결과'] || '상담 진행') === '상담 진행';
     const pending = records.filter(r => !r.registered && isGo(r));
@@ -226,6 +250,7 @@ class Component extends DCLogic {
       todayCount: todayRecs.length, myToday,
       totalCount: records.length, pendingCount: pending.length, hasPending: pending.length > 0, noPending: pending.length === 0, callCount, hasCall: callCount > 0, dueCount, hasDue: dueCount > 0, inProgress, myProgress, myCall, docsWait, hasDocsWait: docsWait > 0,
       hasDraft, draftName: hasDraft ? (draft.store || draft.name || '이름 미입력') : '',
+      hasInbox: inbox.length > 0, inboxN: inbox.length, inbox, hasTrMsg: !!msg && signedIn, acceptAll: act(async () => { for (const x of inboxRaw) await lib.acceptTransfer(x); }, inboxRaw.length + '건 모두 수락했어요'), hasOutbox: outbox.length > 0, outboxN: outbox.length, outbox,
       recent, noRecent: recent.length === 0, sourceLabel: '회사 서버',
       locked: !unlocked, unlocked, signedIn, gridCls: unlocked ? '' : 'locked', busy, hasMsg: !!msg || deniedMsg,
       statusCls, statusText, msg: deniedMsg ? '이 계정(' + email + ')은 아직 사용자로 등록되지 않았어요. 관리자에게 등록을 요청하세요.' : msg, msgCls: deniedMsg ? 'err' : msgCls,

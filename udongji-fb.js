@@ -395,5 +395,28 @@ export async function setConsultHours(cfg) {
 export function storageConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/storage'; }
 export function firestoreConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/firestore'; }
 
+// ── 고객 이관 (Firestore: transfers/{id}) — 보낸 사람이 요청, 받는 사람이 수락해야 상담자가 바뀐다 ──
+export const TRANSFER_LOG_COL = '이관 이력';
+export async function listTransfers() {
+  await init(); need(); const { fs } = _mods; const m = await me();
+  const s = await fs.getDocs(fs.query(fs.collection(_db, 'transfers'), fs.orderBy('at', 'desc'), fs.limit(300)));
+  return s.docs.map(d => Object.assign({ id: d.id }, d.data())).filter(t => m.admin || t.toEmail === m.email || t.fromEmail === m.email);
+}
+export async function requestTransfers(items, toUser) {
+  await init(); need(); const { fs } = _mods; const m = await me(); if (!toUser || !toUser.email) throw new Error('받을 사람을 고르세요'); if (!toUser.name) throw new Error('받을 사람 계정에 이름이 없어요 (관리자에서 이름 등록)');
+  const now = new Date().toISOString(); const batch = fs.writeBatch(_db); let n = 0;
+  for (const it of items) { const d = it.data || {}; batch.set(fs.doc(fs.collection(_db, 'transfers')), { customerId: it.id, store: String(d['매장명'] || ''), customer: String(d['고객명'] || ''), phone: String(d['연락처'] || ''), from: m.name || m.email, fromEmail: m.email, to: toUser.name, toEmail: String(toUser.email).toLowerCase(), at: now, status: 'pending' }); n++; }
+  await batch.commit(); return n;
+}
+export async function acceptTransfer(t) {
+  await init(); need(); const { fs } = _mods; const m = await me(); if (!m.name) throw new Error('내 계정에 이름이 없어 수락할 수 없어요');
+  const now = new Date().toISOString(), stamp = '[' + todayStr() + '] ' + (t.from || '') + ' → ' + m.name;
+  let prev = ''; try { const s = await fs.getDoc(fs.doc(_db, COL, t.customerId)); if (s.exists()) prev = String(s.data()[TRANSFER_LOG_COL] || ''); } catch (e) {}
+  await updateCells(t.customerId, { '상담자': m.name, [TRANSFER_LOG_COL]: (prev ? prev + '\n' : '') + stamp });
+  await fs.setDoc(fs.doc(_db, 'transfers', t.id), { status: 'accepted', decidedAt: now, decidedBy: m.email }, { merge: true });
+}
+export async function rejectTransfer(t) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, 'transfers', t.id), { status: 'rejected', decidedAt: new Date().toISOString(), decidedBy: userEmail() }, { merge: true }); }
+export async function cancelTransfer(t) { await init(); need(); const { fs } = _mods; await fs.deleteDoc(fs.doc(_db, 'transfers', t.id)); }
+
 // ── 시트 내보내기 (엑셀/시트에 붙일 TSV 전체) ──
 export function buildExportTSV(items) { const header = FULL_HEADER().concat([DOC_CHECK_COL, ...Object.values(STAGE_COLS), PROGRESS_NOTE_COL]); return [header.join('\t')].concat(items.map(it => header.map(h => val(it.data, h).replace(/\t/g, ' ')).join('\t'))).join('\n'); }

@@ -30,6 +30,13 @@ service cloud.firestore {
       allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['restoredAt', 'restoredBy']);
       allow delete: if false;
     }
+    // 고객 이관 요청: 보낸 사람이 생성, 받는 사람(또는 관리자)만 수락·거절, 보낸 사람·관리자만 취소
+    match /transfers/{id} {
+      allow read: if isUser();
+      allow create: if isUser() && request.resource.data.fromEmail == email() && request.resource.data.status == 'pending';
+      allow update: if isUser() && (resource.data.toEmail == email() || isAdmin()) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decidedAt', 'decidedBy']);
+      allow delete: if isAdmin() || resource.data.fromEmail == email();
+    }
     // (구) 관리자 목록 — 호환용. 슈퍼관리자만 수정
     match /admins/{e} { allow read: if isUser(); allow write: if isSuper(); }
     // 연동 설정(웹훅 URL·시크릿): 사용자 읽기(전송에 필요), 관리자 이상 수정
@@ -47,4 +54,4 @@ service cloud.firestore {
     match /public/{k} { allow read: if true; allow write: if isAdmin(); }
   }
 }
-// v11 — 2026-09-12: 구성원은 본인 상담 고객만 조회. 삭제는 관리자 이상. 삭제 로그에 사유·이름 기록.
+// v12 — 2026-09-12: 고객 이관(transfers) 추가. 구성원은 본인 상담 고객만 조회.
