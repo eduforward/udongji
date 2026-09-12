@@ -23,8 +23,8 @@ service cloud.firestore {
     function privileged(r) { return r in ['admin', 'super']; }
 
     // 조회: 관리자 이상은 전체, 구성원은 본인 이름이 상담자인 기록만 (목록 쿼리도 where('상담자','==',내 이름) 필요)
-    // 마감 담당(close)은 수취 완료일이 찍힌 고객만 (목록 쿼리도 where('수취 완료일','>','') 필요)
-    match /customers/{id} { allow read: if isAdmin() || (isClose() && resource.data['수취 완료일'] > '') || (isUser() && !isClose() && myName() != '' && resource.data.get('상담자', '') == myName()); allow delete: if isAdmin(); allow create, update: if isUser() && agentOk(); }
+    // 마감 담당(close)은 기본정보 완료일이 찍힌 고객만 (목록 쿼리도 where('기본정보 완료일','>','') 필요)
+    match /customers/{id} { allow read: if isAdmin() || (isClose() && resource.data['기본정보 완료일'] > '') || (isUser() && !isClose() && myName() != '' && resource.data.get('상담자', '') == myName()); allow delete: if isAdmin(); allow create, update: if isUser() && agentOk(); }
     // 삭제 로그: 사용자 기록만 가능, 열람·복구는 관리자 이상, 삭제는 아무도 불가
     match /deleted/{logId} {
       allow create: if isUser() && request.resource.data.deletedBy == email();
@@ -56,4 +56,4 @@ service cloud.firestore {
     match /public/{k} { allow read: if true; allow write: if isAdmin(); }
   }
 }
-// v13 — 2026-09-13: 마감 담당(close) 역할 — 수취 완료 고객만 조회·처리. 이관(transfers). 구성원은 본인 상담 고객만.
+// v14 — 2026-09-13: 마감 담당(close)은 기본정보 완료 고객만 조회·처리. 이관(transfers). 구성원은 본인 상담 고객만.

@@ -72,17 +72,18 @@ export function buildSMS(d) {
 
 // ───────── 구글 시트 연동 ─────────
 
-export const STAGE_COLS = { docs: '수취 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
+export const STAGE_COLS = { docs: '수취 완료일', info: '기본정보 완료일', handoff: '이관일', sign: '서명일', install: '설치일' };
 export const DOC_CHECK_COL = '서류 체크', DOC_FILES_COL = '서류 파일', PROGRESS_NOTE_COL = '진행 메모';
 export const STAGES = [
   { key: 'docs', label: '수취자료' },
+  { key: 'info', label: '기본정보' },
   { key: 'handoff', label: '페이앤 이관' },
   { key: 'sign', label: '전자서명 완료' },
   { key: 'install', label: '커넥트 배송 완료' }
 ];
 export const NEWSLETTER_COL = '뉴스레터 등록일';
 // 진행 상태 (계약 단계·상담 결과에서 파생) — 포기 / 재연락 / 수취자료진행 / 페이앤진행 / 전자서명진행 / 커넥트진행 / 완료
-export const STATUS_FLOW = ['수취자료진행', '페이앤진행', '전자서명진행', '커넥트진행', '완료'];
+export const STATUS_FLOW = ['수취자료진행', '기본정보진행', '페이앤진행', '전자서명진행', '커넥트진행', '완료'];
 export function statusOf(d) {
   d = d || {}; const has = k => !!String(d[k] || '').trim();
   const r = String(d['상담 결과'] || '').trim(), st = String(d['상태'] || '').trim();
@@ -91,7 +92,8 @@ export function statusOf(d) {
   if (has(STAGE_COLS.install)) return { key: 'done', label: '완료', cls: 'ok' };
   if (has(STAGE_COLS.sign)) return { key: 'install', label: '커넥트진행', cls: 'blue' };
   if (has(STAGE_COLS.handoff) || has(REG_COL)) return { key: 'sign', label: '전자서명진행', cls: 'blue' };
-  if (has(STAGE_COLS.docs)) return { key: 'handoff', label: '페이앤진행', cls: 'blue' };
+  if (has(STAGE_COLS.info)) return { key: 'handoff', label: '페이앤진행', cls: 'blue' };
+  if (has(STAGE_COLS.docs)) return { key: 'info', label: '기본정보진행', cls: 'blue' };
   return { key: 'docs', label: '수취자료진행', cls: 'blue' };
 }
 // 고객 조건에 따라 필요 서류 목록
@@ -276,7 +278,7 @@ export async function readAll(opts) {
   const m = await me();
   let q;
   if (m.admin || opts.all) q = fs.collection(_db, COL);
-  else if (m.close) q = fs.query(fs.collection(_db, COL), fs.where(STAGE_COLS.docs, '>', '')); // 마감 담당: 수취자료 완료 고객만
+  else if (m.close) q = fs.query(fs.collection(_db, COL), fs.where(STAGE_COLS.info, '>', '')); // 마감 담당: 기본정보까지 완료된 고객만
   else if (m.name) q = fs.query(fs.collection(_db, COL), fs.where('상담자', '==', m.name));
   else return { header: FULL_HEADER(), items: [] };
   const snap = await fs.getDocs(q);
@@ -413,33 +415,6 @@ export async function setConsultHours(cfg) {
 }
 export function storageConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/storage'; }
 
-// ── 사업자등록증 OCR (브라우저 안 Tesseract.js, 서버 전송 없음) ──
-let _tessP = null;
-function loadTess() { if (_tessP) return _tessP; _tessP = new Promise((res, rej) => { if (window.Tesseract) return res(window.Tesseract); const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; s.onload = () => res(window.Tesseract); s.onerror = () => rej(new Error('OCR 라이브러리 로드 실패')); document.head.appendChild(s); }); return _tessP; }
-export async function ocrBizReg(blob, onProgress) {
-  const T = await loadTess();
-  const worker = await T.createWorker('kor+eng', 1, { logger: m => { if (onProgress) onProgress(m); } });
-  try { const { data } = await worker.recognize(blob); return Object.assign(parseBizReg(data.text || ''), { raw: data.text || '' }); } finally { try { await worker.terminate(); } catch (e) {} }
-}
-export function parseBizReg(text) {
-  const lines = String(text || '').split('\n').map(l => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
-  const joined = lines.join('\n');
-  const isLabel = l => /상\s*호|성\s*명|대\s*표\s*자|소\s*재\s*지|개\s*업|업\s*태|종\s*목|법\s*인|등\s*록\s*번\s*호|교\s*부|발\s*급|사\s*업\s*자|본\s*점|생\s*년/.test(l);
-  const after = (re, multi) => {
-    const i = lines.findIndex(l => re.test(l)); if (i < 0) return '';
-    let v = lines[i].replace(re, '').replace(/^[\s:：\-·.]+/, '').trim();
-    if (!v && lines[i + 1] && !isLabel(lines[i + 1])) { v = lines[i + 1]; if (multi && lines[i + 2] && !isLabel(lines[i + 2])) v += ' ' + lines[i + 2]; }
-    else if (multi && v && lines[i + 1] && !isLabel(lines[i + 1]) && !/\d{3}-\d{2}-\d{5}/.test(lines[i + 1])) v += ' ' + lines[i + 1];
-    return v.replace(/\s+/g, ' ').trim();
-  };
-  let bizno = ''; let m = joined.match(/(\d{3})\s*[-–]\s*(\d{2})\s*[-–]\s*(\d{5})/); if (m) bizno = m[1] + m[2] + m[3]; else { m = joined.replace(/\s/g, '').match(/(?<!\d)(\d{10})(?!\d)/); if (m) bizno = m[1]; }
-  let corpno = ''; m = joined.match(/(\d{6})\s*[-–]\s*(\d{7})/); if (m) corpno = m[1] + m[2];
-  let open = ''; m = joined.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/); if (m) open = m[1] + '-' + m[2].padStart(2, '0') + '-' + m[3].padStart(2, '0');
-  const isCorp = /법인사업자|법인\s*등록번호|주식회사|\(주\)|㈜|유한회사/.test(joined);
-  return { bizno, corpno, open, isCorp,
-    store: after(/^.*?(상\s*호|법\s*인\s*명)\s*(\(단체명\))?\s*[:：]?/), owner: after(/^.*?(성\s*명|대\s*표\s*자)\s*[:：]?/).replace(/\s*\(.*$/, '').replace(/[^가-힣a-zA-Z ]/g, '').trim().slice(0, 10),
-    addr: after(/^.*?(사업장\s*)?소\s*재\s*지\s*[:：]?/, true) };
-}
 export function firestoreConsoleUrl() { return 'https://console.firebase.google.com/project/' + FIREBASE.projectId + '/firestore'; }
 
 // ── 고객 이관 (Firestore: transfers/{id}) — 보낸 사람이 요청, 받는 사람이 수락해야 상담자가 바뀐다 ──

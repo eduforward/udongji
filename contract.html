@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=68"></script>
+  <script src="./udongji-nav.js?v=69"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -72,7 +72,7 @@
     .dh .x { margin-left: auto; font: inherit; font-size: 18px; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; flex: 0 0 auto; }
     .dbody { overflow: auto; padding: 0 0 24px; }
     /* 단계 스텝퍼 */
-    .steps { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; padding: 16px 22px 6px; }
+    .steps { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 6px; padding: 16px 22px 6px; }
     .step { border-radius: 10px; padding: 10px 10px 9px; background: var(--card-2); border: 1px solid var(--line); text-align: left; cursor: pointer; font: inherit; color: var(--text-2); display: flex; flex-direction: column; gap: 3px; }
     .step b { font-size: 12.5px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
     .step small { font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; }
@@ -158,7 +158,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="68"></udongji-nav>
+<udongji-nav current="contract" page-v="69"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -177,7 +177,7 @@
 
   <div class="tw">
     <table>
-      <thead><tr><th>매장 · 고객</th><th>구분</th><th>상담일</th><th>상담자</th><th class="st">수취자료</th><th class="st">페이앤 이관</th><th class="st">전자서명 완료</th><th class="st">커넥트 배송 완료</th><th>메모</th></tr></thead>
+      <thead><tr><th>매장 · 고객</th><th>구분</th><th>상담일</th><th>상담자</th><th class="st">수취자료</th><th class="st">기본정보</th><th class="st">페이앤 이관</th><th class="st">전자서명 완료</th><th class="st">커넥트 배송 완료</th><th>메모</th></tr></thead>
       <tbody>
         <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
           <tr class="{{ r.cls }}" onClick="{{ r.open }}">
@@ -189,6 +189,7 @@
             <td class="st"><span class="stg {{ r.s1 }}">{{ r.s1t }}</span></td>
             <td class="st"><span class="stg {{ r.s2 }}">{{ r.s2t }}</span></td>
             <td class="st"><span class="stg {{ r.s3 }}">{{ r.s3t }}</span></td>
+            <td class="st"><span class="stg {{ r.s4 }}">{{ r.s4t }}</span></td>
             <td class="dim" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">{{ r.memo }}</td>
           </tr>
         </sc-for>
@@ -217,7 +218,6 @@
               <div class="files"><sc-for list="{{ d.files }}" as="f" hint-placeholder-count="0"><div class="fthumb"><a href="{{ f.url }}" target="_blank" rel="noopener" title="크게 보기"><img src="{{ f.url }}" alt="{{ f.name }}" loading="lazy"></a><button type="button" class="fx" onClick="{{ f.remove }}" title="삭제">×</button><div class="fn" title="{{ f.name }}">{{ f.name }}</div></div></sc-for></div>
             </div>
             <label class="btn up">{{ d.upLabel2 }}<input type="file" multiple="{{ d.multi }}" accept="image/*,.pdf,.heic,.heif" onChange="{{ d.upload }}"></label>
-            <sc-if value="{{ d.canOcr }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" style="grid-column:3" onClick="{{ d.ocr }}" disabled="{{ ocrBusy }}">등록증 읽기</button></sc-if>
           </div>
         </sc-for>
         <div class="note"><b>필수</b>는 이 고객 유형(개인/법인 · 단독/공동)에 꼭 필요한 서류, <b>해당 시</b>는 업종·상황에 따라 받는 서류예요. {{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번.jpg</b>로 자동 정리 — PDF·PNG는 JPG로 변환. 업로드하면 자동으로 받음 체크.</div>
@@ -230,19 +230,16 @@
       </div>
       </sc-if>
 
-      <sc-if value="{{ tabHandoff }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ tabInfo }}" hint-placeholder-val="{{ false }}">
       <div class="savebar">
         <span class="pill purple">{{ sel.caseLabel }}</span><span class="pill">입력 {{ sel.pfFilled }} / {{ sel.pfTotal }}</span>
-        <sc-if value="{{ sel.hasLink }}" hint-placeholder-val="{{ false }}"><a class="btn" style="background:var(--purple-2);color:var(--purple);border-color:transparent" href="{{ sel.linkUrl }}" target="_blank" rel="noopener" title="{{ sel.linkTitle }}">페이앤 접수창 열기 ↗ {{ sel.linkNo }}</a></sc-if>
-        <sc-if value="{{ sel.noLink }}" hint-placeholder-val="{{ false }}"><span class="pill hot" title="신규/기존 · 개인/법인 · 단독/공동이 다 있어야 링크가 정해져요">접수 링크 미확정 — 고객 유형 확인</span></sc-if>
         <span class="{{ sel.pfMissCls }}" style="font-size:12px">{{ sel.pfMissTxt }}</span>
         <button type="button" class="btn primary" onClick="{{ savePayn }}" disabled="{{ sel.pfSaveOff }}" style="margin-left:auto">{{ sel.pfSaveLabel }}</button>
-        <button type="button" class="btn ok" onClick="{{ completeHandoff }}" disabled="{{ sel.handoffDone }}">{{ sel.handoffBtn }}</button>
+        <button type="button" class="btn ok" onClick="{{ completeInfo }}" disabled="{{ sel.infoDone }}">{{ sel.infoBtn }}</button>
       </div>
       <div class="sec" id="payn-sec">
-        <h3>페이앤 가맹점 접수 <span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span></h3>
-        <div class="note" style="margin-top:0">상담 기록에서 미리 채워진 값은 <b>점선 테두리</b>. 고친 다음 위 <b>저장</b>을 눌러야 기록돼요. 빨간 칸 = 미입력·자릿수 오류. 페이앤 폼에 옮길 땐 각 칸 오른쪽 <b>복사</b>를 누르거나, <b>순서대로 복사</b>로 한 칸씩 넘기세요.</div>
-        <div class="seqbar"><button type="button" class="btn primary" onClick="{{ sel.seqCopy }}">{{ sel.seqLabel }}</button><span>{{ sel.seqInfo }}</span><button type="button" class="btn" onClick="{{ sel.seqReset }}" style="margin-left:auto">처음부터</button></div>
+        <h3>기본정보 — 페이앤 접수에 들어갈 값 <span class="pill {{ sel.infoCls }}">{{ sel.infoTag }}</span></h3>
+        <div class="note" style="margin-top:0">상담 기록에서 미리 채워진 값은 <b>점선 테두리</b>. 비어 있거나 빨간 칸(미입력·자릿수 오류)을 채우고 위 <b>저장</b> → 다 채웠으면 <b>기본정보 완료 처리</b>. 그래야 마감 담당에게 넘어가요.</div>
         <sc-for list="{{ pf }}" as="g" hint-placeholder-count="0">
           <div class="pf-sec">{{ g.sec }}</div>
           <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="0">
@@ -252,8 +249,30 @@
               <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}"><select class="{{ f.cls }}" value="{{ f.value }}" onChange="{{ f.onChange }}"><option value="">선택</option><sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="0"><option value="{{ o }}">{{ o }}</option></sc-for></select></sc-if>
               <sc-if value="{{ f.isMulti }}" hint-placeholder-val="{{ false }}"><textarea class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}"></textarea></sc-if>
               <sc-if value="{{ f.isText }}" hint-placeholder-val="{{ true }}"><input class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}" placeholder="{{ f.ph }}" maxLength="{{ f.max }}" inputMode="{{ f.imode }}"></sc-if>
-              <button type="button" class="cp {{ f.cpCls }}" onClick="{{ f.copy }}" disabled="{{ f.cpOff }}">{{ f.cpLabel }}</button>
+              <span></span>
             </div>
+          </sc-for>
+        </sc-for>
+        <div class="note"><sc-if value="{{ sel.infoIsDone }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ undoInfo }}">기본정보 완료 취소</button></sc-if></div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ tabHandoff }}" hint-placeholder-val="{{ false }}">
+      <div class="savebar">
+        <span class="pill purple">{{ sel.caseLabel }}</span>
+        <sc-if value="{{ sel.hasLink }}" hint-placeholder-val="{{ false }}"><a class="btn" style="background:var(--purple-2);color:var(--purple);border-color:transparent" href="{{ sel.linkUrl }}" target="_blank" rel="noopener" title="{{ sel.linkTitle }}">페이앤 접수창 열기 ↗ {{ sel.linkNo }}</a></sc-if>
+        <sc-if value="{{ sel.noLink }}" hint-placeholder-val="{{ false }}"><span class="pill hot">접수 링크 미확정 — 고객 유형 확인</span></sc-if>
+        <span class="{{ sel.pfMissCls }}" style="font-size:12px">{{ sel.pfMissTxt }}</span>
+        <button type="button" class="btn ok" onClick="{{ completeHandoff }}" disabled="{{ sel.handoffDone }}" style="margin-left:auto">{{ sel.handoffBtn }}</button>
+      </div>
+      <div class="sec">
+        <h3>페이앤 접수 — 값 옮기기 <span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span></h3>
+        <div class="note" style="margin-top:0">기본정보 탭에서 저장한 값을 페이앤 폼에 옮겨요. 각 칸 <b>복사</b>를 누르거나 <b>순서대로 복사</b>로 한 칸씩. 값을 고치려면 기본정보 탭에서.</div>
+        <div class="seqbar"><button type="button" class="btn primary" onClick="{{ sel.seqCopy }}">{{ sel.seqLabel }}</button><span>{{ sel.seqInfo }}</span><button type="button" class="btn" onClick="{{ sel.seqReset }}" style="margin-left:auto">처음부터</button></div>
+        <sc-for list="{{ pf }}" as="g" hint-placeholder-count="0">
+          <div class="pf-sec">{{ g.sec }}</div>
+          <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="0">
+            <div class="pf {{ f.rowCls }}"><label>{{ f.label }}</label><div class="ro {{ f.roCls }}">{{ f.valueOrDash }}</div><button type="button" class="cp {{ f.cpCls }}" onClick="{{ f.copy }}" disabled="{{ f.cpOff }}">{{ f.cpLabel }}</button></div>
           </sc-for>
         </sc-for>
         <div class="note">페이앤 전산에 다 입력했으면 위 <b>이관 완료 처리</b>. <sc-if value="{{ sel.handoffIsDone }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ undoHandoff }}" style="margin-left:8px">이관 완료 취소</button></sc-if></div>
@@ -308,22 +327,6 @@
     </div>
   </aside>
   <div class="{{ toastCls }}">{{ toastMsg }}</div>
-  <sc-if value="{{ hasOcr }}" hint-placeholder-val="{{ false }}">
-    <div class="scrim" style="z-index:70" onClick="{{ closeOcr }}"></div>
-    <div style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:90vh;overflow:auto;background:var(--card);border-radius:16px;box-shadow:var(--shadow-lg);padding:22px 24px;z-index:71">
-      <h3 style="font-size:17px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">사업자등록증에서 읽은 값</h3>
-      <p style="font-size:13px;color:var(--text-2);margin-bottom:12px">{{ ocr.sub }}</p>
-      <sc-if value="{{ ocr.busy }}" hint-placeholder-val="{{ true }}"><div class="track" style="height:8px;background:var(--line-2);border-radius:999px;overflow:hidden"><div style="height:100%;background:var(--blue);border-radius:999px;width:{{ ocr.pct }}%"></div></div><div class="note">{{ ocr.status }} — 처음 한 번은 한글 인식 데이터(약 10MB)를 받아 좀 걸려요</div></sc-if>
-      <sc-if value="{{ ocr.ready }}" hint-placeholder-val="{{ false }}">
-        <sc-for list="{{ ocr.fields }}" as="f" hint-placeholder-count="0">
-          <div class="pf" style="grid-template-columns:22px 130px minmax(0,1fr)"><button type="button" class="cb" style="width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);background:{{ f.bg }};color:#fff;font-size:13px;font-weight:800;cursor:pointer" onClick="{{ f.toggle }}">{{ f.mark }}</button><label>{{ f.label }}<small>{{ f.hint }}</small></label><input class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}" placeholder="읽지 못함 — 직접 입력"></div>
-        </sc-for>
-        <details style="margin-top:10px"><summary style="font-size:12.5px;color:var(--text-3);cursor:pointer">인식된 원문 보기</summary><pre style="white-space:pre-wrap;font-size:11.5px;color:var(--text-3);background:var(--card-2);border-radius:8px;padding:8px 10px;max-height:160px;overflow:auto">{{ ocr.raw }}</pre></details>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button type="button" class="btn" onClick="{{ closeOcr }}">닫기</button><button type="button" class="btn primary" onClick="{{ applyOcr }}" disabled="{{ ocr.applyOff }}">{{ ocr.applyLabel }}</button></div>
-      </sc-if>
-      <sc-if value="{{ ocr.failed }}" hint-placeholder-val="{{ false }}"><div class="note" style="color:var(--red)">{{ ocr.err }}</div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button type="button" class="btn" onClick="{{ closeOcr }}">닫기</button></div></sc-if>
-    </div>
-  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -331,7 +334,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {}, seq: 0, copied: {}, tab: 'docs', scope: 'mine', me: null };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=22'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=23'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me();
       this.setState({ lib, me }, () => this.load(true));
@@ -354,38 +357,6 @@ class Component extends DCLogic {
     } catch (e) { this.setState({ loading: false, err: e.message }); }
   }
   toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
-  // 사업자등록증 OCR → 확인 모달
-  // 모달 표시값
-  ocrView(rec) {
-    const o = this.state.ocr; if (!o) return {};
-    if (o.busy) return { busy: true, pct: o.pct || 0, status: o.status || '', sub: '업로드한 사업자등록증 사진을 이 브라우저에서 읽고 있어요 (서버로 보내지 않음).' };
-    if (o.failed) return { failed: true, err: o.err, sub: '' };
-    const lib = this.state.lib, d = rec ? rec.data : {}, V = k => lib ? lib.val(d, k) : '';
-    const defs = [
-      { k: 'bizno', label: '사업자번호', hint: '현재: ' + (V('사업자번호') || '없음'), digits: 10 },
-      { k: 'addr', label: '사업장 소재지 → 매장 주소', hint: '현재: ' + (V('매장 주소') || '없음') },
-      { k: 'corpno', label: '법인등록번호', hint: '법인만 · 페이앤 접수 칸에 들어가요', digits: 13 },
-      { k: 'store', label: '상호 → 매장명', hint: '현재: ' + (V('매장명') || '없음') + ' · 다르면 체크' },
-      { k: 'owner', label: '성명 → 고객명', hint: '현재: ' + (V('고객명') || '없음') },
-      { k: 'open', label: '개업연월일', hint: 'YYYY-MM-DD' }
-    ];
-    const fields = defs.map(f => { const v = String(o.vals[f.k] || ''), on = !!o.on[f.k]; return { label: f.label, hint: f.hint, value: v, cls: (f.digits ? 'mono ' : '') + (v ? '' : 'miss'), mark: on ? '✓' : '', bg: on ? 'var(--blue)' : '#fff',
-      toggle: () => this.setState({ ocr: Object.assign({}, this.state.ocr, { on: Object.assign({}, this.state.ocr.on, { [f.k]: !on }) }) }),
-      onInput: e => { let nv = e.target.value; if (f.digits) { nv = nv.replace(/\D/g, '').slice(0, f.digits); e.target.value = nv; } this.setState({ ocr: Object.assign({}, this.state.ocr, { vals: Object.assign({}, this.state.ocr.vals, { [f.k]: nv }), on: Object.assign({}, this.state.ocr.on, { [f.k]: !!nv }) }) }); } }; });
-    const n = defs.filter(f => o.on[f.k] && o.vals[f.k]).length;
-    return { ready: true, fields, raw: o.raw || '', sub: '체크된 항목만 고객 기록에 반영돼요. 잘못 읽은 값은 고치고, 반영하면 페이앤 접수 폼에도 바로 들어갑니다.', applyOff: !n, applyLabel: n ? n + '개 항목 반영' : '반영할 항목 없음' };
-  }
-  async runOcr(rec, blob) {
-    const lib = this.state.lib; if (!lib || !blob) return;
-    this.setState({ ocr: { busy: true, pct: 0, status: '준비 중…', recRow: rec.row } });
-    try {
-      const r = await lib.ocrBizReg(blob, m => { if (m && typeof m.progress === 'number') this.setState({ ocr: Object.assign({}, this.state.ocr, { pct: Math.round(m.progress * 100), status: m.status === 'recognizing text' ? '글자 인식 중' : m.status === 'loading language traineddata' ? '한글 인식 데이터 받는 중' : (m.status || '') }) }); });
-      const d = rec.data, V = k => lib.val(d, k);
-      const vals = { bizno: r.bizno, addr: r.addr, corpno: r.corpno, store: r.store, owner: r.owner, open: r.open };
-      const on = { bizno: !!r.bizno, addr: !!r.addr, corpno: !!r.corpno && (V('대형/개인/법인') === '법인' || r.isCorp), store: false, owner: false, open: false };
-      this.setState({ ocr: { busy: false, ready: true, recRow: rec.row, vals, on, raw: r.raw, isCorp: r.isCorp } });
-    } catch (e) { this.setState({ ocr: { failed: true, err: 'OCR 실패: ' + e.message, recRow: rec.row } }); }
-  }
   async saveMemoNow() {
     const { lib, items, selRow, memo } = this.state; const rec = items.find(it => it.row === selRow); if (!rec || !lib) return;
     if ((rec.data[lib.PROGRESS_NOTE_COL] || '') === memo) { this.setState({ memoDirty: false }); return; }
@@ -443,9 +414,9 @@ class Component extends DCLogic {
       return prev && stageDone(d, prev.key) ? { cls: 'next', t: '대기' } : { cls: 'wait', t: '—' };
     };
     const rows = list.map(it => { const d = it.data, c = STAGES.map(s => cell(d, s.key)); return {
-      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => { const firstOpen = STAGES.find(s => !stageDone(d, s.key)); clearTimeout(this._memoT); this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', memoDirty: false, memoSavedAt: '', pfDraft: {}, seq: 0, copied: {}, photoSel: {}, tab: firstOpen ? (meInfo.close && firstOpen.key === 'docs' ? 'handoff' : firstOpen.key) : 'install' }); },
+      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => { const firstOpen = STAGES.find(s => !stageDone(d, s.key)); clearTimeout(this._memoT); this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', memoDirty: false, memoSavedAt: '', pfDraft: {}, seq: 0, copied: {}, photoSel: {}, tab: firstOpen ? (meInfo.close && (firstOpen.key === 'docs' || firstOpen.key === 'info') ? 'handoff' : firstOpen.key) : 'install' }); },
       store: V(d, '매장명') || '(매장명 없음)', who: [V(d, '고객명'), V(d, '연락처')].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '—', date: V(d, '상담일').slice(5), agent: V(d, '상담자'), memo: V(d, lib ? lib.PROGRESS_NOTE_COL : '진행 메모'),
-      s0: c[0] ? c[0].cls : '', s0t: c[0] ? c[0].t : '', s1: c[1] ? c[1].cls : '', s1t: c[1] ? c[1].t : '', s2: c[2] ? c[2].cls : '', s2t: c[2] ? c[2].t : '', s3: c[3] ? c[3].cls : '', s3t: c[3] ? c[3].t : ''
+      s0: c[0] ? c[0].cls : '', s0t: c[0] ? c[0].t : '', s1: c[1] ? c[1].cls : '', s1t: c[1] ? c[1].t : '', s2: c[2] ? c[2].cls : '', s2t: c[2] ? c[2].t : '', s3: c[3] ? c[3].cls : '', s3t: c[3] ? c[3].t : '', s4: c[4] ? c[4].cls : '', s4t: c[4] ? c[4].t : ''
     }; });
     const rec = items.find(it => it.row === selRow) || null;
     let sel = {}, steps = [], docs = [], pf = [];
@@ -491,7 +462,7 @@ class Component extends DCLogic {
       const valOf = f => String(f.k in pfDraft ? pfDraft[f.k] : lib.paynValue(d, f) || '');
       const copyField = (f, i) => { const v = valOf(f).trim(); this.copy(v, f.label); this.setState({ copied: Object.assign({}, this.state.copied, { [f.k]: true }), seq: Math.max(this.state.seq, i + 1) }); };
       pf = Object.keys(bySec).map(sec => ({ sec, fields: bySec[sec].map(f => { const i = active.indexOf(f), col = P + f.label, saved = String(d[col] || '').trim(), value = valOf(f); const missing = (!f.opt && !String(value || '').trim()) || (f.digits && value.trim() && value.trim().length !== f.digits); const cls = (f.mono ? 'mono ' : '') + (missing ? 'miss' : (!saved && !f.ro && value) ? 'pre' : ''); return {
-        label: f.label, hint: f.hint || '', value: value || '', cls, ph: f.opt ? '' : '필수', opts: f.opts || [], isRo: !!f.ro, isSelect: !f.ro && !!f.opts, isMulti: !f.ro && !!f.multi, isText: !f.ro && !f.opts && !f.multi, max: f.digits || 200, imode: f.digits ? 'numeric' : 'text',
+        label: f.label, hint: f.hint || '', value: value || '', valueOrDash: String(value || '').trim() || '—', roCls: String(value || '').trim() ? '' : 'miss', cls, ph: f.opt ? '' : '필수', opts: f.opts || [], isRo: !!f.ro, isSelect: !f.ro && !!f.opts, isMulti: !f.ro && !!f.multi, isText: !f.ro && !f.opts && !f.multi, max: f.digits || 200, imode: f.digits ? 'numeric' : 'text',
         rowCls: curF === f ? 'cur' : '', cpCls: copied[f.k] ? 'done' : '', cpLabel: copied[f.k] ? '✓ 복사됨' : '복사', cpOff: !String(value || '').trim(), copy: () => copyField(f, i),
         onInput: e => { const nv = sanitize(f, e.target.value); if (nv !== e.target.value) e.target.value = nv; this.setState({ pfDraft: Object.assign({}, this.state.pfDraft, { [f.k]: nv }) }); },
         onChange: e => { this.setState({ pfDraft: Object.assign({}, this.state.pfDraft, { [f.k]: e.target.value }) }); }
@@ -520,7 +491,7 @@ class Component extends DCLogic {
       // 단계별 탭 내용
       const agentNm = V(d, '상담자') || '담당자', nm = V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님', joint = V(d, '단독/공동') === '공동';
       Object.assign(sel, {
-        docsIsDone: stageDone(d, 'docs'), handoffIsDone: stageDone(d, 'handoff'), signIsDone: stageDone(d, 'sign'), installIsDone: stageDone(d, 'install'),
+        docsIsDone: stageDone(d, 'docs'), infoIsDone: stageDone(d, 'info'), infoDone: stageDone(d, 'info') || busy, infoBtn: stageDone(d, 'info') ? '✓ 기본정보 완료됨' : '기본정보 완료 처리', infoTag: stageDone(d, 'info') ? '완료 ' + stageDate(d, 'info').slice(5) : '입력 중', infoCls: stageDone(d, 'info') ? 'ok' : 'amber', handoffIsDone: stageDone(d, 'handoff'), signIsDone: stageDone(d, 'sign'), installIsDone: stageDone(d, 'install'),
         signTag: stageDone(d, 'sign') ? '서명 ' + stageDate(d, 'sign').slice(5) : stageDone(d, 'handoff') ? '서명 대기' : '이관 전', signCls: stageDone(d, 'sign') ? 'ok' : stageDone(d, 'handoff') ? 'amber' : '',
         jointNote: joint ? '공동대표 매장이라 두 분 모두 서명해야 완료됩니다.' : '',
         signSms: '[우동지] ' + nm + ', 우동지 ' + agentNm + '입니다.\n페이앤 접수가 완료되어 카톡(모두싸인 알림톡)으로 전자계약서가 발송됐어요. 내용 확인 후 서명해 주시면 바로 다음 단계(카드 가맹·기기 출고)로 넘어갑니다.' + (joint ? '\n공동대표님도 함께 서명해 주세요.' : '') + '\n\n알림톡이 안 왔거나 어려우신 점 있으면 이 번호로 카톡 주세요.\n감사합니다.',
@@ -532,19 +503,17 @@ class Component extends DCLogic {
         cls: 'doc' + (on ? ' on' : ''), mark: on ? '✓' : '', name: x.name, hint: x.hint, upLabel: busy ? '업로드 중…' : '업로드', tag: x.cond ? '해당 시' : on ? '받음' : '필수', tagCls: x.cond ? 'opt' : '',
         toggle: async () => { const n = Object.assign({}, chk); if (on) { if (myFiles.length) { if (!confirm('"' + x.name + '" 체크를 풀면 올린 파일 ' + myFiles.length + '개도 함께 삭제돼요. 삭제할까요?')) return; for (const f of myFiles) { try { await lib.deleteFile(f.id); } catch (er) {} } delete n[x.id]; await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(fl.filter(z => z.doc !== x.id)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, '받음 해제 · 파일 ' + myFiles.length + '개 삭제'); return; } delete n[x.id]; } else n[x.id] = true; this.patch(rec, { [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, on ? '받음 해제' : '받음 체크'); },
         files: myFiles.map(f => ({ name: f.name, url: f.url, remove: async e => { e.preventDefault(); e.stopPropagation(); if (!confirm('"' + f.name + '" 파일을 삭제할까요?')) return; try { await lib.deleteFile(f.id); } catch (er) {} const nf = fl.filter(z => z.id !== f.id); const patch = { [lib.DOC_FILES_COL]: JSON.stringify(nf) }; if (!nf.some(z => z.doc === x.id) && chk[x.id]) { const n = Object.assign({}, chk); delete n[x.id]; patch[lib.DOC_CHECK_COL] = Object.keys(n).join(','); } await this.patch(rec, patch, '파일 삭제' + (patch[lib.DOC_CHECK_COL] !== undefined ? ' · 받음 체크 해제' : '')); } })),
-        single: !!x.single, multi: !x.single, hasFile: myFiles.length > 0, canOcr: x.id === 'biz' && myFiles.length > 0, ocr: async () => { try { this.setState({ ocr: { busy: true, pct: 0, status: '사진 불러오는 중…', recRow: rec.row } }); const b = await (await fetch(myFiles[0].url, { mode: 'cors' })).blob(); await this.runOcr(rec, b); } catch (e) { this.setState({ ocr: { failed: true, err: '사진을 불러오지 못했어요: ' + e.message, recRow: rec.row } }); } }, upLabel2: busy ? '업로드 중…' : myFiles.length ? '교체' : '업로드',
+        single: !!x.single, multi: !x.single, hasFile: myFiles.length > 0, upLabel2: busy ? '업로드 중…' : myFiles.length ? '교체' : '업로드',
         upload: async e => {
           const list2 = Array.from(e.target.files || []); e.target.value = ''; if (!list2.length) return;
           if (x.single && list2.length > 1) { this.toast('이 항목은 사진 1장만 — 한 장씩 올려주세요'); return; }
           this.setState({ busy: true });
-          const firstBlobRef = { b: null };
           try {
             const folder = await lib.ensureCustomerFolder(label, rec.row);
             const added = []; let seq = myFiles.length, converted = 0;
             for (const file of list2) {
               const parts = await lib.toJpgs(file);
               if (parts.length > 1 || parts[0].blob !== file) converted++;
-              if (!firstBlobRef.b) firstBlobRef.b = parts[0].blob;
               for (const p of parts) { seq++; const nm = lib.docFileName(d, x.name, seq, p.ext); const r = await lib.uploadFile(p.blob, folder, nm); added.push({ id: r.id, name: nm, url: r.webViewLink, doc: x.id, at: today }); }
             }
             const n = Object.assign({}, chk, { [x.id]: true });
@@ -553,7 +522,6 @@ class Component extends DCLogic {
             await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(keep.concat(added)), [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, (x.single && myFiles.length ? '사진 교체' : added.length + '개 파일 업로드') + (converted ? ' (JPG 변환 ' + converted + '건)' : '') + ' · 받음 체크');
           } catch (er) { this.toast('업로드 실패: ' + er.message); }
           this.setState({ busy: false });
-          if (x.id === 'biz' && firstBlobRef.b) this.runOcr(rec, firstBlobRef.b);
         }
       }; });
     }
@@ -564,25 +532,25 @@ class Component extends DCLogic {
       fActiveCls: filter === 'active' ? 'on' : '', fDocsCls: filter === 'docs' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fAllCls: filter === 'all' ? 'on' : '',
       setActive: setF('active'), setDocs: setF('docs'), setDone: setF('done'), setAll: setF('all'),
       reload: () => this.load(false), folderUrl: lib ? lib.storageConsoleUrl() : '#',
-      pageTitle: meInfo.close ? '마감 업무' : '계약 업무', pageSub: meInfo.close ? '수취 완료 고객 → 페이앤 접수 → 서명 → 배송 마감' : '수취자료 → 페이앤 접수 → 서명 → 배송',
+      pageTitle: meInfo.close ? '마감 업무' : '계약 업무', pageSub: meInfo.close ? '기본정보 완료 고객 → 페이앤 접수 → 서명 → 배송 마감' : '수취자료 → 기본정보 → 페이앤 접수 → 서명 → 배송',
       isAdmin: isAdminUser, scopeMineCls: scope === 'mine' ? 'on' : '', scopeAllCls: scope === 'all' ? 'on' : '', setScopeMine: () => this.setState({ scope: 'mine' }), setScopeAll: () => this.setState({ scope: 'all' }),
       folderNote: '파일은 회사 저장소(Firebase Storage)에 고객별로 보관돼요.',
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, pf, photoGroups: this._pg || [], noPhotos: !!rec && !(this._pg || []).length,
-      ocrBusy: !!(this.state.ocr && this.state.ocr.busy), hasOcr: !!this.state.ocr, ocr: this.ocrView(rec), closeOcr: () => this.setState({ ocr: null }),
-      applyOcr: async () => { const o = this.state.ocr; if (!o || !o.ready || !rec || !lib) return; const patch = {}; if (o.on.bizno && o.vals.bizno) patch['사업자번호'] = o.vals.bizno; if (o.on.addr && o.vals.addr) patch['매장 주소'] = o.vals.addr; if (o.on.corpno && o.vals.corpno) patch[lib.PAYN_PREFIX + '가맹점 법인등록번호'] = o.vals.corpno; if (o.on.store && o.vals.store) patch['매장명'] = o.vals.store; if (o.on.owner && o.vals.owner) patch['고객명'] = o.vals.owner; if (o.on.open && o.vals.open) patch['개업일'] = o.vals.open; const n = Object.keys(patch).length; if (!n) { this.toast('반영할 항목이 없어요'); return; } const ok = await this.patch(rec, patch, n + '개 항목 반영 (등록증 OCR)'); if (ok) this.setState({ ocr: null }); },
       memoState: this.state.memoSaving ? '저장 중…' : this.state.memoDirty ? '입력 중 — 1초 후 자동 저장' : this.state.memoSavedAt ? '자동 저장 완료 ' + this.state.memoSavedAt : '자동 저장됨', memoCls: this.state.memoDirty || this.state.memoSaving ? 'amber' : 'ok',
       hasPhotoSel: !!(this._photoDrag && this._photoDrag.selFiles.length), noPhotoSel: !!rec && !!(this._pg || []).length && !(this._photoDrag && this._photoDrag.selFiles.length), photoSelN: this._photoDrag ? this._photoDrag.selFiles.length : 0,
       photoSelInfo: this._photoDrag ? (this._photoDrag.readyN < this._photoDrag.selFiles.length ? '사진 불러오는 중 ' + this._photoDrag.readyN + '/' + this._photoDrag.selFiles.length : '준비됨 — 다운로드 후 페이앤 파일 칸에서 여러 개 선택') : '',
       dlBusy: !!this.state.dlBusy || !(this._photoDrag && this._photoDrag.readyN === this._photoDrag.selFiles.length), dlLabel: this.state.dlBusy ? '다운로드 중…' : '선택한 ' + (this._photoDrag ? this._photoDrag.selFiles.length : 0) + '장 다운로드',
       downloadSel: async () => { const p = this._photoDrag; if (!p) return; this.setState({ dlBusy: true }); try { for (const f of p.selFiles) { const file = this._blobs[f.id]; if (!file) continue; const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); await new Promise(r => setTimeout(r, 350)); } this.toast(p.selFiles.length + '장 다운로드 — 브라우저가 "여러 파일 다운로허용" 물으면 허용'); } catch (e) { this.toast('다운로드 실패: ' + e.message); } this.setState({ dlBusy: false }); },
       clearPhotoSel: () => this.setState({ photoSel: {} }), selectAllPhotos: () => { const s = {}; const d0 = rec ? lib.parseDocFiles(rec.data[lib.DOC_FILES_COL]) : []; d0.forEach(f => { s[f.id] = true; }); this.setState({ photoSel: s }); },
-      tabDocs: this.state.tab === 'docs', tabHandoff: this.state.tab === 'handoff', tabSign: this.state.tab === 'sign', tabInstall: this.state.tab === 'install',
+      tabDocs: this.state.tab === 'docs', tabInfo: this.state.tab === 'info', tabHandoff: this.state.tab === 'handoff', tabSign: this.state.tab === 'sign', tabInstall: this.state.tab === 'install',
       completeSign: () => { const s = steps.find(x => x.key === 'sign'); if (s) s.complete(); },
+      completeInfo: () => { const p = this._payn; const s = steps.find(x => x.key === 'info'); if (!p || !s) return; if (p.dirtyKeys.length) { this.toast('바꾼 내용을 먼저 저장하세요'); return; } if (p.pfMiss.length && !confirm('미입력·오류 ' + p.pfMiss.length + '칸이 있어요. 그래도 기본정보 완료로 처리할까요? (마감 담당에게 넘어갑니다)')) return; s.complete(); },
+      undoInfo: () => { const s = steps.find(x => x.key === 'info'); if (s) s.undo(); },
       undoDocs: () => { const s = steps.find(x => x.key === 'docs'); if (s) s.undo(); }, undoHandoff: () => { const s = steps.find(x => x.key === 'handoff'); if (s) s.undo(); }, undoSign: () => { const s = steps.find(x => x.key === 'sign'); if (s) s.undo(); }, undoInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.undo(); },
       copySignSms: () => { if (sel.signSms) this.copy(sel.signSms, '서명 요청 문자'); }, copyInstallSms: () => { if (sel.installSms) this.copy(sel.installSms, '배송 안내 문자'); },
-      openPayn: () => this.setState({ tab: 'handoff' }),
+      openPayn: () => this.setState({ tab: 'info' }),
       setSignYes: () => rec && this.patch(rec, { '간판 유무': '있음' }, '간판 있음 — 매장사진 4매 구성'), setSignNo: () => rec && this.patch(rec, { '간판 유무': '없음' }, '간판 없음 — 매장사진 5매 구성'),
       savePayn: async () => { const p = this._payn; if (!p || !p.dirtyKeys.length) return; const o = {}; p.dirtyKeys.forEach(f => { o[p.P + f.label] = String(p.pfDraft[f.k]); }); const ok = await this.patch(p.rec, o, p.dirtyKeys.length + '칸 저장'); if (ok) { const nd = Object.assign({}, this.state.pfDraft); p.dirtyKeys.forEach(f => { delete nd[f.k]; }); this.setState({ pfDraft: nd }); } },
       completeHandoff: () => { const p = this._payn; if (!p || p.stageDoneHandoff) return; if (p.dirtyKeys.length) { this.toast('바꾼 내용을 먼저 저장하세요'); return; } if (p.pfMiss.length && !confirm('미입력·오류 ' + p.pfMiss.length + '칸이 있어요. 그래도 이관 완료로 처리할까요?')) return; this.patch(p.rec, { [SC.handoff]: today, [lib.REG_COL]: today }, '페이앤 이관 완료'); },
