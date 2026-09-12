@@ -238,10 +238,11 @@
 
     <section class="step" id="s5" data-screen-label="5 구성">
       <div class="step-h"><div class="no">5</div><div class="t">구성 · 색상 · 청약 정보<small>이번 단계 상품은 커넥트+카드단말기 0원만. 포스 신규는 조합가표 받은 뒤 추가.</small></div></div>
-      <div class="say"><span class="who">상담사</span>기본은 <b>커넥트 + 카드단말기</b>, 월 0원이에요. 배송으로 보내드리고 전원·랜선만 꽂으시면 돼요. <span class="rec req {{ f.bundle }}">구성 <select value="{{ v.bundle }}" onChange="{{ set.bundle }}"><option value="">선택</option><option value="cat">커넥트 + 카드단말기</option><option value="printer">커넥트 + 유선 프린터 (포스 있음)</option><option value="only">커넥트만</option></select></span></div>
-      <div class="say" hidden="{{ hidePosLink }}"><span class="who">상담원 · 포스 있음</span><span class="q">"쓰시는 포스 화면에서 결제 바로 넘기게 연동해 드릴까요?"</span> <span class="rec req {{ f.link }}">포스 연동 <span class="seg"><button class="{{ on.link.yes }}" onClick="{{ pick.link.yes }}">필요 → 현장 설치</button><button class="{{ on.link.no }}" onClick="{{ pick.link.no }}">불필요 → 자가 설치</button></span></span></div>
+      <div class="say"><span class="who">상담사</span>기본은 <b>커넥트 + 카드단말기</b>, 월 0원이에요. 배송으로 보내드리고 전원·랜선만 꽂으시면 돼요. <span class="rec req {{ f.bundle }}">구성 <select value="{{ v.bundle }}" onChange="{{ set.bundle }}"><option value="">선택</option><option value="cat">커넥트 + 카드단말기</option><option value="pos">커넥트 + POS (설치기사 방문)</option><option value="only">커넥트만</option></select></span></div>
+      <div class="say" hidden="{{ hidePosLink }}"><span class="who">상담원 · 포스 있음</span><span class="q">"쓰시는 포스 화면에서 결제 바로 넘기게 연동해 드릴까요?"</span> <span class="rec req {{ f.link }}">포스 연동 <span class="seg"><button class="{{ on.link.yes }}" onClick="{{ pick.link.yes }}">필요</button><button class="{{ on.link.no }}" onClick="{{ pick.link.no }}">불필요</button></span></span></div>
       <ul class="branch" hidden="{{ hidePosLink }}">
-        <li><span class="if">배달앱</span><span class="arrow">→</span>위젯만 띄워 쓰면 연동과 무관. 매출 합산 연동(배달매니저 등)을 원하면 <b>월 이용료 별도</b>라고만 안내, 현장 설치.</li>
+        <li><span class="if">배달앱</span><span class="arrow">→</span>위젯만 띄워 쓰면 연동과 무관. 매출 합산 연동(배달매니저 등)을 원하면 <b>월 이용료 별도</b>라고만 안내.</li>
+        <li><span class="if">설치</span><span class="arrow">→</span>설치기사 방문은 <b>커넥트 + POS</b> 구성일 때만. 나머지 구성은 택배 자가 설치.</li>
       </ul>
       <div class="say"><span class="who">상담사</span><span class="q">"기기 색상은 화이트, 블랙 중에 어떤 게 좋으세요?"</span> <span class="rec req {{ f.color }}">색상 <span class="seg"><button class="{{ on.color.white }}" onClick="{{ pick.color.white }}">화이트</button><button class="{{ on.color.black }}" onClick="{{ pick.color.black }}">블랙</button></span></span></div>
       <p class="note">커넥트·프린터·금전함은 화이트/블랙 선택. 포스는 단일색이라 묻지 않음.</p>
@@ -308,7 +309,7 @@ class Component extends DCLogic {
   KEY = 'udj_v5_draft';
   TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','categoryEtc','naver','email','memo'];
   OPTS = { sign:['yes','no'], channel:['callin','chatin','out'], mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','unknown','nonet'], wifi:['yes','no','unknown'], link:['yes','no'], color:['white','black'], status:['go'], netReq:['yes'] };
-  LBL = { channel:{callin:'Call-In',chatin:'Chat-In',out:'Out'}, mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',unknown:'모름',nonet:'인터넷 없음'}, wifi:{yes:'가능',no:'불가',unknown:'모름'} };
+  LBL = { channel:{callin:'Call-In',chatin:'Chat-In',out:'Out'}, mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',pos:'커넥트 + POS',printer:'커넥트 + POS',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',unknown:'모름',nonet:'인터넷 없음'}, wifi:{yes:'가능',no:'불가',unknown:'모름'} };
   LINKS = { 'fresh|person|single':'841963','fresh|person|joint':'841961','fresh|corp|single':'841955','fresh|corp|joint':'841952','existing|person|single':'841968','existing|person|joint':'841965','existing|corp|single':'841959','existing|corp|joint':'841957' };
   BIZ = ['카페','음식점','미용·뷰티','의류·잡화','학원·교육'];
   loadDraft() { try { return JSON.parse(localStorage.getItem('udj_v5_draft') || '{}') || {}; } catch (e) { return {}; } }
@@ -345,7 +346,7 @@ class Component extends DCLogic {
     v.openDate = g('오픈 예정일'); v.pos = this.inv('pos', g('현재 포스')); v.term = this.inv('term', g('약정 잔여 개월'));
     v.lan = g('인터넷 변경/신규 필요') === '필요' ? 'nonet' : g('인터넷 회선(랜선) 보유') === 'O' ? 'yes' : g('인터넷 회선(랜선) 보유') === '모름' ? 'unknown' : g('인터넷 회선(랜선) 보유') === 'X' ? 'no' : '';
     v.link = g('포스 연동') === '필요' ? 'yes' : g('포스 연동') === '불필요' ? 'no' : ''; v.wifi = g('와이파이 가능') === 'O' ? 'yes' : g('와이파이 가능') === 'X' ? 'no' : g('와이파이 가능') === '모름' ? 'unknown' : '';
-    v.bundle = this.inv('bundle', g('안내한 상품 구성')); v.color = this.inv('color', g('기기 색상'));
+    v.bundle = /프린터|POS/.test(g('안내한 상품 구성')) ? 'pos' : this.inv('bundle', g('안내한 상품 구성')); v.color = this.inv('color', g('기기 색상'));
     { const c = g('판매 물품'), CATS = ['음식·음료','미용','의류·잡화','화장품','교육']; if (c) { if (CATS.includes(c)) v.category = c; else { v.category = '기타'; v.categoryEtc = c; } } } v.naver = g('네이버 ID'); v.email = g('이메일');
     v.memo = g('특이사항');
     v.netReq = g('인터넷 상담 요청 일정') ? 'yes' : '';
@@ -363,7 +364,7 @@ class Component extends DCLogic {
       '사업자등록증 발급': v.reg === 'done' ? '발급 완료' : v.reg === 'pending' ? '발급 예정' : '', '오픈 예정일': v.openDate || '',
       '현재 포스': L.pos || '', '약정 잔여 개월': L.term || '', '포스 연동': v.link === 'yes' ? '필요' : v.link === 'no' ? '불필요' : '',
       '와이파이 가능': v.wifi === 'yes' ? 'O' : v.wifi === 'no' ? 'X' : v.wifi === 'unknown' ? '모름' : '', '인터넷 회선(랜선) 보유': v.lan === 'yes' ? 'O' : v.lan === 'unknown' ? '모름' : v.lan ? 'X' : '', '랜선 직접 준비 안내': (v.lan === 'no' || v.lan === 'unknown') ? 'O' : v.lan ? 'X' : '', '인터넷 변경/신규 필요': v.lan === 'nonet' ? '필요' : v.lan ? '불필요' : '', '인터넷 상담 요청 일정': v.netReq ? '페이앤 인터넷 상담 요청' : '',
-      '안내한 상품 구성': L.bundle || '', '월 이용요금': v.bundle ? '0' : '', '기기 색상': L.color || '', '설치 방식': v.bundle ? (v.link === 'yes' ? '현장 설치' : '자가 설치') : '',
+      '안내한 상품 구성': L.bundle || '', '월 이용요금': v.bundle ? '0' : '', '기기 색상': L.color || '', '설치 방식': v.bundle ? ((v.bundle === 'pos' || v.bundle === 'printer') ? '현장 설치' : '자가 설치') : '',
       '네이버 ID': v.naver || '', '이메일': ctx.emailFinal || '', '우동지 수신 동의': 'O', '특이사항': v.memo || '',
       '상담 결과': kind === 'go' ? '상담 진행' : kind === 'recall' ? '상담 연기' : '상담 거부', '상태': kind === 'go' ? '상담 중' : kind === 'recall' ? '재연락 예정' : '종료',
       '다음 액션 · 일시': kind === 'recall' ? extra.when : '', '포기 이유': kind === 'drop' ? extra.reason : ''
@@ -403,7 +404,7 @@ class Component extends DCLogic {
     const typeLabel = typed ? `${L.mode} · ${L.entity} · ${L.owners}` : '유형 미확정';
     const linkNo = this.LINKS[`${v.mode}|${v.entity}|${v.owners}`] || '—';
     const posHas = v.pos === 'pc' || v.pos === 'android';
-    const needSite = v.link === 'yes';
+    const needSite = v.bundle === 'pos' || v.bundle === 'printer';
     const installLabel = v.bundle ? (needSite ? '현장 설치' : '자가 설치 (택배)') : '설치 방식 미정';
     const noReg = isNew && v.reg === 'pending';
     const noNet = v.lan === 'nonet';
