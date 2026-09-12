@@ -242,6 +242,7 @@ class Component extends DCLogic {
     const isCall = d => d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
     const agents = [...new Set(items.map(it => V(it.data, '상담자')).filter(Boolean))].sort();
     const q = query.trim().toLowerCase();
+    const base = items.filter(it => (!mode || it.data['매장 구분'] === mode) && (!agent || V(it.data, '상담자') === agent));
     let list = items.filter(it => {
       const d = it.data;
       if (filter === 'pending' && (isReg(d) || !isGo(d))) return false;
@@ -304,11 +305,11 @@ class Component extends DCLogic {
     const setF = f => () => this.setState({ filter: f });
     return {
       query, onQuery: e => this.setState({ query: e.target.value }), mode, onMode: e => this.setState({ mode: e.target.value }), agent, onAgent: e => this.setState({ agent: e.target.value }), agents, isAdminUser: !!this.state.isAdmin,
-      nAll: items.length, nPend: items.filter(it => !isReg(it.data) && isGo(it.data)).length, nDone: items.filter(it => isReg(it.data)).length, nCall: items.filter(it => isCall(it.data)).length,
+      nAll: base.length, nPend: base.filter(it => !isReg(it.data) && isGo(it.data)).length, nDone: base.filter(it => isReg(it.data)).length, nCall: base.filter(it => isCall(it.data)).length,
       fAllCls: filter === 'all' ? 'on' : '', fPendCls: filter === 'pending' ? 'on' : '', fDoneCls: filter === 'done' ? 'on' : '', fCallCls: filter === 'call' ? 'on' : '',
       setAll: setF('all'), setPend: setF('pending'), setDone: setF('done'), setCall: setF('call'),
       reload: () => this.load(), exportTsv: () => lib && this.copy(lib.buildExportTSV(items), '전체 ' + items.length + '건 (엑셀에 붙이기)'),
-      cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + ' / ' + items.length + '건',
+      cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + ' / ' + base.length + '건',
       cols, rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : items.length === 0 ? '아직 상담 기록이 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, groups, isAdmin: !!this.state.isAdmin, close: () => this.setState({ selRow: null, editing: false, draft: null, viewDoc: null }),
       docs, docSummary, viewer: viewer || { files: [] }, hasViewer: !!viewer, closeViewer: () => this.setState({ viewDoc: null }), stop: e => e.stopPropagation(),
