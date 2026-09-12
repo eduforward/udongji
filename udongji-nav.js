@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v76 · 2026-09-13 02:24';
+  const VERSION = 'v77 · 2026-09-13 02:27';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 77, d: '2026-09-13', t: '02:27', c: ['상단 메뉴바가 스크롤해도 항상 고정'] },
     { v: 76, d: '2026-09-13', t: '02:24', c: ['상담 스크립트: 권장 칸은 노란 배지(빨간 테두리 제거), 고객명·연락처만 빨간 "필수"'] },
     { v: 75, d: '2026-09-13', t: '02:18', c: ['상담 스크립트: "필수" → "권장", "작성 완료" → "계약 업무로" — 고객명·연락처만 있으면 권장 항목이 비어도 넘길 수 있음 (빠진 값은 계약 업무 기본정보에서 보완)', '재연락 날짜는 텍스트 입력만 (자동 인식)'] },
     { v: 74, d: '2026-09-13', t: '01:56', c: ['재연락 "직접 입력": 말로 쓰면 자동 날짜 인식 (다음주 월요일 오후 2시 / 9월 20일 / 3일 뒤 / 다음달 초·중순·말 등), 인식 실패 시 안내 + 날짜 선택칸', '판매 카테고리 기타 직접 입력'] },
@@ -53,7 +54,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 76;
+  const PAGE_V = 77;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -72,7 +73,7 @@
   const ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3D5AF1"/><path d="M20 14v24a12 12 0 0 0 24 0V14" fill="none" stroke="#fff" stroke-width="10"/><circle cx="46" cy="16" r="11" fill="#3D5AF1"/><circle cx="46" cy="16" r="7" fill="#FF4D5E"/></svg>');
   const isDeploy = !/\.dc\.html$/.test(location.pathname) && !/\.dc\.html/.test(decodeURIComponent(location.pathname));
   const css = `
-    :host { display: block; position: sticky; top: 0; z-index: 10; font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; letter-spacing: -0.01em; }
+    :host { display: block; position: fixed; top: 0; left: 0; right: 0; z-index: 10; font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; letter-spacing: -0.01em; }
     .bar { background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid #E4E8F0; }
     .in { max-width: 1400px; margin: 0 auto; padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 4px; }
     a.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #171C2B; font-weight: 800; font-size: 15px; margin-right: 14px; white-space: nowrap; }
@@ -113,6 +114,7 @@
   `;
   class UNav extends HTMLElement {
     connectedCallback() {
+      try { document.body.style.paddingTop = '52px'; } catch (e) {}
       const pv = parseInt(this.getAttribute('page-v') || '0', 10);
       if (pv && pv < PAGE_V) { try { const k = 'udongji-reload-' + PAGE_V; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, '1'); fetch(location.href, { cache: 'reload' }).catch(() => {}).then(() => location.reload()); return; } } catch (e) {} }
       if (!document.querySelector('link[rel="icon"]')) { const l = document.createElement('link'); l.rel = 'icon'; l.type = 'image/svg+xml'; l.href = ICON; document.head.appendChild(l); }
