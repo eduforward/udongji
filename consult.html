@@ -236,7 +236,7 @@
       </ul>
       <div class="say"><span class="who">상담원</span><span class="q">"기기 색상은 화이트, 블랙 중에 어떤 게 좋으세요?"</span> <span class="rec req {{ f.color }}">색상 <span class="seg"><button class="{{ on.color.white }}" onClick="{{ pick.color.white }}">화이트</button><button class="{{ on.color.black }}" onClick="{{ pick.color.black }}">블랙</button></span></span></div>
       <p class="note">커넥트·프린터·금전함은 화이트/블랙 선택. 포스는 단일색이라 묻지 않음.</p>
-      <div class="say"><span class="who">상담원</span>네이버페이 청약에 들어가는 두 가지만 여쭐게요. <span class="q">"주로 뭘 판매하세요? 음식, 화장품, 옷 이렇게 크게만요."</span> <span class="rec req {{ f.category }}">판매 카테고리 <select value="{{ v.category }}" onChange="{{ set.category }}"><option value="">선택</option><option>음식·음료</option><option>미용</option><option>의류·잡화</option><option>화장품</option><option>교육</option><option>기타</option></select></span></div>
+      <div class="say"><span class="who">상담원</span>네이버페이 청약에 들어가는 두 가지만 여쭐게요. <span class="q">"주로 뭘 판매하세요? 음식, 화장품, 옷 이렇게 크게만요."</span> <span class="rec req {{ f.category }}">판매 카테고리 <select value="{{ v.category }}" onChange="{{ set.category }}"><option value="">선택</option><option>음식·음료</option><option>미용</option><option>의류·잡화</option><option>화장품</option><option>교육</option><option>기타</option></select></span> <span class="rec req {{ f.categoryEtc }}" hidden="{{ hideCatEtc }}">직접 입력 <input value="{{ v.categoryEtc }}" onInput="{{ set.categoryEtc }}" placeholder="예: 꽃, 반려동물용품"></span></div>
       <div class="say"><span class="who">상담원</span><span class="q">"네이버 아이디 알려주시겠어요? 대표님 개인 명의 계정이요. 비밀번호는 필요 없어요."</span> 커넥트를 대표님 네이버 계정에 연결하는 데 쓰이고, 설치 후 우동지 플레이스 활용 가이드도 <b>이 네이버 이메일(아이디@naver.com)</b>로 보내드려요. <span class="rec req {{ f.naver }}">네이버 ID <input value="{{ v.naver }}" onInput="{{ set.naver }}" placeholder="아이디만"></span></div>
       <p class="note">이메일은 따로 묻지 않음 — 네이버 ID로 <b>{{ naverEmail }}</b> 자동 생성. 다른 이메일을 원하면 7번에서 수정.</p>
     </section>
@@ -273,7 +273,7 @@
   </div>
 
   <aside class="side">
-    <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.channel }}">{{ L.channel }}</span><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>접수 링크</dt><dd>{{ linkNo }}</dd><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매</dt><dd>{{ v.category }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
+    <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.channel }}">{{ L.channel }}</span><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>접수 링크</dt><dd>{{ linkNo }}</dd><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매</dt><dd>{{ catLabel }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
     <div class="card"><h4>고객 안내 문자 <button onClick="{{ copySms }}">복사</button></h4><pre>{{ sms }}</pre></div>
   </aside>
 
@@ -297,7 +297,7 @@
 class Component extends DCLogic {
   state = { v: this.loadDraft(), modal: null, lib: null, agent: '', saving: false, conn: 'wait' };
   KEY = 'udj_v5_draft';
-  TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','naver','email','memo'];
+  TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','categoryEtc','naver','email','memo'];
   OPTS = { sign:['yes','no'], channel:['callin','chatin','out'], mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','unknown','nonet'], wifi:['yes','no','unknown'], link:['yes','no'], color:['white','black'], status:['go'], netReq:['yes'] };
   LBL = { channel:{callin:'Call-In',chatin:'Chat-In',out:'Out'}, mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',printer:'커넥트 + 유선 프린터',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',unknown:'모름',nonet:'인터넷 없음'}, wifi:{yes:'가능',no:'불가',unknown:'모름'} };
   LINKS = { 'fresh|person|single':'841963','fresh|person|joint':'841961','fresh|corp|single':'841955','fresh|corp|joint':'841952','existing|person|single':'841968','existing|person|joint':'841965','existing|corp|single':'841959','existing|corp|joint':'841957' };
@@ -337,7 +337,7 @@ class Component extends DCLogic {
     v.lan = g('인터넷 변경/신규 필요') === '필요' ? 'nonet' : g('인터넷 회선(랜선) 보유') === 'O' ? 'yes' : g('인터넷 회선(랜선) 보유') === '모름' ? 'unknown' : g('인터넷 회선(랜선) 보유') === 'X' ? 'no' : '';
     v.link = g('포스 연동') === '필요' ? 'yes' : g('포스 연동') === '불필요' ? 'no' : ''; v.wifi = g('와이파이 가능') === 'O' ? 'yes' : g('와이파이 가능') === 'X' ? 'no' : g('와이파이 가능') === '모름' ? 'unknown' : '';
     v.bundle = this.inv('bundle', g('안내한 상품 구성')); v.color = this.inv('color', g('기기 색상'));
-    v.category = g('판매 물품'); v.naver = g('네이버 ID'); v.email = g('이메일');
+    { const c = g('판매 물품'), CATS = ['음식·음료','미용','의류·잡화','화장품','교육']; if (c) { if (CATS.includes(c)) v.category = c; else { v.category = '기타'; v.categoryEtc = c; } } } v.naver = g('네이버 ID'); v.email = g('이메일');
     v.memo = g('특이사항');
     v.netReq = g('인터넷 상담 요청 일정') ? 'yes' : '';
     v._id = it.id; v._prev = { 상담일: g('상담일'), 결과: g('상담 결과'), 일시: g('다음 액션 · 일시') };
@@ -347,7 +347,7 @@ class Component extends DCLogic {
   toRecord(v, L, ctx, kind, extra) {
     const O = (a, b) => v[a] ? (v[a] === b ? 'O' : 'X') : '';
     const r = {
-      '유입 경로': L.channel || '', '간판 유무': v.sign === 'yes' ? '있음' : v.sign === 'no' ? '없음' : '', '고객명': v.name || '', '연락처': v.phone || '', '매장명': v.store || '', '매장 주소': v.addr || '', '업종': v.biz === '기타' ? (v.bizEtc || '기타') : (v.biz || ''), '판매 물품': v.category || '',
+      '유입 경로': L.channel || '', '간판 유무': v.sign === 'yes' ? '있음' : v.sign === 'no' ? '없음' : '', '고객명': v.name || '', '연락처': v.phone || '', '매장명': v.store || '', '매장 주소': v.addr || '', '업종': v.biz === '기타' ? (v.bizEtc || '기타') : (v.biz || ''), '판매 물품': ctx.catLabel || '',
       '매장 구분': v.mode === 'fresh' ? '신규 오픈' : v.mode === 'existing' ? '기존 운영' : '', '상담일': this.today(), '상담자': this.state.agent || '',
       '대형/개인/법인': v.entity === 'corp' ? '법인' : v.entity === 'person' ? '개인' : '', '단독/공동': v.owners === 'joint' ? '공동' : v.owners === 'single' ? '단독' : '', '연매출 3억': L.large || '',
       '서류 분류': ctx.typed ? `${L.mode}·${L.entity}·${v.owners === 'joint' ? '공동' : '단독'}` : '', '페이앤 접수 링크': ctx.linkNo !== '—' ? ctx.linkNo : '',
@@ -405,8 +405,9 @@ class Component extends DCLogic {
     const greetLead = v.channel === 'out' ? '남겨주신 네이버 커넥트 문의 보고 연락드렸어요.' : v.channel === 'chatin' ? '채팅으로 문의 주신 네이버 커넥트 건으로 전화드렸어요.' : '네이버 커넥트 문의 주셔서 연락드렸어요.';
     const bizEtc = v.biz === '기타'; if (bizEtc) req.push('bizEtc');
     const bizLabel = bizEtc ? (v.bizEtc || '기타') : (v.biz || '-');
+    const catEtc = v.category === '기타'; const catLabel = catEtc ? (v.categoryEtc || '기타') : (v.category || '');
     if (isNew) req.push('reg'); if (isNew && !noReg) req.push('openDate');
-    if (!noReg) { req.push('pos','lan'); if (!noNet) req.push('wifi'); if (!noNet) { req.push('bundle','color','category','naver'); if (posHas && v.bundle && v.bundle !== 'cat') req.push('link'); } }
+    if (!noReg) { req.push('pos','lan'); if (!noNet) req.push('wifi'); if (!noNet) { req.push('bundle','color','category','naver'); if (catEtc) req.push('categoryEtc'); if (posHas && v.bundle && v.bundle !== 'cat') req.push('link'); } }
     req.push('status');
     for (const k of [...this.TEXT, ...Object.keys(this.OPTS)]) f[k] = v[k] ? 'filled' : '';
     const reqDone = req.filter(k => v[k]).length, reqTotal = req.length;
@@ -433,7 +434,7 @@ class Component extends DCLogic {
     const smsRecall = when => head + `오늘 통화 감사합니다. ${when ? when + '에' : '말씀해 주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증이 발급되면 바로 진행하겠습니다.' : ''} 그 전에 준비되시면 미리 보내주셔도 됩니다.` + tail;
     const smsDrop = head + `오늘 시간 내주셔서 감사합니다. 이후 네이버 플레이스나 결제 관련 도움이 필요하시면 언제든 이 번호로 연락 주시기 바랍니다.\n감사합니다.`;
     const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'} / 와이파이: ${L.wifi || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
-    this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop, emailFinal };
+    this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop, emailFinal, catLabel };
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
     const ready = reqDone === reqTotal && !!this.state.lib && !this.state.saving;
     const hideIf = (k, val) => v[k] ? (v[k] === val ? 'pick' : 'hide') : '';
@@ -456,15 +457,15 @@ class Component extends DCLogic {
     const quickDates = QD.map(q => ({ label: q.label, cls: modal && modal.quick === q.k ? 'on' : '', pick: () => { if (q.date) { const d = ymd(q.date()); setM({ quick: q.k, date: d, when: fmtWhen(d, modal.whenNote) }); } else setM({ quick: 'other', date: modal.date || '', when: fmtWhen(modal.date || '', modal.whenNote) }); } }));
     const conn = this.state.conn;
     return {
-      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
+      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
       ch: { channel: v.channel ? 'ok' : '', mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
       typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
-      hideBizEtc: !bizEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
+      hideBizEtc: !bizEtc, hideCatEtc: !catEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
       hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, naverEmail,
       br: { wifiNo: hideIf('wifi','no'), wifiUnknown: hideIf('wifi','unknown'), lanUnknown: hideIf('lan','unknown'), callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
-      p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc','sign']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan','wifi']), p5: prog(['bundle','link','color','category','naver']), p8: prog(['status']),
+      p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc','sign']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan','wifi']), p5: prog(['bundle','link','color','category','categoryEtc','naver']), p8: prog(['status']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
       dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : reqDone === reqTotal ? (this.state.lib ? '필수 항목 모두 입력됨 — 작성 완료를 누르면 저장돼요' : '서버 연결 대기 중') : `필수 ${reqTotal - reqDone}개 남음 · 재연락·고객 포기는 지금도 저장 가능`,
       notReady: !ready, finishLabel: this.state.saving ? '저장 중…' : '작성 완료', finish: () => ready && this.save('go'),
