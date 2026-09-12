@@ -21,7 +21,8 @@ service cloud.firestore {
     }
     function privileged(r) { return r in ['admin', 'super']; }
 
-    match /customers/{id} { allow read: if isUser(); allow delete: if isAdmin(); allow create, update: if isUser() && agentOk(); }
+    // 조회: 관리자 이상은 전체, 구성원은 본인 이름이 상담자인 기록만 (목록 쿼리도 where('상담자','==',내 이름) 필요)
+    match /customers/{id} { allow read: if isAdmin() || (isUser() && myName() != '' && resource.data.get('상담자', '') == myName()); allow delete: if isAdmin(); allow create, update: if isUser() && agentOk(); }
     // 삭제 로그: 사용자 기록만 가능, 열람·복구는 관리자 이상, 삭제는 아무도 불가
     match /deleted/{logId} {
       allow create: if isUser() && request.resource.data.deletedBy == email();
@@ -46,4 +47,4 @@ service cloud.firestore {
     match /public/{k} { allow read: if true; allow write: if isAdmin(); }
   }
 }
-// v10 — 2026-09-12: 고객 삭제는 관리자 이상만. 삭제 로그에 사유(reason)·이름(deletedByName) 기록.
+// v11 — 2026-09-12: 구성원은 본인 상담 고객만 조회. 삭제는 관리자 이상. 삭제 로그에 사유·이름 기록.

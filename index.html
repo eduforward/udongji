@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=55"></script>
+  <script src="./udongji-nav.js?v=56"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.14); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -119,7 +119,7 @@
     @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .row .m, .row .d { display: none; } }
   </style>
 </helmet>
-<udongji-nav current="home" page-v="55"></udongji-nav>
+<udongji-nav current="home" page-v="56"></udongji-nav>
 <div class="wrap">
   <div class="top">
     <img class="mark" src="favicon.svg" alt=""><div><h1>우동지CRM</h1><div class="sub">커넥트 상담 → 계약 → 배송</div></div>
@@ -152,7 +152,7 @@
     <a class="task contract" href="contract.html">
       <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path><path d="M8 17c1-1.5 2-1.5 3 0s2 1.5 3 0"></path></svg></div>
       <div><h2>계약 업무</h2><p>상담 후 고객별로 수취자료 → 페이앤 이관 → 전자서명 → 커넥트 수령까지 추적. 서류 업로드와 완료 처리.</p></div>
-      <div class="foot"><sc-if value="{{ hasDocsWait }}" hint-placeholder-val="{{ false }}"><span class="pill hot">서류 대기 {{ docsWait }}건</span></sc-if><span class="pill purple">나의 진행 중 {{ myProgress }}건</span><span class="pill">총 진행 중 {{ inProgress }}건</span><span class="go">열기 →</span></div>
+      <div class="foot"><sc-if value="{{ hasDocsWait }}" hint-placeholder-val="{{ false }}"><span class="pill hot">나의 서류 대기 {{ docsWait }}건</span></sc-if><span class="pill purple">나의 진행 중 {{ myProgress }}건</span><sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><span class="pill">전체 {{ inProgress }}건</span></sc-if><span class="go">열기 →</span></div>
     </a>
     <a class="task list" href="customers.html">
       <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M17.5 14a6.5 6.5 0 0 1 4 6"></path></svg></div>
@@ -184,7 +184,7 @@ class Component extends DCLogic {
   }
   async componentDidMount() {
     if (location.hash === '#admin') { location.replace('admin.html'); return; }
-    try { const lib = await import('./udongji-fb.js?v=12'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); lib.myName().then(n => this.setState({ myName: n || '' })).catch(() => {}); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
+    try { const lib = await import('./udongji-fb.js?v=13'); await lib.init(); this.setState({ lib, signedIn: lib.isSignedIn(), email: lib.userEmail() }, () => { this.load(); this.refreshAdmin(); lib.myName().then(n => this.setState({ myName: n || '' })).catch(() => {}); }); } catch (e) { this.setState({ msg: '스크립트 로드 실패: ' + e.message, msgCls: 'err' }); }
     this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('storage', this._on);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('storage', this._on); }
@@ -218,7 +218,7 @@ class Component extends DCLogic {
     const myProgress = prog.filter(mine).length, myCall = recalls.filter(mine).length;
     const todayRecs = records.filter(r => String(r.savedAt || '').slice(0, 10) === todayStr);
     const myToday = todayRecs.filter(mine).length;
-    const docsWait = goRecs.filter(r => { const d = r.data || {}; return !String(d['수취 완료일'] || '').trim() && !String(d['설치일'] || '').trim(); }).length;
+    const docsWait = goRecs.filter(mine).filter(r => { const d = r.data || {}; return !String(d['수취 완료일'] || '').trim() && !String(d['설치일'] || '').trim(); }).length;
     const hasDraft = !!draft && Object.keys(draft).some(k => k[0] !== '_' && String(draft[k] || '').trim());
     const recent = records.slice(0, 6).map(r => {
       const d = r.data || {}, res = d['상담 결과'] || '상담 진행';

@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=55"></script>
+  <script src="./udongji-nav.js?v=56"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -81,7 +81,7 @@
     @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, minmax(0,1fr)); } }
   </style>
 </helmet>
-<udongji-nav current="kpi" page-v="55"></udongji-nav>
+<udongji-nav current="kpi" page-v="56"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>KPI 대시보드</b><small>상담사별 단계 전환율</small></div></div>
@@ -110,7 +110,7 @@
   </div>
 
   <div class="tw">
-    <div class="th"><b>상담사별</b><span>{{ rangeText }} · 상담일 기준 · 칸을 누르면 해당 고객 목록이 아래에 열립니다 · 빨간 글씨 = {{ delayDays }}일 넘게 다음 단계로 못 간 건</span></div>
+    <div class="th"><b>상담사별</b><sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><div class="seg" style="margin-left:4px"><button type="button" class="{{ scopeMineCls }}" onClick="{{ setScopeMine }}">나만</button><button type="button" class="{{ scopeAllCls }}" onClick="{{ setScopeAll }}">모든 상담사</button></div></sc-if><span>{{ rangeText }} · 상담일 기준 · 칸을 누르면 해당 고객 목록이 아래에 열립니다 · 빨간 글씨 = {{ delayDays }}일 넘게 다음 단계로 못 간 건</span></div>
     <table style="margin-top:12px">
       <thead><tr>
         <th>상담자</th>
@@ -156,14 +156,14 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, items: [], loading: true, err: '', period: 'month', from: '', to: '', rateBase: 'step', delayDays: 5, drill: null, channel: '' };
+  state = { lib: null, items: [], loading: true, err: '', period: 'month', from: '', to: '', rateBase: 'step', delayDays: 5, drill: null, channel: '', scope: 'all', me: null };
   PERIODS = [['today','오늘'],['week','이번 주'],['month','이번 달'],['last','지난 달'],['all','전체']];
   async componentDidMount() {
     this.setPeriod('month');
     try {
-      const lib = await import('./udongji-fb.js?v=12'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=13'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
-      this.setState({ lib }, () => this.load());
+      const me = await lib.me(); this.setState({ lib, me }, () => this.load());
     } catch (e) { location.replace('index.html#login'); }
     this._on = () => this.load(); window.addEventListener('focus', this._on);
   }
@@ -189,7 +189,7 @@ class Component extends DCLogic {
     const today = this.ymd(new Date());
     // 기간 필터 (상담일 기준). 상담일이 없으면 생성일로.
     const inRange = it => { const d = this.norm(V(it.data, '상담일')) || String(it._createdAt || '').slice(0, 10); if (!d) return period === 'all'; return (!from || d >= from) && (!to || d <= to); };
-    const list = items.filter(inRange).filter(it => (it.data['상담 결과'] || '상담 진행') !== '상담 거부').filter(it => !this.state.channel || V(it.data, '유입 경로') === this.state.channel);
+    const list = items.filter(inRange).filter(it => (it.data['상담 결과'] || '상담 진행') !== '상담 거부').filter(it => !this.state.channel || V(it.data, '유입 경로') === this.state.channel).filter(it => { const m = this.state.me || {}; return !m.admin || this.state.scope === 'all' || !m.name || V(it.data, '상담자') === m.name; });
     // 각 고객의 도달 단계 인덱스 + 도달일
     const info = it => { const d = it.data; let idx = 0, at = this.norm(V(d, '상담일')) || String(it._createdAt || '').slice(0, 10); for (let i = 1; i < STAGES.length; i++) { const v = this.norm(d[STAGES[i].col]); if (v) { idx = i; at = v; } else break; } return { idx, at, stale: idx < STAGES.length - 1 && at && this.days(at, today) > delayDays }; };
     const enriched = list.map(it => Object.assign({ it }, info(it)));
@@ -216,6 +216,7 @@ class Component extends DCLogic {
     return {
       periods: this.PERIODS.map(([k, label]) => ({ label, cls: period === k ? 'on' : '', go: () => this.setPeriod(k) })),
       from, to, onFrom: e => this.setState({ from: e.target.value, period: 'custom', drill: null }), onTo: e => this.setState({ to: e.target.value, period: 'custom', drill: null }),
+      isAdmin: !!(this.state.me && this.state.me.admin), scopeMineCls: this.state.scope === 'mine' ? 'on' : '', scopeAllCls: this.state.scope === 'all' ? 'on' : '', setScopeMine: () => this.setState({ scope: 'mine', drill: null }), setScopeAll: () => this.setState({ scope: 'all', drill: null }),
       channel: this.state.channel, onChannel: e => this.setState({ channel: e.target.value, drill: null }),
       rateBase, onRateBase: e => this.setState({ rateBase: e.target.value }), delayDays: String(delayDays), onDelay: e => this.setState({ delayDays: Number(e.target.value) }),
       reload: () => this.load(), cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : enriched.length + ' / ' + items.length + '건',

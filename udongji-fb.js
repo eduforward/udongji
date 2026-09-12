@@ -238,10 +238,19 @@ export function todayStr() { const t = new Date(), p = n => String(n).padStart(2
 // ── 레코드 (Firestore: customers/{id}) ── 페이지 호환을 위해 { row: id, data } 형태로 반환
 const COL = 'customers';
 function need() { if (!_user) throw new Error('로그인이 필요해요. 홈에서 구글 계정으로 로그인하세요.'); }
-export async function readAll() {
-  await init(); need(); const { fs } = _mods;
-  const snap = await fs.getDocs(fs.query(fs.collection(_db, COL), fs.orderBy('_createdAt', 'asc')));
+// 내 정보(역할·이름) 캐시 — 구성원(consult/sales)은 본인 상담 고객만 조회 가능
+let _me = null;
+export async function me(force) { if (_me && !force) return _me; await init(); const email = userEmail(); const role = await roleOf(email); const name = await myName(); _me = { email, role, name, admin: isAdminRole(role) }; return _me; }
+export async function readAll(opts) {
+  await init(); need(); const { fs } = _mods; opts = opts || {};
+  const m = await me();
+  let q;
+  if (m.admin || opts.all) q = fs.query(fs.collection(_db, COL), fs.orderBy('_createdAt', 'asc'));
+  else if (m.name) q = fs.query(fs.collection(_db, COL), fs.where('상담자', '==', m.name));
+  else return { header: FULL_HEADER(), items: [] };
+  const snap = await fs.getDocs(q);
   const items = snap.docs.map((d, i) => { const data = d.data(); const clean = {}; Object.keys(data).forEach(k => { if (k[0] !== '_') clean[k] = data[k] == null ? '' : String(data[k]); }); clean[ID_COL] = d.id; return { row: d.id, id: d.id, data: clean, _createdAt: data._createdAt || '', _updatedAt: data._updatedAt || '' }; });
+  items.sort((a, b) => String(a._createdAt).localeCompare(String(b._createdAt)));
   return { header: FULL_HEADER(), items };
 }
 export const FULL_HEADER = () => COLS.map(c => c.name).concat([ID_COL, REG_COL]).concat(PAYN_FIELDS.filter(f => !f.ro).map(f => PAYN_PREFIX + f.label));
