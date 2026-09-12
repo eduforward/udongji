@@ -300,7 +300,7 @@
       </sc-if>
 
       <div class="sec">
-        <h3>진행 메모</h3>
+        <h3>진행 메모 <span class="pill {{ memoCls }}" style="margin-left:auto">{{ memoState }}</span></h3>
         <textarea class="memo" value="{{ sel.memo }}" onInput="{{ onMemo }}" onBlur="{{ saveMemo }}" placeholder="재촉 연락, 특이사항 등"></textarea>
         <div class="acts" style="padding-left:0"><a class="btn" href="{{ sel.mapHref }}" target="_blank" rel="noopener">지도</a></div>
       </div>
@@ -337,6 +337,14 @@ class Component extends DCLogic {
     } catch (e) { this.setState({ loading: false, err: e.message }); }
   }
   toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
+  async saveMemoNow() {
+    const { lib, items, selRow, memo } = this.state; const rec = items.find(it => it.row === selRow); if (!rec || !lib) return;
+    if ((rec.data[lib.PROGRESS_NOTE_COL] || '') === memo) { this.setState({ memoDirty: false }); return; }
+    this.setState({ memoSaving: true });
+    const ok = await this.patch(rec, { [lib.PROGRESS_NOTE_COL]: memo });
+    const p = n => String(n).padStart(2, '0'), t = new Date();
+    this.setState({ memoSaving: false, memoDirty: !ok, memoSavedAt: ok ? p(t.getHours()) + ':' + p(t.getMinutes()) + ':' + p(t.getSeconds()) : this.state.memoSavedAt });
+  }
   scrollToPayn() { const el = document.getElementById('payn-sec'), box = el && el.closest('.dbody'); if (el && box) box.scrollTo({ top: el.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - 12, behavior: 'smooth' }); }
   async patch(rec, obj, msg) {
     const lib = this.state.lib; this._mut = (this._mut || 0) + 1;
@@ -386,7 +394,7 @@ class Component extends DCLogic {
       return prev && stageDone(d, prev.key) ? { cls: 'next', t: '대기' } : { cls: 'wait', t: '—' };
     };
     const rows = list.map(it => { const d = it.data, c = STAGES.map(s => cell(d, s.key)); return {
-      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => { const firstOpen = STAGES.find(s => !stageDone(d, s.key)); this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', pfDraft: {}, seq: 0, copied: {}, photoSel: {}, tab: firstOpen ? firstOpen.key : 'install' }); },
+      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => { const firstOpen = STAGES.find(s => !stageDone(d, s.key)); clearTimeout(this._memoT); this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', memoDirty: false, memoSavedAt: '', pfDraft: {}, seq: 0, copied: {}, photoSel: {}, tab: firstOpen ? firstOpen.key : 'install' }); },
       store: V(d, '매장명') || '(매장명 없음)', who: [V(d, '고객명'), V(d, '연락처')].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '—', date: V(d, '상담일').slice(5), agent: V(d, '상담자'), memo: V(d, lib ? lib.PROGRESS_NOTE_COL : '진행 메모'),
       s0: c[0] ? c[0].cls : '', s0t: c[0] ? c[0].t : '', s1: c[1] ? c[1].cls : '', s1t: c[1] ? c[1].t : '', s2: c[2] ? c[2].cls : '', s2t: c[2] ? c[2].t : '', s3: c[3] ? c[3].cls : '', s3t: c[3] ? c[3].t : ''
     }; });
@@ -509,6 +517,7 @@ class Component extends DCLogic {
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : list.length + '건',
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, pf, photoGroups: this._pg || [], noPhotos: !!rec && !(this._pg || []).length,
+      memoState: this.state.memoSaving ? '저장 중…' : this.state.memoDirty ? '입력 중 — 1초 후 자동 저장' : this.state.memoSavedAt ? '자동 저장 완료 ' + this.state.memoSavedAt : '자동 저장됨', memoCls: this.state.memoDirty || this.state.memoSaving ? 'amber' : 'ok',
       hasPhotoSel: !!(this._photoDrag && this._photoDrag.selFiles.length), noPhotoSel: !!rec && !!(this._pg || []).length && !(this._photoDrag && this._photoDrag.selFiles.length), photoSelN: this._photoDrag ? this._photoDrag.selFiles.length : 0,
       photoSelInfo: this._photoDrag ? (this._photoDrag.readyN < this._photoDrag.selFiles.length ? '사진 불러오는 중 ' + this._photoDrag.readyN + '/' + this._photoDrag.selFiles.length : '준비됨 — 다운로드 후 페이앤 파일 칸에서 여러 개 선택') : '',
       dlBusy: !!this.state.dlBusy || !(this._photoDrag && this._photoDrag.readyN === this._photoDrag.selFiles.length), dlLabel: this.state.dlBusy ? '다운로드 중…' : '선택한 ' + (this._photoDrag ? this._photoDrag.selFiles.length : 0) + '장 다운로드',
@@ -524,9 +533,9 @@ class Component extends DCLogic {
       completeHandoff: () => { const p = this._payn; if (!p || p.stageDoneHandoff) return; if (p.dirtyKeys.length) { this.toast('바꾼 내용을 먼저 저장하세요'); return; } if (p.pfMiss.length && !confirm('미입력·오류 ' + p.pfMiss.length + '칸이 있어요. 그래도 이관 완료로 처리할까요?')) return; this.patch(p.rec, { [SC.handoff]: today, [lib.REG_COL]: today }, '페이앤 이관 완료'); },
       copyPayn: () => { if (sel.payn) this.copy(sel.payn, '페이앤 접수 양식 (탭 구분 2열)'); },
       copySms: () => { if (sel.sms) this.copy(sel.sms, '안내 문자'); },
-      completeInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.complete(); }, resendNewsletter: () => { if (rec) this.sendNewsletter(rec, true); }, close: () => this.setState({ selRow: null, pfDraft: {}, seq: 0, copied: {} }),
-      onMemo: e => this.setState({ memo: e.target.value }),
-      saveMemo: () => { if (rec && lib && (rec.data[lib.PROGRESS_NOTE_COL] || '') !== memo) this.patch(rec, { [lib.PROGRESS_NOTE_COL]: memo }, '메모 저장'); },
+      completeInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.complete(); }, resendNewsletter: () => { if (rec) this.sendNewsletter(rec, true); }, close: () => { clearTimeout(this._memoT); if (this.state.memoDirty) this.saveMemoNow(); this.setState({ selRow: null, pfDraft: {}, seq: 0, copied: {} }); },
+      onMemo: e => { const v = e.target.value; this.setState({ memo: v, memoDirty: true }); clearTimeout(this._memoT); this._memoT = setTimeout(() => this.saveMemoNow(), 1000); },
+      saveMemo: () => { clearTimeout(this._memoT); this.saveMemoNow(); },
       completeDocs: () => { const s = steps.find(x => x.key === 'docs'); if (s) s.complete(); },
       copyNudge: () => { if (!rec || !lib) return; const d = rec.data, left = reqDocs(d).filter(x => !checked(d)[x.id]); const txt = '[우동지] ' + (V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님') + ', 우동지 ' + (V(d, '상담자') || '담당자') + '입니다.\n커넥트 접수 진행을 위해 아직 못 받은 서류가 있어요. 편하실 때 이 번호로 사진 보내주시면 바로 접수 넣어드릴게요.\n\n' + left.map((x, i) => (i + 1) + '. ' + x.name + (x.hint ? ' (' + x.hint + ')' : '')).join('\n') + '\n\n감사합니다.'; this.copy(txt, '재촉 문자'); },
       toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
