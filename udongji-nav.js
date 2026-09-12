@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v53 · 2026-09-12';
-  // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가
+  const VERSION = 'v54 · 2026-09-12 21:28';
+  // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 54, d: '2026-09-12', t: '21:28', c: ['배포 이력·상단 버전 배지에 푸시 시각(한국시간) 표시', '계약 업무: 페이앤 접수 양식 텍스트 박스 제거 (칸별 복사만)'] },
     { v: 53, d: '2026-09-12', c: ['수취자료: 고객 유형에 맞는 서류만 "필수", 나머지는 "해당 시" — 못 받은 개수는 필수 기준', '페이앤 이관 단계 클릭 → 접수 입력란으로 이동, 입력 후 "저장" 버튼, 이관 완료는 폼 아래 버튼으로', '페이앤 접수 칸별 복사 버튼 + "순서대로 복사"로 페이앤 폼에 한 칸씩 붙이기', '사업자번호 10자리·법인등록번호 13자리·생년월일 6자리 숫자만 입력'] },
     { v: 52, d: '2026-09-12', c: ['고객 삭제는 관리자 이상만 (서버 규칙 + 화면 버튼), 삭제 시 사유 필수 입력', '삭제 로그에 사유 열 추가, 삭제·복구한 사람은 이름(이메일)로 표시'] },
     { v: 51, d: '2026-09-12', c: ['상담 스크립트: 이메일 질문 제거 — 네이버 ID 물을 때 커넥트 연결·우동지 가이드 발송 안내, 이메일은 아이디@naver.com 자동 생성'] },
@@ -30,7 +31,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 53;
+  const PAGE_V = 54;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -83,7 +84,7 @@
     .he { padding: 12px 18px; border-bottom: 1px solid #EEF1F6; display: grid; grid-template-columns: 84px 1fr; gap: 6px 14px; }
     .he:last-child { border-bottom: 0; }
     .he .v { font-weight: 800; font-size: 13px; color: #3D5AF1; font-variant-numeric: tabular-nums; } .he .v.cur { color: #1E9E66; }
-    .he .d { grid-column: 1; font-size: 11px; color: #8C95A8; white-space: nowrap; }
+    .he .d { grid-column: 1; font-size: 11px; color: #8C95A8; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .he ul { grid-column: 2; grid-row: 1 / span 2; margin: 0; padding-left: 16px; font-size: 13px; color: #171C2B; line-height: 1.5; }
     .he li + li { margin-top: 3px; }
     @media (max-width: 640px) { .who { display: none; } a.brand span { display: none; } .in { padding: 0 12px; } }
@@ -103,7 +104,7 @@
       </div></div>
       <div class="hb" id="hb"><div class="hp" role="dialog" aria-label="배포 이력">
         <div class="hh"><b>배포 이력</b><small>현재 ${VERSION}</small><button type="button" id="hx">닫기</button></div>
-        ${HISTORY.map(h => `<div class="he"><span class="v ${h.v === PAGE_V ? 'cur' : ''}">v${h.v}</span><span class="d">${h.d}</span><ul>${h.c.map(x => `<li>${x}</li>`).join('')}</ul></div>`).join('')}
+        ${HISTORY.map(h => `<div class="he"><span class="v ${h.v === PAGE_V ? 'cur' : ''}">v${h.v}</span><span class="d">${h.d}${h.t ? '<br>' + h.t : ''}</span><ul>${h.c.map(x => `<li>${x}</li>`).join('')}</ul></div>`).join('')}
       </div></div>`;
       const hb = root.getElementById('hb'), ver = root.getElementById('ver');
       const openH = () => { hb.classList.add('on'); }, closeH = () => { hb.classList.remove('on'); };
