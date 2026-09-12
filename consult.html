@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=72"></script>
+  <script src="./udongji-nav.js?v=73"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -133,7 +133,7 @@
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="72"></udongji-nav>
+<udongji-nav current="consult" page-v="73"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="단계">
     <div class="k">상담 흐름 v5</div>
@@ -281,7 +281,11 @@
     <div class="scrim" onClick="{{ closeModal }}"></div>
     <div class="modal">
       <h3>{{ modal.title }}</h3><p>{{ modal.sub }}</p>
-      <sc-if value="{{ modal.isRecall }}" hint-placeholder-val="{{ true }}"><label>다음 연락 일시 <b>*</b></label><input type="text" placeholder="예: 9/15 오후 2시" value="{{ modal.when }}" onInput="{{ onModalWhen }}"><label>메모 (선택)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="부재중 · 사업자등록증 나오면 등"></textarea></sc-if>
+      <sc-if value="{{ modal.isRecall }}" hint-placeholder-val="{{ true }}"><label>다음 연락 <b>*</b></label>
+        <div class="seg" style="flex-wrap:wrap;gap:6px"><sc-for list="{{ quickDates }}" as="q" hint-placeholder-count="0"><button type="button" class="{{ q.cls }}" onClick="{{ q.pick }}" style="height:32px;padding:0 12px;border-color:var(--line)">{{ q.label }}</button></sc-for></div>
+        <sc-if value="{{ modal.isOther }}" hint-placeholder-val="{{ false }}"><label>날짜 직접 입력 <b>*</b></label><input type="date" value="{{ modal.date }}" onInput="{{ onModalDate }}"><label>시간·상황 (선택)</label><input type="text" placeholder="예: 오후 2시 이후, 점심시간 피해서" value="{{ modal.whenNote }}" onInput="{{ onModalWhenNote }}"></sc-if>
+        <sc-if value="{{ modal.hasPreview }}" hint-placeholder-val="{{ false }}"><div class="note" style="padding:6px 0 0;color:var(--green);font-weight:600">→ {{ modal.preview }}</div></sc-if>
+        <label>메모 (선택)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="부재중 · 사업자등록증 나오면 등"></textarea></sc-if>
       <sc-if value="{{ modal.isDrop }}" hint-placeholder-val="{{ false }}"><label>포기 이유 <b>* 필수</b></label><select value="{{ modal.reason }}" onChange="{{ onModalReason }}"><option value="">선택하세요</option><option>타사 계약·이미 사용 중</option><option>조건 불만족 (수수료·약정·위약금)</option><option>인터넷·설치 환경 불가</option><option>사업자등록증 미발급·폐업</option><option>연락 두절 (3회 이상 부재)</option><option>관심 없음·거부</option><option>기타</option></select><label>상세 (선택 · 기타면 필수)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="어떤 말씀을 하셨는지 한 줄"></textarea></sc-if>
       <sc-if value="{{ modal.hasErr }}" hint-placeholder-val="{{ false }}"><div class="err">{{ modal.err }}</div></sc-if>
       <div class="row"><button type="button" class="btn ghost" onClick="{{ closeModal }}">취소</button><button type="button" class="btn {{ modal.okCls }}" onClick="{{ saveModal }}" disabled="{{ saving }}">{{ modal.ok }}</button></div>
@@ -436,6 +440,20 @@ class Component extends DCLogic {
     const modal = this.state.modal, who = v.store || v.name || '(고객명 미입력)';
     const setM = p => this.setState({ modal: Object.assign({}, this.state.modal, { err: '' }, p) });
     const needBasic = () => !v.name || !v.phone ? '고객명과 연락처는 있어야 저장할 수 있어요.' : '';
+    // 재연락 빠른 날짜
+    const ymd = dt => { const p = n => String(n).padStart(2, '0'); return dt.getFullYear() + '-' + p(dt.getMonth() + 1) + '-' + p(dt.getDate()); };
+    const addD = n => { const t = new Date(); t.setHours(0, 0, 0, 0); t.setDate(t.getDate() + n); return t; };
+    const nextDow = (dow, nextWeek) => { const t = addD(0); let diff = (dow - t.getDay() + 7) % 7; if (diff === 0) diff = 7; if (nextWeek) { const daysToNextMon = (8 - t.getDay()) % 7 || 7; diff = daysToNextMon + ((dow - 1 + 7) % 7); } return addD(diff); };
+    const nextMonthStart = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth() + 1, 1); };
+    const QD = [
+      { k: 'tomorrow', label: '내일', date: () => addD(1) }, { k: 'dat', label: '내일모레', date: () => addD(2) },
+      { k: 'fri', label: '이번 주 금', date: () => nextDow(5, false) }, { k: 'nmon', label: '다음 주 월', date: () => nextDow(1, true) },
+      { k: 'w1', label: '1주 뒤', date: () => addD(7) }, { k: 'w2', label: '2주 뒤', date: () => addD(14) }, { k: 'nm', label: '다음 달 초', date: () => nextMonthStart() },
+      { k: 'other', label: '기타 (직접 입력)', date: null }
+    ];
+    const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+    const fmtWhen = (d, note) => d ? d + ' (' + DOW[new Date(d).getDay()] + ')' + (note ? ' ' + note : '') : '';
+    const quickDates = QD.map(q => ({ label: q.label, cls: modal && modal.quick === q.k ? 'on' : '', pick: () => { if (q.date) { const d = ymd(q.date()); setM({ quick: q.k, date: d, when: fmtWhen(d, modal.whenNote) }); } else setM({ quick: 'other', date: modal.date || '', when: fmtWhen(modal.date || '', modal.whenNote) }); } }));
     const conn = this.state.conn;
     return {
       v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
@@ -453,13 +471,14 @@ class Component extends DCLogic {
       copySms: copy(sms), copyForm: copy(form),
       reset: () => { if (Object.keys(v).length && !confirm('입력 중인 내용을 지우고 새 상담을 시작할까요?')) return; localStorage.removeItem(this.KEY); this.setState({ v: {} }); },
       saving: this.state.saving,
-      hasModal: !!modal, modal: modal ? Object.assign({ hasErr: !!modal.err }, modal) : {}, closeModal: () => this.setState({ modal: null }),
-      openRecall: () => this.setState({ modal: { kind: 'recall', isRecall: true, isDrop: false, title: '재연락으로 저장', sub: who + ' — 지금까지 입력한 내용을 그대로 저장하고 상태를 "재연락 예정"으로 바꿔요. 재연락 목록에 올라갑니다.', when: '', note: '', ok: '재연락 저장', okCls: 'warn', err: '' } }),
+      hasModal: !!modal, modal: modal ? Object.assign({ hasErr: !!modal.err, isOther: modal.quick === 'other', hasPreview: !!modal.when, preview: modal.when }, modal) : {}, closeModal: () => this.setState({ modal: null }), quickDates,
+      onModalDate: e => { const d = e.target.value; setM({ date: d, when: fmtWhen(d, modal.whenNote) }); }, onModalWhenNote: e => { const n = e.target.value; setM({ whenNote: n, when: fmtWhen(modal.date, n) }); },
+      openRecall: () => this.setState({ modal: { kind: 'recall', isRecall: true, isDrop: false, title: '재연락으로 저장', sub: who + ' — 지금까지 입력한 내용을 그대로 저장하고 상태를 "재연락 예정"으로 바꿔요. 재연락 목록에 올라갑니다.', when: '', quick: '', date: '', whenNote: '', note: '', ok: '재연락 저장', okCls: 'warn', err: '' } }),
       openDrop: () => this.setState({ modal: { kind: 'drop', isRecall: false, isDrop: true, title: '고객 포기', sub: who + ' — 상담을 여기서 중단해요. 이유는 반드시 남겨야 하고, 고객 목록에는 남습니다.', reason: '', note: '', ok: '포기 처리', okCls: 'danger', err: '' } }),
       onModalWhen: e => setM({ when: e.target.value }), onModalNote: e => setM({ note: e.target.value }), onModalReason: e => setM({ reason: e.target.value }),
       saveModal: () => {
         if (!modal || this.state.saving) return; const b = needBasic(); if (b) return setM({ err: b });
-        if (modal.kind === 'recall') { if (!modal.when.trim()) return setM({ err: '다음 연락 일시를 입력하세요.' }); this.save('recall', { when: modal.when.trim(), note: modal.note.trim() }); }
+        if (modal.kind === 'recall') { if (!modal.date) return setM({ err: '다음 연락 날짜를 고르거나 직접 입력하세요.' }); this.save('recall', { when: modal.when.trim(), note: modal.note.trim() }); }
         else { if (!modal.reason) return setM({ err: '포기 이유를 선택해야 저장할 수 있어요.' }); if (modal.reason === '기타' && !modal.note.trim()) return setM({ err: '"기타"는 상세 내용을 적어주세요.' }); this.save('drop', { reason: modal.reason + (modal.note.trim() ? ' — ' + modal.note.trim() : ''), note: '' }); }
       }
     };
