@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=77"></script>
+  <script src="./udongji-nav.js?v=78"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -140,7 +140,7 @@
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="77"></udongji-nav>
+<udongji-nav current="consult" page-v="78"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="단계">
     <div class="k">상담 흐름 v5</div>
@@ -177,8 +177,8 @@
     </section>
 
     <section class="step" id="s1" data-screen-label="1 인사">
-      <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. 업종은 통화 전 네이버 지도로 봐둔 걸 확인만.</small></div></div>
-      <div class="say"><span class="who">상담원</span>안녕하세요, 우동지 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"○○ 하시는 매장 맞으시죠?"</span></div>
+      <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. Out(접수 고객)은 통화 전 네이버 지도로 매장을 봐두고 확인만, Call-In·Chat-In은 매장명·업종을 직접 물어요.</small></div></div>
+      <div class="say"><span class="who">상담원</span>안녕하세요, 우동지 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"{{ greetAsk }}"</span></div>
       <div class="fgrid">
         <span class="rec must {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
         <span class="rec must {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
@@ -409,7 +409,8 @@ class Component extends DCLogic {
     const req = ['channel','name','phone','store','biz','sign','mode','entity','owners','large'];
     const naverEmail = v.naver ? (v.naver.includes('@') ? v.naver.trim() : v.naver.trim() + '@naver.com') : '아이디@naver.com';
     const emailFinal = (v.email || '').trim() || (v.naver ? naverEmail : '');
-    const greetLead = v.channel === 'out' ? '남겨주신 네이버 커넥트 문의 보고 연락드렸어요.' : v.channel === 'chatin' ? '채팅으로 문의 주신 네이버 커넥트 건으로 전화드렸어요.' : '네이버 커넥트 문의 주셔서 연락드렸어요.';
+    const greetLead = v.channel === 'out' ? '남겨주신 네이버 커넥트 문의 보고 연락드렸어요.' : v.channel === 'chatin' ? '채팅으로 문의 주신 네이버 커넥트 건으로 전화드렸어요.' : v.channel === 'callin' ? '네이버 커넥트 문의 감사합니다.' : '네이버 커넥트 문의 주셔서 연락드렸어요.';
+    const greetAsk = v.channel === 'out' ? (v.store ? v.store + ' 하시는 매장 맞으시죠?' : '○○ 하시는 매장 맞으시죠?') : '어떤 매장 운영하고 계세요? 매장 이름이랑 어떤 업종인지 말씀해 주시겠어요?';
     const bizEtc = v.biz === '기타'; if (bizEtc) req.push('bizEtc');
     const bizLabel = bizEtc ? (v.bizEtc || '기타') : (v.biz || '-');
     const catEtc = v.category === '기타'; const catLabel = catEtc ? (v.categoryEtc || '기타') : (v.category || '');
@@ -482,7 +483,7 @@ class Component extends DCLogic {
     const quickDates = QD.map(q => ({ label: q.label, cls: modal && modal.quick === q.k ? 'on' : '', pick: () => { if (q.date) { const d = ymd(q.date()); setM({ quick: q.k, date: d, when: fmtWhen(d, modal.whenNote) }); } else setM({ quick: 'other', date: modal.date || '', when: fmtWhen(modal.date || '', modal.whenNote) }); } }));
     const conn = this.state.conn;
     return {
-      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
+      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, greetAsk, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
       ch: { channel: v.channel ? 'ok' : '', mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
