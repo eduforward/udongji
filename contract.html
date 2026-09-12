@@ -209,7 +209,7 @@
       <sc-if value="{{ tabDocs }}" hint-placeholder-val="{{ true }}">
       <div class="sec">
         <h3>수취 자료 <span class="pill {{ sel.docPillCls }}">{{ sel.docPill }}</span></h3>
-        <div class="case" style="margin:4px 0 8px"><span style="font-size:13px;font-weight:700;color:var(--text-2)">매장 간판</span><div class="seg"><button type="button" class="{{ sel.signYesCls }}" onClick="{{ setSignYes }}">있음 · 사진 4매</button><button type="button" class="{{ sel.signNoCls }}" onClick="{{ setSignNo }}">없음 · 사진 5매</button></div><span class="note" style="margin:0">간판 유무에 따라 매장사진 항목이 바뀝니다</span></div>
+        <div class="case" style="margin:4px 0 8px"><span style="font-size:13px;font-weight:700;color:var(--text-2)">매장 외부 간판</span><div class="seg"><button type="button" class="{{ sel.signYesCls }}" onClick="{{ setSignYes }}">있음 · 사진 4매</button><button type="button" class="{{ sel.signNoCls }}" onClick="{{ setSignNo }}">없음 · 사진 5매</button></div><span class="note" style="margin:0">간판 유무에 따라 매장사진 항목이 바뀝니다</span></div>
         <sc-for list="{{ docs }}" as="d" hint-placeholder-count="5">
           <div class="{{ d.cls }}">
             <button type="button" class="cb" onClick="{{ d.toggle }}" aria-label="받음 체크">{{ d.mark }}</button>
