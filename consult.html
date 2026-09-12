@@ -84,10 +84,17 @@
     .rec.opt { background: var(--card-2); color: var(--text-2); }
     .rec.opt input, .rec.opt select { border-color: var(--line); }
     .rec.opt.filled { background: var(--green-2); color: var(--green); }
-    .rec.req { border: 1px solid var(--red); box-shadow: 0 0 0 3px rgba(217,58,74,.12); padding-left: 5px; }
-    .rec.req::before { content: "권장"; font-size: 10px; font-weight: 800; color: #fff; background: var(--red); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
-    .rec.req.filled { border-color: var(--green); box-shadow: none; }
+    .rec.req { background: var(--amber-2); color: var(--amber); padding-left: 5px; }
+    .rec.req input, .rec.req select { border-color: #F0D9A6; }
+    .rec.req .seg button { border-color: #F0D9A6; }
+    .rec.req::before { content: "권장"; font-size: 10px; font-weight: 800; color: #fff; background: var(--amber); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
+    .rec.req.filled { background: var(--green-2); color: var(--green); }
     .rec.req.filled::before { content: "완료"; background: var(--green); }
+    .rec.must { border: 1px solid var(--red); box-shadow: 0 0 0 3px rgba(217,58,74,.12); background: var(--red-2); color: var(--red); padding-left: 5px; }
+    .rec.must::before { content: "필수"; font-size: 10px; font-weight: 800; color: #fff; background: var(--red); border-radius: 5px; padding: 2px 6px; letter-spacing: .04em; line-height: 1.2; }
+    .rec.must.filled { border-color: var(--green); box-shadow: none; background: var(--green-2); color: var(--green); }
+    .rec.must.filled input { border-color: var(--green-3); }
+    .rec.must.filled::before { content: "완료"; background: var(--green); }
     .seg { display: inline-flex; gap: 4px; }
     .seg button { font: inherit; font-size: 13px; font-weight: 700; height: 30px; padding: 0 12px; border-radius: var(--r-xs); border: 1px solid var(--red-3); background: var(--card); color: var(--text-2); cursor: pointer; }
     .seg button.on { background: var(--blue); color: #fff; border-color: var(--blue); }
@@ -152,7 +159,7 @@
 
   <div class="main">
     <header class="doc">
-      <div><div class="kicker">우동지 · 네이버페이 커넥트 상담 스크립트 <b style="color:var(--purple)">v5</b></div><h1>상담 업무</h1><p>말풍선을 읽으며 진행하고, <b style="color:var(--red)">빨간 칸</b>만 채우면 됩니다. 매장 주소·사업자번호·생년월일·이메일은 <b>묻지 않아요</b> — 서류(사업자등록증·신분증·통장)에 다 있어요. 밴사도 언급하지 않습니다.</p></div>
+      <div><div class="kicker">우동지 · 네이버페이 커넥트 상담 스크립트 <b style="color:var(--purple)">v5</b></div><h1>상담 업무</h1><p>말풍선을 읽으며 진행하세요. <b style="color:var(--red)">필수</b>는 고객명·연락처 둘뿐이고, <b style="color:var(--amber)">권장</b> 칸은 채울 수 있는 만큼만 — 빠진 건 계약 업무에서 보완합니다. 매장 주소·사업자번호·생년월일·이메일은 <b>묻지 않아요</b> — 서류(사업자등록증·신분증·통장)에 다 있어요. 밴사도 언급하지 않습니다.</p></div>
       <div class="typebadge"><span class="tb {{ typeCls }}">{{ typeLabel }}</span><small>접수 링크 <b>{{ linkNo }}</b></small><small>{{ installLabel }}</small></div>
     </header>
     <div class="prevbar" hidden="{{ hidePrev }}">재연락 상담 — {{ prevTxt }} · "계약 업무로" 넘기면 같은 고객 기록이 갱신돼요.</div>
@@ -173,8 +180,8 @@
       <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. 업종은 통화 전 네이버 지도로 봐둔 걸 확인만.</small></div></div>
       <div class="say"><span class="who">상담원</span>안녕하세요, 우동지 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"○○ 하시는 매장 맞으시죠?"</span></div>
       <div class="fgrid">
-        <span class="rec req {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
-        <span class="rec req {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
+        <span class="rec must {{ f.name }}">고객명 <input value="{{ v.name }}" onInput="{{ set.name }}" placeholder="대표님 성함"></span>
+        <span class="rec must {{ f.phone }}">연락처 <input value="{{ v.phone }}" onInput="{{ set.phone }}" placeholder="010-0000-0000" inputMode="tel"></span>
         <span class="rec req {{ f.store }}">매장명 <input value="{{ v.store }}" onInput="{{ set.store }}" placeholder="지도 검색용"><a href="{{ mapHref }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:7px;background:var(--green-2);color:var(--green);text-decoration:none;white-space:nowrap">지도</a></span>
         <span class="rec req {{ f.biz }}">업종 <select value="{{ v.biz }}" onChange="{{ set.biz }}"><option value="">선택</option><option>카페</option><option>음식점</option><option>미용·뷰티</option><option>의류·잡화</option><option>학원·교육</option><option>기타</option></select></span>
         <span class="rec req {{ f.bizEtc }}" hidden="{{ hideBizEtc }}">업종 직접 입력 <input value="{{ v.bizEtc }}" onInput="{{ set.bizEtc }}" placeholder="예: 세탁소, 꽃집"></span>
