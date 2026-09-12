@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=52"></script>
+  <script src="./udongji-nav.js?v=53"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -85,7 +85,10 @@
     .doc { display: grid; grid-template-columns: 26px minmax(0,1fr) auto; gap: 10px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line-2); }
     .doc .cb { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--card); cursor: pointer; display: grid; place-items: center; color: #fff; font-size: 13px; font-weight: 800; margin-top: 1px; }
     .doc.on .cb { background: var(--green); border-color: var(--green); }
-    .doc .n { font-size: 14px; font-weight: 600; }
+    .doc .n { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .doc .n .tag { font-size: 10.5px; font-weight: 800; padding: 2px 6px; border-radius: 5px; background: var(--red-2); color: var(--red); letter-spacing: .02em; }
+    .doc .n .tag.opt { background: var(--card-2); color: var(--text-3); }
+    .doc.on .n .tag { background: var(--green-2); color: var(--green); }
     .doc.on .n { color: var(--text-2); text-decoration: line-through; text-decoration-color: var(--green-3); }
     .doc .h { font-size: 12px; color: var(--text-3); margin-top: 1px; }
     .doc .files { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
@@ -104,7 +107,15 @@
     .case { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
     .case .pill.purple { background: var(--purple-2); color: var(--purple); }
     .pf-sec { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); padding: 12px 0 4px; border-bottom: 1px solid var(--line-2); margin-bottom: 4px; }
-    .pf { display: grid; grid-template-columns: 170px minmax(0,1fr); gap: 6px 10px; align-items: center; padding: 4px 0; }
+    .pf { display: grid; grid-template-columns: 170px minmax(0,1fr) auto; gap: 6px 10px; align-items: center; padding: 4px 0; border-radius: 8px; }
+    .pf.cur { background: var(--blue-2); box-shadow: 0 0 0 2px var(--blue-3); padding: 4px 6px; margin: 0 -6px; }
+    .pf .cp { font: inherit; font-size: 11.5px; font-weight: 700; padding: 5px 9px; border-radius: 7px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; white-space: nowrap; }
+    .pf .cp:hover { border-color: var(--blue-3); color: var(--blue); background: var(--blue-2); }
+    .pf .cp.done { color: var(--green); border-color: var(--green-3); background: var(--green-2); }
+    .pf .cp:disabled { opacity: .35; cursor: default; }
+    .seqbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 2px; padding: 8px 10px; border-radius: 10px; background: var(--card-2); border: 1px solid var(--line); font-size: 12.5px; color: var(--text-2); }
+    .seqbar b { color: var(--text); }
+    .seqbar .btn { padding: 6px 11px; font-size: 12.5px; }
     .pf label { font-size: 12.5px; color: var(--text-2); font-weight: 600; line-height: 1.35; }
     .pf label small { display: block; font-weight: 500; color: var(--text-3); font-size: 11px; }
     .pf input, .pf select, .pf textarea { width: 100%; font: inherit; font-size: 13.5px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); }
@@ -121,7 +132,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="52"></udongji-nav>
+<udongji-nav current="contract" page-v="53"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>계약 업무</b><small>수취자료 → 페이앤 접수 → 서명 → 배송</small></div></div>
@@ -173,32 +184,35 @@
         <sc-for list="{{ docs }}" as="d" hint-placeholder-count="5">
           <div class="{{ d.cls }}">
             <button type="button" class="cb" onClick="{{ d.toggle }}" aria-label="받음 체크">{{ d.mark }}</button>
-            <div><div class="n">{{ d.name }}</div><div class="h">{{ d.hint }}</div>
+            <div><div class="n">{{ d.name }}<span class="tag {{ d.tagCls }}">{{ d.tag }}</span></div><div class="h">{{ d.hint }}</div>
               <div class="files"><sc-for list="{{ d.files }}" as="f" hint-placeholder-count="0"><a class="file" href="{{ f.url }}" target="_blank" rel="noopener"><span>{{ f.name }}</span><button type="button" onClick="{{ f.remove }}" title="삭제">×</button></a></sc-for></div>
             </div>
             <label class="btn up">{{ d.upLabel }}<input type="file" multiple accept="image/*,.pdf,.heic,.heif" onChange="{{ d.upload }}"></label>
           </div>
         </sc-for>
-        <div class="note">{{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번.jpg</b>로 자동 정리 — PDF·PNG는 JPG로 변환(PDF는 페이지별). 업로드하면 자동으로 받음 체크.</div>
+        <div class="note"><b>필수</b>는 이 고객 유형(개인/법인 · 단독/공동)에 꾸 필요한 서류, <b>해당 시</b>는 업종·상황에 따라 받는 서류예요. {{ folderNote }} 파일명은 <b>매장명_고객명_서류명_순번.jpg</b>로 자동 정리 — PDF·PNG는 JPG로 변환. 업로드하면 자동으로 받음 체크.</div>
       </div>
 
-      <div class="sec">
+      <div class="sec" id="payn-sec">
         <h3>페이앤 가맹점 접수 <span class="pill {{ sel.regCls }}">{{ sel.regTag }}</span></h3>
-        <div class="case"><span class="pill purple">{{ sel.caseLabel }}</span><span class="pill">입력 {{ sel.pfFilled }} / {{ sel.pfTotal }}</span><span class="pill">서류 {{ sel.docGot }} / {{ sel.docTotal }}</span></div>
-        <div class="note" style="margin-top:0">상담 기록에서 미리 채워진 값은 <b>점선 테두리</b>, 수정하면 바로 저장되고 실선으로 바뀝니다. 빨간 칸 = 미입력.</div>
+        <div class="case"><span class="pill purple">{{ sel.caseLabel }}</span><span class="pill">입력 {{ sel.pfFilled }} / {{ sel.pfTotal }}</span><span class="pill">필수 서류 {{ sel.docGot }} / {{ sel.docTotal }}</span><sc-if value="{{ sel.pfDirty }}" hint-placeholder-val="{{ false }}"><span class="pill amber">저장 안 된 변경 {{ sel.pfDirtyN }}칸</span></sc-if></div>
+        <div class="note" style="margin-top:0">상담 기록에서 미리 채워진 값은 <b>점선 테두리</b>. 고친 다음 아래 <b>저장</b>을 눌러야 기록돼요. 빨간 칸 = 미입력·자릿수 오류. 페이앤 폼에 옵길 땐 각 칸 오른쪽 <b>복사</b>를 누르거나, 아래 <b>순서대로 복사</b>로 한 칸씩 넘기세요.</div>
+        <div class="seqbar"><button type="button" class="btn primary" onClick="{{ sel.seqCopy }}">{{ sel.seqLabel }}</button><span>{{ sel.seqInfo }}</span><button type="button" class="btn" onClick="{{ sel.seqReset }}" style="margin-left:auto">처음부터</button></div>
         <sc-for list="{{ pf }}" as="g" hint-placeholder-count="0">
           <div class="pf-sec">{{ g.sec }}</div>
           <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="0">
-            <div class="pf">
+            <div class="pf {{ f.rowCls }}">
               <label>{{ f.label }}<small>{{ f.hint }}</small></label>
               <sc-if value="{{ f.isRo }}" hint-placeholder-val="{{ false }}"><div class="ro">{{ f.value }}</div></sc-if>
               <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}"><select class="{{ f.cls }}" value="{{ f.value }}" onChange="{{ f.onChange }}"><option value="">선택</option><sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="0"><option value="{{ o }}">{{ o }}</option></sc-for></select></sc-if>
-              <sc-if value="{{ f.isMulti }}" hint-placeholder-val="{{ false }}"><textarea class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}" onBlur="{{ f.onBlur }}"></textarea></sc-if>
-              <sc-if value="{{ f.isText }}" hint-placeholder-val="{{ true }}"><input class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}" onBlur="{{ f.onBlur }}" placeholder="{{ f.ph }}"></sc-if>
+              <sc-if value="{{ f.isMulti }}" hint-placeholder-val="{{ false }}"><textarea class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}"></textarea></sc-if>
+              <sc-if value="{{ f.isText }}" hint-placeholder-val="{{ true }}"><input class="{{ f.cls }}" value="{{ f.value }}" onInput="{{ f.onInput }}" placeholder="{{ f.ph }}" maxLength="{{ f.max }}" inputMode="{{ f.imode }}"></sc-if>
+              <button type="button" class="cp {{ f.cpCls }}" onClick="{{ f.copy }}" disabled="{{ f.cpOff }}">{{ f.cpLabel }}</button>
             </div>
           </sc-for>
         </sc-for>
-        <div class="pf-foot"><span class="{{ sel.pfMissCls }}">{{ sel.pfMissTxt }}</span><span>· 아래 탭 구분 2열 텍스트를 복사해 페이앤 엑셀·전산에 그대로 붙이세요. 전달했으면 <b>이관 완료 처리</b>.</span></div>
+        <div class="pf-foot"><button type="button" class="btn primary" onClick="{{ savePayn }}" disabled="{{ sel.pfSaveOff }}">{{ sel.pfSaveLabel }}</button><button type="button" class="btn ok" onClick="{{ completeHandoff }}" disabled="{{ sel.handoffDone }}">{{ sel.handoffBtn }}</button><span class="{{ sel.pfMissCls }}">{{ sel.pfMissTxt }}</span></div>
+        <div class="note">전체를 한 번에 붙이려면 아래 탭 구분 2열 텍스트. 페이앤 전산에 다 입력했으면 <b>이관 완료 처리</b>.</div>
         <div class="tbox"><h4>페이앤 접수 양식 (엑셀 붙이기용) <button type="button" class="btn" onClick="{{ copyPayn }}">복사</button></h4><textarea readonly value="{{ sel.payn }}"></textarea></div>
         <div class="tbox"><h4>고객 안내 문자 <button type="button" class="btn" onClick="{{ copySms }}">복사</button></h4><textarea readonly value="{{ sel.sms }}"></textarea></div>
       </div>
@@ -210,7 +224,7 @@
 
       <div class="acts">
         <button type="button" class="btn ok" onClick="{{ completeDocs }}" disabled="{{ sel.docsDone }}">{{ sel.docsBtn }}</button>
-        <button type="button" class="btn ok" onClick="{{ completeHandoff }}" disabled="{{ sel.handoffDone }}">{{ sel.handoffBtn }}</button>
+        <button type="button" class="btn" onClick="{{ openPayn }}">페이앤 접수 입력 ↓</button>
         <button type="button" class="btn ok" onClick="{{ completeSign }}" disabled="{{ sel.signDone }}">{{ sel.signBtn }}</button>
         <button type="button" class="btn ok" onClick="{{ completeInstall }}" disabled="{{ sel.installDone }}">{{ sel.installBtn }}</button>
         <sc-if value="{{ sel.showNl }}" hint-placeholder-val="{{ false }}"><span class="pill {{ sel.nlCls }}" style="align-self:center">{{ sel.nlTag }}</span><button type="button" class="btn" onClick="{{ resendNewsletter }}" disabled="{{ busy }}">뉴스레터 재전송</button></sc-if>
@@ -224,10 +238,10 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {} };
+  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {}, seq: 0, copied: {} };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=11'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=12'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       this.setState({ lib }, () => this.load(true));
     } catch (e) { location.replace('index.html#login'); }
@@ -246,6 +260,7 @@ class Component extends DCLogic {
     } catch (e) { this.setState({ loading: false, err: e.message }); }
   }
   toast(m) { clearTimeout(this._t); this.setState({ toast: m, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 1600); }
+  scrollToPayn() { const el = document.getElementById('payn-sec'), box = el && el.closest('.dbody'); if (el && box) box.scrollTo({ top: el.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - 12, behavior: 'smooth' }); }
   async patch(rec, obj, msg) {
     const lib = this.state.lib;
     try { await lib.updateCells(rec.row, obj); Object.assign(rec.data, obj); this.setState({ items: this.state.items.slice() }); if (msg) this.toast(msg); return true; }
@@ -273,7 +288,7 @@ class Component extends DCLogic {
     const reqDocs = d => lib ? lib.requiredDocs(d) : [];
     const checked = d => lib ? lib.parseDocCheck(d[lib.DOC_CHECK_COL]) : {};
     const files = d => lib ? lib.parseDocFiles(d[lib.DOC_FILES_COL]) : [];
-    const missing = d => reqDocs(d).filter(x => !checked(d)[x.id]).length;
+    const missing = d => reqDocs(d).filter(x => !x.cond && !checked(d)[x.id]).length;
     const stageDone = (d, k) => !!String(d[SC[k]] || '').trim() || (k === 'handoff' && !!String(d[lib ? lib.REG_COL : '페이앤 등록'] || '').trim());
     const stageDate = (d, k) => String(d[SC[k]] || (k === 'handoff' ? d[lib ? lib.REG_COL : '페이앤 등록'] : '') || '').slice(0, 10);
     const all = items.filter(it => isGo(it.data));
@@ -293,43 +308,51 @@ class Component extends DCLogic {
       return prev && stageDone(d, prev.key) ? { cls: 'next', t: '대기' } : { cls: 'wait', t: '—' };
     };
     const rows = list.map(it => { const d = it.data, c = STAGES.map(s => cell(d, s.key)); return {
-      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', pfDraft: {} }),
+      cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', pfDraft: {}, seq: 0, copied: {} }),
       store: V(d, '매장명') || '(매장명 없음)', who: [V(d, '고객명'), V(d, '연락처')].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '—', date: V(d, '상담일').slice(5), agent: V(d, '상담자'), memo: V(d, lib ? lib.PROGRESS_NOTE_COL : '진행 메모'),
       s0: c[0] ? c[0].cls : '', s0t: c[0] ? c[0].t : '', s1: c[1] ? c[1].cls : '', s1t: c[1] ? c[1].t : '', s2: c[2] ? c[2].cls : '', s2t: c[2] ? c[2].t : '', s3: c[3] ? c[3].cls : '', s3t: c[3] ? c[3].t : ''
     }; });
     const rec = items.find(it => it.row === selRow) || null;
     let sel = {}, steps = [], docs = [], pf = [];
     if (rec && lib) {
-      const d = rec.data, req = reqDocs(d), chk = checked(d), fl = files(d), miss = req.filter(x => !chk[x.id]).length, addr = V(d, '매장 주소'), store = V(d, '매장명');
+      const d = rec.data, req = reqDocs(d), chk = checked(d), fl = files(d), miss = req.filter(x => !x.cond && !chk[x.id]).length, mustN = req.filter(x => !x.cond).length, addr = V(d, '매장 주소'), store = V(d, '매장명');
       const label = store || V(d, '고객명') || ('행' + rec.row);
       // 페이앤 접수 폼: 입력 중 값은 pfDraft, 아니면 저장값/미리채움
       const pfDraft = this.state.pfDraft, cs = lib.paynCase(d), active = lib.paynActive(d), P = lib.PAYN_PREFIX;
       const merged = Object.assign({}, d); active.forEach(f => { if (f.k in pfDraft) merged[P + f.label] = pfDraft[f.k]; });
       const pfMiss = lib.paynMissing(merged), pfFilled = active.filter(f => String(lib.paynValue(merged, f) || '').trim()).length;
       const commit = (f, val) => { const col = P + f.label; const cur = String(d[col] || ''); if (String(val) === cur) return; if (!String(val).trim() && !cur) return; this.patch(rec, { [col]: val }); };
+      const dirtyKeys = active.filter(f => f.k in pfDraft && String(pfDraft[f.k]) !== String(d[P + f.label] || '') && !(String(pfDraft[f.k]).trim() === '' && !String(d[P + f.label] || '')));
+      const sanitize = (f, val) => f.digits ? String(val).replace(/\D/g, '').slice(0, f.digits) : val;
       const bySec = {}; active.forEach(f => { (bySec[f.sec] = bySec[f.sec] || []).push(f); });
-      pf = Object.keys(bySec).map(sec => ({ sec, fields: bySec[sec].map(f => { const col = P + f.label, saved = String(d[col] || '').trim(), value = f.k in pfDraft ? pfDraft[f.k] : lib.paynValue(d, f); const missing = !f.opt && !String(value || '').trim(); const cls = (f.mono ? 'mono ' : '') + (missing ? 'miss' : (!saved && !f.ro && value) ? 'pre' : ''); return {
-        label: f.label, hint: f.hint || '', value: value || '', cls, ph: f.opt ? '' : '필수', opts: f.opts || [], isRo: !!f.ro, isSelect: !f.ro && !!f.opts, isMulti: !f.ro && !!f.multi, isText: !f.ro && !f.opts && !f.multi,
-        onInput: e => this.setState({ pfDraft: Object.assign({}, this.state.pfDraft, { [f.k]: e.target.value }) }),
-        onBlur: e => { commit(f, e.target.value); },
-        onChange: e => { this.setState({ pfDraft: Object.assign({}, this.state.pfDraft, { [f.k]: e.target.value }) }); commit(f, e.target.value); }
+      const seq = this.state.seq, copied = this.state.copied, curF = active[seq] || null;
+      const valOf = f => String(f.k in pfDraft ? pfDraft[f.k] : lib.paynValue(d, f) || '');
+      const copyField = (f, i) => { const v = valOf(f).trim(); this.copy(v, f.label); this.setState({ copied: Object.assign({}, this.state.copied, { [f.k]: true }), seq: Math.max(this.state.seq, i + 1) }); };
+      pf = Object.keys(bySec).map(sec => ({ sec, fields: bySec[sec].map(f => { const i = active.indexOf(f), col = P + f.label, saved = String(d[col] || '').trim(), value = valOf(f); const missing = (!f.opt && !String(value || '').trim()) || (f.digits && value.trim() && value.trim().length !== f.digits); const cls = (f.mono ? 'mono ' : '') + (missing ? 'miss' : (!saved && !f.ro && value) ? 'pre' : ''); return {
+        label: f.label, hint: f.hint || '', value: value || '', cls, ph: f.opt ? '' : '필수', opts: f.opts || [], isRo: !!f.ro, isSelect: !f.ro && !!f.opts, isMulti: !f.ro && !!f.multi, isText: !f.ro && !f.opts && !f.multi, max: f.digits || 200, imode: f.digits ? 'numeric' : 'text',
+        rowCls: curF === f ? 'cur' : '', cpCls: copied[f.k] ? 'done' : '', cpLabel: copied[f.k] ? '✓ 복사됨' : '복사', cpOff: !String(value || '').trim(), copy: () => copyField(f, i),
+        onInput: e => { const nv = sanitize(f, e.target.value); if (nv !== e.target.value) e.target.value = nv; this.setState({ pfDraft: Object.assign({}, this.state.pfDraft, { [f.k]: nv }) }); },
+        onChange: e => { this.setState({ pfDraft: Object.assign({}, this.state.pfDraft, { [f.k]: e.target.value }) }); }
       }; }) }));
       sel = { store: label, sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '매장 구분'), V(d, '업종')].filter(Boolean).join(' · '),
         caseLabel: [cs.isNew ? '신규' : V(d, '매장 구분') ? '기존' : '신규/기존 ?', cs.corp ? '법인' : V(d, '대형/개인/법인') ? '개인' : '개인/법인 ?', cs.joint ? '공동대표' : V(d, '단독/공동') ? '단독' : '단독/공동 ?'].join(' · '),
-        pfFilled, pfTotal: active.length, pfMissCls: pfMiss.length ? 'miss' : 'ok', pfMissTxt: pfMiss.length ? '미입력 ' + pfMiss.length + '칸 (' + pfMiss.slice(0, 3).map(f => f.label).join(', ') + (pfMiss.length > 3 ? ' …' : '') + ')' : '전부 입력됨',
-        docGot: req.length - miss, docTotal: req.length,
+        pfFilled, pfTotal: active.length, pfMissCls: pfMiss.length ? 'miss' : 'ok', pfMissTxt: pfMiss.length ? '미입력·오류 ' + pfMiss.length + '칸 (' + pfMiss.slice(0, 3).map(f => f.label).join(', ') + (pfMiss.length > 3 ? ' …' : '') + ')' : '전부 입력됨',
+        pfDirty: dirtyKeys.length > 0, pfDirtyN: dirtyKeys.length, pfSaveOff: !dirtyKeys.length || busy, pfSaveLabel: busy ? '저장 중…' : dirtyKeys.length ? '저장 (' + dirtyKeys.length + '칸)' : '저장됨',
+        docGot: mustN - miss, docTotal: mustN,
+        seqLabel: curF ? '다음 복사: ' + curF.label : '순서대로 복사 완료', seqInfo: curF ? (seq + 1) + ' / ' + active.length + (valOf(curF).trim() ? ' → “' + valOf(curF).trim().slice(0, 30) + '”' : ' · 값 없음 (건너뜀)') : active.length + '칸 전부 복사함', seqCopy: () => { if (!curF) return; if (!valOf(curF).trim()) { this.setState({ seq: seq + 1 }); return; } copyField(curF, seq); }, seqReset: () => this.setState({ seq: 0, copied: {} }),
         docPill: miss ? '아직 ' + miss + '개 못 받음' : '전부 받음', docPillCls: miss ? 'hot' : 'ok', docsDone: stageDone(d, 'docs') || busy, docsBtn: stageDone(d, 'docs') ? '✓ 수취 완료됨' : miss ? '수취 완료 처리 (' + miss + '개 남음)' : '수취 완료 처리',
-        handoffDone: stageDone(d, 'handoff') || busy, handoffBtn: stageDone(d, 'handoff') ? '✓ 페이앤 이관됨' : '페이앤 이관 완료 처리', regTag: stageDone(d, 'handoff') ? '이관 ' + stageDate(d, 'handoff').slice(5) : '이관 전', regCls: stageDone(d, 'handoff') ? 'ok' : 'hot',
+        handoffDone: stageDone(d, 'handoff') || busy, handoffBtn: stageDone(d, 'handoff') ? '✓ 페이앤 이관됨' : '이관 완료 처리', regTag: stageDone(d, 'handoff') ? '이관 ' + stageDate(d, 'handoff').slice(5) : '이관 전', regCls: stageDone(d, 'handoff') ? 'ok' : 'hot',
         payn: lib.buildPaynTSV(merged), sms: lib.buildSMS(d).text,
         signDone: stageDone(d, 'sign') || busy, signBtn: stageDone(d, 'sign') ? '✓ 전자서명 완료됨' : '전자서명 완료 처리', installDone: stageDone(d, 'install') || busy, installBtn: stageDone(d, 'install') ? '✓ 커넥트 배송 완료됨' : '커넥트 배송 완료 처리',
         nlDone: !!String(d[lib.NEWSLETTER_COL] || '').trim(), nlTag: String(d[lib.NEWSLETTER_COL] || '').trim() ? '뉴스레터 등록 ' + String(d[lib.NEWSLETTER_COL]).slice(5) : '뉴스레터 미등록', nlCls: String(d[lib.NEWSLETTER_COL] || '').trim() ? 'ok' : 'hot', showNl: stageDone(d, 'install'),
         memo, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent(store) };
       steps = STAGES.map((s, i) => { const done = stageDone(d, s.key), prevDone = i === 0 || stageDone(d, STAGES[i - 1].key); return {
-        key: s.key, label: s.label, date: done ? stageDate(d, s.key) : prevDone ? '진행 중' : '대기', cls: 'step' + (done ? ' done' : prevDone ? ' cur' : ''), title: done ? '클릭하면 완료 취소' : '클릭하면 오늘 날짜로 완료',
-        toggle: () => { if (done) { if (!confirm('"' + s.label + '" 완료를 취소할까요?')) return; const o = { [SC[s.key]]: '' }; if (s.key === 'handoff') o[lib.REG_COL] = ''; this.patch(rec, o, s.label + ' 완료 취소'); } else { if (s.key === 'docs' && miss && !confirm('아직 ' + miss + '개 서류를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; const o = { [SC[s.key]]: today }; if (s.key === 'handoff') o[lib.REG_COL] = today; if (s.key === 'install' && !V(d, '이메일') && !confirm('이메일이 없어서 뉴스레터를 보낼 수 없어요. 그래도 수령 완료로 처리할까요?')) return; this.patch(rec, o, s.label + ' 완료').then(ok => { if (ok && s.key === 'install') this.sendNewsletter(rec, false); }); } }
+        key: s.key, label: s.label, date: done ? stageDate(d, s.key) : prevDone ? '진행 중' : '대기', cls: 'step' + (done ? ' done' : prevDone ? ' cur' : ''), title: done ? '클릭하면 완료 취소' : s.key === 'handoff' ? '클릭하면 페이앤 접수 입력란으로' : '클릭하면 오늘 날짜로 완료',
+        toggle: () => { if (done) { if (!confirm('"' + s.label + '" 완료를 취소할까요?')) return; const o = { [SC[s.key]]: '' }; if (s.key === 'handoff') o[lib.REG_COL] = ''; this.patch(rec, o, s.label + ' 완료 취소'); } else { if (s.key === 'handoff') { this.scrollToPayn(); return; } if (s.key === 'docs' && miss && !confirm('아직 필수 서류 ' + miss + '개를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; const o = { [SC[s.key]]: today }; if (s.key === 'install' && !V(d, '이메일') && !confirm('이메일이 없어서 뉴스레터를 보낼 수 없어요. 그래도 수령 완료로 처리할까요?')) return; this.patch(rec, o, s.label + ' 완료').then(ok => { if (ok && s.key === 'install') this.sendNewsletter(rec, false); }); } }
       }; });
+      this._payn = { rec, dirtyKeys, active, pfDraft, pfMiss, stageDoneHandoff: stageDone(d, 'handoff'), P };
       docs = req.map(x => { const on = !!chk[x.id], myFiles = fl.filter(f => f.doc === x.id); return {
-        cls: 'doc' + (on ? ' on' : ''), mark: on ? '✓' : '', name: x.name, hint: x.hint, upLabel: busy ? '업로드 중…' : '업로드',
+        cls: 'doc' + (on ? ' on' : ''), mark: on ? '✓' : '', name: x.name, hint: x.hint, upLabel: busy ? '업로드 중…' : '업로드', tag: x.cond ? '해당 시' : on ? '받음' : '필수', tagCls: x.cond ? 'opt' : '',
         toggle: () => { const n = Object.assign({}, chk); if (on) delete n[x.id]; else n[x.id] = true; this.patch(rec, { [lib.DOC_CHECK_COL]: Object.keys(n).join(',') }, on ? '받음 해제' : '받음 체크'); },
         files: myFiles.map(f => ({ name: f.name, url: f.url, remove: async e => { e.preventDefault(); e.stopPropagation(); if (!confirm('"' + f.name + '" 파일을 삭제할까요?')) return; try { await lib.deleteFile(f.id); } catch (er) {} const nf = fl.filter(z => z.id !== f.id); await this.patch(rec, { [lib.DOC_FILES_COL]: JSON.stringify(nf) }, '파일 삭제'); } })),
         upload: async e => {
@@ -362,10 +385,12 @@ class Component extends DCLogic {
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, pf,
       completeSign: () => { const s = steps.find(x => x.key === 'sign'); if (s) s.toggle(); },
-      completeHandoff: () => { const s = steps.find(x => x.key === 'handoff'); if (s) s.toggle(); },
+      openPayn: () => this.scrollToPayn(),
+      savePayn: async () => { const p = this._payn; if (!p || !p.dirtyKeys.length) return; const o = {}; p.dirtyKeys.forEach(f => { o[p.P + f.label] = String(p.pfDraft[f.k]); }); const ok = await this.patch(p.rec, o, p.dirtyKeys.length + '칸 저장'); if (ok) { const nd = Object.assign({}, this.state.pfDraft); p.dirtyKeys.forEach(f => { delete nd[f.k]; }); this.setState({ pfDraft: nd }); } },
+      completeHandoff: () => { const p = this._payn; if (!p || p.stageDoneHandoff) return; if (p.dirtyKeys.length) { this.toast('바꾼 내용을 먼저 저장하세요'); return; } if (p.pfMiss.length && !confirm('미입력·오류 ' + p.pfMiss.length + '칸이 있어요. 그래도 이관 완료로 처리할까요?')) return; this.patch(p.rec, { [SC.handoff]: today, [lib.REG_COL]: today }, '페이앤 이관 완료'); },
       copyPayn: () => { if (sel.payn) this.copy(sel.payn, '페이앤 접수 양식 (탭 구분 2열)'); },
       copySms: () => { if (sel.sms) this.copy(sel.sms, '안내 문자'); },
-      completeInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.toggle(); }, resendNewsletter: () => { if (rec) this.sendNewsletter(rec, true); }, close: () => this.setState({ selRow: null, pfDraft: {} }),
+      completeInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.toggle(); }, resendNewsletter: () => { if (rec) this.sendNewsletter(rec, true); }, close: () => this.setState({ selRow: null, pfDraft: {}, seq: 0, copied: {} }),
       onMemo: e => this.setState({ memo: e.target.value }),
       saveMemo: () => { if (rec && lib && (rec.data[lib.PROGRESS_NOTE_COL] || '') !== memo) this.patch(rec, { [lib.PROGRESS_NOTE_COL]: memo }, '메모 저장'); },
       completeDocs: () => { if (!rec || !lib) return; const m = missing(rec.data); if (m && !confirm('아직 ' + m + '개 서류를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; this.patch(rec, { [SC.docs]: today }, '수취 완료'); },

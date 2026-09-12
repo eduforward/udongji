@@ -89,8 +89,8 @@ export function requiredDocs(d) {
     { id: 'biz', name: '사업자등록증', hint: '최근 발급본, 가리는 곳 없이' },
     { id: 'idcard', name: '대표자 신분증', hint: '주민등록증 또는 운전면허증 (여권 불가)' },
     { id: 'bank', name: '통장 사본 (정산계좌)', hint: corp ? '예금주 = 법인명 표기까지 완전 일치' : '예금주 = 대표 본인, 모바일 캡처 가능' },
-    { id: 'license', name: '영업신고증 / 인허가증', hint: '요식업·병원·학원·통신판매 등 해당 업종만' },
-    { id: 'poa', name: '위임장', hint: '대표자 외 신청 시만' },
+    { id: 'license', name: '영업신고증 / 인허가증', hint: '요식업·병원·학원·통신판매 등 해당 업종만', cond: true },
+    { id: 'poa', name: '위임장', hint: '대표자 외 신청 시만', cond: true },
     { id: 'photo', name: '매장사진', hint: '간판 있으면 4매: 간판 포함 외관 2 + 내부 전체 2 / 간판 없으면 5매: 건물 외부 1 + 실내 보이는 입구 1 + 도로명주소 표지판 1 + 내부 전체 2' }
   ];
   if (corp) list.push(
@@ -98,8 +98,8 @@ export function requiredDocs(d) {
     { id: 'corp_seal', name: '법인 인감증명서', hint: '3개월 이내' },
     { id: 'corp_share', name: '주주명부', hint: '' },
     { id: 'corp_owner', name: '법인 소유지배자 확인서', hint: '서식은 우리가 보내드림' },
-    { id: 'corp_doc', name: '공문 / 정관 / 회칙', hint: '해당 업종만' },
-    { id: 'corp_useseal', name: '사용인감계', hint: '사용인감 사용 시만' }
+    { id: 'corp_doc', name: '공문 / 정관 / 회칙', hint: '해당 업종만', cond: true },
+    { id: 'corp_useseal', name: '사용인감계', hint: '사용인감 사용 시만', cond: true }
   );
   if (joint) list.push(
     { id: 'joint_poa', name: '공동대표자 가맹점 가입 동의 및 위임장', hint: '서식은 우리가 보내드림' },
@@ -120,10 +120,10 @@ export const PAYN_FIELDS = [
   { k: 'name', sec: 'B. 가맹점 정보', label: '가맹점 대표자 성명', src: d => val(d, '고객명') },
   { k: 'store', sec: 'B. 가맹점 정보', label: '가맹점 상호명', src: d => val(d, '매장명') },
   { k: 'email', sec: 'B. 가맹점 정보', label: '가맹점 대표자 이메일', src: d => val(d, '이메일') },
-  { k: 'bizno', sec: 'B. 가맹점 정보', label: '가맹점 사업자번호', mono: true, hint: '하이픈 없이 숫자 10자리', src: d => String(d['사업자번호'] || '').replace(/\D/g, '') },
+  { k: 'bizno', sec: 'B. 가맹점 정보', label: '가맹점 사업자번호', mono: true, digits: 10, hint: '하이픈 없이 숫자 10자리', src: d => String(d['사업자번호'] || '').replace(/\D/g, '') },
   { k: 'goods', sec: 'B. 가맹점 정보', label: '판매 물품', hint: '예: 의류, 요식업', src: d => val(d, '판매 물품') || val(d, '업종') },
   { k: 'naver', sec: 'B. 가맹점 정보', label: '네이버 ID', hint: '대표자 명의만', src: d => val(d, '네이버 ID') },
-  { k: 'corpno', sec: 'B. 가맹점 정보', label: '가맹점 법인등록번호', mono: true, hint: '하이픈 없이', cond: 'corp', src: d => '' },
+  { k: 'corpno', sec: 'B. 가맹점 정보', label: '가맹점 법인등록번호', mono: true, digits: 13, hint: '하이픈 없이 숫자 13자리', cond: 'corp', src: d => '' },
   { k: 'joint', sec: 'B. 가맹점 정보', label: '공동 대표자 성함/연락처', hint: '예: 토세토/010-9292-0202', cond: 'joint', src: d => '' },
   { k: 'engname', sec: 'B. 가맹점 정보', label: '가맹점 대표자 영문 성명', hint: '반드시 여권상 성함과 일치', cond: 'newperson', src: d => val(d, '영문 성함') },
   { k: 'bank', sec: 'C. 자동이체 정보', label: '자동이체 은행명', src: d => '' },
@@ -131,7 +131,7 @@ export const PAYN_FIELDS = [
   { k: 'holder', sec: 'C. 자동이체 정보', label: '자동이체 예금주명', src: d => val(d, '대형/개인/법인') === '법인' ? val(d, '매장명') : val(d, '고객명') },
   { k: 'holderRel', sec: 'C. 자동이체 정보', label: '자동이체 예금주와의 관계', src: d => '본인' },
   { k: 'holderPhone', sec: 'C. 자동이체 정보', label: '자동이체 예금주 연락처', mono: true, src: d => val(d, '연락처') },
-  { k: 'holderBirth', sec: 'C. 자동이체 정보', label: '자동이체 예금주 생년월일', mono: true, hint: '6자리, 예: 890330', src: d => '' },
+  { k: 'holderBirth', sec: 'C. 자동이체 정보', label: '자동이체 예금주 생년월일', mono: true, digits: 6, hint: '6자리, 예: 890330', src: d => '' },
   { k: 'color', sec: 'D. 단말·설치', label: '커넥트 색상', opts: ['화이트', '블랙'], src: d => val(d, '기기 색상') },
   { k: 'cat', sec: 'D. 단말·설치', label: '캣단말기 여부', opts: ['O', 'X'], src: d => val(d, '안내한 상품 구성') ? (/카드단말기|캣/.test(val(d, '안내한 상품 구성')) ? 'O' : 'X') : '' },
   { k: 'installWhen', sec: 'D. 단말·설치', label: '설치 일정 (대략적인)', src: d => val(d, '오픈 예정일') },
@@ -145,7 +145,9 @@ export function paynCase(d) { const v = k => val(d, k); return { corp: v('대형
 export function paynActive(d) { const c = paynCase(d); return PAYN_FIELDS.filter(f => !f.cond || (f.cond === 'corp' && c.corp) || (f.cond === 'joint' && c.joint) || (f.cond === 'newperson' && c.isNew && !c.corp)); }
 // 저장값 있으면 저장값, 없으면 상담 기록에서 미리 채움 (ro 필드는 항상 계산값)
 export function paynValue(d, f) { if (f.ro) return f.src(d); const saved = String(d[PAYN_PREFIX + f.label] || '').trim(); return saved || f.src(d); }
-export function paynMissing(d) { return paynActive(d).filter(f => !f.opt && !String(paynValue(d, f) || '').trim()); }
+export function paynMissing(d) { return paynActive(d).filter(f => { const v = String(paynValue(d, f) || '').trim(); return (!f.opt && !v) || (f.digits && v && v.length !== f.digits); }); }
+// 필수 서류만 (cond=해당 시에만 받는 서류는 제외)
+export function requiredDocsMust(d) { return requiredDocs(d).filter(x => !x.cond); }
 // 엑셀 원본이 '항목명 / 값' 2열이므로 탭 구분 2열. 해당 케이스에 없는 항목은 줄 자체를 뺀다.
 export function buildPaynTSV(d) { return paynActive(d).map(f => f.label + '\t' + String(paynValue(d, f) || '').replace(/[\t\r\n]+/g, ' ').trim()).join('\n'); }
 // 구 서류 id → 새 id (기존 고객의 체크·파일 유지)

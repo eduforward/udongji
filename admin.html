@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=52"></script>
+  <script src="./udongji-nav.js?v=53"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -94,7 +94,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="admin" page-v="52"></udongji-nav>
+<udongji-nav current="admin" page-v="53"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><span class="mark">!</span><div><b>{{ myRoleLabel }}</b><small>{{ email }}</small></div></div>
@@ -172,7 +172,7 @@ class Component extends DCLogic {
   state = { lib: null, myRole: '', newUserRole: 'consult', tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : 'users', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=11'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=12'); await lib.init();
       if (location.hash === '#hours') { location.replace('hours.html'); return; }
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const email = lib.userEmail(); const myRole = await lib.roleOf(email); const ok = lib.isAdminRole(myRole);

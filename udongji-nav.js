@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v52 · 2026-09-12';
+  const VERSION = 'v53 · 2026-09-12';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가
   const HISTORY = [
+    { v: 53, d: '2026-09-12', c: ['수취자료: 고객 유형에 맞는 서류만 "필수", 나머지는 "해당 시" — 못 받은 개수는 필수 기준', '페이앤 이관 단계 클릭 → 접수 입력란으로 이동, 입력 후 "저장" 버튼, 이관 완료는 폼 아래 버튼으로', '페이앤 접수 칸별 복사 버튼 + "순서대로 복사"로 페이앤 폼에 한 칸씩 붙이기', '사업자번호 10자리·법인등록번호 13자리·생년월일 6자리 숫자만 입력'] },
     { v: 52, d: '2026-09-12', c: ['고객 삭제는 관리자 이상만 (서버 규칙 + 화면 버튼), 삭제 시 사유 필수 입력', '삭제 로그에 사유 열 추가, 삭제·복구한 사람은 이름(이메일)로 표시'] },
     { v: 51, d: '2026-09-12', c: ['상담 스크립트: 이메일 질문 제거 — 네이버 ID 물을 때 커넥트 연결·우동지 가이드 발송 안내, 이메일은 아이디@naver.com 자동 생성'] },
     { v: 50, d: '2026-09-12', c: ['상담 스크립트: 우동지 솔루션 수신 동의 질문 제거 (문의 자체가 신청 — 가이드는 그냥 발송), 기존 단말기 계약서 서류 요구 제거'] },
@@ -29,7 +30,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 52;
+  const PAGE_V = 53;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -110,7 +111,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=11';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=12';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; if (await m.isAdmin(m.userEmail())) { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } } }).catch(() => {});
     }
   }
