@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v71 · 2026-09-13 01:12';
+  const VERSION = 'v72 · 2026-09-13 01:17';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 72, d: '2026-09-13', t: '01:17', c: ['고객 문자 전체를 "~합니다" 정중한 문체로 통일 — 서류 안내·재연락·포기·서명 요청·배송 안내·서류 재촉'] },
     { v: 71, d: '2026-09-13', t: '01:12', c: ['랜선·와이파이 질문에서 "모름"을 별도 버튼으로 분리 — 각각 확인 안내 말풍선과 고객 문자 문구 추가'] },
     { v: 70, d: '2026-09-13', t: '01:07', c: ['상담 스크립트 4단계에 와이파이 가능 여부 질문 추가 (필수), 불가 시 안내 문구 · 고객 목록·접수 양식에 표시'] },
     { v: 69, d: '2026-09-13', t: '01:00', c: ['계약 단계에 "기본정보" 추가 — 수취자료 → 기본정보(페이앤 접수값 입력·저장·완료) → 페이앤 이관 → 전자서명 → 배송', '마감 담당은 기본정보 완료된 고객부터 보임. 이관 탭은 값 복사·접수창 열기·사진만', '사업자등록증 자동 판독(OCR) 제거 — 정확도 부족'] },
@@ -48,7 +49,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 71;
+  const PAGE_V = 72;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -129,7 +130,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=25';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=26';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }

@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=71"></script>
+  <script src="./udongji-nav.js?v=72"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -158,7 +158,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="71"></udongji-nav>
+<udongji-nav current="contract" page-v="72"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -334,7 +334,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {}, seq: 0, copied: {}, tab: 'docs', scope: 'mine', me: null };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=25'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=26'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me();
       this.setState({ lib, me }, () => this.load(true));
@@ -494,10 +494,10 @@ class Component extends DCLogic {
         docsIsDone: stageDone(d, 'docs'), infoIsDone: stageDone(d, 'info'), infoDone: stageDone(d, 'info') || busy, infoBtn: stageDone(d, 'info') ? '✓ 기본정보 완료됨' : '기본정보 완료 처리', infoTag: stageDone(d, 'info') ? '완료 ' + stageDate(d, 'info').slice(5) : '입력 중', infoCls: stageDone(d, 'info') ? 'ok' : 'amber', handoffIsDone: stageDone(d, 'handoff'), signIsDone: stageDone(d, 'sign'), installIsDone: stageDone(d, 'install'),
         signTag: stageDone(d, 'sign') ? '서명 ' + stageDate(d, 'sign').slice(5) : stageDone(d, 'handoff') ? '서명 대기' : '이관 전', signCls: stageDone(d, 'sign') ? 'ok' : stageDone(d, 'handoff') ? 'amber' : '',
         jointNote: joint ? '공동대표 매장이라 두 분 모두 서명해야 완료됩니다.' : '',
-        signSms: '[우동지] ' + nm + ', 우동지 ' + agentNm + '입니다.\n페이앤 접수가 완료되어 카톡(모두싸인 알림톡)으로 전자계약서가 발송됐어요. 내용 확인 후 서명해 주시면 바로 다음 단계(카드 가맹·기기 출고)로 넘어갑니다.' + (joint ? '\n공동대표님도 함께 서명해 주세요.' : '') + '\n\n알림톡이 안 왔거나 어려우신 점 있으면 이 번호로 카톡 주세요.\n감사합니다.',
+        signSms: '[우동지] ' + nm + ', 우동지 ' + agentNm + '입니다.\n페이앤 접수가 완료되어 카카오톡(모두싸인 알림톡)으로 전자계약서가 발송되었습니다. 내용 확인 후 서명해 주시면 다음 단계(카드 가맹 · 기기 출고)로 바로 진행됩니다.' + (joint ? '\n공동대표님도 함께 서명해 주시기 바랍니다.' : '') + '\n\n알림톡이 오지 않았거나 어려운 점이 있으시면 이 번호로 카카오톡 메시지 주시기 바랍니다.\n감사합니다.',
         installTag: stageDone(d, 'install') ? '배송 완료 ' + stageDate(d, 'install').slice(5) : stageDone(d, 'sign') ? '배송 대기' : '서명 전', installCls: stageDone(d, 'install') ? 'ok' : stageDone(d, 'sign') ? 'amber' : '',
         installWay: V(d, '설치 방식') || '미정', color: V(d, '기기 색상') || '-', lan: V(d, '인터넷 회선(랜선) 보유') === 'O' ? '있음' : V(d, '인터넷 회선(랜선) 보유') === 'X' ? '없음(자가 준비)' : '-', email: V(d, '이메일') || '(이메일 없음)',
-        installSms: '[우동지] ' + nm + ', 우동지 ' + agentNm + '입니다.\n서명 감사합니다. 커넥트' + (/카드단말기/.test(V(d, '안내한 상품 구성')) ? '와 카드단말기' : '') + '가 ' + (V(d, '설치 방식') === '현장 설치' ? '현장 설치 일정에 맞춰 준비됩니다.' : '택배로 발송됩니다. 도착하면 전원과 랜선만 꽂으시면 동작해요.') + (V(d, '랜선 직접 준비 안내') === 'O' ? '\n카드단말기 자리까지 랜선 연장선은 미리 준비해 주세요 (다이소·온라인 벇 천 원).' : '') + '\n\n설치 후 네이버 플레이스 활용 가이드를 카톡·이메일로 보내드릴게요.\n감사합니다.'
+        installSms: '[우동지] ' + nm + ', 우동지 ' + agentNm + '입니다.\n서명 감사합니다. 커넥트' + (/카드단말기/.test(V(d, '안내한 상품 구성')) ? '와 카드단말기' : '') + '가 ' + (V(d, '설치 방식') === '현장 설치' ? '현장 설치 일정에 맞춰 준비됩니다.' : '택배로 발송됩니다. 도착 후 전원과 랜선만 연결하시면 바로 사용할 수 있습니다.') + (V(d, '랜선 직접 준비 안내') === 'O' ? '\n카드단말기 자리까지 랜선 연장선을 미리 준비해 주시기 바랍니다 (다이소·온라인에서 벇 천 원입니다).' : '') + '\n\n설치 후 네이버 플레이스 활용 가이드를 카카오톡과 이메일로 보내드리겠습니다.\n감사합니다.'
       });
       docs = req.map(x => { const on = !!chk[x.id], myFiles = fl.filter(f => f.doc === x.id); return {
         cls: 'doc' + (on ? ' on' : ''), mark: on ? '✓' : '', name: x.name, hint: x.hint, upLabel: busy ? '업로드 중…' : '업로드', tag: x.cond ? '해당 시' : on ? '받음' : '필수', tagCls: x.cond ? 'opt' : '',
@@ -560,7 +560,7 @@ class Component extends DCLogic {
       onMemo: e => { const v = e.target.value; this.setState({ memo: v, memoDirty: true }); clearTimeout(this._memoT); this._memoT = setTimeout(() => this.saveMemoNow(), 1000); },
       saveMemo: () => { clearTimeout(this._memoT); this.saveMemoNow(); },
       completeDocs: () => { const s = steps.find(x => x.key === 'docs'); if (s) s.complete(); },
-      copyNudge: () => { if (!rec || !lib) return; const d = rec.data, left = reqDocs(d).filter(x => !checked(d)[x.id]); const txt = '[우동지] ' + (V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님') + ', 우동지 ' + (V(d, '상담자') || '담당자') + '입니다.\n커넥트 접수 진행을 위해 아직 못 받은 서류가 있어요. 편하실 때 이 번호로 사진 보내주시면 바로 접수 넣어드릴게요.\n\n' + left.map((x, i) => (i + 1) + '. ' + x.name + (x.hint ? ' (' + x.hint + ')' : '')).join('\n') + '\n\n감사합니다.'; this.copy(txt, '재촉 문자'); },
+      copyNudge: () => { if (!rec || !lib) return; const d = rec.data, left = reqDocs(d).filter(x => !checked(d)[x.id]); const txt = '[우동지] ' + (V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님') + ', 우동지 ' + (V(d, '상담자') || '담당자') + '입니다.\n커넥트 접수 진행을 위해 아직 받지 못한 서류가 있습니다. 편하신 때 이 번호로 사진을 보내주시면 바로 접수 진행하겠습니다.\n\n' + left.map((x, i) => (i + 1) + '. ' + x.name + (x.hint ? ' (' + x.hint + ')' : '')).join('\n') + '\n\n감사합니다.'; this.copy(txt, '재촉 문자'); },
       toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
     };
   }
