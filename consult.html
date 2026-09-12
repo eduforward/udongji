@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=50"></script>
+  <script src="./udongji-nav.js?v=51"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -133,7 +133,7 @@
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="50"></udongji-nav>
+<udongji-nav current="consult" page-v="51"></udongji-nav>
 <div class="page">
   <nav class="toc" aria-label="단계">
     <div class="k">상담 흐름 v5</div>
@@ -232,7 +232,8 @@
       <div class="say"><span class="who">상담원</span><span class="q">"기기 색상은 화이트, 블랙 중에 어떤 게 좋으세요?"</span> <span class="rec req {{ f.color }}">색상 <span class="seg"><button class="{{ on.color.white }}" onClick="{{ pick.color.white }}">화이트</button><button class="{{ on.color.black }}" onClick="{{ pick.color.black }}">블랙</button></span></span></div>
       <p class="note">커넥트·프린터·금전함은 화이트/블랙 선택. 포스는 단일색이라 묻지 않음.</p>
       <div class="say"><span class="who">상담원</span>네이버페이 청약에 들어가는 두 가지만 여쭐게요. <span class="q">"주로 뭘 판매하세요? 음식, 화장품, 옷 이렇게 크게만요."</span> <span class="rec req {{ f.category }}">판매 카테고리 <select value="{{ v.category }}" onChange="{{ set.category }}"><option value="">선택</option><option>음식·음료</option><option>미용</option><option>의류·잡화</option><option>화장품</option><option>교육</option><option>기타</option></select></span></div>
-      <div class="say"><span class="who">상담원</span><span class="q">"네이버 아이디 알려주시겠어요? 대표님 개인 명의 계정이요. 비밀번호는 필요 없어요."</span> <span class="rec req {{ f.naver }}">네이버 ID <input value="{{ v.naver }}" onInput="{{ set.naver }}" placeholder="이메일 대체"></span></div>
+      <div class="say"><span class="who">상담원</span><span class="q">"네이버 아이디 알려주시겠어요? 대표님 개인 명의 계정이요. 비밀번호는 필요 없어요."</span> 커넥트를 대표님 네이버 계정에 연결하는 데 쓰이고, 설치 후 우동지 플레이스 활용 가이드도 <b>이 네이버 이메일(아이디@naver.com)</b>로 보내드려요. <span class="rec req {{ f.naver }}">네이버 ID <input value="{{ v.naver }}" onInput="{{ set.naver }}" placeholder="아이디만"></span></div>
+      <p class="note">이메일은 따로 묻지 않음 — 네이버 ID로 <b>{{ naverEmail }}</b> 자동 생성. 다른 이메일을 원하면 7번에서 수정.</p>
     </section>
 
     <section class="step" id="s6" data-screen-label="6 서류">
@@ -247,10 +248,10 @@
     </section>
 
     <section class="step" id="s7" data-screen-label="7 우동지">
-      <div class="step-h"><div class="no">7</div><div class="t">우동지 솔루션 안내 + 이메일<small>커넥트 배송 완료 후 활용 가이드 자동 발송.</small></div></div>
-      <div class="say"><span class="who">상담원</span>저희 우동지는 커넥트 설치 이후에 네이버 플레이스 순위·리뷰 관리를 도와드리는 팀이에요. 배송되면 활용 가이드를 카톡·이메일로 보내드릴게요.</div>
-      <div class="say"><span class="who">상담원</span><span class="q">"{{ emailAsk }}"</span> <span class="rec opt {{ f.email }}">이메일 <input value="{{ v.email }}" onInput="{{ set.email }}" placeholder="네이버 ID@naver.com"></span></div>
-      <p class="note">이메일은 페이앤 접수 양식 필수 항목이에요. 네이버 ID가 있으면 <b>ID@naver.com</b>인지 확인만.</p>
+      <div class="step-h"><div class="no">7</div><div class="t">우동지 솔루션 안내<small>이메일은 5번 네이버 ID에서 이미 안내. 커넥트 배송 완료 후 활용 가이드 자동 발송.</small></div></div>
+      <div class="say"><span class="who">상담원</span>저희 우동지는 커넥트 설치 이후에 네이버 플레이스 순위·리뷰 관리를 도와드리는 팀이에요. 배송되면 활용 가이드를 카톡과 네이버 이메일로 보내드릴게요.</div>
+      <div class="fgrid"><span class="rec opt {{ f.email }}">발송 이메일 (기본 {{ naverEmail }}) <input class="wide" value="{{ v.email }}" onInput="{{ set.email }}" placeholder="{{ naverEmail }}"></span></div>
+      <p class="note">비워두면 네이버 이메일로 저장돼요. 고객이 다른 주소를 원할 때만 입력.</p>
     </section>
 
     <section class="step" id="s8" data-screen-label="8 마무리">
@@ -344,7 +345,7 @@ class Component extends DCLogic {
       '현재 포스': L.pos || '', '약정 잔여 개월': L.term || '', '포스 연동': v.link === 'yes' ? '필요' : v.link === 'no' ? '불필요' : '',
       '인터넷 회선(랜선) 보유': v.lan === 'yes' ? 'O' : v.lan ? 'X' : '', '랜선 직접 준비 안내': v.lan === 'no' ? 'O' : v.lan ? 'X' : '', '인터넷 변경/신규 필요': v.lan === 'nonet' ? '필요' : v.lan ? '불필요' : '', '인터넷 상담 요청 일정': v.netReq ? '페이앤 인터넷 상담 요청' : '',
       '안내한 상품 구성': L.bundle || '', '월 이용요금': v.bundle ? '0' : '', '기기 색상': L.color || '', '설치 방식': v.bundle ? (v.link === 'yes' ? '현장 설치' : '자가 설치') : '',
-      '네이버 ID': v.naver || '', '이메일': v.email || '', '우동지 수신 동의': 'O', '특이사항': v.memo || '',
+      '네이버 ID': v.naver || '', '이메일': ctx.emailFinal || '', '우동지 수신 동의': 'O', '특이사항': v.memo || '',
       '상담 결과': kind === 'go' ? '상담 진행' : kind === 'recall' ? '상담 연기' : '상담 거부', '상태': kind === 'go' ? '상담 중' : kind === 'recall' ? '재연락 예정' : '종료',
       '다음 액션 · 일시': kind === 'recall' ? extra.when : '', '포기 이유': kind === 'drop' ? extra.reason : ''
     };
@@ -389,6 +390,8 @@ class Component extends DCLogic {
     const noNet = v.lan === 'nonet';
     let daysToOpen = null; if (v.openDate) daysToOpen = Math.round((new Date(v.openDate) - new Date().setHours(0,0,0,0)) / 864e5);
     const req = ['channel','name','phone','store','biz','mode','entity','owners','large'];
+    const naverEmail = v.naver ? (v.naver.includes('@') ? v.naver.trim() : v.naver.trim() + '@naver.com') : '아이디@naver.com';
+    const emailFinal = (v.email || '').trim() || (v.naver ? naverEmail : '');
     const greetLead = v.channel === 'out' ? '남겨주신 네이버 커넥트 문의 보고 연락드렸어요.' : v.channel === 'chatin' ? '채팅으로 문의 주신 네이버 커넥트 건으로 전화드렸어요.' : '네이버 커넥트 문의 주셔서 연락드렸어요.';
     const bizEtc = v.biz === '기타'; if (bizEtc) req.push('bizEtc');
     const bizLabel = bizEtc ? (v.bizEtc || '기타') : (v.biz || '-');
@@ -418,7 +421,7 @@ class Component extends DCLogic {
     const smsRecall = when => head + `오늘 통화 감사합니다. ${when ? when + '에' : '말씀해주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증 나오시면 바로 진행할게요.' : ''}` + tail;
     const smsDrop = head + `오늘 시간 내주셔서 감사합니다. 나중에 네이버 플레이스나 결제 쪽 도움이 필요하시면 언제든 이 번호로 연락 주세요.\n감사합니다.`;
     const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
-    this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop };
+    this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop, emailFinal };
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
     const ready = reqDone === reqTotal && !!this.state.lib && !this.state.saving;
     const hideIf = (k, val) => v[k] ? (v[k] === val ? 'pick' : 'hide') : '';
@@ -433,7 +436,7 @@ class Component extends DCLogic {
       ch: { channel: v.channel ? 'ok' : '', mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
       typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
       hideBizEtc: !bizEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
-      hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, emailAsk: '가이드 받으실 이메일 하나 알려주세요. 페이앤 접수에도 들어가요.',
+      hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, naverEmail,
       br: { callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
       p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan']), p5: prog(['bundle','link','color','category','naver']), p8: prog(['status']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
