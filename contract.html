@@ -254,14 +254,14 @@
       </div>
       <div class="sec">
         <h3>서류 사진 · 페이앤 업로드용 <span class="pill">{{ sel.photoN }}장</span></h3>
-        <div class="note" style="margin-top:0">사진을 선택하고 아래 <b>드래그 바</b>를 페이앤 파일 칸으로 끌어다 놓으면 한 번에 첨부돼요. 사진 한 장을 바로 끌어다 놓아도 됩니다. <b>복사</b>는 붙여넣기(⌘V)용, 안 되면 <b>다운로드</b>.</div>
-        <sc-if value="{{ hasPhotoSel }}" hint-placeholder-val="{{ false }}"><div class="dragbar" draggable="true" onDragStart="{{ dragSel }}"><b>☰ 선택한 {{ photoSelN }}장 끌어다 놓기</b><span>{{ photoSelInfo }}</span><button type="button" class="btn" onClick="{{ clearPhotoSel }}">선택 해제</button></div></sc-if>
+        <div class="note" style="margin-top:0">사진을 선택하고 <b>선택한 N장 다운로드</b> → 다운로드 폴더에 파일이 내려가요. 페이앤 파일 칸에서 그 파일들을 ⌘ 클릭으로 한 번에 선택하거나, 다운로드 폴더에서 페이앤 창으로 끌어다 놓으세요. (브라우저 안에서 바로 다른 사이트로 끌어다 놓는 건 맥·크롬이 막아요.) 한 장짜리는 <b>복사</b> 후 붙여넣기도 됩니다.</div>
+        <sc-if value="{{ hasPhotoSel }}" hint-placeholder-val="{{ false }}"><div class="dragbar" style="cursor:default"><b>선택 {{ photoSelN }}장</b><span>{{ photoSelInfo }}</span><button type="button" class="btn primary" onClick="{{ downloadSel }}" disabled="{{ dlBusy }}">{{ dlLabel }}</button><button type="button" class="btn" onClick="{{ clearPhotoSel }}">선택 해제</button></div></sc-if>
         <sc-if value="{{ noPhotoSel }}" hint-placeholder-val="{{ false }}"><div class="note"><button type="button" class="btn" onClick="{{ selectAllPhotos }}">전체 선택 ({{ sel.photoN }}장)</button></div></sc-if>
         <sc-for list="{{ photoGroups }}" as="g" hint-placeholder-count="0">
           <div class="pf-sec">{{ g.name }} <span style="font-weight:500;text-transform:none;letter-spacing:0">· {{ g.n }}장</span></div>
           <div class="pgrid">
             <sc-for list="{{ g.files }}" as="p" hint-placeholder-count="0">
-              <div class="pcard {{ p.selCls }}" draggable="true" onDragStart="{{ p.drag }}" onMouseEnter="{{ p.prefetch }}"><button type="button" class="pk" onClick="{{ p.toggle }}" title="선택">{{ p.mark }}</button><a class="th" href="{{ p.url }}" target="_blank" rel="noopener"><img src="{{ p.url }}" alt="{{ p.name }}" loading="lazy"></a><div class="pn">{{ p.seq }}</div><div class="pm" title="{{ p.name }}">{{ p.name }}</div><div class="pa"><button type="button" class="btn {{ p.cpCls }}" onClick="{{ p.copy }}">{{ p.cpLabel }}</button><button type="button" class="btn" onClick="{{ p.download }}">다운로드</button></div></div>
+              <div class="pcard {{ p.selCls }}" onMouseEnter="{{ p.prefetch }}"><button type="button" class="pk" onClick="{{ p.toggle }}" title="선택">{{ p.mark }}</button><a class="th" href="{{ p.url }}" target="_blank" rel="noopener"><img src="{{ p.url }}" alt="{{ p.name }}" loading="lazy"></a><div class="pn">{{ p.seq }}</div><div class="pm" title="{{ p.name }}">{{ p.name }}</div><div class="pa"><button type="button" class="btn {{ p.cpCls }}" onClick="{{ p.copy }}">{{ p.cpLabel }}</button><button type="button" class="btn" onClick="{{ p.download }}">다운로드</button></div></div>
             </sc-for>
           </div>
         </sc-for>
@@ -505,8 +505,9 @@ class Component extends DCLogic {
       rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '상담 진행 중인 고객이 아직 없어요.' : '조건에 맞는 건이 없어요.',
       hasSel: !!rec, drawerCls: rec ? 'open' : '', sel, steps, docs, pf, photoGroups: this._pg || [], noPhotos: !!rec && !(this._pg || []).length,
       hasPhotoSel: !!(this._photoDrag && this._photoDrag.selFiles.length), noPhotoSel: !!rec && !!(this._pg || []).length && !(this._photoDrag && this._photoDrag.selFiles.length), photoSelN: this._photoDrag ? this._photoDrag.selFiles.length : 0,
-      photoSelInfo: this._photoDrag ? (this._photoDrag.readyN < this._photoDrag.selFiles.length ? '사진 불러오는 중 ' + this._photoDrag.readyN + '/' + this._photoDrag.selFiles.length : '준비됨 — 이 바를 잡고 페이앤 파일 칸에 놓으세요') : '',
-      dragSel: e => { const p = this._photoDrag; if (!p) return; const files = p.selFiles.map(f => this._blobs[f.id]).filter(Boolean); const dt = e.dataTransfer; if (!dt) return; try { dt.clearData(); } catch (er) {} let n = 0; files.forEach(file => { try { dt.items.add(file); n++; } catch (er) {} }); if (!n) { e.preventDefault(); this.toast('사진을 아직 불러오는 중'); return; } dt.effectAllowed = 'copy'; },
+      photoSelInfo: this._photoDrag ? (this._photoDrag.readyN < this._photoDrag.selFiles.length ? '사진 불러오는 중 ' + this._photoDrag.readyN + '/' + this._photoDrag.selFiles.length : '준비됨 — 다운로드 후 페이앤 파일 칸에서 여러 개 선택') : '',
+      dlBusy: !!this.state.dlBusy || !(this._photoDrag && this._photoDrag.readyN === this._photoDrag.selFiles.length), dlLabel: this.state.dlBusy ? '다운로드 중…' : '선택한 ' + (this._photoDrag ? this._photoDrag.selFiles.length : 0) + '장 다운로드',
+      downloadSel: async () => { const p = this._photoDrag; if (!p) return; this.setState({ dlBusy: true }); try { for (const f of p.selFiles) { const file = this._blobs[f.id]; if (!file) continue; const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); await new Promise(r => setTimeout(r, 350)); } this.toast(p.selFiles.length + '장 다운로드 — 브라우저가 "여러 파일 다운로허용" 물으면 허용'); } catch (e) { this.toast('다운로드 실패: ' + e.message); } this.setState({ dlBusy: false }); },
       clearPhotoSel: () => this.setState({ photoSel: {} }), selectAllPhotos: () => { const s = {}; const d0 = rec ? lib.parseDocFiles(rec.data[lib.DOC_FILES_COL]) : []; d0.forEach(f => { s[f.id] = true; }); this.setState({ photoSel: s }); },
       tabDocs: this.state.tab === 'docs', tabHandoff: this.state.tab === 'handoff', tabSign: this.state.tab === 'sign', tabInstall: this.state.tab === 'install',
       completeSign: () => { const s = steps.find(x => x.key === 'sign'); if (s) s.complete(); },
