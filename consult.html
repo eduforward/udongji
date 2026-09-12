@@ -156,7 +156,7 @@
     <a href="#s5"><span class="n">5</span><span class="t">구성 · 색상 · 청약정보</span><span class="prog {{ p5.cls }}">{{ p5.txt }}</span></a>
     <a href="#s6"><span class="n">6</span><span class="t">서류 안내</span><span class="prog skip">안내</span></a>
     <a href="#s7"><span class="n">7</span><span class="t">우동지 솔루션</span><span class="prog skip">안내</span></a>
-    <a href="#s8"><span class="n">8</span><span class="t">마무리</span><span class="prog {{ p8.cls }}">{{ p8.txt }}</span></a>
+    <a href="#s8"><span class="n">8</span><span class="t">마무리</span><span class="prog skip">안내</span></a>
     <div class="tot">권장 {{ reqDone }} / {{ reqTotal }}<div class="bar"><i style="width: {{ reqPct }}%"></i></div></div>
   </nav>
 
@@ -276,7 +276,6 @@
       <div class="step-h"><div class="no">8</div><div class="t">마무리 — 복창 후 상태 결정<small>진행할 고객이면 "계약 업무로". 권장 항목이 비어 있어도 넘길 수 있고, 빠진 값은 계약 업무 기본정보에서 채워요.</small></div></div>
       <div class="say"><span class="who">상담사</span>정리할게요. <b>{{ summary }}</b> 서류 사진 보내주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.</div>
       <div class="fgrid">
-        <span class="rec req {{ f.status }}">상태 <span class="seg"><button class="{{ on.status.go }}" onClick="{{ pick.status.go }}">상담 진행</button><button class="warn2" onClick="{{ openRecall }}">재연락…</button><button class="danger2" onClick="{{ openDrop }}">고객 포기…</button></span></span>
         <span class="rec opt {{ f.netReq }}">페이앤 인터넷 상담 요청 <span class="seg"><button class="{{ on.netReq.yes }}" onClick="{{ pick.netReq.yes }}">요청</button></span></span>
         <span class="rec opt {{ f.memo }}">메모 <input class="wide" value="{{ v.memo }}" onInput="{{ set.memo }}" placeholder="특이사항"></span>
       </div>
@@ -422,7 +421,6 @@ class Component extends DCLogic {
     const catEtc = v.category === '기타'; const catLabel = catEtc ? (v.categoryEtc || '기타') : (v.category || '');
     if (isNew) req.push('reg'); if (isNew && !noReg) req.push('openDate');
     if (!noReg) { req.push('pos','lan'); if (!noNet) req.push('wifi'); if (!noNet) { req.push('bundle','color','category','naver'); if (catEtc) req.push('categoryEtc'); if (posHas && v.bundle && v.bundle !== 'cat') req.push('link'); } }
-    req.push('status');
     for (const k of [...this.TEXT, ...Object.keys(this.OPTS)]) f[k] = v[k] ? 'filled' : '';
     const reqDone = req.filter(k => v[k]).length, reqTotal = req.length;
     const prog = keys => { const ks = keys.filter(k => req.includes(k)); if (!ks.length) return { cls: 'skip', txt: '건너뜀' }; const d = ks.filter(k => v[k]).length; return d === ks.length ? { cls: 'done', txt: '완료' } : { cls: 'todo', txt: `${ks.length - d} 남음` }; };
@@ -497,7 +495,7 @@ class Component extends DCLogic {
       hideBizEtc: !bizEtc, hideCatEtc: !catEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
       hideExisting: !isExisting, hideCorpNote: !isCorp, hidePosLink: !posHas, naverEmail,
       br: { wifiNo: hideIf('wifi','no'), wifiUnknown: hideIf('wifi','unknown'), lanUnknown: hideIf('lan','unknown'), callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
-      p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc','sign']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan','wifi']), p5: prog(['bundle','link','color','category','categoryEtc','naver']), p8: prog(['status']),
+      p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc','sign']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan','wifi']), p5: prog(['bundle','link','color','category','categoryEtc','naver']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
       dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : !this.state.lib ? '서버 연결 대기 중' : !(v.name && v.phone) ? '계약 업무로 넘기려면 고객명·연락처가 있어야 해요 (재연락·고객 포기는 바로 가능)' : reqDone === reqTotal ? '권장 항목 모두 입력됨' : `권장 ${reqTotal - reqDone}개 미입력 — 그래도 넘길 수 있어요 (계약 업무 기본정보에서 보완)`,
       notReady: !ready, finishLabel: this.state.saving ? '저장 중…' : '계약 업무로 →', finish: () => { if (!ready) return; if (reqDone < reqTotal && !confirm('권장 항목 ' + (reqTotal - reqDone) + '개가 비어 있어요. 그래도 계약 업무로 넘길까요?')) return; this.save('go'); },
