@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=79"></script>
+  <script src="./udongji-nav.js?v=80"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -64,14 +64,15 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="recall" page-v="79"></udongji-nav>
+<udongji-nav current="recall" page-v="80"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>재연락</b><small>상담 연기 · 재연락 예정 고객</small></div></div>
     <input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 검색" value="{{ query }}" onInput="{{ onQuery }}">
     <div class="seg">
-      <button type="button" class="{{ fDueCls }}" onClick="{{ setDue }}">오늘까지 {{ nDue }}</button>
       <button type="button" class="{{ fAllCls }}" onClick="{{ setAll }}">전체 {{ nAll }}</button>
+      <button type="button" class="{{ fDueCls }}" onClick="{{ setDue }}">오늘까지 {{ nDue }}</button>
+      <button type="button" class="{{ fSoonCls }}" onClick="{{ setSoon }}">연락임박 {{ nSoon }}</button>
     </div>
     <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><div class="seg"><button type="button" class="{{ scopeMineCls }}" onClick="{{ setScopeMine }}">내 담당</button><button type="button" class="{{ scopeAllCls }}" onClick="{{ setScopeAll }}">모든 상담자</button></div></sc-if>
     <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
@@ -109,7 +110,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'due', modal: null, busy: false, toast: '', toastOn: false, scope: 'mine', me: null };
+  state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'all', modal: null, busy: false, toast: '', toastOn: false, scope: 'mine', me: null };
   async componentDidMount() {
     try {
       const lib = await import('./udongji-fb.js?v=26'); await lib.init();
@@ -148,6 +149,7 @@ class Component extends DCLogic {
     const enrich = it => { const d = it.data, dt = this.parseWhen(d['다음 액션 · 일시']); let days = dt ? Math.round((new Date(dt).setHours(0,0,0,0) - today0) / 864e5) : null; return { it, d, dt, days }; };
     let list = all.map(enrich).filter(x => {
       if (filter === 'due' && !(x.days === null || x.days <= 0)) return false;
+      if (filter === 'soon' && !(x.days !== null && x.days <= 2)) return false;
       if (q && !['매장명','고객명','연락처'].some(k => V(x.d, k).toLowerCase().includes(q))) return false;
       return true;
     }).sort((a, b) => (a.days === null ? 9e9 : a.days) - (b.days === null ? 9e9 : b.days) || (b.it._updatedAt || '').localeCompare(a.it._updatedAt || ''));
@@ -170,14 +172,16 @@ class Component extends DCLogic {
       };
     });
     const setF = f => () => this.setState({ filter: f });
-    const nDue = all.map(enrich).filter(x => x.days === null || x.days <= 0).length;
+    const enriched = all.map(enrich);
+    const nDue = enriched.filter(x => x.days === null || x.days <= 0).length;
+    const nSoon = enriched.filter(x => x.days !== null && x.days <= 2).length;
     return {
       query, onQuery: e => this.setState({ query: e.target.value }),
-      nDue, nAll: all.length, fDueCls: filter === 'due' ? 'on' : '', fAllCls: filter === 'all' ? 'on' : '',
-      setDue: setF('due'), setAll: setF('all'), reload: () => this.load(),
+      nDue, nSoon, nAll: all.length, fDueCls: filter === 'due' ? 'on' : '', fAllCls: filter === 'all' ? 'on' : '', fSoonCls: filter === 'soon' ? 'on' : '',
+      setDue: setF('due'), setAll: setF('all'), setSoon: setF('soon'), reload: () => this.load(),
       isAdmin: isAdminUser, scopeMineCls: scope === 'mine' ? 'on' : '', scopeAllCls: scope === 'all' ? 'on' : '', setScopeMine: () => this.setState({ scope: 'mine' }), setScopeAll: () => this.setState({ scope: 'all' }),
       cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : rows.length + '건',
-      rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '재연락할 고객이 없어요.' : filter === 'due' ? '오늘까지 연락할 고객이 없어요. "전체"에서 예정 건을 볼 수 있어요.' : '조건에 맞는 건이 없어요.',
+      rows, noRows: !loading && rows.length === 0, emptyMsg: err ? '데이터를 읽지 못했어요.' : all.length === 0 ? '재연락할 고객이 없어요.' : filter === 'due' ? '오늘까지 연락할 고객이 없어요. "전체"에서 예정 건을 볼 수 있어요.' : filter === 'soon' ? '2일 내 연락 예정 고객이 없어요.' : '조건에 맞는 건이 없어요.',
       hasModal: !!modal, modal: modal || {}, busy, closeModal: () => this.setState({ modal: null }),
       onModalWhen: e => this.setState({ modal: Object.assign({}, modal, { when: e.target.value }) }), onModalNote: e => this.setState({ modal: Object.assign({}, modal, { note: e.target.value }) }), onModalReason: e => this.setState({ modal: Object.assign({}, modal, { reason: e.target.value }) }),
       saveModal: async () => {
