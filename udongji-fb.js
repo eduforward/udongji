@@ -365,6 +365,9 @@ export async function uploadFile(blob, folder, name) {
   return { id: path, name, webViewLink: url, size: blob.size };
 }
 export async function deleteFile(id) { await init(); need(); const { st } = _mods; try { await st.deleteObject(st.ref(_st, id)); } catch (e) { if (!/not-found/.test(String(e && e.code))) throw e; } }
+// ── KPI 팀 통계 스냅샷: config/kpi_stats — 관리자가 KPI 페이지를 열 때 익명화(상담자 번호만)된 단계 도달일만 기록. 구성원은 이걸로 '전체 상담사 평균'만 본다 ──
+export async function getKpiStats() { await init(); need(); const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'config', 'kpi_stats')); return s.exists() ? s.data() : null; } catch (e) { return null; } }
+export async function setKpiStats(rows, agentsN) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, 'config', 'kpi_stats'), { rows, agentsN, _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }); }
 // ── 뉴스레터(스티비) 연동: config/newsletter {url, secret, enabled} — 관리자만 읽기/쓰기, 전송 로그는 newsletter_log ──
 let _nlCfg = null;
 export async function getNewsletterConfig(force) { await init(); if (_nlCfg && !force) return _nlCfg; const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, 'config', 'newsletter')); _nlCfg = s.exists() ? s.data() : {}; } catch (e) { _nlCfg = {}; } return _nlCfg; }
