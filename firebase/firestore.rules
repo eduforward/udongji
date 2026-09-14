@@ -52,8 +52,16 @@ service cloud.firestore {
       allow update: if isSuper() || (isAdmin() && !privileged(request.resource.data.get('role', '')) && !privileged(resource.data.get('role', '')));
       allow delete: if isSuper() || (isAdmin() && !privileged(resource.data.get('role', '')));
     }
+    // 홈페이지 상담신청(leads): 생성은 Cloud Function(Admin SDK)만. 구성원은 열람·배정(status/assigned*/customerId만 변경), 삭제는 관리자
+    match /leads/{id} {
+      allow read: if isUser() && !isClose();
+      allow create: if false;
+      allow update: if isUser() && !isClose() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'assignedTo', 'assignedName', 'assignedAt', 'customerId']) && (request.resource.data.status != 'assigned' || request.resource.data.assignedTo == email());
+      allow delete: if isAdmin();
+    }
     // 공개 설정(홈페이지 상담시간): 로그인 없이 누구나 읽기(랜딩페이지·Apps Script), 관리자 이상 수정. 비밀값 넣지 말 것
     match /public/{k} { allow read: if true; allow write: if isAdmin(); }
   }
 }
+// v15 — 2026-09-14: leads(홈페이지 상담신청) 열람·배정.
 // v14 — 2026-09-13: 마감 담당(close)은 기본정보 완료 고객만 조회·처리. 이관(transfers). 구성원은 본인 상담 고객만.

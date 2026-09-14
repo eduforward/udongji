@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v81 · 2026-09-14 17:34';
+  const VERSION = 'v82 · 2026-09-14 18:30';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 82, d: '2026-09-14', t: '18:30', c: ['홈페이지 상담신청 수신: 상담 업무·재연락 상단에 "새로 들어온 신규문의 X건" 마에 — 누르믴 이름·연락처·상담 선호 수단 목록, "나에게 배정"하믴 오늘 재연락 고객으로 들어가요', '아임웹 폼 → CRM 수신 서버(lead) 신설'] },
     { v: 81, d: '2026-09-14', t: '17:34', c: ['KPI: 관리자는 나만/모든 상담사 비교, 일반 상담사는 내 성과 + 전체 상담사 평균만 (전체 건수·다른 이름 비노출)'] },
     { v: 80, d: '2026-09-14', t: '17:26', c: ['재연락 필터를 전체 · 오늘까지 · 연락임박(2일 후까지) 순으로 바꾸고 기본값을 전체로'] },
     { v: 79, d: '2026-09-13', t: '03:28', c: ['사용법 전면 갱신 (5단계 계약 흐름·KPI·역할·이관·구성 변경 반영)', '상담: 인사→궁금한 점→접수 동의 흐름, 상담사 호칭, 커넥트+POS 구성(현장 설치는 POS만), 하단 바 정리', 'KPI: 수취자료·기본정보 묶음, 전환율 기본 신규 대비'] },
@@ -58,7 +59,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 81;
+  const PAGE_V = 82;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -140,9 +141,77 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=26';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=27';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
   if (!customElements.get('udongji-nav')) customElements.define('udongji-nav', UNav);
+
+  // 신규문의(홈페이지 상담신청) 가로 배너 <udongji-leads> — 상담 업무·재연락 상단
+  const leadsCss = `
+    :host { display: block; margin-bottom: 14px; font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; letter-spacing: -0.01em; color: #171C2B; font-size: 14px; line-height: 1.5; }
+    :host([hidden]) { display: none; }
+    .card { background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(20,27,45,.04), 0 6px 20px rgba(20,27,45,.05); overflow: hidden; border: 1px solid transparent; }
+    .card.has { border-color: #D93A4A; }
+    .head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 13px 18px; background: none; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+    .head:disabled { cursor: default; }
+    .head:hover:not(:disabled) { background: #F6F8FC; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #C9D0DE; flex: none; }
+    .has .dot { background: #D93A4A; box-shadow: 0 0 0 4px #FDECEE; }
+    .msg { font-weight: 700; font-size: 14.5px; }
+    .msg b { color: #D93A4A; font-size: 17px; font-variant-numeric: tabular-nums; }
+    .msg.none { color: #8C95A8; font-weight: 600; }
+    .sub { color: #8C95A8; font-size: 12.5px; font-weight: 500; }
+    .chev { margin-left: auto; width: 18px; height: 18px; color: #8C95A8; transition: transform .15s; flex: none; }
+    .open .chev { transform: rotate(180deg); }
+    .list { display: none; border-top: 1px solid #E4E8F0; }
+    .open .list { display: block; }
+    .row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px 14px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #EEF1F6; }
+    .row:last-child { border-bottom: 0; }
+    .row .n { font-weight: 800; font-size: 15px; }
+    .row .m { color: #58627A; font-size: 13px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
+    .row .m .ph { font-weight: 700; color: #171C2B; font-variant-numeric: tabular-nums; }
+    .pill { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #EEF1FE; color: #2E48D6; }
+    .pill.tel { background: #E5F6EE; color: #1E9E66; } .pill.any { background: #F6F8FC; color: #58627A; }
+    .t { color: #8C95A8; font-size: 12px; font-variant-numeric: tabular-nums; }
+    .acts { display: flex; gap: 8px; }
+    .btn { font: inherit; font-size: 13px; font-weight: 700; padding: 8px 13px; border-radius: 9px; border: 1px solid #E4E8F0; background: #fff; color: #58627A; cursor: pointer; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { background: #F6F8FC; color: #171C2B; }
+    .btn.primary { background: #3D5AF1; border-color: #3D5AF1; color: #fff; } .btn.primary:hover { background: #2E48D6; }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .btn svg { width: 14px; height: 14px; }
+    .empty, .err { padding: 14px 18px; color: #8C95A8; font-size: 13px; } .err { color: #D93A4A; font-weight: 600; }
+    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .sub { display: none; } }
+  `;
+  class ULeads extends HTMLElement {
+    connectedCallback() {
+      const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.leads = null; this.busy = ''; this.err = '';
+      root.innerHTML = `<style>${leadsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">신규문의 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
+      root.getElementById('head').onclick = () => { if (!this.leads || !this.leads.length) return; this.open = !this.open; this.paint(); };
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=27';
+      import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; await this.load(); this._iv = setInterval(() => this.load(), 60000); this._on = () => this.load(); window.addEventListener('focus', this._on); }).catch(() => { this.hidden = true; });
+    }
+    disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); }
+    async load() { if (!this.lib) return; try { this.leads = await this.lib.listLeads(); this.err = ''; } catch (e) { this.err = e.message || String(e); if (!this.leads) this.leads = []; } this.paint(); }
+    fmtT(ms) { if (!ms) return ''; const d = new Date(ms), p = n => String(n).padStart(2, '0'), now = new Date(); const same = d.toDateString() === now.toDateString(); return (same ? '오늘 ' : p(d.getMonth() + 1) + '/' + p(d.getDate()) + ' ') + p(d.getHours()) + ':' + p(d.getMinutes()); }
+    paint() {
+      const r = this.root, L = this.leads || [], n = L.length, card = r.getElementById('card'), msg = r.getElementById('msg'), sub = r.getElementById('sub'), list = r.getElementById('list'), head = r.getElementById('head');
+      card.classList.toggle('has', n > 0); card.classList.toggle('open', this.open && n > 0); head.disabled = n === 0;
+      if (this.err && !n) { msg.className = 'msg none'; msg.textContent = '신규문의를 불러오지 못했어요'; sub.textContent = this.err; }
+      else if (n === 0) { msg.className = 'msg none'; msg.textContent = '새로 들어온 신규문의가 없습니다'; sub.textContent = '홈페이지 상담신청이 들어오믴 여기에 바로 보여요'; }
+      else { msg.className = 'msg'; msg.innerHTML = `새로 들어온 신규문의가 <b>${n}건</b> 있습니다`; sub.textContent = this.open ? '배정하믴 재연락 목록에 들어가요' : '눌러서 목록 보기'; }
+      const pillCls = m => /전화/.test(m) ? 'pill tel' : /카톡/.test(m) ? 'pill' : 'pill any';
+      list.innerHTML = L.map((x, i) => `<div class="row"><div><div class="n">${esc(x.name) || '(이름 없음)'}</div><div class="m"><span class="ph">${esc(x.phone)}</span>${x.method ? `<span class="${pillCls(x.method)}">${esc(x.method)}</span>` : ''}<span class="t">${this.fmtT(x.submittedAt)} 접수</span></div></div><div class="acts"><a class="btn" href="tel:${x.phoneDigits}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg>전화</a><button type="button" class="btn" data-copy="${i}">번호 복사</button><button type="button" class="btn primary" data-assign="${i}" ${this.busy === x.id ? 'disabled' : ''}>${this.busy === x.id ? '배정 중…' : '나에게 배정'}</button></div></div>`).join('');
+      list.querySelectorAll('[data-copy]').forEach(b => { b.onclick = () => { const x = L[+b.dataset.copy]; if (navigator.clipboard) navigator.clipboard.writeText(x.phone).then(() => { b.textContent = '복사됨'; setTimeout(() => { b.textContent = '번호 복사'; }, 1200); }); }; });
+      list.querySelectorAll('[data-assign]').forEach(b => { b.onclick = () => this.assign(L[+b.dataset.assign]); });
+    }
+    async assign(x) {
+      if (this.busy) return; this.busy = x.id; this.paint();
+      try { const cid = await this.lib.assignLead(x); this.leads = (this.leads || []).filter(y => y.id !== x.id); if (!this.leads.length) this.open = false; window.dispatchEvent(new CustomEvent('udongji-lead-assigned', { detail: { lead: x, customerId: cid } })); }
+      catch (e) { alert('배정 실패: ' + (e.message || e)); }
+      this.busy = ''; this.paint();
+    }
+  }
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  if (!customElements.get('udongji-leads')) customElements.define('udongji-leads', ULeads);
 })();
