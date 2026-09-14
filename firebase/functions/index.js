@@ -8,7 +8,7 @@ const db = admin.firestore();
 const ORIGINS = ['https://udongji.co.kr', 'https://www.udongji.co.kr'];
 const RATE = new Map(); // phoneDigits → [timestamps] (인스턴스 메모리, 최소 남용 방지)
 
-exports.lead = onRequest({ region: 'asia-northeast3', cors: false, maxInstances: 5 }, async (req, res) => {
+exports.lead = onRequest({ region: 'asia-northeast3', cors: false, maxInstances: 5, invoker: 'public', serviceAccount: 'firebase-adminsdk-fbsvc@udongj-5d8da.iam.gserviceaccount.com' }, async (req, res) => {
   const origin = req.get('origin') || '';
   res.set('Access-Control-Allow-Origin', ORIGINS.includes(origin) ? origin : ORIGINS[0]);
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
