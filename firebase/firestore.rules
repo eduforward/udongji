@@ -59,9 +59,19 @@ service cloud.firestore {
       allow update: if isUser() && !isClose() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'assignedTo', 'assignedName', 'assignedAt', 'customerId']) && (request.resource.data.status != 'assigned' || request.resource.data.assignedTo == email());
       allow delete: if isAdmin();
     }
+    // AI 상담 도우미 로그: Cloud Function(Admin SDK)만 기록, 관리자 이상 열람
+    match /ailogs/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    // AI 키 등 비밀 설정: 관리자만
+    match /secrets/{id} {
+      allow read, write: if isAdmin();
+    }
     // 공개 설정(홈페이지 상담시간): 로그인 없이 누구나 읽기(랜딩페이지·Apps Script), 관리자 이상 수정. 비밀값 넣지 말 것
     match /public/{k} { allow read: if true; allow write: if isAdmin(); }
   }
 }
+// v16 — 2026-09-21: ailogs(AI 도우미 질문 로그) 관리자 열람.
 // v15 — 2026-09-14: leads(홈페이지 상담신청) 열람·배정.
 // v14 — 2026-09-13: 마감 담당(close)은 기본정보 완료 고객만 조회·처리. 이관(transfers). 구성원은 본인 상담 고객만.

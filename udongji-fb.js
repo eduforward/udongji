@@ -334,6 +334,23 @@ export async function assignLead(lead) {
   await fs.setDoc(fs.doc(_db, 'leads', lead.id), { status: 'assigned', assignedTo: userEmail(), assignedName: m.name, assignedAt: new Date().toISOString(), customerId: cid }, { merge: true });
   return cid;
 }
+// ── AI 상담 도우미 (Cloud Function /ai, 로그인 토큰 필요) ──
+export const AI_URL = 'https://ai-cwxa2uzhya-du.a.run.app';
+export async function askAI(messages, context) {
+  await init(); need();
+  const tok = await _user.getIdToken();
+  const r = await fetch(AI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok }, body: JSON.stringify({ messages, context: context || '' }) });
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (!r.ok || !j.ok) throw new Error(j.error || ('AI 서버 오류 ' + r.status));
+  return j.text;
+}
+export async function getAIConfig() { await init(); need(); const { fs } = _mods; const d = await fs.getDoc(fs.doc(_db, 'secrets', 'ai')); return d.exists() ? d.data() : {}; }
+export async function setAIConfig(cfg) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, 'secrets', 'ai'), Object.assign({}, cfg, { updatedAt: new Date().toISOString(), updatedBy: userEmail() }), { merge: true }); }
+export async function listAILogs(limit) {
+  await init(); need(); const { fs } = _mods;
+  const s = await fs.getDocs(fs.query(fs.collection(_db, 'ailogs'), fs.orderBy('at', 'desc'), fs.limit(limit || 300)));
+  return s.docs.map(d => { const x = d.data(); return { id: d.id, email: x.email || '', name: x.name || '', q: x.q || '', a: x.a || '', context: x.context || '', turns: x.turns || 1, at: x.at && x.at.toDate ? x.at.toDate().toISOString() : '' }; });
+}
 // ── 삭제 로그 (Firestore: deleted/{logId}) — 슈퍼관리자만 조회·복구, 삭제 불가 ──
 export async function listDeleted() { await init(); need(); const { fs } = _mods; const s = await fs.getDocs(fs.query(fs.collection(_db, 'deleted'), fs.orderBy('deletedAt', 'desc'))); return s.docs.map(d => Object.assign({ logId: d.id }, d.data())); }
 export async function restoreDeleted(logId) {

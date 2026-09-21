@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=83"></script>
+  <script src="./udongji-nav.js?v=84"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -142,9 +142,29 @@
     .modal .row .btn { padding: 8px 14px; font-size: 13px; }
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
     .page-top { max-width: 1200px; margin: 0 auto; padding: 20px 20px 0; }
+    /* AI 도우미 */
+    .ai { display: flex; flex-direction: column; gap: 8px; }
+    .ai h4 .st { font-size: 11px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--purple); background: var(--purple-2); padding: 2px 7px; border-radius: 6px; }
+    .ai .qs { display: flex; flex-wrap: wrap; gap: 5px; }
+    .ai .qs button { font: inherit; font-size: 11.5px; font-weight: 600; padding: 4px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--card-2); color: var(--text-2); cursor: pointer; }
+    .ai .qs button:hover { border-color: var(--purple); color: var(--purple); }
+    .ai .log { display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow: auto; padding-right: 2px; }
+    .ai .m { font-size: 12.5px; line-height: 1.55; border-radius: 10px; padding: 8px 11px; white-space: pre-wrap; word-break: break-word; }
+    .ai .m.u { align-self: flex-end; background: var(--blue); color: #fff; max-width: 92%; border-bottom-right-radius: 3px; }
+    .ai .m.a { align-self: stretch; background: var(--card-2); color: var(--text); border-bottom-left-radius: 3px; }
+    .ai .m.a b { color: var(--purple); }
+    .ai .m.err { background: var(--red-2); color: var(--red); font-weight: 600; }
+    .ai .m.wait { color: var(--text-3); font-style: italic; }
+    .ai .empty { font-size: 12.5px; color: var(--text-3); line-height: 1.5; padding: 4px 2px; }
+    .ai form { display: flex; gap: 6px; align-items: flex-end; }
+    .ai textarea { flex: 1; font: inherit; font-size: 13px; line-height: 1.4; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text); resize: none; min-height: 38px; max-height: 110px; }
+    .ai .send { font: inherit; font-size: 13px; font-weight: 700; height: 38px; padding: 0 13px; border-radius: 9px; border: 1px solid var(--purple); background: var(--purple); color: #fff; cursor: pointer; white-space: nowrap; }
+    .ai .send:disabled { opacity: .45; cursor: not-allowed; }
+    .ai .foot { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-3); }
+    .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="83"></udongji-nav>
+<udongji-nav current="consult" page-v="84"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -287,6 +307,14 @@
   </div>
 
   <aside class="side">
+    <div class="card ai" data-screen-label="AI 도우미">
+      <h4>AI 도우미 <span class="st">상담 중 바로 물어보세요</span></h4>
+      <div class="qs"><sc-for list="{{ aiQuick }}" as="q" hint-placeholder-count="6"><button type="button" onClick="{{ q.ask }}">{{ q.label }}</button></sc-for></div>
+      <sc-if value="{{ aiEmpty }}" hint-placeholder-val="{{ true }}"><div class="empty">고객이 뭔가 예상 밖의 말을 하면 그대로 적으세요. 예) "3년 약정인데 3개월 남았다고 함" — 지금 화면에 고른 유형·포스·약정 정보를 알고 답해요.</div></sc-if>
+      <div class="log" ref="{{ aiLogRef }}"><sc-for list="{{ aiMsgs }}" as="m" hint-placeholder-count="0"><div class="m {{ m.cls }}">{{ m.node }}</div></sc-for></div>
+      <form onSubmit="{{ aiSend }}"><textarea rows="1" placeholder="고객이 뭔라고 했나요?" value="{{ aiQ }}" onInput="{{ aiOnQ }}" onKeyDown="{{ aiKey }}"></textarea><button type="submit" class="send" disabled="{{ aiBusy }}">{{ aiBtn }}</button></form>
+      <div class="foot"><span>기준: 딜러 가이드·가격표·서류 체크리스트 · 확정 안 된 조건은 관리자 확인</span><sc-if value="{{ aiHas }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ aiClear }}">대화 지우기</button></sc-if></div>
+    </div>
     <div class="card"><h4>확정 유형</h4><div class="chips"><span class="chip {{ ch.channel }}">{{ L.channel }}</span><span class="chip {{ ch.mode }}">{{ L.mode }}</span><span class="chip {{ ch.entity }}">{{ L.entity }}</span><span class="chip {{ ch.owners }}">{{ L.owners }}</span><span class="chip {{ ch.large }}">{{ L.large }}</span><span class="chip {{ ch.install }}">{{ installLabel }}</span></div><dl class="kv"><dt>구성</dt><dd>{{ L.bundle }} · {{ L.color }}</dd><dt>판매품목</dt><dd>{{ catLabel }}</dd><dt>네이버 ID</dt><dd>{{ v.naver }}</dd></dl></div>
     <div class="card"><h4>고객 안내 문자 <button onClick="{{ copySms }}">복사</button></h4><pre>{{ sms }}</pre></div>
   </aside>
@@ -309,7 +337,27 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { v: this.loadDraft(), modal: null, lib: null, agent: '', saving: false, conn: 'wait' };
+  state = { v: this.loadDraft(), modal: null, lib: null, agent: '', saving: false, conn: 'wait', ai: { msgs: [], q: '', busy: false } };
+  AI_QUICK = [['약정 남았다', '고객이 기존 단말기 약정이 아직 남았다고 해요. 잔여 개월은 아직 모름.'], ['위약금 물어봄', '고객이 기존 계약 위약금은 어떻게 하냐고 물어봐요.'], ['월 버용 부담', '고객이 월 버용이 부담된다고 해요.'], ['이미 포스 있다', '고객이 이미 쓰는 포스가 있어서 괜찮다고 해요.'], ['배달 위주', '고객 매장이 배달 위주라고 해요. 어떤 구성으로 안내해요?'], ['인터넷 없다', '매장에 인터넷이 없다고 해요.'], ['생각해본다', '고객이 나중에 생각해보고 연락하게다고 해요.'], ['수수료 질문', '고객이 카드 수수료가 얼마냐고 물어봐요.']];
+  aiContext() {
+    const v = this.state.v || {}, L = {}; for (const k in this.LBL) L[k] = this.LBL[k][v[k]] || '';
+    const row = [['유입 경로', L.channel], ['매장 구분', L.mode], ['사업자', [L.entity, L.owners].filter(Boolean).join(' · ')], ['연매출 3억', L.large], ['업종', v.biz === '기태' ? v.bizEtc : v.biz], ['매장명', v.store], ['현재 포스', L.pos], ['기존 약정', L.term], ['랜선', L.lan], ['와이파이', L.wifi], ['안내한 구성', L.bundle], ['사업자등록증', v.reg === 'pending' ? '미발급' : v.reg === 'done' ? '발급' : ''], ['오픈 예정일', v.openDate], ['메모', v.memo]].filter(x => x[1]);
+    return row.length ? row.map(x => x[0] + ': ' + x[1]).join('\n') : '(아직 입력된 정보 없음)';
+  }
+  setAI(p) { this.setState({ ai: Object.assign({}, this.state.ai, p) }); }
+  async aiAsk(text) {
+    const t = String(text || '').trim(); if (!t || this.state.ai.busy) return; const lib = this.state.lib; if (!lib) return;
+    const msgs = this.state.ai.msgs.concat([{ role: 'user', content: t }]); this.setAI({ msgs, q: '', busy: true }); this._aiScroll = true;
+    try { const a = await lib.askAI(msgs.filter(m => !m.err).map(m => ({ role: m.role, content: m.content })), this.aiContext()); this.setAI({ msgs: msgs.concat([{ role: 'assistant', content: a }]), busy: false }); }
+    catch (e) { this.setAI({ msgs: msgs.concat([{ role: 'assistant', content: e.message || String(e), err: true }]), busy: false }); }
+    this._aiScroll = true;
+  }
+  componentDidUpdate() { if (this._aiScroll && this._aiLog) { this._aiScroll = false; this._aiLog.scrollTop = this._aiLog.scrollHeight; } }
+  aiNode(m) {
+    if (m.role === 'user' || m.err) return m.content;
+    const parts = m.content.split(/(\*\*[^*]+\*\*)/g);
+    return React.createElement(React.Fragment, null, ...parts.map((p, i) => /^\*\*[^*]+\*\*$/.test(p) ? React.createElement('b', { key: i }, p.slice(2, -2)) : p));
+  }
   KEY = 'udj_v5_draft';
   TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','categoryEtc','naver','email','memo'];
   OPTS = { sign:['yes','no'], channel:['callin','chatin','out'], mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','unknown','nonet'], wifi:['yes','no','unknown'], link:['yes','no'], color:['white','black'], status:['go'], netReq:['yes'] };
@@ -319,7 +367,7 @@ class Component extends DCLogic {
   loadDraft() { try { return JSON.parse(localStorage.getItem('udj_v5_draft') || '{}') || {}; } catch (e) { return {}; } }
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=27'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=28'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const meR = await lib.me().catch(() => ({})); if (meR.close) { location.replace('contract.html'); return; }
       const agent = await lib.myName().catch(() => '');
@@ -488,7 +536,14 @@ class Component extends DCLogic {
     const fmtWhen = (d, note) => d ? d + ' (' + DOW[new Date(d).getDay()] + ')' + (note ? ' ' + note : '') : '';
     const quickDates = QD.map(q => ({ label: q.label, cls: modal && modal.quick === q.k ? 'on' : '', pick: () => { if (q.date) { const d = ymd(q.date()); setM({ quick: q.k, date: d, when: fmtWhen(d, modal.whenNote) }); } else setM({ quick: 'other', date: modal.date || '', when: fmtWhen(modal.date || '', modal.whenNote) }); } }));
     const conn = this.state.conn;
+    const ai = this.state.ai;
+    const aiMsgs = ai.msgs.map((m, i) => ({ cls: m.err ? 'a err' : m.role === 'user' ? 'u' : 'a', node: this.aiNode(m) }));
+    if (ai.busy) aiMsgs.push({ cls: 'a wait', node: '생각 중…' });
     return {
+      aiMsgs, aiEmpty: !ai.msgs.length && !ai.busy, aiHas: ai.msgs.length > 0, aiQ: ai.q, aiBusy: ai.busy || !this.state.lib, aiBtn: ai.busy ? '…' : '묻기',
+      aiQuick: this.AI_QUICK.map(([label, text]) => ({ label, ask: () => this.aiAsk(text) })),
+      aiOnQ: e => this.setAI({ q: e.target.value }), aiSend: e => { e.preventDefault(); this.aiAsk(ai.q); }, aiKey: e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); this.aiAsk(ai.q); } },
+      aiClear: () => this.setAI({ msgs: [], q: '' }), aiLogRef: el => { this._aiLog = el; },
       v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, greetAsk, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
