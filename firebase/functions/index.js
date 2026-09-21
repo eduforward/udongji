@@ -83,9 +83,9 @@ exports.ai = onRequest({ region: 'asia-northeast3', cors: false, maxInstances: 5
     let msgs = Array.isArray(b.messages) ? b.messages : []; msgs = msgs.filter(x => x && (x.role === 'user' || x.role === 'assistant') && typeof x.content === 'string' && x.content.trim()).slice(-12).map(x => ({ role: x.role, content: x.content.slice(0, 3000) }));
     if (!msgs.length || msgs[msgs.length - 1].role !== 'user') return fail(400, '질문이 없어요');
     const context = String(b.context || '').slice(0, 2000);
-    const system = [{ type: 'text', text: RULES }, { type: 'text', text: '[지식]\n' + KNOWLEDGE, cache_control: { type: 'ephemeral' } }];
+    const system = [{ type: 'text', text: RULES }, { type: 'text', text: '[지식]\n' + KNOWLEDGE, cache_control: { type: 'ephemeral', ttl: '1h' } }];
     if (context) system.push({ type: 'text', text: '[지금 상담 중인 고객 화면 정보]\n' + context });
-    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 700, system, messages: msgs }) });
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'extended-cache-ttl-2025-04-11' }, body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 600, system, messages: msgs }) });
     const j = await r.json();
     if (!r.ok) { console.error('anthropic', r.status, JSON.stringify(j).slice(0, 500)); return fail(502, 'AI 응답 실패 (' + (j.error && j.error.message ? j.error.message.slice(0, 120) : r.status) + ')'); }
     const text = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
