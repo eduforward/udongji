@@ -1,5 +1,5 @@
 // 우동지 CRM — 홈페이지(아임웹) 상담신청 수신: POST /lead
-// 본문: text/plain JSON {name, phone, method, source, ts} → Firestore leads/imweb_{전화숫자}_{분단위}
+// 본문: text/plain JSON {name, phone, method, event, source, ts} → Firestore leads/imweb_{전화숫자}_{분단위}
 const { onRequest } = require('firebase-functions/v2/https');
 const admin = require('firebase-admin');
 const fs = require('fs'), path = require('path');
@@ -38,7 +38,7 @@ exports.lead = onRequest({ region: 'asia-northeast3', cors: false, maxInstances:
     const ref = db.collection('leads').doc(id);
     await db.runTransaction(async tx => {
       const cur = await tx.get(ref);
-      const doc = { name, phone, phoneDigits, method: String(b.method || '').trim().slice(0, 20), source: String(b.source || 'imweb').trim().slice(0, 20), submittedAt: admin.firestore.Timestamp.fromDate(ts), channel: 'homepage', updatedAt: admin.firestore.FieldValue.serverTimestamp() };
+      const doc = { name, phone, phoneDigits, method: String(b.method || '').trim().slice(0, 20), event: ['참여', '미참여'].includes(String(b.event || '').trim()) ? String(b.event).trim() : '', source: String(b.source || 'imweb').trim().slice(0, 20), submittedAt: admin.firestore.Timestamp.fromDate(ts), channel: 'homepage', updatedAt: admin.firestore.FieldValue.serverTimestamp() };
       if (!cur.exists) Object.assign(doc, { status: 'new', createdAt: admin.firestore.FieldValue.serverTimestamp() });
       tx.set(ref, doc, { merge: true });
     });

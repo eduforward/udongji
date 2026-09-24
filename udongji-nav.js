@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v84 · 2026-09-21 15:40';
+  const VERSION = 'v85 · 2026-09-24 15:00';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 85, d: '2026-09-24', t: '15:00', c: ['신규문의에 체험단 이벤트 참여 여부 표시(참여 = 빨간 배지) + 체험단 참여/미참여 필터', '배정 시 특이사항에 체험단 참여 여부 기록'] },
     { v: 84, d: '2026-09-21', t: '15:40', c: ['상담 업무 오른쪽에 AI 도우미 — 상담 중 고객이 한 말을 적으면(예: 약정 3개월 남음) 딜러 가이드·가격표 기준으로 바로 읽을 멘트와 다음 액션을 알려줘요. 지금 화면의 유형·포스·약정 정보를 알고 답해요', '관리자 → AI 도우미 탭: API 키 설정, 질문·답변 로그 열람'] },
     { v: 83, d: '2026-09-14', t: '21:20', c: ['홈 화면 상담 업무·재연락 카드 위에도 신규문의 배너 표시', '홈페이지 → CRM 수신 서버(lead) 가동 시작'] },
     { v: 82, d: '2026-09-14', t: '20:33', c: ['홈페이지 상담신청 수신: 상담 업무·재연락 상단에 "새로 들어온 신규문의 X건" 배너 — 누르면 이름·연락처·상담 선호 수단 목록, "나에게 배정"하면 오늘 재연락 고객으로 들어가요', '아임웹 폼 → CRM 수신 서버(lead) 신설'] },
@@ -61,7 +62,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 84;
+  const PAGE_V = 85;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -143,7 +144,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=28';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=29';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
@@ -175,6 +176,9 @@
     .row .m .ph { font-weight: 700; color: #171C2B; font-variant-numeric: tabular-nums; }
     .pill { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #EEF1FE; color: #2E48D6; }
     .pill.tel { background: #E5F6EE; color: #1E9E66; } .pill.any { background: #F6F8FC; color: #58627A; }
+    .ev { font-size: 11.5px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: #D93A4A; color: #fff; } .ev.no { background: #F6F8FC; color: #8C95A8; font-weight: 600; }
+    .flt { display: flex; gap: 6px; padding: 10px 18px; border-bottom: 1px solid #EEF1F6; align-items: center; flex-wrap: wrap; } .flt span { font-size: 12px; color: #8C95A8; font-weight: 600; margin-right: 2px; }
+    .flt button { font: inherit; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1px solid #E4E8F0; background: #fff; color: #58627A; cursor: pointer; } .flt button.on { background: #171C2B; border-color: #171C2B; color: #fff; }
     .t { color: #8C95A8; font-size: 12px; font-variant-numeric: tabular-nums; }
     .acts { display: flex; gap: 8px; }
     .btn { font: inherit; font-size: 13px; font-weight: 700; padding: 8px 13px; border-radius: 9px; border: 1px solid #E4E8F0; background: #fff; color: #58627A; cursor: pointer; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
@@ -187,10 +191,10 @@
   `;
   class ULeads extends HTMLElement {
     connectedCallback() {
-      const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.leads = null; this.busy = ''; this.err = '';
+      const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.leads = null; this.busy = ''; this.ev = ''; this.err = '';
       root.innerHTML = `<style>${leadsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">신규문의 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
       root.getElementById('head').onclick = () => { if (!this.leads || !this.leads.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=28';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=29';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; await this.load(); this._iv = setInterval(() => this.load(), 60000); this._on = () => this.load(); window.addEventListener('focus', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); }
@@ -203,9 +207,14 @@
       else if (n === 0) { msg.className = 'msg none'; msg.textContent = '새로 들어온 신규문의가 없습니다'; sub.textContent = '홈페이지 상담신청이 들어오면 여기에 바로 보여요'; }
       else { msg.className = 'msg'; msg.innerHTML = `새로 들어온 신규문의가 <b>${n}건</b> 있습니다`; sub.textContent = this.open ? '배정하면 재연락 목록에 들어가요' : '눌러서 목록 보기'; }
       const pillCls = m => /전화/.test(m) ? 'pill tel' : /카톡/.test(m) ? 'pill' : 'pill any';
-      list.innerHTML = L.map((x, i) => `<div class="row"><div><div class="n">${esc(x.name) || '(이름 없음)'}</div><div class="m"><span class="ph">${esc(x.phone)}</span>${x.method ? `<span class="${pillCls(x.method)}">${esc(x.method)}</span>` : ''}<span class="t">${this.fmtT(x.submittedAt)} 접수</span></div></div><div class="acts"><a class="btn" href="tel:${x.phoneDigits}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg>전화</a><button type="button" class="btn" data-copy="${i}">번호 복사</button><button type="button" class="btn primary" data-assign="${i}" ${this.busy === x.id ? 'disabled' : ''}>${this.busy === x.id ? '배정 중…' : '나에게 배정'}</button></div></div>`).join('');
-      list.querySelectorAll('[data-copy]').forEach(b => { b.onclick = () => { const x = L[+b.dataset.copy]; if (navigator.clipboard) navigator.clipboard.writeText(x.phone).then(() => { b.textContent = '복사됨'; setTimeout(() => { b.textContent = '번호 복사'; }, 1200); }); }; });
-      list.querySelectorAll('[data-assign]').forEach(b => { b.onclick = () => this.assign(L[+b.dataset.assign]); });
+      const cnt = { '': n, '참여': L.filter(x => x.event === '참여').length, '미참여': L.filter(x => x.event === '미참여').length };
+      const V = this.ev ? L.filter(x => x.event === this.ev) : L;
+      const flt = `<div class="flt"><span>체험단</span>${[['', '전체'], ['참여', '참여'], ['미참여', '미참여']].map(([k, l]) => `<button type="button" data-ev="${k}" class="${this.ev === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
+      const evTag = e => e === '참여' ? '<span class="ev">체험단 참여</span>' : e === '미참여' ? '<span class="ev no">체험단 미참여</span>' : '';
+      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 문의가 없어요</div>') + V.map((x, i) => `<div class="row"><div><div class="n">${esc(x.name) || '(이름 없음)'}</div><div class="m"><span class="ph">${esc(x.phone)}</span>${x.method ? `<span class="${pillCls(x.method)}">${esc(x.method)}</span>` : ''}${evTag(x.event)}<span class="t">${this.fmtT(x.submittedAt)} 접수</span></div></div><div class="acts"><a class="btn" href="tel:${x.phoneDigits}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg>전화</a><button type="button" class="btn" data-copy="${i}">번호 복사</button><button type="button" class="btn primary" data-assign="${i}" ${this.busy === x.id ? 'disabled' : ''}>${this.busy === x.id ? '배정 중…' : '나에게 배정'}</button></div></div>`).join('');
+      list.querySelectorAll('[data-copy]').forEach(b => { b.onclick = () => { const x = V[+b.dataset.copy]; if (navigator.clipboard) navigator.clipboard.writeText(x.phone).then(() => { b.textContent = '복사됨'; setTimeout(() => { b.textContent = '번호 복사'; }, 1200); }); }; });
+      list.querySelectorAll('[data-ev]').forEach(b => { b.onclick = () => { this.ev = b.dataset.ev; this.paint(); }; });
+      list.querySelectorAll('[data-assign]').forEach(b => { b.onclick = () => this.assign(V[+b.dataset.assign]); });
     }
     async assign(x) {
       if (this.busy) return; this.busy = x.id; this.paint();

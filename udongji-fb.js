@@ -323,13 +323,13 @@ export async function listLeads() {
   await init(); need(); const { fs } = _mods;
   const s = await fs.getDocs(fs.query(fs.collection(_db, 'leads'), fs.where('status', '==', 'new')));
   const toMs = t => t && typeof t.toMillis === 'function' ? t.toMillis() : (t ? new Date(t).getTime() : 0);
-  return s.docs.map(d => { const x = d.data(); return { id: d.id, name: String(x.name || ''), phone: fmtPhone(x.phone || x.phoneDigits || ''), phoneDigits: String(x.phoneDigits || ''), method: String(x.method || ''), submittedAt: toMs(x.submittedAt) || toMs(x.createdAt) }; }).sort((a, b) => b.submittedAt - a.submittedAt);
+  return s.docs.map(d => { const x = d.data(); return { id: d.id, name: String(x.name || ''), phone: fmtPhone(x.phone || x.phoneDigits || ''), phoneDigits: String(x.phoneDigits || ''), method: String(x.method || ''), event: String(x.event || ''), submittedAt: toMs(x.submittedAt) || toMs(x.createdAt) }; }).sort((a, b) => b.submittedAt - a.submittedAt);
 }
 // 나에게 배정: customers에 재연락 예정(오늘) 고객 생성 → lead를 assigned로. 반환: 고객 id
 export async function assignLead(lead) {
   await init(); need(); const { fs } = _mods; const m = await me(); if (!m.name) throw new Error('계정에 이름이 등록돼 있어야 배정할 수 있어요 (관리자에게 요청)');
   const t = new Date(); const p = n => String(n).padStart(2, '0'); const when = t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate());
-  const note = '홈페이지 상담신청' + (lead.method ? ' · ' + lead.method + ' 선호' : '') + (lead.submittedAt ? ' (' + new Date(lead.submittedAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 접수)' : '');
+  const note = '홈페이지 상담신청' + (lead.method ? ' · ' + lead.method + ' 선호' : '') + (lead.event ? ' · 체험단 ' + lead.event : '') + (lead.submittedAt ? ' (' + new Date(lead.submittedAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 접수)' : '');
   const cid = await appendRecord({ '고객명': lead.name, '연락처': fmtPhone(lead.phone), '유입 경로': 'Chat-In', '상담일': when, '상태': '재연락 예정', '다음 액션 · 일시': when + ' (홈페이지 신청 · ' + (lead.method || '연락') + ')', '특이사항': note });
   await fs.setDoc(fs.doc(_db, 'leads', lead.id), { status: 'assigned', assignedTo: userEmail(), assignedName: m.name, assignedAt: new Date().toISOString(), customerId: cid }, { merge: true });
   return cid;
