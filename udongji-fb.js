@@ -346,6 +346,8 @@ export async function askAI(messages, context) {
 }
 export async function getAIConfig() { await init(); need(); const { fs } = _mods; const d = await fs.getDoc(fs.doc(_db, 'secrets', 'ai')); return d.exists() ? d.data() : {}; }
 export async function setAIConfig(cfg) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, 'secrets', 'ai'), Object.assign({}, cfg, { updatedAt: new Date().toISOString(), updatedBy: userEmail() }), { merge: true }); }
+export async function getSlackConfig() { await init(); need(); const { fs } = _mods; const d = await fs.getDoc(fs.doc(_db, 'secrets', 'slack')); return d.exists() ? d.data() : {}; }
+export async function setSlackConfig(cfg) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, 'secrets', 'slack'), Object.assign({}, cfg, { updatedAt: new Date().toISOString(), updatedBy: userEmail() }), { merge: true }); }
 export async function listAILogs(limit) {
   await init(); need(); const { fs } = _mods;
   const s = await fs.getDocs(fs.query(fs.collection(_db, 'ailogs'), fs.orderBy('at', 'desc'), fs.limit(limit || 300)));

@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=85"></script>
+  <script src="./udongji-nav.js?v=86"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -94,11 +94,11 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="admin" page-v="85"></udongji-nav>
+<udongji-nav current="admin" page-v="86"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><span class="mark">!</span><div><b>{{ myRoleLabel }}</b><small>{{ email }}</small></div></div>
-    <div class="seg"><button type="button" class="{{ tabUsersCls }}" onClick="{{ showUsers }}">계정 관리</button><button type="button" class="{{ tabLogCls }}" onClick="{{ showLog }}">삭제 로그</button><button type="button" class="{{ tabNlCls }}" onClick="{{ showNl }}">뉴스레터 연동</button><button type="button" class="{{ tabAiCls }}" onClick="{{ showAi }}">AI 도우미</button></div>
+    <div class="seg"><button type="button" class="{{ tabUsersCls }}" onClick="{{ showUsers }}">계정 관리</button><button type="button" class="{{ tabLogCls }}" onClick="{{ showLog }}">삭제 로그</button><button type="button" class="{{ tabNlCls }}" onClick="{{ showNl }}">뉴스레터 연동</button><button type="button" class="{{ tabAiCls }}" onClick="{{ showAi }}">AI 도우미</button><button type="button" class="{{ tabSlCls }}" onClick="{{ showSl }}">슬랙 알림</button></div>
     <sc-if value="{{ isLog }}" hint-placeholder-val="{{ false }}"><input class="search" type="search" placeholder="매장명 · 고객명 · 연락처 · 삭제한 사람 검색" value="{{ query }}" onInput="{{ onQuery }}"></sc-if>
     <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
     <span class="cnt {{ cntCls }}">{{ cntText }}</span>
@@ -165,6 +165,15 @@
   </div>
   </sc-if>
 
+  <sc-if value="{{ isSl }}" hint-placeholder-val="{{ false }}">
+  <div class="card">
+    <div class="gs-head"><h3>슬랙 신규문의 알림</h3><span class="status {{ slStatusCls }}">{{ slStatus }}</span></div>
+    <p class="hint">홈페이지 상담신청이 들어오면 슬랙 채널에 바로 알려줘요 (이름·연락처·상담 수단·체험단). 슬랙에서 <b>Incoming Webhook URL</b>(https://hooks.slack.com/services/…)을 만들어 붙여 넣으세요. 비우고 저장하면 알림이 꺼져요.</p>
+    <div class="frm"><input type="password" style="flex:1 1 320px" placeholder="https://hooks.slack.com/services/…" value="{{ slUrl }}" onInput="{{ onSlUrl }}"><button type="button" class="btn primary" onClick="{{ saveSl }}" disabled="{{ busy }}">저장</button><button type="button" class="btn" onClick="{{ testSl }}" disabled="{{ busy }}">테스트 알림</button></div>
+    <div class="msg {{ msgCls }}">{{ msg }}</div>
+  </div>
+  </sc-if>
+
   <sc-if value="{{ isAi }}" hint-placeholder-val="{{ false }}">
   <div class="card">
     <div class="gs-head"><h3>AI 상담 도우미</h3><span class="status {{ aiStatusCls }}">{{ aiStatus }}</span></div>
@@ -189,10 +198,10 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, myRole: '', newUserRole: 'consult', tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : location.hash === '#ai' ? 'ai' : 'users', aiCfg: {}, aiLog: [], aiKey: '', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
+  state = { lib: null, myRole: '', newUserRole: 'consult', tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : location.hash === '#ai' ? 'ai' : location.hash === '#slack' ? 'sl' : 'users', slCfg: {}, slUrl: '', aiCfg: {}, aiLog: [], aiKey: '', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=29'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=30'); await lib.init();
       if (location.hash === '#hours') { location.replace('hours.html'); return; }
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const email = lib.userEmail(); const myRole = await lib.roleOf(email); const ok = lib.isAdminRole(myRole);
@@ -210,6 +219,7 @@ class Component extends DCLogic {
       let nlCfg = {}, nlLog = []; try { nlCfg = await lib.getNewsletterConfig(true); } catch (e) {} try { nlLog = await lib.listNewsletterLog(); } catch (e) {}
       let aiCfg = {}, aiLog = []; try { aiCfg = await lib.getAIConfig(); } catch (e) {} try { aiLog = await lib.listAILogs(); } catch (e) {}
       this.setState({ aiCfg, aiLog, aiKey: aiCfg.anthropicKey || '' });
+      let slCfg = {}; try { slCfg = await lib.getSlackConfig(); } catch (e) {} this.setState({ slCfg, slUrl: slCfg.webhookUrl || '' });
       this.setState({ admins, users, records: all.items, logs, nlCfg, nlLog, nlUrl: nlCfg.url || 'https://script.google.com/macros/s/AKfycbzYuxZuF9Wrd4BBLPtK2UFiuVbCP94Ydr5nmhLzk5OMysh-PMnefofxSW5CaHchWmfn/exec', nlSecret: nlCfg.secret || '', nlEnabled: nlCfg.enabled !== false, loading: false });
     } catch (e) { this.setState({ loading: false, err: e.message }); }
   }
@@ -238,15 +248,20 @@ class Component extends DCLogic {
         remove: async () => { if (!confirm(u.email + ' 을(를) 사용자에서 제거할까요? 이후 로그인해도 데이터가 보이지 않아요.')) return; try { await lib.removeUser(u.email); this.say('제거했어요.', 'ok'); this.load(); } catch (e) { this.say('제거 실패: ' + e.message, 'err'); } } }; }));
     const adminRows = ROOT.map(e => ({ email: e, meta: '기본 관리자', removable: false, remove: () => {} })).concat(admins.map(a => ({ email: a.email, meta: (a.at ? a.at + ' 위임' : '') + (a.by ? ' · ' + a.by : ''), removable: true,
       remove: async () => { if (!confirm(a.email + ' 의 관리자 권한을 해제할까요?')) return; try { await lib.removeAdmin(a.email); this.say('해제했어요.', 'ok'); this.load(); } catch (e) { this.say('해제 실패: ' + e.message, 'err'); } } })));
-    const setTab = t => () => { this.setState({ tab: t, msg: '' }); try { history.replaceState(null, '', t === 'log' ? '#log' : t === 'nl' ? '#newsletter' : t === 'ai' ? '#ai' : '#'); } catch (e) {} };
-    const isLog = tab === 'log', isNl = tab === 'nl', isAi = tab === 'ai';
+    const setTab = t => () => { this.setState({ tab: t, msg: '' }); try { history.replaceState(null, '', t === 'log' ? '#log' : t === 'nl' ? '#newsletter' : t === 'ai' ? '#ai' : t === 'sl' ? '#slack' : '#'); } catch (e) {} };
+    const isLog = tab === 'log', isNl = tab === 'nl', isAi = tab === 'ai', isSl = tab === 'sl';
+    const { slCfg, slUrl } = this.state;
     const { aiCfg, aiLog, aiKey } = this.state;
     const aiRows = aiLog.map(L => ({ when: fmt(L.at), who: L.name || L.email, q: L.q, a: L.a, aShort: (L.a || '').replace(/\*\*/g, '').replace(/\s+/g, ' ').slice(0, 60) + ((L.a || '').length > 60 ? '…' : ''), ctx: (L.context || '').replace(/\n/g, ' · ').slice(0, 140) }));
     const { nlCfg, nlLog, nlUrl, nlSecret, nlEnabled } = this.state;
     const nlRows = nlLog.map(L => ({ when: fmt(L.at), by: L.by || '', who: [L.name, L.email].filter(Boolean).join(' · '), store: L.store || '', st: L.status === 'sent' ? '전송' : L.status === 'skip' ? '건너뜀 · ' + (L.detail || '') : '실패 · ' + (L.detail || ''), cls: L.status === 'sent' ? 'ok' : L.status === 'skip' ? '' : '' }));
     const nlReady = !!(nlCfg.url && nlCfg.secret) && nlCfg.enabled !== false;
     return {
-      email, ok, denied, isLog, isNl, isAi, isUsers: !isLog && !isNl && !isAi, tabUsersCls: !isLog && !isNl && !isAi ? 'on' : '', tabLogCls: isLog ? 'on' : '', tabNlCls: isNl ? 'on' : '', tabAiCls: isAi ? 'on' : '', showUsers: setTab('users'), showLog: setTab('log'), showNl: setTab('nl'), showAi: setTab('ai'),
+      email, ok, denied, isLog, isNl, isAi, isSl, isUsers: !isLog && !isNl && !isAi && !isSl, tabUsersCls: !isLog && !isNl && !isAi && !isSl ? 'on' : '', tabLogCls: isLog ? 'on' : '', tabNlCls: isNl ? 'on' : '', tabAiCls: isAi ? 'on' : '', tabSlCls: isSl ? 'on' : '', showUsers: setTab('users'), showLog: setTab('log'), showNl: setTab('nl'), showAi: setTab('ai'), showSl: setTab('sl'),
+      slUrl, onSlUrl: e => this.setState({ slUrl: e.target.value }),
+      slStatus: slCfg.webhookUrl ? '알림 켜짐' + (slCfg.updatedAt ? ' · ' + fmt(slCfg.updatedAt) : '') : '알림 꺼짐', slStatusCls: slCfg.webhookUrl ? '' : 'off',
+      saveSl: async () => { if (!lib) return; const u = slUrl.trim(); if (u && !/^https:\/\/hooks\.slack\.com\//.test(u)) { this.say('슬랙 Webhook URL은 https://hooks.slack.com/ 으로 시작해요', 'err'); return; } this.setState({ busy: true }); try { await lib.setSlackConfig({ webhookUrl: u }); this.say(u ? '저장했어요. 다음 신청부터 알림이 가요.' : '알림을 껌어요.', 'ok'); await this.load(); } catch (e) { this.say('저장 실패: ' + e.message, 'err'); } this.setState({ busy: false }); },
+      testSl: async () => { const u = slUrl.trim(); if (!/^https:\/\/hooks\.slack\.com\//.test(u)) { this.say('먼저 Webhook URL을 넣어주세요', 'err'); return; } try { await fetch(u, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ text: ':bell: *테스트 알림* — 우동지 CRM 신규문의 알림이 연결됐어요.' }) }); this.say('보냈어요. 슬랙 채널을 확인하세요.', 'ok'); } catch (e) { this.say('실패: ' + e.message, 'err'); } },
       aiKey, onAiKey: e => this.setState({ aiKey: e.target.value }), aiRows, noAiRows: aiRows.length === 0,
       aiStatus: aiCfg.anthropicKey ? '키 설정됨' + (aiCfg.updatedAt ? ' · ' + fmt(aiCfg.updatedAt) : '') : '키 미설정', aiStatusCls: aiCfg.anthropicKey ? '' : 'off',
       saveAiKey: async () => { if (!lib) return; const k = aiKey.trim(); if (k && !/^sk-ant-/.test(k)) { this.say('Anthropic 키는 sk-ant- 로 시작해요', 'err'); return; } this.setState({ busy: true }); try { await lib.setAIConfig({ anthropicKey: k }); this.say(k ? '저장했어요. 1분 안에 적용돼요.' : '키를 지웠어요 (AI 도우미 중담).', 'ok'); await this.load(); } catch (e) { this.say('저장 실패: ' + e.message, 'err'); } this.setState({ busy: false }); },

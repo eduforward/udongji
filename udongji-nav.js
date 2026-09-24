@@ -1,9 +1,10 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v85 · 2026-09-24 15:00';
+  const VERSION = 'v86 · 2026-09-24 16:40';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
-    { v: 85, d: '2026-09-24', t: '15:00', c: ['신규문의에 체험단 이벤트 참여 여부 표시(참여 = 빨간 배지) + 체험단 참여/미참여 필터', '배정 시 특이사항에 체험단 참여 여부 기록'] },
+    { v: 86, d: '2026-09-24', t: '16:40', c: ['홈페이지 상담신청이 들어오면 슬랙 채널로 바로 알림 (관리자 → 슬랙 알림 탭에서 연결)'] },
+    { v: 85, d: '2026-09-24', t: '16:21', c: ['신규문의에 체험단 이벤트 참여 여부 표시(참여 = 빨간 배지) + 체험단 참여/미참여 필터', '배정 시 특이사항에 체험단 참여 여부 기록'] },
     { v: 84, d: '2026-09-21', t: '15:40', c: ['상담 업무 오른쪽에 AI 도우미 — 상담 중 고객이 한 말을 적으면(예: 약정 3개월 남음) 딜러 가이드·가격표 기준으로 바로 읽을 멘트와 다음 액션을 알려줘요. 지금 화면의 유형·포스·약정 정보를 알고 답해요', '관리자 → AI 도우미 탭: API 키 설정, 질문·답변 로그 열람'] },
     { v: 83, d: '2026-09-14', t: '21:20', c: ['홈 화면 상담 업무·재연락 카드 위에도 신규문의 배너 표시', '홈페이지 → CRM 수신 서버(lead) 가동 시작'] },
     { v: 82, d: '2026-09-14', t: '20:33', c: ['홈페이지 상담신청 수신: 상담 업무·재연락 상단에 "새로 들어온 신규문의 X건" 배너 — 누르면 이름·연락처·상담 선호 수단 목록, "나에게 배정"하면 오늘 재연락 고객으로 들어가요', '아임웹 폼 → CRM 수신 서버(lead) 신설'] },
@@ -62,7 +63,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 85;
+  const PAGE_V = 86;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -144,7 +145,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=29';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=30';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
@@ -194,7 +195,7 @@
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.leads = null; this.busy = ''; this.ev = ''; this.err = '';
       root.innerHTML = `<style>${leadsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">신규문의 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
       root.getElementById('head').onclick = () => { if (!this.leads || !this.leads.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=29';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=30';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; await this.load(); this._iv = setInterval(() => this.load(), 60000); this._on = () => this.load(); window.addEventListener('focus', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); }

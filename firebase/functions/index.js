@@ -9,6 +9,15 @@ const db = admin.firestore();
 let _key = { v: '', t: 0 };
 async function aiKey() { if (Date.now() - _key.t < 60000) return _key.v; const d = await db.collection('secrets').doc('ai').get(); _key = { v: d.exists ? String(d.data().anthropicKey || '').trim() : '', t: Date.now() }; return _key.v; }
 
+// 슬랙 알림: Firestore secrets/slack.webhookUrl (관리자 화면에서 입력)
+async function notifySlack(l) {
+  const d = await db.collection('secrets').doc('slack').get(); const url = d.exists ? String(d.data().webhookUrl || '').trim() : ''; if (!/^https:\/\/hooks\.slack\.com\//.test(url)) return;
+  const kst = new Date(l.ts.getTime() + 9 * 3600e3), p = n => String(n).padStart(2, '0'), when = p(kst.getUTCMonth() + 1) + '/' + p(kst.getUTCDate()) + ' ' + p(kst.getUTCHours()) + ':' + p(kst.getUTCMinutes());
+  const parts = [l.method, l.event ? '체험단 ' + l.event : ''].filter(Boolean).join(' · ');
+  const text = ':bell: *새 홈페이지 상담신청* — ' + l.name + ' · ' + l.phone + (parts ? ' · ' + parts : '') + ' (' + when + ')' + (l.event === '참여' ? '  :star: *체험단 참여*' : '') + '\n<https://eduforward.github.io/udongji/|CRM에서 배정하기>';
+  await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text }) });
+}
+
 const ORIGINS = ['https://udongji.co.kr', 'https://www.udongji.co.kr'];
 const RATE = new Map(); // phoneDigits → [timestamps] (인스턴스 메모리, 최소 남용 방지)
 
@@ -36,12 +45,14 @@ exports.lead = onRequest({ region: 'asia-northeast3', cors: false, maxInstances:
     const minute = ts.getUTCFullYear() + p(ts.getUTCMonth() + 1) + p(ts.getUTCDate()) + p(ts.getUTCHours()) + p(ts.getUTCMinutes());
     const id = 'imweb_' + phoneDigits + '_' + minute;
     const ref = db.collection('leads').doc(id);
+    let created = false;
     await db.runTransaction(async tx => {
-      const cur = await tx.get(ref);
+      const cur = await tx.get(ref); created = !cur.exists;
       const doc = { name, phone, phoneDigits, method: String(b.method || '').trim().slice(0, 20), event: ['참여', '미참여'].includes(String(b.event || '').trim()) ? String(b.event).trim() : '', source: String(b.source || 'imweb').trim().slice(0, 20), submittedAt: admin.firestore.Timestamp.fromDate(ts), channel: 'homepage', updatedAt: admin.firestore.FieldValue.serverTimestamp() };
       if (!cur.exists) Object.assign(doc, { status: 'new', createdAt: admin.firestore.FieldValue.serverTimestamp() });
       tx.set(ref, doc, { merge: true });
     });
+    if (created) await notifySlack({ name, phone, method: String(b.method || '').trim(), event: String(b.event || '').trim(), ts }).catch(e => console.error('slack', e.message));
     return res.status(200).json({ ok: true, id });
   } catch (e) {
     console.error(e);
