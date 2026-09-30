@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=87"></script>
+  <script src="./udongji-nav.js?v=88"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -141,7 +141,14 @@
     .modal .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
     .modal .row .btn { padding: 8px 14px; font-size: 13px; }
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
-    .page-top { max-width: 1200px; margin: 0 auto; padding: 20px 20px 0; }
+    .page-top { max-width: 1240px; margin: 0 auto; padding: 24px 24px 0; }
+    .page-top udongji-leads, .page-top udongji-recalls { display: block; margin-bottom: 12px; }
+    .page-top + .page { padding-top: 8px; }
+    @media (max-width: 800px) { .page-top { padding: 14px 12px 0; } }
+    .totop { position: fixed; left: 18px; bottom: 18px; z-index: 18; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text-2); box-shadow: var(--shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .18s, transform .18s; }
+    .totop.on { opacity: 1; pointer-events: auto; transform: none; }
+    .totop:hover { color: var(--blue); border-color: var(--blue); }
+    .totop svg { width: 20px; height: 20px; }
     /* AI 도우미 */
     .ai { display: flex; flex-direction: column; gap: 8px; }
     .ai h4 .st { font-size: 11px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--purple); background: var(--purple-2); padding: 2px 7px; border-radius: 6px; }
@@ -164,7 +171,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="87"></udongji-nav>
+<udongji-nav current="consult" page-v="88"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -333,6 +340,7 @@
       <div class="row"><button type="button" class="btn ghost" onClick="{{ closeModal }}">취소</button><button type="button" class="btn {{ modal.okCls }}" onClick="{{ saveModal }}" disabled="{{ saving }}">{{ modal.ok }}</button></div>
     </div>
   </sc-if>
+  <button type="button" class="totop {{ toTopCls }}" onClick="{{ toTop }}" title="맨 위로" aria-label="맨 위로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -366,6 +374,7 @@ class Component extends DCLogic {
   BIZ = ['카페','음식점','미용·뷰티','의류·잡화','학원·교육'];
   loadDraft() { try { return JSON.parse(localStorage.getItem('udj_v5_draft') || '{}') || {}; } catch (e) { return {}; } }
   async componentDidMount() {
+    this._onScroll = () => { const on = window.scrollY > 400; if (on !== this.state.showTop) this.setState({ showTop: on }); }; window.addEventListener('scroll', this._onScroll, { passive: true });
     try {
       const lib = await import('./udongji-fb.js?v=30'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
@@ -382,7 +391,7 @@ class Component extends DCLogic {
       }
     } catch (e) { this.setState({ conn: 'off' }); }
   }
-  componentWillUnmount() { window.removeEventListener('udongji-recall-pick', this._onPick); }
+  componentWillUnmount() { window.removeEventListener('udongji-recall-pick', this._onPick); window.removeEventListener('scroll', this._onScroll); }
   setDraft(v) { localStorage.setItem(this.KEY, JSON.stringify(v)); this.setState({ v }); }
   updMany(o) { this.setDraft(Object.assign({}, this.state.v, o)); }
   upd(k, val) { this.updMany({ [k]: k === 'phone' ? this.fmtPhone(val) : val }); }
@@ -544,6 +553,7 @@ class Component extends DCLogic {
     const aiMsgs = ai.msgs.map((m, i) => ({ cls: m.err ? 'a err' : m.role === 'user' ? 'u' : 'a', node: this.aiNode(m) }));
     if (ai.busy) aiMsgs.push({ cls: 'a wait', node: '생각 중…' });
     return {
+      toTopCls: this.state.showTop ? 'on' : '', toTop: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
       aiMsgs, aiEmpty: !ai.msgs.length && !ai.busy, aiHas: ai.msgs.length > 0, aiQ: ai.q, aiBusy: ai.busy || !this.state.lib, aiBtn: ai.busy ? '…' : '묻기',
       aiQuick: this.AI_QUICK.map(([label, text]) => ({ label, ask: () => this.aiAsk(text) })),
       aiOnQ: e => this.setAI({ q: e.target.value }), aiSend: e => { e.preventDefault(); this.aiAsk(ai.q); }, aiKey: e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); this.aiAsk(ai.q); } },
