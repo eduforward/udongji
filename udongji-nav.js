@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v88 · 2026-09-30 13:35';
+  const VERSION = 'v89 · 2026-09-30 14:10';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 89, d: '2026-09-30', t: '14:10', c: ['재연락 페이지 제거 — 재연락 고객은 상담 업무 상단 칸에서 불러와 이어서 상담, 전체 현황은 고객 목록의 "재연락" 필터(관리자)', '홈 상담 업무 카드에 "나의 재연락 N건" 표시'] },
     { v: 88, d: '2026-09-30', t: '13:35', c: ['상담 업무: 상단 두 칸 폭을 아래 3단과 맞춤, 왼쪽 아래 "맨 위로" 버튼 추가'] },
     { v: 87, d: '2026-09-30', t: '11:00', c: ['상담 업무 상단(신규문의 아래)에 "재연락 고객이 N명" 칸 — 누르면 내 재연락 목록(오늘까지·2일 후까지 필터), 고객을 누르면 아래 상담 화면에 바로 불러와요'] },
     { v: 86, d: '2026-09-24', t: '16:40', c: ['홈페이지 상담신청이 들어오면 슬랙 채널로 바로 알림 (관리자 → 슬랙 알림 탭에서 연결)'] },
@@ -65,11 +66,10 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 88;
+  const PAGE_V = 89;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
-    { key: 'recall', label: '재연락', file: '우동지 재연락.dc.html', dep: 'recall.html' },
     { key: 'contract', label: '계약 업무', file: '우동지 계약 업무.dc.html', dep: 'contract.html' },
     { key: 'customers', label: '고객 목록', file: '우동지 고객 목록.dc.html', dep: 'customers.html' },
     { key: 'kpi', label: 'KPI', file: '우동지 KPI 대시보드.dc.html', dep: 'kpi.html' },
