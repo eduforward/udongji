@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=89"></script>
+  <script src="./udongji-nav.js?v=90"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -171,7 +171,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="89"></udongji-nav>
+<udongji-nav current="consult" page-v="90"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -511,7 +511,8 @@ class Component extends DCLogic {
     const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'} / 와이파이: ${L.wifi || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
     this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop, emailFinal, catLabel };
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
-    const ready = !!this.state.lib && !this.state.saving && !!(v.name && v.phone);
+    const typedAll = !!(v.mode && v.entity && v.owners);
+    const ready = !!this.state.lib && !this.state.saving && !!(v.name && v.phone) && typedAll;
     const hideIf = (k, val) => v[k] ? (v[k] === val ? 'pick' : 'hide') : '';
     const modal = this.state.modal, who = v.store || v.name || '(고객명 미입력)';
     const setM = p => this.setState({ modal: Object.assign({}, this.state.modal, { err: '' }, p) });
@@ -568,7 +569,7 @@ class Component extends DCLogic {
       br: { wifiNo: hideIf('wifi','no'), wifiUnknown: hideIf('wifi','unknown'), lanUnknown: hideIf('lan','unknown'), callin: hideIf('channel','callin'), chatin: hideIf('channel','chatin'), out: hideIf('channel','out'), ios: hideIf('pos','ios'), laptop: hideIf('pos','laptop'), pc: v.pos ? (posHas ? 'pick' : 'hide') : '', termShort: v.term ? (v.term === 'long' ? 'hide' : 'pick') : '', termLong: hideIf('term','long'), lanNo: hideIf('lan','no'), lanNonet: hideIf('lan','nonet') },
       p0: prog(['channel']), p1: prog(['name','phone','store','biz','bizEtc','sign']), p2: prog(['mode','entity','owners','large']), p3: prog(['reg','openDate']), p4: prog(['pos','lan','wifi']), p5: prog(['bundle','link','color','category','categoryEtc','naver']),
       reqDone, reqTotal, reqPct: reqTotal ? Math.round(reqDone / reqTotal * 100) : 0,
-      dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : !this.state.lib ? '서버 연결 대기 중' : !(v.name && v.phone) ? '계약 업무로 넘기려면 고객명·연락처가 있어야 해요 (재연락·고객 포기는 바로 가능)' : reqDone === reqTotal ? '권장 항목 모두 입력됨' : `권장 ${reqTotal - reqDone}개 미입력 — 그래도 넘길 수 있어요 (계약 업무 기본정보에서 보완)`,
+      dnCls: ready || this.state.saving ? '' : 'bad', dnTxt: this.state.saving ? '저장 중…' : !this.state.lib ? '서버 연결 대기 중' : !(v.name && v.phone) ? '계약 업무로 넘기려면 고객명·연락처가 있어야 해요 (재연락·고객 포기는 바로 가능)' : !typedAll ? '계약 업무로 넘기려면 2번 유형 판별(신규/기존 · 개인/법인 · 단독/공동)을 다 골라야 해요 — 서류·접수 링크가 여기서 갈려요' : reqDone === reqTotal ? '권장 항목 모두 입력됨' : `권장 ${reqTotal - reqDone}개 미입력 — 그래도 넘길 수 있어요 (계약 업무 기본정보에서 보완)`,
       notReady: !ready, finishLabel: this.state.saving ? '저장 중…' : '계약 업무로 →', finish: () => { if (!ready) return; if (reqDone < reqTotal && !confirm('권장 항목 ' + (reqTotal - reqDone) + '개가 비어 있어요. 그래도 계약 업무로 넘길까요?')) return; this.save('go'); },
       copySms: copy(sms), copyForm: copy(form),
       reset: () => { if (Object.keys(v).length && !confirm('입력 중인 내용을 지우고 새 상담을 시작할까요?')) return; localStorage.removeItem(this.KEY); this.setState({ v: {} }); },

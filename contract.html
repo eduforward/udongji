@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=89"></script>
+  <script src="./udongji-nav.js?v=90"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -64,6 +64,19 @@
     .empty { padding: 60px 20px; text-align: center; color: var(--text-3); }
     /* 드로어 */
     .scrim { position: fixed; inset: 0; background: rgba(23,28,43,.25); z-index: 60; }
+    /* 유형 변경 */
+    .casebtn { font: inherit; cursor: pointer; border: 1px dashed var(--purple); background: var(--purple-2); color: var(--purple); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+    .casebtn:hover { background: #E4E0FD; }
+    .casebtn small { font-weight: 600; opacity: .75; }
+    .casebox { margin: 10px 22px 0; padding: 12px 14px; border: 1px solid var(--purple); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+    .casebox h4 { font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+    .casebox .rowz { display: grid; grid-template-columns: 90px 1fr; gap: 8px 10px; align-items: center; font-size: 13px; }
+    .casebox .rowz label { font-weight: 700; color: var(--text-2); font-size: 12.5px; }
+    .casebox .seg { display: inline-flex; gap: 4px; background: var(--card-2); padding: 3px; border-radius: 9px; }
+    .casebox .seg button { font: inherit; font-size: 12.5px; font-weight: 700; padding: 5px 11px; border-radius: 7px; border: 0; background: transparent; color: var(--text-2); cursor: pointer; }
+    .casebox .seg button.on { background: var(--card); color: var(--purple); box-shadow: var(--shadow); }
+    .casebox .foot { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 12px; color: var(--text-3); }
+    .casebox .foot .btn { font-size: 12.5px; padding: 6px 12px; }
     .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(620px, 100vw); background: var(--card); box-shadow: -12px 0 40px rgba(20,27,45,.18); z-index: 61; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s; }
     .drawer.open { transform: none; }
     .dh { padding: 18px 22px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: flex-start; }
@@ -158,7 +171,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="89"></udongji-nav>
+<udongji-nav current="contract" page-v="90"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -200,7 +213,18 @@
 
   <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><div class="scrim" onClick="{{ close }}"></div></sc-if>
   <aside class="drawer {{ drawerCls }}">
-    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
+    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div><div style="margin-top:7px"><button type="button" class="casebtn" onClick="{{ toggleCase }}" title="고객 유형 변경 — 서류 목록·접수 링크·기본정보가 이 유형을 따라가요">{{ sel.caseLabel }} <small>{{ caseBtnHint }}</small></button></div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
+    <sc-if value="{{ caseOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="casebox">
+      <h4>고객 유형 변경</h4>
+      <div class="rowz">
+        <label>매장</label><div class="seg"><button type="button" class="{{ ce.modeNewCls }}" onClick="{{ ce.setModeNew }}">신규 오픈</button><button type="button" class="{{ ce.modeOldCls }}" onClick="{{ ce.setModeOld }}">기존 운영</button></div>
+        <label>사업자</label><div class="seg"><button type="button" class="{{ ce.entPersonCls }}" onClick="{{ ce.setEntPerson }}">개인</button><button type="button" class="{{ ce.entCorpCls }}" onClick="{{ ce.setEntCorp }}">법인</button></div>
+        <label>대표</label><div class="seg"><button type="button" class="{{ ce.ownSingleCls }}" onClick="{{ ce.setOwnSingle }}">단독</button><button type="button" class="{{ ce.ownJointCls }}" onClick="{{ ce.setOwnJoint }}">공동대표</button></div>
+      </div>
+      <div class="foot"><span>저장하면 서류 목록·페이앤 접수 링크·기본정보 양식이 바로 바뀝어요. 이미 받은 서류는 그대로.</span><button type="button" class="btn ok" style="margin-left:auto" onClick="{{ saveCase }}" disabled="{{ ce.saveOff }}">{{ ce.saveLabel }}</button><button type="button" class="btn" onClick="{{ toggleCase }}">닫기</button></div>
+    </div>
+    </sc-if>
     <div class="dbody">
       <div class="steps">
         <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4"><button type="button" class="{{ s.cls }}" onClick="{{ s.pick }}" title="{{ s.title }}"><b>{{ s.label }}</b><small>{{ s.date }}</small></button></sc-for>
@@ -556,12 +580,18 @@ class Component extends DCLogic {
       completeHandoff: () => { const p = this._payn; if (!p || p.stageDoneHandoff) return; if (p.dirtyKeys.length) { this.toast('바꾼 내용을 먼저 저장하세요'); return; } if (p.pfMiss.length && !confirm('미입력·오류 ' + p.pfMiss.length + '칸이 있어요. 그래도 이관 완료로 처리할까요?')) return; this.patch(p.rec, { [SC.handoff]: today, [lib.REG_COL]: today }, '페이앤 이관 완료'); },
       copyPayn: () => { if (sel.payn) this.copy(sel.payn, '페이앤 접수 양식 (탭 구분 2열)'); },
       copySms: () => { if (sel.sms) this.copy(sel.sms, '안내 문자'); },
-      completeInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.complete(); }, resendNewsletter: () => { if (rec) this.sendNewsletter(rec, true); }, close: () => { clearTimeout(this._memoT); if (this.state.memoDirty) this.saveMemoNow(); this.setState({ selRow: null, pfDraft: {}, seq: 0, copied: {} }); },
+      completeInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.complete(); }, resendNewsletter: () => { if (rec) this.sendNewsletter(rec, true); }, close: () => { clearTimeout(this._memoT); if (this.state.memoDirty) this.saveMemoNow(); this.setState({ selRow: null, pfDraft: {}, seq: 0, copied: {}, caseOpen: false }); },
       onMemo: e => { const v = e.target.value; this.setState({ memo: v, memoDirty: true }); clearTimeout(this._memoT); this._memoT = setTimeout(() => this.saveMemoNow(), 1000); },
       saveMemo: () => { clearTimeout(this._memoT); this.saveMemoNow(); },
       completeDocs: () => { const s = steps.find(x => x.key === 'docs'); if (s) s.complete(); },
       copyNudge: () => { if (!rec || !lib) return; const d = rec.data, left = reqDocs(d).filter(x => !checked(d)[x.id]); const txt = '[우동지] ' + (V(d, '고객명') ? V(d, '고객명') + ' 대표님' : '대표님') + ', 우동지 ' + (V(d, '상담자') || '담당자') + '입니다.\n커넥트 접수 진행을 위해 아직 받지 못한 서류가 있습니다. 편하신 때 이 번호로 사진을 보내주시면 바로 접수 진행하겠습니다.\n\n' + left.map((x, i) => (i + 1) + '. ' + x.name + (x.hint ? ' (' + x.hint + ')' : '')).join('\n') + '\n\n감사합니다.'; this.copy(txt, '재촉 문자'); },
-      toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast
+      toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast,
+      caseOpen: !!this.state.caseOpen && !!rec, caseBtnHint: this.state.caseOpen ? '' : '변경',
+      toggleCase: () => { if (!rec) return; const d = rec.data; this.setState({ caseOpen: !this.state.caseOpen, caseDraft: { mode: V(d, '매장 구분'), ent: V(d, '대형/개인/법인') === '법인' ? '법인' : V(d, '대형/개인/법인') ? '개인' : '', own: V(d, '단독/공동') } }); },
+      ce: (() => { const c = this.state.caseDraft || {}, d = rec ? rec.data : {}; const cur = { mode: V(d, '매장 구분'), ent: V(d, '대형/개인/법인') === '법인' ? '법인' : V(d, '대형/개인/법인') ? '개인' : '', own: V(d, '단독/공동') }; const dirty = c.mode !== cur.mode || c.ent !== cur.ent || c.own !== cur.own; const full = !!(c.mode && c.ent && c.own); const set = p => () => this.setState({ caseDraft: Object.assign({}, this.state.caseDraft, p) });
+        return { modeNewCls: c.mode === '신규 오픈' ? 'on' : '', modeOldCls: c.mode === '기존 운영' ? 'on' : '', setModeNew: set({ mode: '신규 오픈' }), setModeOld: set({ mode: '기존 운영' }), entPersonCls: c.ent === '개인' ? 'on' : '', entCorpCls: c.ent === '법인' ? 'on' : '', setEntPerson: set({ ent: '개인' }), setEntCorp: set({ ent: '법인' }), ownSingleCls: c.own === '단독' ? 'on' : '', ownJointCls: c.own === '공동' ? 'on' : '', setOwnSingle: set({ own: '단독' }), setOwnJoint: set({ own: '공동' }), saveOff: !dirty || !full || busy, saveLabel: busy ? '저장 중…' : !full ? '세 가지 다 고르세요' : dirty ? '유형 저장' : '변경 없음' }; })(),
+      saveCase: async () => { if (!rec || !lib) return; const c = this.state.caseDraft || {}; if (!(c.mode && c.ent && c.own)) return; const d = rec.data; const before = [V(d, '매장 구분'), V(d, '대형/개인/법인'), V(d, '단독/공동')].filter(Boolean).join('·') || '미확정'; const after = [c.mode, c.ent, c.own].join('·'); this.setState({ busy: true });
+        try { const patch = { '매장 구분': c.mode, '대형/개인/법인': c.ent, '단독/공동': c.own, '서류 분류': (c.mode === '신규 오픈' ? '신규' : '기존') + '·' + c.ent + '·' + c.own }; const nd = Object.assign({}, d, patch); const lk = lib.paynLink(nd); patch['페이앤 접수 링크'] = lk ? lk.no : ''; const stamp = '[' + lib.todayStr() + '] 유형 변경 ' + before + ' → ' + after; patch['특이사항'] = (V(d, '특이사항') ? V(d, '특이사항') + '\n' : '') + stamp; await this.patch(rec, patch, '유형을 ' + after + '으로 바꿨어요'); this.setState({ caseOpen: false, busy: false, pfDraft: {} }); } catch (e) { this.setState({ busy: false }); this.toast('저장 실패: ' + e.message); } },
     };
   }
 }
