@@ -222,7 +222,7 @@
         <label>사업자</label><div class="seg"><button type="button" class="{{ ce.entPersonCls }}" onClick="{{ ce.setEntPerson }}">개인</button><button type="button" class="{{ ce.entCorpCls }}" onClick="{{ ce.setEntCorp }}">법인</button></div>
         <label>대표</label><div class="seg"><button type="button" class="{{ ce.ownSingleCls }}" onClick="{{ ce.setOwnSingle }}">단독</button><button type="button" class="{{ ce.ownJointCls }}" onClick="{{ ce.setOwnJoint }}">공동대표</button></div>
       </div>
-      <div class="foot"><span>저장하면 서류 목록·페이앤 접수 링크·기본정보 양식이 바로 바뀝어요. 이미 받은 서류는 그대로.</span><button type="button" class="btn ok" style="margin-left:auto" onClick="{{ saveCase }}" disabled="{{ ce.saveOff }}">{{ ce.saveLabel }}</button><button type="button" class="btn" onClick="{{ toggleCase }}">닫기</button></div>
+      <div class="foot"><span>저장하면 서류 목록·페이앤 접수 링크·기본정보 양식이 바로 바뀌어요. 이미 받은 서류는 그대로.</span><button type="button" class="btn ok" style="margin-left:auto" onClick="{{ saveCase }}" disabled="{{ ce.saveOff }}">{{ ce.saveLabel }}</button><button type="button" class="btn" onClick="{{ toggleCase }}">닫기</button></div>
     </div>
     </sc-if>
     <div class="dbody">
