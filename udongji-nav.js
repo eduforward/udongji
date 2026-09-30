@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v86 · 2026-09-24 16:40';
+  const VERSION = 'v87 · 2026-09-30 11:00';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 87, d: '2026-09-30', t: '11:00', c: ['상담 업무 상단(신규문의 아래)에 "재연락 고객이 N명" 칸 — 누르면 내 재연락 목록(오늘까지·2일 후까지 필터), 고객을 누르면 아래 상담 화면에 바로 불러와요'] },
     { v: 86, d: '2026-09-24', t: '16:40', c: ['홈페이지 상담신청이 들어오면 슬랙 채널로 바로 알림 (관리자 → 슬랙 알림 탭에서 연결)'] },
     { v: 85, d: '2026-09-24', t: '16:21', c: ['신규문의에 체험단 이벤트 참여 여부 표시(참여 = 빨간 배지) + 체험단 참여/미참여 필터', '배정 시 특이사항에 체험단 참여 여부 기록'] },
     { v: 84, d: '2026-09-21', t: '15:40', c: ['상담 업무 오른쪽에 AI 도우미 — 상담 중 고객이 한 말을 적으면(예: 약정 3개월 남음) 딜러 가이드·가격표 기준으로 바로 읽을 멘트와 다음 액션을 알려줘요. 지금 화면의 유형·포스·약정 정보를 알고 답해요', '관리자 → AI 도우미 탭: API 키 설정, 질문·답변 로그 열람'] },
@@ -63,7 +64,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 86;
+  const PAGE_V = 87;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -226,4 +227,62 @@
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   if (!customElements.get('udongji-leads')) customElements.define('udongji-leads', ULeads);
+  // 재연락 고객 가로 배너 <udongji-recalls> — 상담 업무 상단. 항목 클릭 → 'udongji-recall-pick' 이벤트(같은 페이지 폼에 불러오기), 페이지가 안 받으면 ?id= 로 이동
+  const recallsCss = leadsCss + `
+    .card.has { border-color: #E9A23B; } .has .dot { background: #E9A23B; box-shadow: 0 0 0 4px #FBF1DF; } .msg b { color: #B8791A; }
+    .row { cursor: pointer; } .row:hover { background: #F6F8FC; }
+    .when { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #F6F8FC; color: #58627A; }
+    .when.due { background: #FDECEE; color: #D93A4A; } .when.today { background: #FBF1DF; color: #B8791A; } .when.soon { background: #EEF1FE; color: #2E48D6; }
+    .h { color: #8C95A8; font-size: 12px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 720px; }
+  `;
+  class URecalls extends HTMLElement {
+    connectedCallback() {
+      const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.items = null; this.filter = ''; this.err = '';
+      root.innerHTML = `<style>${recallsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">재연락 고객 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
+      root.getElementById('head').onclick = () => { if (!this.items || !this.items.length) return; this.open = !this.open; this.paint(); };
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=30';
+      import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; this.me = me; await this.load(); this._iv = setInterval(() => this.load(), 120000); this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('udongji-lead-assigned', this._on); window.addEventListener('udongji-record-saved', this._on); }).catch(() => { this.hidden = true; });
+    }
+    disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); window.removeEventListener('udongji-lead-assigned', this._on); window.removeEventListener('udongji-record-saved', this._on); }
+    parseWhen(s) {
+      s = String(s || '').trim(); if (!s) return null; const y = new Date().getFullYear();
+      let m = /(\d{4})[-./](\d{1,2})[-./](\d{1,2})/.exec(s); if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+      m = /(\d{1,2})[./월]\s*(\d{1,2})/.exec(s); if (m) { const d = new Date(y, +m[1] - 1, +m[2]); if (d < new Date(Date.now() - 30 * 864e5)) d.setFullYear(y + 1); return d; }
+      if (/오늘/.test(s)) return new Date(); if (/내일/.test(s)) return new Date(Date.now() + 864e5); if (/모레/.test(s)) return new Date(Date.now() + 2 * 864e5);
+      m = /(\d+)\s*일\s*(뒤|후)/.exec(s); if (m) return new Date(Date.now() + (+m[1]) * 864e5);
+      if (/다음\s*주/.test(s)) return new Date(Date.now() + 7 * 864e5);
+      return null;
+    }
+    async load() {
+      if (!this.lib) return;
+      try {
+        const { items } = await this.lib.readAll(); const V = (d, k) => this.lib.val(d, k); const me = this.me || {};
+        const isPost = d => d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
+        const isRecall = d => d['상태'] !== '종료' && d['상담 결과'] !== '상담 거부' && (isPost(d) || d['상태'] === '재연락 예정' || d['상태'] === '보류');
+        const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+        this.items = items.filter(it => isRecall(it.data)).filter(it => !me.name || V(it.data, '상담자') === me.name || (me.admin && !V(it.data, '상담자'))).map(it => {
+          const d = it.data, dt = this.parseWhen(d['다음 액션 · 일시']); const days = dt ? Math.round((new Date(dt).setHours(0, 0, 0, 0) - t0) / 864e5) : null;
+          return { it, days, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d) };
+        }).sort((a, b) => (a.days === null ? 9e9 : a.days) - (b.days === null ? 9e9 : b.days));
+        this.err = '';
+      } catch (e) { this.err = e.message || String(e); if (!this.items) this.items = []; }
+      this.paint();
+    }
+    paint() {
+      const r = this.root, L = this.items || [], n = L.length, card = r.getElementById('card'), msg = r.getElementById('msg'), sub = r.getElementById('sub'), list = r.getElementById('list'), head = r.getElementById('head');
+      const nDue = L.filter(x => x.days !== null && x.days <= 0).length;
+      card.classList.toggle('has', n > 0); card.classList.toggle('open', this.open && n > 0); head.disabled = n === 0;
+      if (this.err && !n) { msg.className = 'msg none'; msg.textContent = '재연락 목록을 불러오지 못했어요'; sub.textContent = this.err; }
+      else if (n === 0) { msg.className = 'msg none'; msg.textContent = '재연락할 고객이 없습니다'; sub.textContent = '상담을 재연락·보류로 마치면 여기에 쌓여요'; }
+      else { msg.className = 'msg'; msg.innerHTML = `재연락 고객이 <b>${n}명</b> 있습니다` + (nDue ? ` <span class="when due" style="margin-left:6px">오늘까지 ${nDue}</span>` : ''); sub.textContent = this.open ? '고객을 누르면 아래 상담 화면에 바로 불러와요' : '눌러서 목록 보기'; }
+      const V = this.filter ? L.filter(x => this.filter === 'due' ? (x.days === null || x.days <= 0) : (x.days !== null && x.days <= 2)) : L;
+      const cnt = { '': n, due: L.filter(x => x.days === null || x.days <= 0).length, soon: L.filter(x => x.days !== null && x.days <= 2).length };
+      const flt = `<div class="flt"><span>기간</span>${[['', '전체'], ['due', '오늘까지'], ['soon', '2일 후까지']].map(([k, l]) => `<button type="button" data-f="${k}" class="${this.filter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
+      const tag = x => x.days === null ? `<span class="when">${x.when ? esc(x.when) : '일정 없음'}</span>` : x.days < 0 ? `<span class="when due">${-x.days}일 지남</span>` : x.days === 0 ? `<span class="when today">오늘</span>` : `<span class="when ${x.days <= 2 ? 'soon' : ''}">${x.days}일 후</span>`;
+      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px">${x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      list.querySelectorAll('[data-f]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.filter = b.dataset.f; this.paint(); }; });
+      list.querySelectorAll('.row').forEach(row => { row.onclick = () => { const x = V[+row.dataset.i]; const ev = new CustomEvent('udongji-recall-pick', { detail: { item: x.it }, cancelable: true }); const handled = !window.dispatchEvent(ev); if (!handled) location.href = (this.getAttribute('consult') || '우동지 상담 스크립트.dc.html') + '?id=' + encodeURIComponent(x.it.id); else { this.open = false; this.paint(); } }; });
+    }
+  }
+  if (!customElements.get('udongji-recalls')) customElements.define('udongji-recalls', URecalls);
 })();

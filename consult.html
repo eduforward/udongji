@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=86"></script>
+  <script src="./udongji-nav.js?v=87"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -164,8 +164,8 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="86"></udongji-nav>
-<div class="page-top"><udongji-leads></udongji-leads></div>
+<udongji-nav current="consult" page-v="87"></udongji-nav>
+<div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
     <div class="k">상담 흐름 v5</div>
@@ -373,6 +373,8 @@ class Component extends DCLogic {
       const agent = await lib.myName().catch(() => '');
       this.setState({ lib, agent, conn: 'ok' });
       // 재연락: ?id=… → 기록을 폼에 불러와 이어서 상담 (저장 시 같은 기록 갱신)
+      this._onPick = e => { e.preventDefault(); const it = e.detail && e.detail.item; if (!it) return; const cur = this.state.v || {}; if ((cur.name || cur.phone) && cur._id !== it.id && !confirm('지금 작성 중인 상담 내용을 지우고 이 고객을 불러올까요?')) return; this.setDraft(this.fromRecord(it)); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+      window.addEventListener('udongji-recall-pick', this._onPick);
       const m = /[?&]id=([^&]+)/.exec(location.search);
       if (m) {
         try { const { items } = await lib.readAll(); const it = items.find(x => x.id === decodeURIComponent(m[1])); if (it) this.setDraft(this.fromRecord(it)); } catch (e) {}
@@ -380,6 +382,7 @@ class Component extends DCLogic {
       }
     } catch (e) { this.setState({ conn: 'off' }); }
   }
+  componentWillUnmount() { window.removeEventListener('udongji-recall-pick', this._onPick); }
   setDraft(v) { localStorage.setItem(this.KEY, JSON.stringify(v)); this.setState({ v }); }
   updMany(o) { this.setDraft(Object.assign({}, this.state.v, o)); }
   upd(k, val) { this.updMany({ [k]: k === 'phone' ? this.fmtPhone(val) : val }); }
@@ -439,6 +442,7 @@ class Component extends DCLogic {
         delete data._addRecall; await lib.updateRecord(row, data);
       } else { delete data._addRecall; await lib.appendRecord(data, id); }
     } catch (e) { ok = false; err = e.message || String(e); delete data._addRecall; }
+    if (ok) try { window.dispatchEvent(new CustomEvent('udongji-record-saved', { detail: { id } })); } catch (e) {}
     const sms = kind === 'go' ? ctx.sms : kind === 'recall' ? ctx.smsRecall(extra.when) : ctx.smsDrop;
     try { localStorage.setItem('udongji-last-done', JSON.stringify({ id, data, sms, savedAt: new Date().toISOString(), synced: ok, err })); } catch (e) {}
     localStorage.removeItem(this.KEY);
