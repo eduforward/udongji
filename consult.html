@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=91"></script>
+  <script src="./udongji-nav.js?v=92"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -48,7 +48,13 @@
     .typebadge .tb.empty { background: var(--card-2); color: var(--text-3); font-weight: 600; }
     .typebadge small { font-size: 12px; color: var(--text-3); font-weight: 600; }
     .typebadge small b { color: var(--blue); }
-    .prevbar { margin-top: 14px; background: var(--amber-2); border-radius: var(--r-s); padding: 10px 14px; font-size: 13.5px; color: #7A4F0E; font-weight: 600; }
+    .prevbar { margin-top: 14px; background: var(--amber-2); border: 1px solid var(--amber-3); border-radius: var(--r-s); padding: 10px 14px; font-size: 13.5px; color: #7A4F0E; font-weight: 600; }
+    .prevbar .ph { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .prevbar .ph button { margin-left: auto; font: inherit; font-size: 12px; font-weight: 700; color: var(--text-2); background: var(--card); border: 1px solid var(--line); border-radius: var(--r-xs); padding: 3px 9px; cursor: pointer; }
+    .prevbar dl { display: grid; grid-template-columns: 96px 1fr; gap: 6px 10px; margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed var(--amber-3); font-size: 13.5px; line-height: 1.55; font-weight: 500; }
+    .prevbar dt { color: #A06A1A; font-weight: 700; font-size: 12px; padding-top: 2px; }
+    .prevbar dd { margin: 0; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+    .prevbar dd.hist { font-size: 12.5px; color: var(--text-2); } .prevbar dd.hist span { display: block; }
     .prevbar[hidden] { display: none; }
     section.step { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px 26px 24px; margin-top: 14px; scroll-margin-top: 70px; }
     section.step.off { display: none; }
@@ -171,7 +177,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="91"></udongji-nav>
+<udongji-nav current="consult" page-v="92"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -194,7 +200,17 @@
       <div><div class="kicker">우동지 · 네이버페이 커넥트 상담 스크립트 <b style="color:var(--purple)">v5</b></div><h1>상담 업무</h1><p>말풍선을 읽으며 진행하세요. <b style="color:var(--red)">필수</b>는 고객명·연락처와 <b>유형 판별 3개</b>(매장 구분·사업자 형태·대표 구성)이고, <b style="color:var(--amber)">권장</b> 칸은 채울 수 있는 만큼만 — 빠진 건 계약 업무에서 보완합니다. 매장 주소·사업자번호·생년월일·이메일은 <b>묻지 않아요</b> — 서류(사업자등록증·신분증·통장)에 다 있어요. 밴사도 언급하지 않습니다.</p></div>
       <div class="typebadge"><span class="tb {{ typeCls }}">{{ typeLabel }}</span><small>{{ installLabel }}</small></div>
     </header>
-    <div class="prevbar" hidden="{{ hidePrev }}">재연락 상담 — {{ prevTxt }} · "계약 업무로" 넘기면 같은 고객 기록이 갱신돼요.</div>
+    <div class="prevbar" hidden="{{ hidePrev }}">
+      <div class="ph"><b>재연락 상담</b> — {{ prevTxt }} · "계약 업무로" 넘기면 같은 고객 기록이 갱신돼요.<button type="button" onClick="{{ togglePrev }}">{{ prevBtn }}</button></div>
+      <sc-if value="{{ prevOpen }}" hint-placeholder-val="{{ true }}">
+      <dl>
+        <sc-if value="{{ prev.memo }}" hint-placeholder-val="{{ false }}"><dt>메모·특이사항</dt><dd>{{ prev.memo }}</dd></sc-if>
+        <sc-if value="{{ prev.next }}" hint-placeholder-val="{{ false }}"><dt>약속</dt><dd>{{ prev.next }}</dd></sc-if>
+        <sc-if value="{{ prev.hasHist }}" hint-placeholder-val="{{ false }}"><dt>재연락 이력</dt><dd class="hist"><sc-for list="{{ prev.hist }}" as="h" hint-placeholder-count="0"><span>{{ h }}</span></sc-for></dd></sc-if>
+        <sc-if value="{{ prev.empty }}" hint-placeholder-val="{{ false }}"><dt>메모</dt><dd style="color:var(--text-3)">지난 상담에 남긴 메모가 없어요.</dd></sc-if>
+      </dl>
+      </sc-if>
+    </div>
 
     <section class="step" id="s0" data-screen-label="0 경로">
       <div class="step-h"><div class="no">0</div><div class="t">유입 경로 — 시작 전에 먼저<small>Call-In 전화 문의 · Chat-In 채팅(카톡·채널톡) 문의 · Out 접수된 고객에게 우리가 연락. 인사말과 KPI 집계가 여기서 갈려요.</small></div></div>
@@ -414,7 +430,7 @@ class Component extends DCLogic {
     { const c = g('판매 물품'), CATS = ['음식·음료','미용','의류·잡화','화장품','교육']; if (c) { if (CATS.includes(c)) v.category = c; else { v.category = '기타'; v.categoryEtc = c; } } } v.naver = g('네이버 ID'); v.email = g('이메일');
     v.memo = g('특이사항');
     v.netReq = g('인터넷 상담 요청 일정') ? 'yes' : '';
-    v._id = it.id; v._prev = { 상담일: g('상담일'), 결과: g('상담 결과'), 일시: g('다음 액션 · 일시') };
+    v._id = it.id; v._prev = { 상담일: g('상담일'), 결과: g('상담 결과'), 일시: g('다음 액션 · 일시'), 메모: g('특이사항'), 이력: g('재연락 이력') };
     return v;
   }
   // 폼 값 → Firestore 기록 (COLS 열 이름)
@@ -562,6 +578,8 @@ class Component extends DCLogic {
       v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, greetAsk, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
+      prevOpen: this.state.prevOpen !== false, prevBtn: this.state.prevOpen !== false ? '접기' : '메모 보기', togglePrev: () => this.setState({ prevOpen: this.state.prevOpen === false }),
+      prev: (() => { const p = v._prev || {}; const hist = String(p.이력 || '').split('\n').filter(Boolean).reverse(); const memo = p.메모 || ''; return { memo, next: p.일시 || '', hist, hasHist: hist.length > 0, empty: !memo && !hist.length && !p.일시 }; })(),
       ch: { channel: v.channel ? 'ok' : '', mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
       typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
       hideBizEtc: !bizEtc, hideCatEtc: !catEtc, hideLarge: v.large !== 'over', hideNoReg: !noReg, hideSoon: !(daysToOpen !== null && daysToOpen >= 0 && daysToOpen < 4), daysToOpen: daysToOpen ?? '',
