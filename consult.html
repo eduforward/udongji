@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=92"></script>
+  <script src="./udongji-nav.js?v=93"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --amber-3:#F0DDB0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -55,6 +55,11 @@
     .prevbar dt { color: #A06A1A; font-weight: 700; font-size: 12px; padding-top: 2px; }
     .prevbar dd { margin: 0; color: var(--text); white-space: pre-wrap; word-break: break-word; }
     .prevbar dd.hist { font-size: 12.5px; color: var(--text-2); } .prevbar dd.hist span { display: block; }
+    .prevbar .ed { display: flex; flex-direction: column; gap: 8px; grid-column: 1 / -1; }
+    .prevbar .ed textarea { font: inherit; font-size: 13.5px; line-height: 1.5; padding: 9px 11px; border: 1px solid var(--amber-3); border-radius: var(--r-xs); background: var(--card); color: var(--text); min-height: 90px; resize: vertical; }
+    .prevbar .ed .row { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-3); font-weight: 500; }
+    .prevbar .ed .row button { font: inherit; font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: var(--r-xs); border: 1px solid var(--line); background: var(--card); color: var(--text-2); cursor: pointer; }
+    .prevbar .ed .row button.ok { background: var(--amber); border-color: var(--amber); color: #fff; } .prevbar .ed .row button:disabled { opacity: .45; cursor: default; }
     .prevbar[hidden] { display: none; }
     section.step { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px 26px 24px; margin-top: 14px; scroll-margin-top: 70px; }
     section.step.off { display: none; }
@@ -177,7 +182,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="92"></udongji-nav>
+<udongji-nav current="consult" page-v="93"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -201,13 +206,18 @@
       <div class="typebadge"><span class="tb {{ typeCls }}">{{ typeLabel }}</span><small>{{ installLabel }}</small></div>
     </header>
     <div class="prevbar" hidden="{{ hidePrev }}">
-      <div class="ph"><b>재연락 상담</b> — {{ prevTxt }} · "계약 업무로" 넘기면 같은 고객 기록이 갱신돼요.<button type="button" onClick="{{ togglePrev }}">{{ prevBtn }}</button></div>
+      <div class="ph"><b>재연락 상담</b> — {{ prevTxt }} · "계약 업무로" 넘기면 같은 고객 기록이 갱신돼요.<button type="button" onClick="{{ editPrevMemo }}" hidden="{{ prevEditing }}">메모 수정</button><button type="button" onClick="{{ togglePrev }}">{{ prevBtn }}</button></div>
       <sc-if value="{{ prevOpen }}" hint-placeholder-val="{{ true }}">
       <dl>
+        <sc-if value="{{ prevEditing }}" hint-placeholder-val="{{ false }}">
+        <div class="ed"><textarea value="{{ prevDraft }}" onInput="{{ onPrevDraft }}" placeholder="고객 메모·특이사항"></textarea><div class="row"><span>저장하면 고객 기록의 특이사항이 바로 바뀝어요 (상담 건수·재연락 횟수엔 영향 없음)</span><button type="button" class="ok" style="margin-left:auto" onClick="{{ savePrevMemo }}" disabled="{{ prevSaveOff }}">{{ prevSaveLabel }}</button><button type="button" onClick="{{ cancelPrevMemo }}">취소</button></div></div>
+        </sc-if>
+        <sc-if value="{{ prevNotEditing }}" hint-placeholder-val="{{ true }}">
         <sc-if value="{{ prev.memo }}" hint-placeholder-val="{{ false }}"><dt>메모·특이사항</dt><dd>{{ prev.memo }}</dd></sc-if>
+        <sc-if value="{{ prev.empty }}" hint-placeholder-val="{{ false }}"><dt>메모</dt><dd style="color:var(--text-3)">지난 상담에 남긴 메모가 없어요.</dd></sc-if>
+        </sc-if>
         <sc-if value="{{ prev.next }}" hint-placeholder-val="{{ false }}"><dt>약속</dt><dd>{{ prev.next }}</dd></sc-if>
         <sc-if value="{{ prev.hasHist }}" hint-placeholder-val="{{ false }}"><dt>재연락 이력</dt><dd class="hist"><sc-for list="{{ prev.hist }}" as="h" hint-placeholder-count="0"><span>{{ h }}</span></sc-for></dd></sc-if>
-        <sc-if value="{{ prev.empty }}" hint-placeholder-val="{{ false }}"><dt>메모</dt><dd style="color:var(--text-3)">지난 상담에 남긴 메모가 없어요.</dd></sc-if>
       </dl>
       </sc-if>
     </div>
@@ -579,6 +589,10 @@ class Component extends DCLogic {
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
       prevOpen: this.state.prevOpen !== false, prevBtn: this.state.prevOpen !== false ? '접기' : '메모 보기', togglePrev: () => this.setState({ prevOpen: this.state.prevOpen === false }),
+      prevEditing: !!this.state.prevEdit, prevNotEditing: !this.state.prevEdit, prevDraft: this.state.prevDraft || '', onPrevDraft: e => this.setState({ prevDraft: e.target.value }),
+      editPrevMemo: () => this.setState({ prevEdit: true, prevOpen: true, prevDraft: (v._prev && v._prev.메모) || '' }), cancelPrevMemo: () => this.setState({ prevEdit: false }),
+      prevSaveOff: !this.state.lib || !!this.state.prevSaving || (this.state.prevDraft || '') === ((v._prev && v._prev.메모) || ''), prevSaveLabel: this.state.prevSaving ? '저장 중…' : '메모 저장',
+      savePrevMemo: async () => { const lib = this.state.lib; if (!lib || !v._id) return; const memo = (this.state.prevDraft || '').trim(); this.setState({ prevSaving: true }); try { await lib.updateCells(v._id, { '특이사항': memo }); const nv = Object.assign({}, v, { memo, _prev: Object.assign({}, v._prev, { 메모: memo }) }); this.setDraft(nv); this.setState({ prevEdit: false, prevSaving: false }); try { window.dispatchEvent(new CustomEvent('udongji-record-saved', { detail: { id: v._id } })); } catch (e) {} } catch (e) { this.setState({ prevSaving: false }); alert('저장 실패: ' + (e.message || e)); } },
       prev: (() => { const p = v._prev || {}; const hist = String(p.이력 || '').split('\n').filter(Boolean).reverse(); const memo = p.메모 || ''; return { memo, next: p.일시 || '', hist, hasHist: hist.length > 0, empty: !memo && !hist.length && !p.일시 }; })(),
       ch: { channel: v.channel ? 'ok' : '', mode: v.mode ? 'on' : '', entity: v.entity ? 'on' : '', owners: v.owners ? 'on' : '', large: v.large === 'over' ? 'bad' : v.large ? 'ok' : '', install: v.bundle ? 'ok' : '' },
       typeCls: typed ? '' : 'empty', s3cls: isNew ? '' : 'off',
