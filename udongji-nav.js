@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v93 · 2026-10-05 14:20';
+  const VERSION = 'v94 · 2026-10-05 15:00';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 94, d: '2026-10-05', t: '15:00', c: ['신규문의를 "나에게 배정"하면 재연락이 아니라 "신규배정" 상태로 들어가요 — 상담 업무 재연락 목록·고객 목록에 파란 "신규배정" 배지, 목록에 신규배정 필터 추가. 실제 상담 후 재연락/계약/포기로 저장하면 그때 상태가 바뀌어요'] },
     { v: 93, d: '2026-10-05', t: '14:20', c: ['상담 업무: 재연락 고객 띠에 "메모 수정" 버튼 — 지난 메모를 바로 고쳐 저장 (상담 건수·재연락 횟수 영향 없음)'] },
     { v: 92, d: '2026-10-05', t: '13:50', c: ['상담 업무: 재연락 고객을 불러오면 설명 칸 아래 노란 띠에 지난 메모·특이사항, 약속, 재연락 이력이 바로 보여요 (접기 가능)'] },
     { v: 91, d: '2026-09-30', t: '15:00', c: ['상담 업무: 유형 판별 3칸(매장 구분·사업자 형태·대표 구성)이 빨간 "필수" 표시로 바뀌고 상단 안내문·사용법도 맞춰 수정'] },
@@ -70,7 +71,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 93;
+  const PAGE_V = 94;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -151,7 +152,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=30';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=31';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
@@ -201,7 +202,7 @@
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.leads = null; this.busy = ''; this.ev = ''; this.err = '';
       root.innerHTML = `<style>${leadsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">신규문의 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
       root.getElementById('head').onclick = () => { if (!this.leads || !this.leads.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=30';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=31';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; await this.load(); this._iv = setInterval(() => this.load(), 60000); this._on = () => this.load(); window.addEventListener('focus', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); }
@@ -245,7 +246,7 @@
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.items = null; this.filter = ''; this.err = '';
       root.innerHTML = `<style>${recallsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">재연락 고객 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
       root.getElementById('head').onclick = () => { if (!this.items || !this.items.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=30';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=31';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; this.me = me; await this.load(); this._iv = setInterval(() => this.load(), 120000); this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('udongji-lead-assigned', this._on); window.addEventListener('udongji-record-saved', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); window.removeEventListener('udongji-lead-assigned', this._on); window.removeEventListener('udongji-record-saved', this._on); }
@@ -263,11 +264,11 @@
       try {
         const { items } = await this.lib.readAll(); const V = (d, k) => this.lib.val(d, k); const me = this.me || {};
         const isPost = d => d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
-        const isRecall = d => d['상태'] !== '종료' && d['상담 결과'] !== '상담 거부' && (isPost(d) || d['상태'] === '재연락 예정' || d['상태'] === '보류');
+        const isRecall = d => d['상태'] !== '종료' && d['상담 결과'] !== '상담 거부' && (isPost(d) || d['상태'] === '재연락 예정' || d['상태'] === '보류' || d['상태'] === '신규배정');
         const t0 = new Date(); t0.setHours(0, 0, 0, 0);
         this.items = items.filter(it => isRecall(it.data)).filter(it => !me.name || V(it.data, '상담자') === me.name || (me.admin && !V(it.data, '상담자'))).map(it => {
           const d = it.data, dt = this.parseWhen(d['다음 액션 · 일시']); const days = dt ? Math.round((new Date(dt).setHours(0, 0, 0, 0) - t0) / 864e5) : null;
-          return { it, days, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d) };
+          return { it, days, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d), fresh: d['상태'] === '신규배정' };
         }).sort((a, b) => (a.days === null ? 9e9 : a.days) - (b.days === null ? 9e9 : b.days));
         this.err = '';
       } catch (e) { this.err = e.message || String(e); if (!this.items) this.items = []; }
@@ -275,16 +276,16 @@
     }
     paint() {
       const r = this.root, L = this.items || [], n = L.length, card = r.getElementById('card'), msg = r.getElementById('msg'), sub = r.getElementById('sub'), list = r.getElementById('list'), head = r.getElementById('head');
-      const nDue = L.filter(x => x.days !== null && x.days <= 0).length;
+      const nDue = L.filter(x => x.days !== null && x.days <= 0).length, nFresh = L.filter(x => x.fresh).length;
       card.classList.toggle('has', n > 0); card.classList.toggle('open', this.open && n > 0); head.disabled = n === 0;
       if (this.err && !n) { msg.className = 'msg none'; msg.textContent = '재연락 목록을 불러오지 못했어요'; sub.textContent = this.err; }
       else if (n === 0) { msg.className = 'msg none'; msg.textContent = '재연락할 고객이 없습니다'; sub.textContent = '상담을 재연락·보류로 마치면 여기에 쌓여요'; }
-      else { msg.className = 'msg'; msg.innerHTML = `재연락 고객이 <b>${n}명</b> 있습니다` + (nDue ? ` <span class="when due" style="margin-left:6px">오늘까지 ${nDue}</span>` : ''); sub.textContent = this.open ? '고객을 누르면 아래 상담 화면에 바로 불러와요' : '눌러서 목록 보기'; }
-      const V = this.filter ? L.filter(x => this.filter === 'due' ? (x.days === null || x.days <= 0) : (x.days !== null && x.days <= 2)) : L;
-      const cnt = { '': n, due: L.filter(x => x.days === null || x.days <= 0).length, soon: L.filter(x => x.days !== null && x.days <= 2).length };
-      const flt = `<div class="flt"><span>기간</span>${[['', '전체'], ['due', '오늘까지'], ['soon', '2일 후까지']].map(([k, l]) => `<button type="button" data-f="${k}" class="${this.filter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
+      else { msg.className = 'msg'; msg.innerHTML = `재연락 고객이 <b>${n}명</b> 있습니다` + (nFresh ? ` <span class="pill" style="margin-left:6px">신규배정 ${nFresh}</span>` : '') + (nDue ? ` <span class="when due" style="margin-left:6px">오늘까지 ${nDue}</span>` : ''); sub.textContent = this.open ? '고객을 누르면 아래 상담 화면에 바로 불러와요' : '눌러서 목록 보기'; }
+      const V = this.filter ? L.filter(x => this.filter === 'due' ? (x.days === null || x.days <= 0) : this.filter === 'fresh' ? x.fresh : (x.days !== null && x.days <= 2)) : L;
+      const cnt = { '': n, fresh: nFresh, due: L.filter(x => x.days === null || x.days <= 0).length, soon: L.filter(x => x.days !== null && x.days <= 2).length };
+      const flt = `<div class="flt"><span>기간</span>${[['', '전체'], ['fresh', '신규배정'], ['due', '오늘까지'], ['soon', '2일 후까지']].map(([k, l]) => `<button type="button" data-f="${k}" class="${this.filter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
       const tag = x => x.days === null ? `<span class="when">${x.when ? esc(x.when) : '일정 없음'}</span>` : x.days < 0 ? `<span class="when due">${-x.days}일 지남</span>` : x.days === 0 ? `<span class="when today">오늘</span>` : `<span class="when ${x.days <= 2 ? 'soon' : ''}">${x.days}일 후</span>`;
-      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px">${x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
       list.querySelectorAll('[data-f]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.filter = b.dataset.f; this.paint(); }; });
       list.querySelectorAll('.row').forEach(row => { row.onclick = () => { const x = V[+row.dataset.i]; const ev = new CustomEvent('udongji-recall-pick', { detail: { item: x.it }, cancelable: true }); const handled = !window.dispatchEvent(ev); if (!handled) location.href = (this.getAttribute('consult') || '우동지 상담 스크립트.dc.html') + '?id=' + encodeURIComponent(x.it.id); else { this.open = false; this.paint(); } }; });
     }
