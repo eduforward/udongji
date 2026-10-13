@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=94"></script>
+  <script src="./udongji-nav.js?v=95"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -171,7 +171,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="94"></udongji-nav>
+<udongji-nav current="contract" page-v="95"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -321,10 +321,11 @@
       <sc-if value="{{ tabSign }}" hint-placeholder-val="{{ false }}">
       <div class="sec">
         <h3>전자서명 <span class="pill {{ sel.signCls }}">{{ sel.signTag }}</span></h3>
-        <div class="note" style="margin-top:0">페이앤 접수 후 모두싸인 알림톡(카톡)으로 전자계약서가 발송돼요. 고객이 서명하면 페이앤 채널톡으로 알림이 옵니다. {{ sel.jointNote }}</div>
+        <div class="note" style="margin-top:0">페이앤 접수 후 모두싸인 알림톡(카톡)으로 전자계약서가 발송돼요. 고객이 서명하면 페이앤 채널톡으로 알림이 옵니다. 서명 완료 처리하면 우동지 활용 가이드 뉴스레터가 {{ sel.email }} 로 자동 등록돼요. {{ sel.jointNote }}</div>
         <div class="tbox"><h4>서명 요청 문자 <button type="button" class="btn" onClick="{{ copySignSms }}">복사</button></h4><textarea readonly value="{{ sel.signSms }}"></textarea></div>
         <div class="acts" style="padding-left:0;padding-right:0">
           <button type="button" class="btn ok" onClick="{{ completeSign }}" disabled="{{ sel.signDone }}">{{ sel.signBtn }}</button>
+          <sc-if value="{{ sel.showNl }}" hint-placeholder-val="{{ false }}"><span class="pill {{ sel.nlCls }}" style="align-self:center">{{ sel.nlTag }}</span><button type="button" class="btn" onClick="{{ resendNewsletter }}" disabled="{{ busy }}">뉴스레터 재전송</button></sc-if>
           <sc-if value="{{ sel.signIsDone }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ undoSign }}">서명 완료 취소</button></sc-if>
         </div>
       </div>
@@ -333,12 +334,11 @@
       <sc-if value="{{ tabInstall }}" hint-placeholder-val="{{ false }}">
       <div class="sec">
         <h3>커넥트 배송 <span class="pill {{ sel.installCls }}">{{ sel.installTag }}</span></h3>
-        <div class="note" style="margin-top:0">설치 방식: <b>{{ sel.installWay }}</b> · 색상 {{ sel.color }} · 랜선 {{ sel.lan }}. 배송 완료 처리하면 우동지 활용 가이드 뉴스레터가 {{ sel.email }} 로 자동 등록돼요.</div>
+        <div class="note" style="margin-top:0">설치 방식: <b>{{ sel.installWay }}</b> · 색상 {{ sel.color }} · 랜선 {{ sel.lan }}.</div>
         <div class="tbox"><h4>배송 안내 문자 <button type="button" class="btn" onClick="{{ copyInstallSms }}">복사</button></h4><textarea readonly value="{{ sel.installSms }}"></textarea></div>
         <div class="acts" style="padding-left:0;padding-right:0">
           <button type="button" class="btn ok" onClick="{{ completeInstall }}" disabled="{{ sel.installDone }}">{{ sel.installBtn }}</button>
           <sc-if value="{{ sel.installIsDone }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn" onClick="{{ undoInstall }}">배송 완료 취소</button></sc-if>
-          <sc-if value="{{ sel.showNl }}" hint-placeholder-val="{{ false }}"><span class="pill {{ sel.nlCls }}" style="align-self:center">{{ sel.nlTag }}</span><button type="button" class="btn" onClick="{{ resendNewsletter }}" disabled="{{ busy }}">뉴스레터 재전송</button></sc-if>
         </div>
       </div>
       </sc-if>
@@ -503,13 +503,13 @@ class Component extends DCLogic {
         handoffDone: stageDone(d, 'handoff') || busy, handoffBtn: stageDone(d, 'handoff') ? '✓ 페이앤 이관됨' : '이관 완료 처리', regTag: stageDone(d, 'handoff') ? '이관 ' + stageDate(d, 'handoff').slice(5) : '이관 전', regCls: stageDone(d, 'handoff') ? 'ok' : 'hot',
         payn: lib.buildPaynTSV(merged), sms: lib.buildSMS(d).text,
         signDone: stageDone(d, 'sign') || busy, signBtn: stageDone(d, 'sign') ? '✓ 전자서명 완료됨' : '전자서명 완료 처리', installDone: stageDone(d, 'install') || busy, installBtn: stageDone(d, 'install') ? '✓ 커넥트 배송 완료됨' : '커넥트 배송 완료 처리',
-        nlDone: !!String(d[lib.NEWSLETTER_COL] || '').trim(), nlTag: String(d[lib.NEWSLETTER_COL] || '').trim() ? '뉴스레터 등록 ' + String(d[lib.NEWSLETTER_COL]).slice(5) : '뉴스레터 미등록', nlCls: String(d[lib.NEWSLETTER_COL] || '').trim() ? 'ok' : 'hot', showNl: stageDone(d, 'install'),
+        nlDone: !!String(d[lib.NEWSLETTER_COL] || '').trim(), nlTag: String(d[lib.NEWSLETTER_COL] || '').trim() ? '뉴스레터 등록 ' + String(d[lib.NEWSLETTER_COL]).slice(5) : '뉴스레터 미등록', nlCls: String(d[lib.NEWSLETTER_COL] || '').trim() ? 'ok' : 'hot', showNl: stageDone(d, 'sign'),
         memo, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent(store) };
       steps = STAGES.map((s, i) => { const done = stageDone(d, s.key), prevDone = i === 0 || stageDone(d, STAGES[i - 1].key); return {
         key: s.key, label: s.label, date: done ? stageDate(d, s.key) : prevDone ? '진행 중' : '대기', cls: 'step' + (done ? ' done' : '') + (this.state.tab === s.key ? ' cur' : ''), title: s.label + ' 화면 열기',
         pick: () => this.setState({ tab: s.key }),
         undo: () => { if (!done) return; if (!confirm('"' + s.label + '" 완료를 취소할까요?')) return; const o = { [SC[s.key]]: '' }; if (s.key === 'handoff') o[lib.REG_COL] = ''; this.patch(rec, o, s.label + ' 완료 취소'); },
-        complete: () => { if (done) return; if (s.key === 'docs' && miss && !confirm('아직 필수 서류 ' + miss + '개를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; const o = { [SC[s.key]]: today }; if (s.key === 'install' && !V(d, '이메일') && !confirm('이메일이 없어서 뉴스레터를 보낼 수 없어요. 그래도 배송 완료로 처리할까요?')) return; this.patch(rec, o, s.label + ' 완료').then(ok => { if (ok && s.key === 'install') this.sendNewsletter(rec, false); }); }
+        complete: () => { if (done) return; if (s.key === 'docs' && miss && !confirm('아직 필수 서류 ' + miss + '개를 못 받았어요. 그래도 수취 완료로 처리할까요?')) return; const o = { [SC[s.key]]: today }; if (s.key === 'sign' && !V(d, '이메일') && !confirm('이메일이 없어서 뉴스레터를 보낼 수 없어요. 그래도 서명 완료로 처리할까요?')) return; this.patch(rec, o, s.label + ' 완료').then(ok => { if (ok && s.key === 'sign') this.sendNewsletter(rec, false); }); }
       }; });
       this._payn = { rec, dirtyKeys, active, pfDraft, pfMiss, stageDoneHandoff: stageDone(d, 'handoff'), P }; this._pg = photoGroups;
       // 단계별 탭 내용
