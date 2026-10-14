@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=95"></script>
+  <script src="./udongji-nav.js?v=96"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -78,10 +78,15 @@
     .empty { padding: 40px 20px; text-align: center; color: var(--text-3); }
     .x { margin-left: auto; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-3); border: 0; background: none; cursor: pointer; }
     .x:hover { color: var(--text); }
+    .btn.rep { background: var(--text); color: #fff; border-color: var(--text); } .btn.rep:hover { background: #2A3146; }
+    .rep-wrap .th { align-items: center; } .rep-wrap .th input { font: inherit; font-size: 13px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; }
+    .rep-wrap .grp { padding: 14px 18px 4px; font-size: 13.5px; font-weight: 800; display: flex; gap: 8px; align-items: center; } .rep-wrap .grp small { font-weight: 600; color: var(--text-3); }
+    .rep-wrap table { min-width: 760px; } .rep-wrap td { white-space: normal; vertical-align: top; } .rep-wrap td.act { font-size: 13px; line-height: 1.5; } .rep-wrap td.act b { color: var(--blue); }
+    .rep-wrap .pre { margin: 12px 18px 18px; padding: 12px 14px; background: var(--card-2); border: 1px solid var(--line); border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; color: var(--text-2); max-height: 320px; overflow: auto; }
     @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, minmax(0,1fr)); } }
   </style>
 </helmet>
-<udongji-nav current="kpi" page-v="95"></udongji-nav>
+<udongji-nav current="kpi" page-v="96"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>KPI 대시보드</b><small>상담사별 단계 전환율</small></div></div>
@@ -95,6 +100,7 @@
     <select class="f" value="{{ rateBase }}" onChange="{{ onRateBase }}"><option value="first">전환율: 신규 고객 대비</option><option value="step">전환율: 직전 단계 대비</option></select>
     <select class="f" value="{{ delayDays }}" onChange="{{ onDelay }}"><option value="5">지연 기준 5일</option><option value="3">지연 기준 3일</option><option value="7">지연 기준 7일</option><option value="14">지연 기준 14일</option></select>
     <button type="button" class="btn" onClick="{{ reload }}">새로고침</button>
+    <button type="button" class="btn rep" onClick="{{ toggleReport }}">{{ reportBtn }}</button>
     <span class="cnt {{ cntCls }}">{{ cntText }}</span>
   </div>
 
@@ -152,6 +158,24 @@
       <sc-if value="{{ drill.empty }}" hint-placeholder-val="{{ false }}"><div class="empty">해당 고객이 없어요.</div></sc-if>
     </div>
   </sc-if>
+  <sc-if value="{{ hasReport }}" hint-placeholder-val="{{ false }}">
+    <div class="tw rep-wrap" data-screen-label="업무 보고서">
+      <div class="th"><b>업무 보고서</b><input type="date" value="{{ report.date }}" onChange="{{ onReportDate }}"><span>{{ report.summary }}</span><button type="button" class="btn" style="margin-left:auto" onClick="{{ copyReport }}">{{ copyLabel }}</button><button type="button" class="x" style="margin-left:8px" onClick="{{ toggleReport }}">닫기 ×</button></div>
+      <sc-for list="{{ report.groups }}" as="g" hint-placeholder-count="0">
+        <div class="grp">{{ g.agent }} <small>{{ g.count }}건</small></div>
+        <table>
+          <thead><tr><th>고객</th><th>구분</th><th>오늘 진행</th><th>현재 상태</th><th>다음 액션</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="0">
+              <tr><td><b>{{ r.store }}</b><br><span class="dim" style="color:var(--text-3)">{{ r.name }} · {{ r.phone }}</span></td><td><span class="pill blue">{{ r.mode }}</span></td><td class="act">{{ r.acts }}</td><td><span class="pill {{ r.stCls }}">{{ r.status }}</span></td><td class="act">{{ r.next }}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </sc-for>
+      <sc-if value="{{ report.empty }}" hint-placeholder-val="{{ false }}"><div class="empty">이 날짜에 변경된 고객 기록이 없어요.</div></sc-if>
+      <div class="pre">{{ report.text }}</div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -183,6 +207,32 @@ class Component extends DCLogic {
   // 날짜 문자열 정규화: 2026-09-10 / 2026.9.10 / 9/10 등 → YYYY-MM-DD
   norm(s) { s = String(s || '').trim(); if (!s) return ''; let m = s.match(/(\d{4})[.\-\/]\s*(\d{1,2})[.\-\/]\s*(\d{1,2})/); if (m) return m[1] + '-' + m[2].padStart(2, '0') + '-' + m[3].padStart(2, '0'); m = s.match(/^(\d{1,2})[.\/](\d{1,2})/); if (m) return new Date().getFullYear() + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0'); return ''; }
   days(a, b) { return Math.floor((new Date(b) - new Date(a)) / 86400000); }
+  // 업무 보고서: 해당 날짜에 생성/수정된 고객을 담당자별로 묶고, 날짜가 찍힌 단계·재연락 이력·상태로 '오늘 한 일'을 추론
+  buildReport(date) {
+    const { lib, items } = this.state; if (!lib) return { date, groups: [], empty: true, text: '', summary: '' };
+    const V = (d, k) => lib.val(d, k), SC = lib.STAGE_COLS, md = date.slice(5).replace('-', '/'), kst = iso => { if (!iso) return ''; const t = new Date(iso); if (isNaN(t)) return ''; return this.ymd(t); };
+    const me = this.state.me || {}; const pool = me.admin ? items : items.filter(it => !me.name || V(it.data, '상담자') === me.name);
+    const rows = [];
+    for (const it of pool) {
+      const d = it.data, acts = []; const created = kst(it._createdAt) === date, touched = kst(it._updatedAt) === date;
+      const hist = String(V(d, '재연락 이력') || '').split('\n').filter(l => this.norm(l) === date);
+      if (created) acts.push(d['상태'] === '신규배정' ? '홈페이지 문의 배정' : '신규 상담 (' + (V(d, '유입 경로') || '경로 미입력') + ')');
+      hist.forEach(l => acts.push('재연락 통화 — ' + l.replace(/^\[?[\d.\-\/\s]+\]?\s*/, '').trim()));
+      [[SC.docs, '수취자료 완료'], [SC.info, '기본정보 완료'], [SC.handoff, '페이앤 이관'], [SC.sign, '전자서명 완료'], [SC.install, '커넥트 배송 완료']].forEach(([c, l]) => { if (this.norm(d[c]) === date) acts.push(l); });
+      if (this.norm(d[lib.NEWSLETTER_COL]) === date) acts.push('뉴스레터 등록');
+      if (!created && this.norm(V(d, '상담일')) === date && !hist.length) acts.push('상담 진행');
+      if (d['상담 결과'] === '상담 거부' && touched) acts.push('고객 포기' + (V(d, '포기 이유') ? ' — ' + V(d, '포기 이유') : ''));
+      if (!acts.length && touched) acts.push('기록 수정');
+      if (!acts.length) continue;
+      const so = lib.statusOf(d);
+      rows.push({ agent: V(d, '상담자') || '(상담자 없음)', store: V(d, '매장명') || '(매장명 없음)', name: V(d, '고객명'), phone: V(d, '연락처'), mode: V(d, '매장 구분') || '—', acts: acts.join(' · '), actList: acts, status: so.label, stCls: so.cls, next: V(d, '다음 액션 · 일시') || (so.key === 'done' || so.key === 'drop' ? '—' : '다음 단계 진행') });
+    }
+    const agents = [...new Set(rows.map(r => r.agent))].sort();
+    const groups = agents.map(a => { const rs = rows.filter(r => r.agent === a); return { agent: a, count: rs.length, rows: rs }; });
+    const lines = ['📋 우동지 업무보고 — ' + date + '  (총 ' + rows.length + '건 · 담당 ' + agents.length + '명)', ''];
+    groups.forEach(g => { lines.push('■ ' + g.agent + ' (' + g.count + '건)'); g.rows.forEach(r => { lines.push('• ' + r.store + (r.name ? ' / ' + r.name : '') + ' [' + r.mode + ']'); lines.push('   진행: ' + r.acts); lines.push('   상태: ' + r.status + (r.next && r.next !== '—' ? '  → 다음: ' + r.next : '')); }); lines.push(''); });
+    return { date, groups, empty: !rows.length, text: lines.join('\n').trim(), summary: rows.length ? '담당 ' + agents.length + '명 · 고객 ' + rows.length + '건' : '' };
+  }
   renderVals() {
     const { lib, items, loading, err, period, from, to, rateBase, delayDays, drill } = this.state;
     const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
@@ -235,7 +285,10 @@ class Component extends DCLogic {
       reload: () => this.load(), cntCls: err ? 'err' : '', cntText: err ? '오류: ' + err : loading ? '불러오는 중…' : isAdmin ? enriched.length + ' / ' + items.length + '건' : enriched.length + '건',
       rangeText: period === 'all' ? '전체 기간' : (from || '…') + ' ~ ' + (to || '…'),
       total, heads: STAGES.map(s => s.label), rows, noRows: !loading && !rows.length, emptyMsg: err ? '데이터를 읽지 못했어요.' : '기간 안에 상담 기록이 없어요.',
-      hasDrill: !!dr, drill: dr || { rows: [] }, closeDrill: () => this.setState({ drill: null })
+      hasDrill: !!dr, drill: dr || { rows: [] }, closeDrill: () => this.setState({ drill: null }),
+      hasReport: !!this.state.reportDate, reportBtn: this.state.reportDate ? '보고서 닫기' : '업무 보고서', toggleReport: () => this.setState({ reportDate: this.state.reportDate ? '' : today, copied: false }),
+      report: this.state.reportDate ? this.buildReport(this.state.reportDate) : { groups: [], text: '', date: '', summary: '' }, onReportDate: e => this.setState({ reportDate: e.target.value || today, copied: false }),
+      copyLabel: this.state.copied ? '복사됨 ✓' : '슬랙용 복사', copyReport: () => { const t = this.buildReport(this.state.reportDate || today).text; if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => { this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1500); }); }
     };
   }
 }
