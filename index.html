@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=97"></script>
+  <script src="./udongji-nav.js?v=98"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.14); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -119,7 +119,7 @@
     @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .row .m, .row .d { display: none; } }
   </style>
 </helmet>
-<udongji-nav current="home" page-v="97"></udongji-nav>
+<udongji-nav current="home" page-v="98"></udongji-nav>
 <div class="wrap">
   <div class="top">
     <img class="mark" src="favicon.svg" alt=""><div><h1>우동지CRM</h1><div class="sub">커넥트 상담 → 계약 → 배송</div></div>
@@ -146,7 +146,7 @@
       <div><h2>상담 업무</h2><p>스크립트 보면서 통화하고, 답변을 바로 기록. 재연락 고객과 신규문의도 상단 칸에서 불러와 이어서 상담해요.</p></div>
       <div class="foot"><sc-if value="{{ hasDraft }}" hint-placeholder-val="{{ false }}"><span class="pill draft">작성 중 · {{ draftName }}</span></sc-if><span class="pill purple">나의 오늘 {{ myToday }}건</span><span class="pill purple">나의 재연락 {{ myCall }}건</span><span class="pill">총 오늘 {{ todayCount }}건</span><span class="go">시작 →</span></div>
     </a>
-        </sc-if>
+    </sc-if>
     <a class="task contract" href="contract.html">
       <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path><path d="M8 17c1-1.5 2-1.5 3 0s2 1.5 3 0"></path></svg></div>
       <div><h2>{{ contractTitle }}</h2><p>{{ contractDesc }}</p></div>
@@ -221,7 +221,7 @@ class Component extends DCLogic {
     const inbox = inboxRaw.map(x => ({ store: x.store || x.customer || '(매장명 없음)', meta: [x.customer, x.phone, x.from + ' 님이 보냄', String(x.at || '').slice(5, 10)].filter(Boolean).join(' · '), accept: act(() => lib.acceptTransfer(x), '이관을 수락했어요'), reject: act(() => lib.rejectTransfer(x), '거절했어요') }));
     const outbox = outboxRaw.map(x => ({ store: x.store || x.customer || '(매장명 없음)', meta: [x.customer, x.to + ' 님에게', String(x.at || '').slice(5, 10)].filter(Boolean).join(' · '), cancel: act(() => lib.cancelTransfer(x), '요청을 취소했어요') }));
     const todayStr = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
-    const isGo = r => ((r.data || {})['상담 결과'] || '상담 진행') === '상담 진행';
+    const isGo = r => ((r.data || {})['상담 결과'] || '상담 진행') === '상담 진행' && (r.data || {})['상태'] !== '신규배정';
     const pending = records.filter(r => !r.registered && isGo(r));
     const recalls = records.filter(r => { const d = r.data || {}; return d['상태'] !== '종료' && (d['상태'] === '재연락 예정' || d['상태'] === '보류' || d['상태'] === '신규배정' || d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가'); });
     const callCount = recalls.length;

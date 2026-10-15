@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=97"></script>
+  <script src="./udongji-nav.js?v=98"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -101,7 +101,7 @@
     .vcap a { color: #fff; } .vcap button { border: 0; background: transparent; color: #FF8A94; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
   </style>
 </helmet>
-<udongji-nav current="customers" page-v="97"></udongji-nav>
+<udongji-nav current="customers" page-v="98"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>고객 목록</b><small>전체 상담 기록</small></div></div>
@@ -250,7 +250,7 @@ class Component extends DCLogic {
     const { lib, items, loading, err, query, filter, mode, agent, sortKey, sortDir, selRow, toast, toastOn, editing, draft, saving } = this.state;
     const V = (d, k) => lib ? lib.val(d, k) : String((d || {})[k] || '').trim();
     const REG = lib ? lib.REG_COL : '페이앤 등록', ID = lib ? lib.ID_COL : '레코드ID';
-    const isGo = d => (d['상담 결과'] || '상담 진행') === '상담 진행';
+    const isGo = d => (d['상담 결과'] || '상담 진행') === '상담 진행' && d['상태'] !== '신규배정';
     const isReg = d => !!String(d[REG] || '').trim();
     const isCall = d => d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
     const SO = d => lib ? lib.statusOf(d) : { key: 'docs', label: '—', cls: '' };
