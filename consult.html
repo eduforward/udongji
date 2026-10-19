@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=98"></script>
+  <script src="./udongji-nav.js?v=99"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --amber-3:#F0DDB0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -182,7 +182,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="98"></udongji-nav>
+<udongji-nav current="consult" page-v="99"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -236,7 +236,7 @@
 
     <section class="step" id="s1" data-screen-label="1 인사">
       <div class="step-h"><div class="no">1</div><div class="t">인사 · 기본정보<small>녹음 고지 포함. Out(접수 고객)은 통화 전 네이버 지도로 매장을 봐두고 확인만, Call-In·Chat-In은 매장명·업종을 직접 물어요.</small></div></div>
-      <div class="say"><span class="who">상담사</span>안녕하세요, 우동지 상담사 {{ agentName }}입니다. {{ greetLead }} 통화 품질을 위해 녹음됩니다. <span class="q">"접수 도와드리기 전에, 먼저 궁금하신 부분 있으실까요?"</span></div>
+      <div class="say"><span class="who">상담사</span>안녕하세요. {{ greetName }} 연락처 맞으실까요?<br>여기는 얼마 전에 신청하신 네이버 단말기 대리점입니다. 혹시 기억하실까요~?<br>네, 접수 진행 도와드리고자 전화드렸는데, <span class="q">"먼저 궁금하신 점 있으실까요~?"</span></div>
       <div class="say" style="background:#fafafa;border-left:3px solid #ddd"><span class="who" style="color:#888">진행</span><small style="color:#555;line-height:1.7">질문에 편하게 문답 (5단계 FAQ 참고). 상황에 따라 우동지 소개 — "저희는 네이버 커넥트 설치를 무료로 도와드리고, 서류 몇 가지만 주시면 접수부터 설치까지 제가 챙겨드려요." 고객이 접수 쪽으로 마음이 기울었다고 느껴지면 ↓</small></div>
       <div class="say"><span class="who">상담사</span><span class="q">"그럼 접수 도와드려도 될까요?"</span> <small style="color:#666">→ 동의하면 각 잡고 접수 시작: "{{ greetAsk }}"</small></div>
       <div class="fgrid">
@@ -585,7 +585,7 @@ class Component extends DCLogic {
       aiQuick: this.AI_QUICK.map(([label, text]) => ({ label, ask: () => this.aiAsk(text) })),
       aiOnQ: e => this.setAI({ q: e.target.value }), aiSend: e => { e.preventDefault(); this.aiAsk(ai.q); }, aiKey: e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); this.aiAsk(ai.q); } },
       aiClear: () => this.setAI({ msgs: [], q: '' }), aiLogRef: el => { this._aiLog = el; },
-      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetLead, greetAsk, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
+      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetName: (v.name || '').trim() ? v.name.trim() + '님' : '○○○님', greetLead, greetAsk, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
       prevOpen: this.state.prevOpen !== false, prevBtn: this.state.prevOpen !== false ? '접기' : '메모 보기', togglePrev: () => this.setState({ prevOpen: this.state.prevOpen === false }),
