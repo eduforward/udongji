@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=99"></script>
+  <script src="./udongji-nav.js?v=100"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --amber-3:#F0DDB0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -182,7 +182,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="99"></udongji-nav>
+<udongji-nav current="consult" page-v="100"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -396,13 +396,13 @@ class Component extends DCLogic {
   TEXT = ['name','phone','store','biz','bizEtc','addr','openDate','pos','term','bundle','category','categoryEtc','naver','email','memo'];
   OPTS = { sign:['yes','no'], channel:['callin','chatin','out'], mode:['existing','fresh'], entity:['person','corp'], owners:['single','joint'], large:['under','over','unknown'], reg:['done','pending'], lan:['yes','no','unknown','nonet'], wifi:['yes','no','unknown'], link:['yes','no'], color:['white','black'], status:['go'], netReq:['yes'] };
   LBL = { channel:{callin:'Call-In',chatin:'Chat-In',out:'Out'}, mode:{existing:'기존',fresh:'신규'}, entity:{person:'개인',corp:'법인'}, owners:{single:'단독',joint:'공동대표'}, large:{under:'3억 미만',over:'3억 이상',unknown:'모름'}, bundle:{cat:'커넥트 + 카드단말기',pos:'커넥트 + POS',printer:'커넥트 + POS',only:'커넥트만'}, color:{white:'화이트',black:'블랙'}, pos:{none:'없음',pc:'PC 포스',android:'안드로이드 태블릿',ios:'아이패드',laptop:'노트북 포스',unknown:'모름'}, term:{none:'없음·만료',short:'10개월 미만',long:'10개월 이상'}, lan:{yes:'있음',no:'없음',unknown:'모름',nonet:'인터넷 없음'}, wifi:{yes:'가능',no:'불가',unknown:'모름'} };
-  LINKS = { 'fresh|person|single':'841963','fresh|person|joint':'841961','fresh|corp|single':'841955','fresh|corp|joint':'841952','existing|person|single':'841968','existing|person|joint':'841965','existing|corp|single':'841959','existing|corp|joint':'841957' };
+  LINKS = { 'fresh|person|single':'862322','fresh|person|joint':'862319','fresh|corp|single':'862306','fresh|corp|joint':'862304','existing|person|single':'862331','existing|person|joint':'862329','existing|corp|single':'862310','existing|corp|joint':'862308' };
   BIZ = ['카페','음식점','미용·뷰티','의류·잡화','학원·교육'];
   loadDraft() { try { return JSON.parse(localStorage.getItem('udj_v5_draft') || '{}') || {}; } catch (e) { return {}; } }
   async componentDidMount() {
     this._onScroll = () => { const on = window.scrollY > 400; if (on !== this.state.showTop) this.setState({ showTop: on }); }; window.addEventListener('scroll', this._onScroll, { passive: true });
     try {
-      const lib = await import('./udongji-fb.js?v=31'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=32'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const meR = await lib.me().catch(() => ({})); if (meR.close) { location.replace('contract.html'); return; }
       const agent = await lib.myName().catch(() => '');
