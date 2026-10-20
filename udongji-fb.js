@@ -32,8 +32,7 @@ export function buildPayn(d) {
   L.push('· 인테리어 타공 : ' + v('인테리어 타공'));
   L.push('· 기기 색상 : ' + v('기기 색상'));
   if (!isNew) { L.push('· VAN 전산 유실적 : NICE ' + v('VAN 유실적 — NICE') + ' / KIS ' + v('VAN 유실적 — KIS')); L.push('· 기존 약정 : 잔여 ' + v('약정 잔여 개월') + '개월 / 월 ' + v('월 납부금') + '원'); }
-  L.push('· 특이사항 : ' + v('특이사항'));
-  L.push('· 기타 상담 내용 : ' + v('기타 상담 내용'));
+  if (v('기타 상담 내용')) L.push('· 기타 상담 내용 : ' + v('기타 상담 내용'));
   L.push('· 서류 : 통화 후 카톡 수취 예정' + (v('서류 분류') ? ' / ' + v('서류 분류') : ''));
   return L.join('\n');
 }
@@ -169,7 +168,7 @@ export const PAYN_FIELDS = [
   { k: 'printer', sec: 'E. 부가장비 신청', label: '영수증 프린터', opts: [NA, '유선 화이트', '유선 블랙', '무선'], src: d => NA },
   { k: 'drawer', sec: 'E. 부가장비 신청', label: '금전함', opts: [NA, '화이트', '블랙'], src: d => NA },
   { k: 'kiosk', sec: 'E. 부가장비 신청', label: '키오스크', opts: [NA, '단품', '스탠드', '베리어프리'], src: d => NA },
-  { k: 'note', sec: 'F. 기타', label: '특이사항 (페이앤 전달용)', multi: true, opt: true, src: d => val(d, '특이사항') }
+  { k: 'note', sec: 'F. 기타', label: '페이앤 전달사항', multi: true, opt: true, src: d => '' }
 ];
 export function paynCase(d) { const v = k => val(d, k); return { corp: v('대형/개인/법인') === '법인', joint: v('단독/공동') === '공동', isNew: v('매장 구분') === '신규 오픈', known: !!(v('대형/개인/법인') && v('단독/공동') && v('매장 구분')) }; }
 // 페이앤 채널톡 접수 워크플로 — 8케이스별 링크 (신규/기존 × 개인/법인 × 단독/공동)
