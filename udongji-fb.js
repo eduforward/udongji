@@ -336,10 +336,10 @@ export async function assignLead(lead) {
 }
 // ── AI 상담 도우미 (Cloud Function /ai, 로그인 토큰 필요) ──
 export const AI_URL = 'https://ai-cwxa2uzhya-du.a.run.app';
-export async function askAI(messages, context) {
+export async function askAI(messages, context, mode) {
   await init(); need();
   const tok = await _user.getIdToken();
-  const r = await fetch(AI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok }, body: JSON.stringify({ messages, context: context || '' }) });
+  const r = await fetch(AI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok }, body: JSON.stringify({ messages, context: context || '', mode: mode || '' }) });
   let j = {}; try { j = await r.json(); } catch (e) {}
   if (!r.ok || !j.ok) throw new Error(j.error || ('AI 서버 오류 ' + r.status));
   return j.text;
