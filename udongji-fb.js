@@ -174,6 +174,8 @@ export function paynCase(d) { const v = k => val(d, k); return { corp: v('대형
 // 페이앤 채널톡 접수 워크플로 — 8케이스별 링크 (신규/기존 × 개인/법인 × 단독/공동)
 export const PAYN_LINKS = { 'new|person|single': '862322', 'new|person|joint': '862319', 'new|corp|single': '862306', 'new|corp|joint': '862304', 'old|person|single': '862331', 'old|person|joint': '862329', 'old|corp|single': '862310', 'old|corp|joint': '862308' };
 export function paynLink(d) { const c = paynCase(d); if (!c.known) return null; const no = PAYN_LINKS[(c.isNew ? 'new' : 'old') + '|' + (c.corp ? 'corp' : 'person') + '|' + (c.joint ? 'joint' : 'single')]; return no ? { no, url: 'https://payn.channel.io/workflows/' + no, label: (c.isNew ? '신규' : '기존') + ' · ' + (c.corp ? '법인' : '개인') + ' · ' + (c.joint ? '공동대표' : '단독') } : null; }
+// 고객 이메일: 상담 열(이메일) 우선, 없으면 계약 업무 페이앤 양식에 입력한 이메일
+export function custEmail(d) { return val(d, '이메일') || val(d, PAYN_PREFIX + '가맹점 대표자 이메일'); }
 export function paynActive(d) { const c = paynCase(d); return PAYN_FIELDS.filter(f => !f.cond || (f.cond === 'corp' && c.corp) || (f.cond === 'joint' && c.joint) || (f.cond === 'newperson' && c.isNew && !c.corp)); }
 // 저장값 있으면 저장값, 없으면 상담 기록에서 미리 채움 (ro 필드는 항상 계산값)
 export function paynValue(d, f) { if (f.ro) return f.src(d); const saved = String(d[PAYN_PREFIX + f.label] || '').trim(); return saved || f.src(d); }
@@ -412,7 +414,7 @@ export async function listNewsletterLog() { await init(); need(); const { fs } =
 // 수령 완료 시 호출. 반환: {ok, skipped?, reason?}
 export async function notifyNewsletter(id, d, opts) {
   await init(); need(); const { fs } = _mods; opts = opts || {};
-  const cfg = await getNewsletterConfig(); const name = val(d, '고객명'), email = val(d, '이메일').toLowerCase(), store = val(d, '매장명');
+  const cfg = await getNewsletterConfig(); const name = val(d, '고객명'), email = custEmail(d).toLowerCase(), store = val(d, '매장명');
   const logIt = async (status, detail) => { try { await fs.addDoc(fs.collection(_db, 'newsletter_log'), { at: new Date().toISOString(), by: userEmail(), recordId: id, name, email, store, status, detail: detail || '' }); } catch (e) {} };
   if (!cfg.url || !cfg.secret) { return { ok: false, skipped: true, reason: '연동 미설정 (관리자 > 연동 설정)' }; }
   if (cfg.enabled === false) return { ok: false, skipped: true, reason: '연동 꺼짐' };
