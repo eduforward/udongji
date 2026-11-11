@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v103 · 2026-11-09 11:20';
+  const VERSION = 'v104 · 2026-11-11 10:20';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 104, d: '2026-11-11', t: '10:20', c: ['등록되지 않은 구글 계정으로 로그인하면 "등록되지 않은 계정" 안내 화면이 뜨고 자동 로그아웃돼요 — 로그인한 주소를 그대로 보여주니 관리자 계정관리의 오타를 바로 확인할 수 있어요'] },
     { v: 103, d: '2026-11-09', t: '11:20', c: ['계약 업무 기본정보(페이앤 양식)에 적은 이메일도 이제 인식해요 — 이메일이 있는데 "이메일이 없어서 뉴스레터를 못 보낸다"고 묻던 경고가 사라지고, 뉴스레터 등록도 그 이메일로 나가요'] },
     { v: 102, d: '2026-10-26', t: '15:30', c: ['모든 페이지 우측 하단에 "플레이스조 AI" 버튼 — 점주가 플레이스 순위·세팅·리뷰·키워드를 물어볼 때 조님 강의방 답변 기록을 근거로 바로 답해줘요. 대화는 탭을 닫기 전까지 유지'] },
     { v: 101, d: '2026-10-20', t: '10:40', c: ['내부 고객 메모(특이사항·재연락 이력)가 더 이상 페이앤 접수 양식·접수 텍스트로 넘어가지 않아요. 페이앤 "F. 기타" 칸은 "페이앤 전달사항"으로 비어 있고, 전달할 내용이 있을 때만 적으면 돼요', '계약 업무 진행 메모 위에 노란 "고객 히스토리" 칸 — 상담 메모와 재연락 이력이 그대로 보여요'] },
@@ -80,7 +81,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 103;
+  const PAGE_V = 104;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -137,6 +138,23 @@
     .he li + li { margin-top: 3px; }
     @media (max-width: 640px) { .who { display: none; } a.brand span { display: none; } .in { padding: 0 12px; } }
   `;
+  // 미등록 계정 게이트 — 구글 로그인은 되지만 users에 없으면 안내 화면 + 자동 로그아웃
+  function showUnregistered(email, m, home) {
+    if (document.getElementById('udongji-unreg')) return;
+    const d = document.createElement('div'); d.id = 'udongji-unreg';
+    d.style.cssText = "position:fixed;inset:0;z-index:99999;background:#F2F4F8;display:grid;place-items:center;padding:24px;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:#171C2B;letter-spacing:-0.01em";
+    d.innerHTML = `<div style="background:#fff;border-radius:16px;box-shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05);padding:28px 30px;max-width:460px;width:100%">
+      <div style="font-size:12px;font-weight:700;color:#D93A4A;letter-spacing:.04em;margin-bottom:8px">등록되지 않은 계정</div>
+      <div style="font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3;margin-bottom:12px">이 계정은 우동지 CRM에 등록되어 있지 않아요</div>
+      <div style="font-size:14px;color:#58627A;line-height:1.6">로그인한 주소<br><b style="color:#171C2B;font-size:16px;user-select:all">${esc(email)}</b></div>
+      <div style="margin-top:14px;padding:12px 14px;background:#FFF5E0;border-radius:10px;font-size:13px;color:#7A5A12;line-height:1.55">관리자에게 <b>위 주소 그대로</b> 등록을 요청하세요. 이미 등록했다면 관리자 → 계정관리에서 주소 철자(예: gmail)를 확인해 주세요.</div>
+      <div style="display:flex;gap:8px;margin-top:18px"><button type="button" id="unreg-copy" style="font:inherit;font-size:13px;font-weight:700;padding:10px 14px;border-radius:10px;border:1px solid #E4E8F0;background:#fff;color:#171C2B;cursor:pointer">주소 복사</button><button type="button" id="unreg-out" style="font:inherit;font-size:13px;font-weight:800;padding:10px 14px;border-radius:10px;border:0;background:#171C2B;color:#fff;cursor:pointer">다른 계정으로 로그인</button></div>
+    </div>`;
+    document.body.appendChild(d);
+    d.querySelector('#unreg-copy').onclick = e => { navigator.clipboard && navigator.clipboard.writeText(email); e.target.textContent = '복사됨'; };
+    d.querySelector('#unreg-out').onclick = async () => { try { await m.signOut(); } catch (e) {} location.href = home; };
+    m.signOut().catch(() => {});
+  }
   class UNav extends HTMLElement {
     connectedCallback() {
       try { document.body.style.paddingTop = '52px'; } catch (e) {}
@@ -162,7 +180,7 @@
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
       const lib = this.getAttribute('lib') || './udongji-fb.js?v=35';
-      import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
+      import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (!role) { showUnregistered(m.userEmail(), m, href(PAGES[0])); return; } if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
   if (!customElements.get('udongji-nav')) customElements.define('udongji-nav', UNav);
