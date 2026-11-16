@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v109 · 2026-11-16 20:20';
+  const VERSION = 'v110 · 2026-11-16 20:26';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 110, d: '2026-11-16', t: '20:26', c: ['상담 업무 위쪽 재연락 고객 목록에서 캘린더 버튼 왼쪽 메모 버튼으로 고객 메모만 바로 고칠 수 있어요 — 재연락·연락 횟수에는 들어가지 않아요'] },
     { v: 109, d: '2026-11-16', t: '20:20', c: ['상담 업무 위쪽 재연락 고객 목록에서 "이어서 상담" 왼쪽 캘린더 버튼으로 다음 연락 일정만 바로 고칠 수 있어요 — 잘못 잡은 일정을 고치는 용도라 재연락·연락 횟수에는 들어가지 않아요'] },
     { v: 108, d: '2026-11-16', t: '20:09', c: ['상담 업무의 재연락·고객 포기 창에서 아래 버튼(취소 · 부재중 · 재연락 저장)의 크기를 똑같이 맞췄어요'] },
     { v: 107, d: '2026-11-16', t: '20:03', c: ['상담 업무의 "재연락" 창에서 다음 연락 칸 오른쪽 캘린더 버튼으로 날짜를 고를 수 있어요', '같은 창에 "부재중" 버튼 추가 — 누르면 재연락으로 저장하면서 부재중 +1, "재연락 저장"은 연락 +1로 기록돼요 (고객 목록 이름 옆 배지에 반영)', '이미 연락된 고객(연1 이상)에게 "부재중"을 누르면 연락 +1로 세고, 부재중은 메모와 소통 이력에 남아요'] },
@@ -86,7 +87,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 109;
+  const PAGE_V = 110;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -362,6 +363,7 @@
     .pop .calw input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; pointer-events: none; }
     .pop .pv { padding: 6px 0 0; color: #1E9E66; font-weight: 600; font-size: 13px; min-height: 20px; }
     .pop .er { font-size: 12.5px; color: #D93A4A; font-weight: 600; margin-top: 6px; }
+    .pop textarea { display: block; width: 100%; box-sizing: border-box; min-height: 110px; resize: vertical; font: inherit; font-size: 14px; line-height: 1.5; padding: 9px 11px; border: 1px solid #E4E8F0; border-radius: 9px; background: #fff; color: #171C2B; }
     .pop .brow { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 16px; }
     .pop .brow .btn { justify-content: center; min-width: 104px; height: 38px; padding: 0 14px; }
   `;
@@ -431,10 +433,32 @@
       const cnt = { '': n, fresh: nFresh, due: L.filter(x => x.days === null || x.days <= 0).length, soon: L.filter(x => x.days !== null && x.days <= 2).length };
       const flt = `<div class="flt"><span>기간</span>${[['', '전체'], ['fresh', '신규배정'], ['due', '오늘까지'], ['soon', '2일 후까지']].map(([k, l]) => `<button type="button" data-f="${k}" class="${this.filter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
       const tag = x => x.days === null ? `<span class="when">${x.when ? esc(x.when) : '일정 없음'}</span>` : x.days < 0 ? `<span class="when due">${-x.days}일 지남</span>` : x.days === 0 ? `<span class="when today">오늘</span>` : `<span class="when ${x.days <= 2 ? 'soon' : ''}">${x.days}일 후</span>`;
-      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn cal" data-memo="${i}" aria-label="메모 수정" title="메모 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"></path><path d="M14 20v-5h5"></path><path d="M8 9h8"></path><path d="M8 13h4"></path></svg></button><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
       list.querySelectorAll('[data-cal]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openWhen(V[+b.dataset.cal]); }; });
+      list.querySelectorAll('[data-memo]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openMemo(V[+b.dataset.memo]); }; });
       list.querySelectorAll('[data-f]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.filter = b.dataset.f; this.paint(); }; });
       list.querySelectorAll('.row').forEach(row => { row.onclick = () => { const x = V[+row.dataset.i]; const ev = new CustomEvent('udongji-recall-pick', { detail: { item: x.it }, cancelable: true }); const handled = !window.dispatchEvent(ev); if (!handled) location.href = (this.getAttribute('consult') || '우동지 상담 스크립트.dc.html') + '?id=' + encodeURIComponent(x.it.id); else { this.open = false; this.paint(); } }; });
+    }
+    openMemo(x) { this.mm = { x, text: String(x.it.data['특이사항'] || ''), err: '', busy: false }; this.paintMemo(true); }
+    closeMemo() { this.mm = null; this.root.getElementById('pop').innerHTML = ''; }
+    paintMemo(build) {
+      const pop = this.root.getElementById('pop'), m = this.mm, $ = id => this.root.getElementById(id); if (!m) { pop.innerHTML = ''; return; }
+      if (build) {
+        pop.innerHTML = `<div class="scrim" id="mScrim"></div><div class="pop" role="dialog" aria-modal="true" aria-labelledby="mT"><h3 id="mT">메모 수정</h3><p>${esc(m.x.name)} — 메모만 바꿔요. 재연락·연락 횟수에는 들어가지 않아요.</p><label for="mText">메모</label><textarea id="mText" rows="5" placeholder="부재중 · 사업자등록증 나오면 등"></textarea><div class="er" id="mErr" hidden></div><div class="brow"><button type="button" class="btn" id="mNo">취소</button><button type="button" class="btn primary" id="mOk">메모 저장</button></div></div>`;
+        $('mText').value = m.text;
+        $('mScrim').onclick = () => this.closeMemo(); $('mNo').onclick = () => this.closeMemo(); $('mOk').onclick = () => this.saveMemo();
+        $('mText').oninput = e => { m.text = e.target.value; };
+        $('mText').onkeydown = e => { if (e.key === 'Escape') this.closeMemo(); else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) this.saveMemo(); };
+        setTimeout(() => { try { const t = $('mText'); t.focus(); t.setSelectionRange(t.value.length, t.value.length); } catch (e) {} }, 0);
+      }
+      $('mErr').hidden = !m.err; $('mErr').textContent = m.err;
+      $('mOk').disabled = !!m.busy; $('mOk').textContent = m.busy ? '저장 중…' : '메모 저장';
+    }
+    async saveMemo() {
+      const m = this.mm; if (!m || m.busy) return;
+      m.busy = true; this.paintMemo();
+      try { await this.lib.updateCells(m.x.it.id, { '특이사항': m.text.trim() }); this.closeMemo(); await this.load(); }
+      catch (e) { m.busy = false; m.err = '저장 실패: ' + (e.message || e); this.paintMemo(); }
     }
     openWhen(x) {
       const cur = String(x.it.data['다음 액션 · 일시'] || '').trim(), r = whenParse(cur);
