@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=111"></script>
+  <script src="./udongji-nav.js?v=112"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -113,7 +113,7 @@
     .vcap a { color: #fff; } .vcap button { border: 0; background: transparent; color: #FF8A94; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
   </style>
 </helmet>
-<udongji-nav current="customers" page-v="111"></udongji-nav>
+<udongji-nav current="customers" page-v="112"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>고객 목록</b><small>전체 상담 기록</small></div></div>
@@ -171,6 +171,7 @@
         <button type="button" class="btn" onClick="{{ copyPayn }}">접수 양식 복사</button>
         <button type="button" class="btn" onClick="{{ copySms }}">안내 문자 복사</button>
         <button type="button" class="btn" onClick="{{ openTransfer }}">이관</button>
+        <sc-if value="{{ sel.canDrop }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn danger" onClick="{{ openDrop }}">고객 포기</button></sc-if>
         <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn danger" onClick="{{ remove }}">삭제</button></sc-if>
       </sc-if>
       <sc-if value="{{ editing }}" hint-placeholder-val="{{ false }}">
@@ -208,6 +209,19 @@
           <div class="vcap" onClick="{{ stop }}"><span>{{ f.name }}</span><a href="{{ f.url }}" target="_blank" rel="noopener">원본 열기</a><button type="button" onClick="{{ f.remove }}">삭제</button></div>
         </sc-for>
       </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasDrop }}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" style="z-index:45" onClick="{{ closeDrop }}"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="dropT" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);background:var(--card);border-radius:16px;box-shadow:0 8px 30px rgba(20,27,45,.16);padding:22px 24px;z-index:46">
+      <h3 id="dropT" style="font-size:17px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">고객 포기</h3>
+      <p style="font-size:13.5px;color:var(--text-2);margin-bottom:12px">{{ drop.sub }}</p>
+      <div style="font-size:12px;font-weight:700;color:var(--text-2);margin:10px 0 5px">포기 이유 <b style="color:var(--red)">* 필수</b></div>
+      <select aria-label="포기 이유" style="width:100%;font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)" value="{{ drop.reason }}" onChange="{{ onDropReason }}"><option value="">선택하세요</option><option>타사 계약·이미 사용 중</option><option>조건 불만족 (수수료·약정·위약금)</option><option>인터넷·설치 환경 불가</option><option>사업자등록증 미발급·폐업</option><option>연락 두절 (3회 이상 부재)</option><option>관심 없음·거부</option><option>기타</option></select>
+      <div style="font-size:12px;font-weight:700;color:var(--text-2);margin:10px 0 5px">상세 (선택 · 기타면 필수)</div>
+      <textarea aria-label="상세" rows="2" style="display:block;width:100%;font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)" value="{{ drop.note }}" onInput="{{ onDropNote }}" placeholder="어떤 말씀을 하셨는지 한 줄"></textarea>
+      <sc-if value="{{ drop.hasErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:var(--red);font-weight:600;margin-top:6px">{{ drop.err }}</div></sc-if>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button type="button" class="btn" style="min-width:104px;height:38px" onClick="{{ closeDrop }}">취소</button><button type="button" class="btn danger" style="min-width:104px;height:38px" onClick="{{ saveDrop }}" disabled="{{ drop.off }}">{{ drop.ok }}</button></div>
     </div>
   </sc-if>
   <sc-if value="{{ hasDraftNotice }}" hint-placeholder-val="{{ false }}">
@@ -260,7 +274,7 @@ class Component extends DCLogic {
       lib.listUsers().then(users => this.setState({ users })).catch(() => {});
     } catch (e) { location.replace('index.html#login'); }
     this._on = () => { if (this.state.selRow || this.state.uploading || this.state.saving) return; this.load(); }; window.addEventListener('focus', this._on);
-    this._esc = e => { if (e.key === 'Escape') this.setState(this.state.draftNotice ? { draftNotice: '' } : this.state.commNotice ? { commNotice: false } : this.state.viewDoc ? { viewDoc: null } : this.state.editing ? { editing: false, draft: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
+    this._esc = e => { if (e.key === 'Escape') this.setState(this.state.drop ? { drop: null } : this.state.draftNotice ? { draftNotice: '' } : this.state.commNotice ? { commNotice: false } : this.state.viewDoc ? { viewDoc: null } : this.state.editing ? { editing: false, draft: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('keydown', this._esc); }
   async load() {
@@ -312,7 +326,7 @@ class Component extends DCLogic {
     let sel = {}, groups = [];
     if (rec) {
       const d = rec.data, ri = regInfo(d), addr = V(d, '매장 주소'), store = V(d, '매장명');
-      sel = { comm: CM(d).short, commCls: CM(d).cls, commTitle: CM(d).label, commLabel: CM(d).label, missOff: commBusy || !CM(d).canMiss, undoOff: commBusy || !CM(d).canUndo, store: store || V(d, '고객명') || '(매장명 없음)', sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '업종'), addr].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '구분 없음', regTag: ri.tag, regCls: ri.cls, status: V(d, '상태') || '—', agent: V(d, '상담자') ? '상담 ' + V(d, '상담자') : '상담자 미입력', row: rec.row,
+      sel = { canDrop: SO(d).key !== 'drop', comm: CM(d).short, commCls: CM(d).cls, commTitle: CM(d).label, commLabel: CM(d).label, missOff: commBusy || !CM(d).canMiss, undoOff: commBusy || !CM(d).canUndo, store: store || V(d, '고객명') || '(매장명 없음)', sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '업종'), addr].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '구분 없음', regTag: ri.tag, regCls: ri.cls, status: V(d, '상태') || '—', agent: V(d, '상담자') ? '상담 ' + V(d, '상담자') : '상담자 미입력', row: rec.row,
         regHref: ['assigned', 'recall'].includes(SO(d).key) ? 'consult.html?id=' + encodeURIComponent(rec.row) : 'contract.html#' + (d[ID] || 'row' + rec.row), openLabel: ['assigned', 'recall'].includes(SO(d).key) ? '상담 업무에서 열기 →' : '계약 업무에서 열기 →', mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent(store) };
       const isNew = d['매장 구분'] === '신규 오픈', isOld = d['매장 구분'] === '기존 운영';
       const src = editing && draft ? draft : d;
@@ -381,6 +395,17 @@ class Component extends DCLogic {
       },
       copyPayn: () => rec && lib && this.copy(lib.buildPaynTSV(rec.data), '페이앤 접수 양식'), copySms: () => rec && lib && this.copy(lib.buildSMS(rec.data).text, '안내 문자'),
       toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast,
+      hasDrop: !!this.state.drop, drop: this.state.drop ? Object.assign({ hasErr: !!this.state.drop.err, off: !!this.state.drop.busy, ok: this.state.drop.busy ? '처리 중…' : '포기 처리', sub: (sel.store || '') + ' — 진행을 여기서 중단해요. 이유는 반드시 남겨야 하고, 고객 목록에는 남습니다.' }, this.state.drop) : {},
+      closeDrop: () => this.setState({ drop: null }),
+      onDropReason: e => this.setState({ drop: Object.assign({}, this.state.drop, { reason: e.target.value, err: '' }) }), onDropNote: e => this.setState({ drop: Object.assign({}, this.state.drop, { note: e.target.value, err: '' }) }),
+      openDrop: () => { if (rec) this.setState({ drop: { reason: '', note: '', err: '', busy: false } }); },
+      saveDrop: async () => {
+        const dp = this.state.drop; if (!dp || dp.busy || !rec || !lib) return; const setD = p => this.setState({ drop: Object.assign({}, this.state.drop, p) });
+        if (!dp.reason) return setD({ err: '포기 이유를 선택해야 저장할 수 있어요.' }); if (dp.reason === '기타' && !dp.note.trim()) return setD({ err: '"기타"는 상세 내용을 적어주세요.' });
+        setD({ busy: true, err: '' });
+        try { await lib.updateCells(rec.row, { '상담 결과': '상담 거부', '상태': '종료', '포기 이유': dp.reason + (dp.note.trim() ? ' — ' + dp.note.trim() : ''), '다음 액션 · 일시': '' }); this.setState({ drop: null }); this.toast('포기 처리했어요'); await this.load(); }
+        catch (e) { setD({ busy: false, err: '저장 실패: ' + e.message }); }
+      },
       hasDraftNotice: !!this.state.draftNotice, draftNoticeSub: '상담 업무에 "' + (this.state.draftNotice || '') + '" 상담이 작성 중이에요. 저장하거나 "새 상담"으로 비운 뒤 다시 열어 주세요.', closeDraftNotice: () => this.setState({ draftNotice: '' }), consultHref: 'consult.html',
       openMain: e => { if (!rec || !['assigned', 'recall'].includes(SO(rec.data).key)) return; let dr = null; try { dr = JSON.parse(localStorage.getItem('udj_v5_draft') || 'null'); } catch (er) {} if (dr && (dr.name || dr.phone) && dr._id !== rec.row) { e.preventDefault(); this.setState({ draftNotice: dr.store || dr.name || '이름 미입력' }); } },
       commBusy, hasCommNotice: !!this.state.commNotice, closeCommNotice: () => this.setState({ commNotice: false }),

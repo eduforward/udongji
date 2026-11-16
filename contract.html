@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=111"></script>
+  <script src="./udongji-nav.js?v=112"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -171,7 +171,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="111"></udongji-nav>
+<udongji-nav current="contract" page-v="112"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -213,7 +213,7 @@
 
   <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><div class="scrim" onClick="{{ close }}"></div></sc-if>
   <aside class="drawer {{ drawerCls }}">
-    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div><div style="margin-top:7px"><button type="button" class="casebtn" onClick="{{ toggleCase }}" title="고객 유형 변경 — 서류 목록·접수 링크·기본정보가 이 유형을 따라가요">{{ sel.caseLabel }} <small>{{ caseBtnHint }}</small></button></div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
+    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div><div style="margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="casebtn" onClick="{{ toggleCase }}" title="고객 유형 변경 — 서류 목록·접수 링크·기본정보가 이 유형을 따라가요">{{ sel.caseLabel }} <small>{{ caseBtnHint }}</small></button><button type="button" class="btn danger" style="padding:3px 10px;font-size:12px;border-radius:999px" onClick="{{ openDrop }}">고객 포기</button></div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
     <sc-if value="{{ caseOpen }}" hint-placeholder-val="{{ false }}">
     <div class="casebox">
       <h4>고객 유형 변경</h4>
@@ -357,6 +357,19 @@
       </div>
     </div>
   </aside>
+  <sc-if value="{{ hasDrop }}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" style="z-index:90" onClick="{{ closeDrop }}"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="dropT" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);background:var(--card);border-radius:16px;box-shadow:0 8px 30px rgba(20,27,45,.16);padding:22px 24px;z-index:91">
+      <h3 id="dropT" style="font-size:17px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">고객 포기</h3>
+      <p style="font-size:13.5px;color:var(--text-2);margin-bottom:12px">{{ drop.sub }}</p>
+      <div style="font-size:12px;font-weight:700;color:var(--text-2);margin:10px 0 5px">포기 이유 <b style="color:var(--red)">* 필수</b></div>
+      <select aria-label="포기 이유" style="width:100%;font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)" value="{{ drop.reason }}" onChange="{{ onDropReason }}"><option value="">선택하세요</option><option>타사 계약·이미 사용 중</option><option>조건 불만족 (수수료·약정·위약금)</option><option>인터넷·설치 환경 불가</option><option>사업자등록증 미발급·폐업</option><option>연락 두절 (3회 이상 부재)</option><option>관심 없음·거부</option><option>기타</option></select>
+      <div style="font-size:12px;font-weight:700;color:var(--text-2);margin:10px 0 5px">상세 (선택 · 기타면 필수)</div>
+      <textarea aria-label="상세" rows="2" style="display:block;width:100%;font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)" value="{{ drop.note }}" onInput="{{ onDropNote }}" placeholder="어떤 말씀을 하셨는지 한 줄"></textarea>
+      <sc-if value="{{ drop.hasErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:var(--red);font-weight:600;margin-top:6px">{{ drop.err }}</div></sc-if>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button type="button" class="btn" style="min-width:104px;height:38px" onClick="{{ closeDrop }}">취소</button><button type="button" class="btn danger" style="min-width:104px;height:38px" onClick="{{ saveDrop }}" disabled="{{ drop.off }}">{{ drop.ok }}</button></div>
+    </div>
+  </sc-if>
   <div class="{{ toastCls }}">{{ toastMsg }}</div>
 </div>
 </x-dc>
@@ -371,7 +384,7 @@ class Component extends DCLogic {
       this.setState({ lib, me }, () => this.load(true));
     } catch (e) { location.replace('index.html#login'); }
     this._on = () => { if (this.state.selRow || this.state.busy) return; this.load(false); }; window.addEventListener('focus', this._on);
-    this._esc = e => { if (e.key === 'Escape') this.setState({ selRow: null }); }; window.addEventListener('keydown', this._esc);
+    this._esc = e => { if (e.key === 'Escape') this.setState(this.state.drop ? { drop: null } : { selRow: null }); }; window.addEventListener('keydown', this._esc);
   }
   componentWillUnmount() { window.removeEventListener('focus', this._on); window.removeEventListener('keydown', this._esc); }
   async load(first) {
@@ -587,6 +600,17 @@ class Component extends DCLogic {
       completeHandoff: () => { const p = this._payn; if (!p || p.stageDoneHandoff) return; if (p.dirtyKeys.length) { this.toast('바꾼 내용을 먼저 저장하세요'); return; } if (p.pfMiss.length && !confirm('미입력·오류 ' + p.pfMiss.length + '칸이 있어요. 그래도 이관 완료로 처리할까요?')) return; this.patch(p.rec, { [SC.handoff]: today, [lib.REG_COL]: today }, '페이앤 이관 완료'); },
       copyPayn: () => { if (sel.payn) this.copy(sel.payn, '페이앤 접수 양식 (탭 구분 2열)'); },
       copySms: () => { if (sel.sms) this.copy(sel.sms, '안내 문자'); },
+      hasDrop: !!this.state.drop, drop: this.state.drop ? Object.assign({ hasErr: !!this.state.drop.err, off: !!this.state.drop.busy, ok: this.state.drop.busy ? '처리 중…' : '포기 처리', sub: (sel.store || '') + ' — 진행을 여기서 중단해요. 이유는 반드시 남겨야 하고, 고객 목록에는 남습니다.' }, this.state.drop) : {},
+      closeDrop: () => this.setState({ drop: null }),
+      onDropReason: e => this.setState({ drop: Object.assign({}, this.state.drop, { reason: e.target.value, err: '' }) }), onDropNote: e => this.setState({ drop: Object.assign({}, this.state.drop, { note: e.target.value, err: '' }) }),
+      openDrop: () => { if (!rec || !lib) return; if (lib.statusOf(rec.data).key === 'drop') { this.toast('이미 포기 처리된 고객이에요'); return; } this.setState({ drop: { reason: '', note: '', err: '', busy: false } }); },
+      saveDrop: async () => {
+        const dp = this.state.drop; if (!dp || dp.busy || !rec || !lib) return; const setD = p => this.setState({ drop: Object.assign({}, this.state.drop, p) });
+        if (!dp.reason) return setD({ err: '포기 이유를 선택해야 저장할 수 있어요.' }); if (dp.reason === '기타' && !dp.note.trim()) return setD({ err: '"기타"는 상세 내용을 적어주세요.' });
+        setD({ busy: true, err: '' });
+        const ok = await this.patch(rec, { '상담 결과': '상담 거부', '상태': '종료', '포기 이유': dp.reason + (dp.note.trim() ? ' — ' + dp.note.trim() : ''), '다음 액션 · 일시': '' });
+        if (ok) { this.setState({ drop: null, selRow: null, pfDraft: {}, seq: 0, copied: {}, caseOpen: false }); this.toast('포기 처리했어요 — 계약 업무 목록에서 빠져요'); } else setD({ busy: false });
+      },
       completeInstall: () => { const s = steps.find(x => x.key === 'install'); if (s) s.complete(); }, resendNewsletter: () => { if (rec) this.sendNewsletter(rec, true); }, close: () => { clearTimeout(this._memoT); if (this.state.memoDirty) this.saveMemoNow(); this.setState({ selRow: null, pfDraft: {}, seq: 0, copied: {}, caseOpen: false }); },
       onMemo: e => { const v = e.target.value; this.setState({ memo: v, memoDirty: true }); clearTimeout(this._memoT); this._memoT = setTimeout(() => this.saveMemoNow(), 1000); },
       saveMemo: () => { clearTimeout(this._memoT); this.saveMemoNow(); },
