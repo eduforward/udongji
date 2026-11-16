@@ -96,6 +96,39 @@ export function statusOf(d) {
   if (has(STAGE_COLS.docs)) return { key: 'info', label: '기본정보진행', cls: 'blue' };
   return { key: 'docs', label: '수취자료진행', cls: 'blue' };
 }
+// ── 소통 상태 (이름 옆 배지): 신규 → 부1·부2·부3(부재중, 신규 고객이 전화를 안 받음) → 연1·연2…(연락, 계속 카운트) ──
+export const MISS_COL = '부재중 횟수', TALK_COL = '연락 횟수', COMM_LOG_COL = '소통 이력', MISS_MAX = 3;
+const commCnt = (d, k) => { const n = parseInt(String((d || {})[k] || '').replace(/\D/g, ''), 10); return n > 0 ? n : 0; };
+export function commOf(d) {
+  d = d || {}; const miss = commCnt(d, MISS_COL), stored = commCnt(d, TALK_COL);
+  // 횟수 기록이 없으면 추정하지 않는다: 신규배정(아직 손대기 전)은 신규, 한 번이라도 데이터 작업을 한 고객은 무(미설정)
+  const talk = stored;
+  const base = { miss, talk, canMiss: talk === 0 && miss < MISS_MAX, canUndo: talk > 0 || miss > 0 };
+  if (talk > 0) return Object.assign(base, { kind: 'talk', n: talk, short: '연' + talk, label: '연락 ' + talk + '회', cls: 'talk' });
+  if (miss > 0) return Object.assign(base, { kind: 'miss', n: miss, short: '부' + miss, label: '부재중 ' + miss + '회 · 아직 통화 전', cls: 'miss' });
+  if (String(d['상태'] || '').trim() === '신규배정') return Object.assign(base, { kind: 'new', n: 0, short: '신규', label: '신규 · 아직 연락 전', cls: 'new' });
+  return Object.assign(base, { kind: 'none', n: 0, short: '무', label: '무 · 소통 기록 없음', cls: 'none' });
+}
+function commStamp() { const t = new Date(), p = n => String(n).padStart(2, '0'); return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()) + ' ' + p(t.getHours()) + ':' + p(t.getMinutes()); }
+async function commSave(id, d, patch, note) {
+  const next = commOf(Object.assign({}, d, patch)), who = await myName().catch(() => ''), prev = String((d || {})[COMM_LOG_COL] || '').trim();
+  patch[COMM_LOG_COL] = (prev ? prev + '\n' : '') + '[' + commStamp() + '] ' + (note || '') + next.short + (who ? ' · ' + who : '');
+  await updateCells(id, patch); return next;
+}
+// kind: 'miss' = 부재중 +1 (통화 전 · 최대 3회), 'talk' = 연락 +1 (제한 없음). 반환: 바뀐 뒤의 소통 상태
+export async function commBump(id, d, kind) {
+  const c = commOf(d), patch = {};
+  if (kind === 'miss') { if (c.talk > 0) throw new Error('이미 통화한 고객은 부재중으로 기록하지 않아요'); if (c.miss >= MISS_MAX) throw new Error('부재중은 ' + MISS_MAX + '회까지 기록해요'); patch[MISS_COL] = String(c.miss + 1); }
+  else patch[TALK_COL] = String(c.talk + 1);
+  return commSave(id, d, patch);
+}
+// 잘못 누른 기록 한 단계 되돌리기
+export async function commUndo(id, d) {
+  const miss = commCnt(d, MISS_COL), talk = commCnt(d, TALK_COL);
+  if (talk > 0) return commSave(id, d, { [TALK_COL]: talk > 1 ? String(talk - 1) : '' }, '되돌림 → ');
+  if (miss > 0) return commSave(id, d, { [MISS_COL]: miss > 1 ? String(miss - 1) : '' }, '되돌림 → ');
+  throw new Error('되돌릴 기록이 없어요');
+}
 // 고객 조건에 따라 필요 서류 목록
 export function requiredDocs(d) {
   const v = k => val(d, k), corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동';
@@ -304,7 +337,7 @@ export async function updateRecord(id, d) {
   const ref = fs.doc(_db, COL, id); const cur = await fs.getDoc(ref); const keep = cur.exists() ? cur.data() : {};
   const patch = cleanIn(d);
   // 계약 진행 열은 상담 폼이 덮어쓰지 않도록 보존
-  [REG_COL, DOC_CHECK_COL, DOC_FILES_COL, PROGRESS_NOTE_COL, ...Object.values(STAGE_COLS)].forEach(k => { if (keep[k] !== undefined && (patch[k] === undefined || patch[k] === '')) patch[k] = keep[k]; });
+  [REG_COL, DOC_CHECK_COL, DOC_FILES_COL, PROGRESS_NOTE_COL, MISS_COL, TALK_COL, COMM_LOG_COL, ...Object.values(STAGE_COLS)].forEach(k => { if (keep[k] !== undefined && (patch[k] === undefined || patch[k] === '')) patch[k] = keep[k]; });
   await fs.setDoc(ref, Object.assign(patch, { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true });
 }
 export async function updateCells(id, obj) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, COL, id), Object.assign(cleanIn(obj), { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true }); }
