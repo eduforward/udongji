@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v108 · 2026-11-16 20:09';
+  const VERSION = 'v109 · 2026-11-16 20:20';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 109, d: '2026-11-16', t: '20:20', c: ['상담 업무 위쪽 재연락 고객 목록에서 "이어서 상담" 왼쪽 캘린더 버튼으로 다음 연락 일정만 바로 고칠 수 있어요 — 잘못 잡은 일정을 고치는 용도라 재연락·연락 횟수에는 들어가지 않아요'] },
     { v: 108, d: '2026-11-16', t: '20:09', c: ['상담 업무의 재연락·고객 포기 창에서 아래 버튼(취소 · 부재중 · 재연락 저장)의 크기를 똑같이 맞췄어요'] },
     { v: 107, d: '2026-11-16', t: '20:03', c: ['상담 업무의 "재연락" 창에서 다음 연락 칸 오른쪽 캘린더 버튼으로 날짜를 고를 수 있어요', '같은 창에 "부재중" 버튼 추가 — 누르면 재연락으로 저장하면서 부재중 +1, "재연락 저장"은 연락 +1로 기록돼요 (고객 목록 이름 옆 배지에 반영)', '이미 연락된 고객(연1 이상)에게 "부재중"을 누르면 연락 +1로 세고, 부재중은 메모와 소통 이력에 남아요'] },
     { v: 106, d: '2026-11-16', t: '19:46', c: ['고객 목록에서 부3(부재중 3회)인 고객에게 "부재중 +1"을 한 번 더 누르면 "부재중 연락은 최대 3번을 권장합니다. 포기처리해주세요." 안내가 뜨고 더는 카운트되지 않아요'] },
@@ -85,7 +86,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 108;
+  const PAGE_V = 109;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -348,11 +349,48 @@
     .when { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #F6F8FC; color: #58627A; }
     .when.due { background: #FDECEE; color: #D93A4A; } .when.today { background: #FBF1DF; color: #B8791A; } .when.soon { background: #EEF1FE; color: #2E48D6; }
     .h { color: #8C95A8; font-size: 12px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 720px; }
+    .btn.cal { padding: 0 10px; min-width: 38px; align-self: stretch; justify-content: center; } .btn.cal svg { width: 16px; height: 16px; } .btn.cal:hover { background: #F6F8FC; color: #171C2B; }
+    .scrim { position: fixed; inset: 0; background: rgba(23,28,43,.3); z-index: 60; }
+    .pop { position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(420px, 92vw); background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(20,27,45,.16); padding: 22px 24px; z-index: 61; }
+    .pop h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 4px; }
+    .pop p { font-size: 13.5px; color: #58627A; margin: 0 0 12px; }
+    .pop label { display: block; font-size: 12px; font-weight: 700; color: #58627A; margin: 10px 0 5px; } .pop label b { color: #D93A4A; }
+    .pop .wrow { display: flex; gap: 8px; align-items: stretch; }
+    .pop .wrow > input { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid #E4E8F0; border-radius: 9px; background: #fff; color: #171C2B; }
+    .pop .calw { position: relative; flex: 0 0 44px; }
+    .pop .calb { width: 100%; height: 100%; min-height: 40px; display: grid; place-items: center; border: 1px solid #E4E8F0; border-radius: 9px; background: #fff; color: #58627A; cursor: pointer; } .pop .calb:hover { background: #F6F8FC; color: #171C2B; } .pop .calb svg { width: 18px; height: 18px; }
+    .pop .calw input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+    .pop .pv { padding: 6px 0 0; color: #1E9E66; font-weight: 600; font-size: 13px; min-height: 20px; }
+    .pop .er { font-size: 12.5px; color: #D93A4A; font-weight: 600; margin-top: 6px; }
+    .pop .brow { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 16px; }
+    .pop .brow .btn { justify-content: center; min-width: 104px; height: 38px; padding: 0 14px; }
   `;
+  // 자연어 일정 → { date:'YYYY-MM-DD', rest:'남은 텍스트(시간 등)' } / null — 상담 업무 재연락 창의 "다음 연락"과 같은 규칙
+  const whenYmd = dt => { const p = n => String(n).padStart(2, '0'); return dt.getFullYear() + '-' + p(dt.getMonth() + 1) + '-' + p(dt.getDate()); };
+  const whenAddD = n => { const t = new Date(); t.setHours(0, 0, 0, 0); t.setDate(t.getDate() + n); return t; };
+  const WHEN_DOW = ['일', '월', '화', '수', '목', '금', '토'];
+  const whenFmt = (d, note) => d ? d + ' (' + WHEN_DOW[new Date(d).getDay()] + ')' + (note ? ' ' + note : '') : '';
+  const whenParse = s0 => {
+    let s = String(s0 || '').trim(); if (!s) return null; const t0 = whenAddD(0); let d = null; const take = re => { const m = s.match(re); if (m) s = (s.slice(0, m.index) + ' ' + s.slice(m.index + m[0].length)).trim(); return m; };
+    let m;
+    if ((m = take(/(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})\s*일?/))) d = new Date(+m[1], +m[2] - 1, +m[3]);
+    else if ((m = take(/(\d{1,2})\s*[\/.월]\s*(\d{1,2})\s*일?/))) { d = new Date(t0.getFullYear(), +m[1] - 1, +m[2]); if (d < whenAddD(-30)) d.setFullYear(d.getFullYear() + 1); }
+    else if (take(/오늘/)) d = whenAddD(0);
+    else if (take(/내일\s*모레|모레/)) d = whenAddD(2);
+    else if (take(/내일/)) d = whenAddD(1);
+    else if ((m = take(/(\d+)\s*일\s*(뒤|후|있다가)/))) d = whenAddD(+m[1]);
+    else if ((m = take(/(\d+)\s*주\s*(뒤|후)/))) d = whenAddD(7 * +m[1]);
+    else if ((m = take(/(이번\s*주|다음\s*주|다다음\s*주|담주|다담주)\s*([월화수목금토일])(요일)?/))) { const dow = '일월화수목금토'.indexOf(m[2]); const wk = /다다음|다담/.test(m[1]) ? 2 : /다음|담/.test(m[1]) ? 1 : 0; const mon = whenAddD(-((t0.getDay() + 6) % 7)); d = new Date(mon); d.setDate(mon.getDate() + wk * 7 + (dow === 0 ? 6 : dow - 1)); if (wk === 0 && d <= t0) d.setDate(d.getDate() + 7); }
+    else if ((m = take(/(다음\s*달|담달|내달|이번\s*달)\s*(초|중순|말)?/))) { const nm = /다음|담|내/.test(m[1]) ? 1 : 0; const y = t0.getFullYear(), mo = t0.getMonth() + nm; d = m[2] === '말' ? new Date(y, mo + 1, 0) : m[2] === '중순' ? new Date(y, mo, 15) : new Date(y, mo, 1); if (!nm && d <= t0) d = new Date(y, mo, Math.max(t0.getDate() + 1, d.getDate())); }
+    else if ((m = take(/다음\s*주|담주/))) d = whenAddD(7);
+    else if ((m = take(/(월|화|수|목|금|토|일)요일/))) { const dow = '일월화수목금토'.indexOf(m[1]); const diff = (dow - t0.getDay() + 7) % 7 || 7; d = whenAddD(diff); }
+    if (!d || isNaN(d)) return null;
+    return { date: whenYmd(d), rest: s.replace(/\s+/g, ' ').replace(/^[에,\s]+/, '').replace(/^\([일월화수목금토]\)\s*/, '').trim() };
+  };
   class URecalls extends HTMLElement {
     connectedCallback() {
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.items = null; this.filter = ''; this.err = '';
-      root.innerHTML = `<style>${recallsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">재연락 고객 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
+      root.innerHTML = `<style>${recallsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">재연락 고객 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div><div id="pop"></div>`;
       root.getElementById('head').onclick = () => { if (!this.items || !this.items.length) return; this.open = !this.open; this.paint(); };
       const lib = this.getAttribute('lib') || './udongji-fb.js?v=38';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; this.me = me; await this.load(); this._iv = setInterval(() => this.load(), 120000); this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('udongji-lead-assigned', this._on); window.addEventListener('udongji-record-saved', this._on); }).catch(() => { this.hidden = true; });
@@ -393,9 +431,39 @@
       const cnt = { '': n, fresh: nFresh, due: L.filter(x => x.days === null || x.days <= 0).length, soon: L.filter(x => x.days !== null && x.days <= 2).length };
       const flt = `<div class="flt"><span>기간</span>${[['', '전체'], ['fresh', '신규배정'], ['due', '오늘까지'], ['soon', '2일 후까지']].map(([k, l]) => `<button type="button" data-f="${k}" class="${this.filter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
       const tag = x => x.days === null ? `<span class="when">${x.when ? esc(x.when) : '일정 없음'}</span>` : x.days < 0 ? `<span class="when due">${-x.days}일 지남</span>` : x.days === 0 ? `<span class="when today">오늘</span>` : `<span class="when ${x.days <= 2 ? 'soon' : ''}">${x.days}일 후</span>`;
-      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      list.querySelectorAll('[data-cal]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openWhen(V[+b.dataset.cal]); }; });
       list.querySelectorAll('[data-f]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.filter = b.dataset.f; this.paint(); }; });
       list.querySelectorAll('.row').forEach(row => { row.onclick = () => { const x = V[+row.dataset.i]; const ev = new CustomEvent('udongji-recall-pick', { detail: { item: x.it }, cancelable: true }); const handled = !window.dispatchEvent(ev); if (!handled) location.href = (this.getAttribute('consult') || '우동지 상담 스크립트.dc.html') + '?id=' + encodeURIComponent(x.it.id); else { this.open = false; this.paint(); } }; });
+    }
+    openWhen(x) {
+      const cur = String(x.it.data['다음 액션 · 일시'] || '').trim(), r = whenParse(cur);
+      this.w = { x, free: r ? r.date + (r.rest ? ' ' + r.rest : '') : cur, date: r ? r.date : '', rest: r ? r.rest : '', err: '', busy: false };
+      this.paintWhen(true);
+    }
+    closeWhen() { this.w = null; this.root.getElementById('pop').innerHTML = ''; }
+    paintWhen(build) {
+      const pop = this.root.getElementById('pop'), w = this.w, $ = id => this.root.getElementById(id); if (!w) { pop.innerHTML = ''; return; }
+      if (build) {
+        pop.innerHTML = `<div class="scrim" id="wScrim"></div><div class="pop" role="dialog" aria-modal="true" aria-labelledby="wT"><h3 id="wT">다음 연락 일정 수정</h3><p>${esc(w.x.name)} — 일정만 바꿔요. 재연락·연락 횟수에는 들어가지 않아요.</p><label for="wFree">다음 연락 <b>*</b></label><div class="wrow"><input type="text" id="wFree" placeholder="예: 내일 오후 2시 / 다음주 월요일 / 9월 20일 / 3일 뒤 / 다음달 초"><span class="calw"><button type="button" class="calb" id="wCal" aria-label="캘린더에서 날짜 고르기" title="캘린더에서 날짜 고르기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><input type="date" id="wDate" tabindex="-1" aria-hidden="true"></span></div><div class="er" id="wErr" hidden></div><div class="pv" id="wPv"></div><div class="brow"><button type="button" class="btn" id="wNo">취소</button><button type="button" class="btn primary" id="wOk">일정 저장</button></div></div>`;
+        $('wFree').value = w.free; $('wDate').value = w.date;
+        $('wScrim').onclick = () => this.closeWhen(); $('wNo').onclick = () => this.closeWhen(); $('wOk').onclick = () => this.saveWhen();
+        $('wFree').oninput = e => { const txt = e.target.value, r = whenParse(txt); w.free = txt; if (r) { w.date = r.date; w.rest = r.rest; w.err = ''; } else { w.date = ''; w.rest = ''; w.err = txt.trim() ? '날짜를 인식하지 못했어요 — 예: 내일, 모레, 다음주 화요일, 9/20, 2주 뒤, 다음달 중순' : ''; } $('wDate').value = w.date; this.paintWhen(); };
+        $('wDate').onchange = e => { const dv = e.target.value; w.date = dv; w.err = ''; w.free = dv ? dv + (w.rest ? ' ' + w.rest : '') : ''; $('wFree').value = w.free; this.paintWhen(); };
+        $('wCal').onclick = () => { const el = $('wDate'); try { if (el.showPicker) el.showPicker(); else { el.focus(); el.click(); } } catch (e) { try { el.focus(); } catch (e2) {} } };
+        $('wFree').onkeydown = e => { if (e.key === 'Enter') this.saveWhen(); else if (e.key === 'Escape') this.closeWhen(); };
+        setTimeout(() => { try { $('wFree').focus(); } catch (e) {} }, 0);
+      }
+      $('wPv').textContent = w.date ? '→ ' + whenFmt(w.date, w.rest) : '';
+      $('wErr').hidden = !w.err; $('wErr').textContent = w.err;
+      $('wOk').disabled = !!w.busy; $('wOk').textContent = w.busy ? '저장 중…' : '일정 저장';
+    }
+    async saveWhen() {
+      const w = this.w; if (!w || w.busy) return;
+      if (!w.date) { w.err = '다음 연락 날짜를 고르거나 직접 입력하세요.'; this.paintWhen(); return; }
+      w.busy = true; this.paintWhen();
+      try { await this.lib.updateCells(w.x.it.id, { '다음 액션 · 일시': whenFmt(w.date, w.rest) }); this.closeWhen(); await this.load(); }
+      catch (e) { w.busy = false; w.err = '저장 실패: ' + (e.message || e); this.paintWhen(); }
     }
   }
   if (!customElements.get('udongji-recalls')) customElements.define('udongji-recalls', URecalls);
