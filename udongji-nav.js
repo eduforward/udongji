@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v112 · 2026-11-16 20:43';
+  const VERSION = 'v113 · 2026-11-16 20:51';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 113, d: '2026-11-16', t: '20:51', c: ['재연락 고객 목록의 메모 버튼을 누르면 이제 메모를 읽기만 하는 창이 먼저 떠요 — 고치려면 창 안의 "수정"을 누르면 돼요'] },
     { v: 112, d: '2026-11-16', t: '20:43', c: ['고객 목록과 계약 업무의 고객 상세에 "고객 포기" 버튼 추가 — 포기 이유를 고르면 바로 포기 처리돼요 (상담 업무의 고객 포기와 같은 방식)'] },
     { v: 111, d: '2026-11-16', t: '20:37', c: ['고객 목록 상세의 파란 버튼이 고객 단계에 따라 바뀌어요 — 신규배정·재연락 고객은 "상담 업무에서 열기", 수취자료부터 완료까지는 "계약 업무에서 열기"', '상담 업무에 작성 중이던 상담이 있으면 "상담 업무에서 열기"가 넘어가지 않고 "작성 중이던 상담을 먼저 처리해 주세요" 안내를 띄워요'] },
     { v: 110, d: '2026-11-16', t: '20:26', c: ['상담 업무 위쪽 재연락 고객 목록에서 캘린더 버튼 왼쪽 메모 버튼으로 고객 메모만 바로 고칠 수 있어요 — 재연락·연락 횟수에는 들어가지 않아요'] },
@@ -89,7 +90,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 112;
+  const PAGE_V = 113;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -366,6 +367,7 @@
     .pop .pv { padding: 6px 0 0; color: #1E9E66; font-weight: 600; font-size: 13px; min-height: 20px; }
     .pop .er { font-size: 12.5px; color: #D93A4A; font-weight: 600; margin-top: 6px; }
     .pop textarea { display: block; width: 100%; box-sizing: border-box; min-height: 110px; resize: vertical; font: inherit; font-size: 14px; line-height: 1.5; padding: 9px 11px; border: 1px solid #E4E8F0; border-radius: 9px; background: #fff; color: #171C2B; }
+    .pop .memo { white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; color: #171C2B; background: #F6F8FC; border: 1px solid #E4E8F0; border-radius: 9px; padding: 11px 12px; min-height: 64px; max-height: 280px; overflow: auto; } .pop .memo.none { color: #58627A; }
     .pop .brow { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 16px; }
     .pop .brow .btn { justify-content: center; min-width: 104px; height: 38px; padding: 0 14px; }
   `;
@@ -441,20 +443,31 @@
       list.querySelectorAll('[data-f]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.filter = b.dataset.f; this.paint(); }; });
       list.querySelectorAll('.row').forEach(row => { row.onclick = () => { const x = V[+row.dataset.i]; const ev = new CustomEvent('udongji-recall-pick', { detail: { item: x.it }, cancelable: true }); const handled = !window.dispatchEvent(ev); if (!handled) location.href = (this.getAttribute('consult') || '우동지 상담 스크립트.dc.html') + '?id=' + encodeURIComponent(x.it.id); else { this.open = false; this.paint(); } }; });
     }
-    openMemo(x) { this.mm = { x, text: String(x.it.data['특이사항'] || ''), err: '', busy: false }; this.paintMemo(true); }
+    openMemo(x) { this.mm = { x, text: String(x.it.data['특이사항'] || ''), edit: false, err: '', busy: false }; this.paintMemo(true); }
     closeMemo() { this.mm = null; this.root.getElementById('pop').innerHTML = ''; }
     paintMemo(build) {
       const pop = this.root.getElementById('pop'), m = this.mm, $ = id => this.root.getElementById(id); if (!m) { pop.innerHTML = ''; return; }
       if (build) {
-        pop.innerHTML = `<div class="scrim" id="mScrim"></div><div class="pop" role="dialog" aria-modal="true" aria-labelledby="mT"><h3 id="mT">메모 수정</h3><p>${esc(m.x.name)} — 메모만 바꿔요. 재연락·연락 횟수에는 들어가지 않아요.</p><label for="mText">메모</label><textarea id="mText" rows="5" placeholder="부재중 · 사업자등록증 나오면 등"></textarea><div class="er" id="mErr" hidden></div><div class="brow"><button type="button" class="btn" id="mNo">취소</button><button type="button" class="btn primary" id="mOk">메모 저장</button></div></div>`;
-        $('mText').value = m.text;
-        $('mScrim').onclick = () => this.closeMemo(); $('mNo').onclick = () => this.closeMemo(); $('mOk').onclick = () => this.saveMemo();
-        $('mText').oninput = e => { m.text = e.target.value; };
-        $('mText').onkeydown = e => { if (e.key === 'Escape') this.closeMemo(); else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) this.saveMemo(); };
-        setTimeout(() => { try { const t = $('mText'); t.focus(); t.setSelectionRange(t.value.length, t.value.length); } catch (e) {} }, 0);
+        const saved = String(m.x.it.data['특이사항'] || '');
+        pop.innerHTML = `<div class="scrim" id="mScrim"></div><div class="pop" role="dialog" aria-modal="true" aria-labelledby="mT"><h3 id="mT">${m.edit ? '메모 수정' : '메모'}</h3><p>${esc(m.x.name)}${m.edit ? ' — 메모만 바꿔요. 재연락·연락 횟수에는 들어가지 않아요.' : ''}</p>` + (m.edit
+          ? `<label for="mText">메모</label><textarea id="mText" rows="5" placeholder="부재중 · 사업자등록증 나오면 등"></textarea><div class="er" id="mErr" hidden></div><div class="brow"><button type="button" class="btn" id="mNo">취소</button><button type="button" class="btn primary" id="mOk">메모 저장</button></div>`
+          : `<div class="memo ${saved.trim() ? '' : 'none'}" id="mView"></div><div class="brow"><button type="button" class="btn" id="mNo">닫기</button><button type="button" class="btn primary" id="mEdit">수정</button></div>`) + `</div>`;
+        $('mScrim').onclick = () => { if (!m.edit) this.closeMemo(); };
+        if (m.edit) {
+          const back = () => { m.edit = false; m.text = saved; m.err = ''; this.paintMemo(true); };
+          $('mText').value = m.text;
+          $('mNo').onclick = back; $('mOk').onclick = () => this.saveMemo();
+          $('mText').oninput = e => { m.text = e.target.value; };
+          $('mText').onkeydown = e => { if (e.key === 'Escape') back(); else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) this.saveMemo(); };
+          setTimeout(() => { try { const t = $('mText'); t.focus(); t.setSelectionRange(t.value.length, t.value.length); } catch (e) {} }, 0);
+        } else {
+          $('mView').textContent = saved.trim() ? saved : '메모가 없어요';
+          $('mNo').onclick = () => this.closeMemo();
+          $('mEdit').onclick = () => { m.edit = true; m.text = saved; this.paintMemo(true); };
+          setTimeout(() => { try { $('mEdit').focus(); } catch (e) {} }, 0);
+        }
       }
-      $('mErr').hidden = !m.err; $('mErr').textContent = m.err;
-      $('mOk').disabled = !!m.busy; $('mOk').textContent = m.busy ? '저장 중…' : '메모 저장';
+      if (m.edit) { $('mErr').hidden = !m.err; $('mErr').textContent = m.err; $('mOk').disabled = !!m.busy; $('mOk').textContent = m.busy ? '저장 중…' : '메모 저장'; }
     }
     async saveMemo() {
       const m = this.mm; if (!m || m.busy) return;
