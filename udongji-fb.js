@@ -103,7 +103,7 @@ export function commOf(d) {
   d = d || {}; const miss = commCnt(d, MISS_COL), stored = commCnt(d, TALK_COL);
   // 횟수 기록이 없으면 추정하지 않는다: 신규배정(아직 손대기 전)은 신규, 한 번이라도 데이터 작업을 한 고객은 무(미설정)
   const talk = stored;
-  const base = { miss, talk, canMiss: talk === 0 && miss < MISS_MAX, canUndo: talk > 0 || miss > 0 };
+  const base = { miss, talk, canMiss: talk === 0, missFull: talk === 0 && miss >= MISS_MAX, canUndo: talk > 0 || miss > 0 };
   if (talk > 0) return Object.assign(base, { kind: 'talk', n: talk, short: '연' + talk, label: '연락 ' + talk + '회', cls: 'talk' });
   if (miss > 0) return Object.assign(base, { kind: 'miss', n: miss, short: '부' + miss, label: '부재중 ' + miss + '회 · 아직 통화 전', cls: 'miss' });
   if (String(d['상태'] || '').trim() === '신규배정') return Object.assign(base, { kind: 'new', n: 0, short: '신규', label: '신규 · 아직 연락 전', cls: 'new' });
@@ -118,7 +118,7 @@ async function commSave(id, d, patch, note) {
 // kind: 'miss' = 부재중 +1 (통화 전 · 최대 3회), 'talk' = 연락 +1 (제한 없음). 반환: 바뀐 뒤의 소통 상태
 export async function commBump(id, d, kind) {
   const c = commOf(d), patch = {};
-  if (kind === 'miss') { if (c.talk > 0) throw new Error('이미 통화한 고객은 부재중으로 기록하지 않아요'); if (c.miss >= MISS_MAX) throw new Error('부재중은 ' + MISS_MAX + '회까지 기록해요'); patch[MISS_COL] = String(c.miss + 1); }
+  if (kind === 'miss') { if (c.talk > 0) throw new Error('이미 통화한 고객은 부재중으로 기록하지 않아요'); if (c.miss >= MISS_MAX) throw new Error('부재중 연락은 최대 ' + MISS_MAX + '번을 권장합니다. 포기처리해주세요.'); patch[MISS_COL] = String(c.miss + 1); }
   else patch[TALK_COL] = String(c.talk + 1);
   return commSave(id, d, patch);
 }
