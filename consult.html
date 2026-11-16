@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=106"></script>
+  <script src="./udongji-nav.js?v=107"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --amber-3:#F0DDB0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -152,6 +152,14 @@
     .modal .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
     .modal .row .btn { padding: 8px 14px; font-size: 13px; }
     .modal .err { font-size: 12.5px; color: var(--red); font-weight: 600; margin-top: 6px; }
+    .modal .when { display: flex; gap: 8px; align-items: stretch; }
+    .modal .when > input { flex: 1 1 auto; min-width: 0; }
+    .modal .cal { position: relative; flex: 0 0 44px; }
+    .modal .calbtn { width: 100%; height: 100%; min-height: 40px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--text-2); cursor: pointer; }
+    .modal .calbtn:hover { background: var(--card-2); color: var(--text); }
+    .modal .calbtn svg { width: 18px; height: 18px; }
+    .modal .cal input[type=date] { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+    .btn.miss { background: #E4E8F0; color: #3A4358; border-color: #E4E8F0; }
     .page-top { max-width: 1240px; margin: 0 auto; padding: 24px 24px 0; }
     .page-top udongji-leads, .page-top udongji-recalls { display: block; margin-bottom: 12px; }
     .page-top + .page { padding-top: 8px; }
@@ -182,7 +190,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="106"></udongji-nav>
+<udongji-nav current="consult" page-v="107"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -357,13 +365,13 @@
     <div class="modal">
       <h3>{{ modal.title }}</h3><p>{{ modal.sub }}</p>
       <sc-if value="{{ modal.isRecall }}" hint-placeholder-val="{{ true }}"><label>다음 연락 <b>*</b></label>
-        <input type="text" placeholder="예: 내일 오후 2시 / 다음주 월요일 / 9월 20일 / 3일 뒤 / 다음달 초" value="{{ modal.free }}" onInput="{{ onModalFree }}">
+        <div class="when"><input type="text" placeholder="예: 내일 오후 2시 / 다음주 월요일 / 9월 20일 / 3일 뒤 / 다음달 초" value="{{ modal.free }}" onInput="{{ onModalFree }}"><span class="cal"><button type="button" class="calbtn" onClick="{{ openCal }}" aria-label="캘린더에서 날짜 고르기" title="캘린더에서 날짜 고르기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><input type="date" id="rcDate" tabindex="-1" aria-hidden="true" value="{{ modal.date }}" onChange="{{ onModalDate }}"></span></div>
         <sc-if value="{{ modal.parseFail }}" hint-placeholder-val="{{ false }}"><div class="err">날짜를 인식하지 못했어요 — 예: 내일, 모레, 다음주 화요일, 9/20, 2주 뒤, 다음달 중순</div></sc-if>
         <sc-if value="{{ modal.hasPreview }}" hint-placeholder-val="{{ false }}"><div class="note" style="padding:6px 0 0;color:var(--green);font-weight:600">→ {{ modal.preview }}</div></sc-if>
         <label>메모 (선택)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="부재중 · 사업자등록증 나오면 등"></textarea></sc-if>
       <sc-if value="{{ modal.isDrop }}" hint-placeholder-val="{{ false }}"><label>포기 이유 <b>* 필수</b></label><select value="{{ modal.reason }}" onChange="{{ onModalReason }}"><option value="">선택하세요</option><option>타사 계약·이미 사용 중</option><option>조건 불만족 (수수료·약정·위약금)</option><option>인터넷·설치 환경 불가</option><option>사업자등록증 미발급·폐업</option><option>연락 두절 (3회 이상 부재)</option><option>관심 없음·거부</option><option>기타</option></select><label>상세 (선택 · 기타면 필수)</label><textarea rows="2" value="{{ modal.note }}" onInput="{{ onModalNote }}" placeholder="어떤 말씀을 하셨는지 한 줄"></textarea></sc-if>
       <sc-if value="{{ modal.hasErr }}" hint-placeholder-val="{{ false }}"><div class="err">{{ modal.err }}</div></sc-if>
-      <div class="row"><button type="button" class="btn ghost" onClick="{{ closeModal }}">취소</button><button type="button" class="btn {{ modal.okCls }}" onClick="{{ saveModal }}" disabled="{{ saving }}">{{ modal.ok }}</button></div>
+      <div class="row"><button type="button" class="btn ghost" onClick="{{ closeModal }}">취소</button><sc-if value="{{ modal.isRecall }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn miss" onClick="{{ saveMiss }}" disabled="{{ saving }}">부재중</button></sc-if><button type="button" class="btn {{ modal.okCls }}" onClick="{{ saveModal }}" disabled="{{ saving }}">{{ modal.ok }}</button></div>
     </div>
   </sc-if>
   <button type="button" class="totop {{ toTopCls }}" onClick="{{ toTop }}" title="맨 위로" aria-label="맨 위로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
@@ -402,7 +410,7 @@ class Component extends DCLogic {
   async componentDidMount() {
     this._onScroll = () => { const on = window.scrollY > 400; if (on !== this.state.showTop) this.setState({ showTop: on }); }; window.addEventListener('scroll', this._onScroll, { passive: true });
     try {
-      const lib = await import('./udongji-fb.js?v=37'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=38'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const meR = await lib.me().catch(() => ({})); if (meR.close) { location.replace('contract.html'); return; }
       const agent = await lib.myName().catch(() => '');
@@ -463,6 +471,20 @@ class Component extends DCLogic {
     if (v._prev) { const p = v._prev, hist = '[재연락 ' + this.today() + '] 이전 ' + (p.상담일 || '') + ' ' + (p.결과 || '') + (p.일시 ? ' (약속 ' + p.일시 + ')' : '') + (kind === 'recall' && extra.when ? ' → 다음 ' + extra.when : '') + (kind !== 'go' && extra.note ? ' — ' + extra.note : ''); r['재연락 이력'] = hist; r['_addRecall'] = 1; }
     return r;
   }
+  // 소통 상태 카운트: 재연락 저장 = 연락 +1, 부재중 버튼 = 부재중 +1 (부3 이후·이미 통화한 고객은 저장하지 않고 안내)
+  applyComm(data, old, extra) {
+    const lib = this.state.lib, how = extra && extra.comm; if (!how || !lib || !lib.commOf) return true;
+    const c = lib.commOf(old);
+    const asTalk = how === 'miss' && c.talk > 0; // 이미 연락된 고객의 부재중은 연락 +1로 세고, 부재중은 메모·이력에만 남긴다
+    if (how === 'miss' && !asTalk) {
+      if (c.missFull) { this.setState({ saving: false, modal: Object.assign({}, this.state.modal, { err: '부재중 연락은 최대 3번을 권장합니다. 포기처리해주세요.' }) }); return false; }
+      data[lib.MISS_COL] = String(c.miss + 1);
+    } else data[lib.TALK_COL] = String(c.talk + 1);
+    const t = new Date(), p = n => String(n).padStart(2, '0'), stamp = t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate()) + ' ' + p(t.getHours()) + ':' + p(t.getMinutes());
+    const prev = String(old[lib.COMM_LOG_COL] || '').trim(), who = this.state.agent || '';
+    data[lib.COMM_LOG_COL] = (prev ? prev + '\n' : '') + '[' + stamp + '] ' + lib.commOf(Object.assign({}, old, data)).short + (asTalk ? ' (부재중)' : '') + (who ? ' · ' + who : '');
+    return true;
+  }
   async save(kind, extra) {
     const { lib, v } = this.state; if (!lib) { alert('서버에 연결되지 않았어요. 홈에서 다시 로그인하세요.'); return; }
     const ctx = this._ctx; const data = this.toRecord(v, ctx.L, ctx, kind, extra || {});
@@ -473,9 +495,10 @@ class Component extends DCLogic {
       const row = await lib.findRowById(id);
       if (row) {
         const cur = (await lib.readAll()).items.find(x => x.id === id); const old = cur ? cur.data : {};
+        if (this.applyComm(data, old, extra) === false) return;
         if (data._addRecall) { data['재연락 이력'] = (old['재연락 이력'] ? old['재연락 이력'] + '\n' : '') + data['재연락 이력']; data['재연락 횟수'] = String((parseInt(old['재연락 횟수'] || '0', 10) || 0) + 1); }
         delete data._addRecall; await lib.updateRecord(row, data);
-      } else { delete data._addRecall; await lib.appendRecord(data, id); }
+      } else { if (this.applyComm(data, {}, extra) === false) return; delete data._addRecall; await lib.appendRecord(data, id); }
     } catch (e) { ok = false; err = e.message || String(e); delete data._addRecall; }
     if (ok) try { window.dispatchEvent(new CustomEvent('udongji-record-saved', { detail: { id } })); } catch (e) {}
     const sms = kind === 'go' ? ctx.sms : kind === 'recall' ? ctx.smsRecall(extra.when) : ctx.smsDrop;
@@ -607,14 +630,20 @@ class Component extends DCLogic {
       reset: () => { if (Object.keys(v).length && !confirm('입력 중인 내용을 지우고 새 상담을 시작할까요?')) return; localStorage.removeItem(this.KEY); this.setState({ v: {} }); },
       saving: this.state.saving,
       hasModal: !!modal, modal: modal ? Object.assign({ hasErr: !!modal.err, isOther: modal.quick === 'other', hasPreview: !!modal.when, preview: modal.when }, modal) : {}, closeModal: () => this.setState({ modal: null }), quickDates,
-      onModalDate: e => { const d = e.target.value; setM({ date: d, when: fmtWhen(d, modal.whenNote), parseFail: false }); },
+      onModalDate: e => { const d = e.target.value; setM({ date: d, when: fmtWhen(d, modal.whenNote), free: d ? d + (modal.whenNote ? ' ' + modal.whenNote : '') : '', quick: '', parseFail: false }); },
+      openCal: () => { const el = document.getElementById('rcDate'); if (!el) return; try { if (el.showPicker) el.showPicker(); else { el.focus(); el.click(); } } catch (e) { try { el.focus(); } catch (e2) {} } },
       onModalFree: e => { const txt = e.target.value; const r = parseKo(txt); if (r) setM({ free: txt, date: r.date, whenNote: r.rest, when: fmtWhen(r.date, r.rest), parseFail: false }); else setM({ free: txt, date: txt.trim() ? '' : modal.date, whenNote: '', when: txt.trim() ? '' : modal.when, parseFail: !!txt.trim() }); },
       openRecall: () => this.setState({ modal: { kind: 'recall', isRecall: true, isDrop: false, title: '재연락으로 저장', sub: who + ' — 지금까지 입력한 내용을 그대로 저장하고 상태를 "재연락 예정"으로 바꿔요. 재연락 목록에 올라갑니다.', when: '', quick: '', date: '', whenNote: '', free: '', parseFail: false, note: '', ok: '재연락 저장', okCls: 'warn', err: '' } }),
       openDrop: () => this.setState({ modal: { kind: 'drop', isRecall: false, isDrop: true, title: '고객 포기', sub: who + ' — 상담을 여기서 중단해요. 이유는 반드시 남겨야 하고, 고객 목록에는 남습니다.', reason: '', note: '', ok: '포기 처리', okCls: 'danger', err: '' } }),
       onModalWhen: e => setM({ when: e.target.value }), onModalNote: e => setM({ note: e.target.value }), onModalReason: e => setM({ reason: e.target.value }),
+      saveMiss: () => {
+        if (!modal || this.state.saving) return; const b = needBasic(); if (b) return setM({ err: b });
+        if (!modal.date) return setM({ err: '다음 연락 날짜를 고르거나 직접 입력하세요.' });
+        const n = modal.note.trim(); this.save('recall', { when: modal.when.trim(), note: /부재중/.test(n) ? n : (n ? '부재중 · ' + n : '부재중'), comm: 'miss' });
+      },
       saveModal: () => {
         if (!modal || this.state.saving) return; const b = needBasic(); if (b) return setM({ err: b });
-        if (modal.kind === 'recall') { if (!modal.date) return setM({ err: '다음 연락 날짜를 고르거나 직접 입력하세요.' }); this.save('recall', { when: modal.when.trim(), note: modal.note.trim() }); }
+        if (modal.kind === 'recall') { if (!modal.date) return setM({ err: '다음 연락 날짜를 고르거나 직접 입력하세요.' }); this.save('recall', { when: modal.when.trim(), note: modal.note.trim(), comm: 'talk' }); }
         else { if (!modal.reason) return setM({ err: '포기 이유를 선택해야 저장할 수 있어요.' }); if (modal.reason === '기타' && !modal.note.trim()) return setM({ err: '"기타"는 상세 내용을 적어주세요.' }); this.save('drop', { reason: modal.reason + (modal.note.trim() ? ' — ' + modal.note.trim() : ''), note: '' }); }
       }
     };
