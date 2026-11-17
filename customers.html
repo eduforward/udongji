@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=115"></script>
+  <script src="./udongji-nav.js?v=116"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -68,6 +68,15 @@
     .comm .k { font-size: 12.5px; color: var(--text-2); }
     .comm b { font-size: 14px; font-weight: 700; margin-right: auto; }
     .comm .btn { font-size: 12.5px; padding: 6px 11px; }
+    /* 다음 연락 일정 칩: 지남(빨강) · 오늘(노랑) · 2일 이내(파랑) · 그 이후(회색). 종료·완료 고객은 강조 없이 기록만 */
+    .nx { display: inline-flex; align-items: center; gap: 7px; padding: 4px 9px; border-radius: 8px; background: var(--card-2); border: 1px solid var(--line); font-variant-numeric: tabular-nums; white-space: nowrap; max-width: 236px; box-sizing: border-box; vertical-align: middle; }
+    .nx b { font-size: 13.5px; font-weight: 800; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .nx i { font-style: normal; font-size: 11.5px; font-weight: 800; color: var(--text-2); padding: 1px 7px; border-radius: 999px; background: #fff; border: 1px solid var(--line); flex: 0 0 auto; }
+    .nx.text i, .nx.off i { display: none; }
+    .nx.due { background: var(--red-2); border-color: #F6C3C9; } .nx.due i { color: #fff; background: #D1343F; border-color: #D1343F; }
+    .nx.today { background: var(--amber-2); border-color: #F0D9A6; } .nx.today i { color: #fff; background: #B7770F; border-color: #B7770F; }
+    .nx.soon { background: var(--blue-2); border-color: var(--blue-3); } .nx.soon i { color: var(--blue-d); border-color: var(--blue-3); }
+    .nx.off { background: transparent; border-color: transparent; padding-left: 0; } .nx.off b { font-weight: 600; color: var(--text-2); }
     /* 상세 패널 */
     .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); background: var(--card); box-shadow: -12px 0 40px rgba(20,27,45,.18); z-index: 20; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s; }
     .drawer.open { transform: none; }
@@ -113,7 +122,7 @@
     .vcap a { color: #fff; } .vcap button { border: 0; background: transparent; color: #FF8A94; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
   </style>
 </helmet>
-<udongji-nav current="customers" page-v="115"></udongji-nav>
+<udongji-nav current="customers" page-v="116"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>고객 목록</b><small>전체 상담 기록</small></div></div>
@@ -145,12 +154,12 @@
             <td class="store">{{ r.store }}</td>
             <td><span class="who"><span class="cb {{ r.commCls }}" title="{{ r.commTitle }}">{{ r.comm }}</span><span>{{ r.name }}</span></span></td>
             <td class="num">{{ r.phone }}</td>
+            <td><sc-if value="{{ r.nxHas }}" hint-placeholder-val="{{ true }}"><span class="nx {{ r.nxCls }}" title="{{ r.next }}"><b>{{ r.nxMain }}</b><i>{{ r.nxRel }}</i></span></sc-if><sc-if value="{{ r.nxNone }}" hint-placeholder-val="{{ false }}"><span class="dim">—</span></sc-if></td>
             <td>{{ r.biz }}</td>
             <td><span class="pill blue">{{ r.mode }}</span></td>
             <td>{{ r.plan }}</td>
             <td><span class="pill {{ r.regCls }}">{{ r.regTag }}</span></td>
             <td class="dim">{{ r.agent }}</td>
-            <td class="dim">{{ r.next }}</td>
           </tr>
         </sc-for>
       </tbody>
@@ -256,7 +265,7 @@
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'all', mode: '', agent: '', sortKey: '상담일', sortDir: -1, selRow: null, toast: '', toastOn: false, editing: false, draft: null, saving: false, tr: null, users: [] };
-  COLS = [['상담일','date'],['매장명','store'],['고객명','name'],['연락처','phone'],['업종','biz'],['매장 구분','mode'],['안내한 상품 구성','plan'],['진행 상태','reg'],['상담자','agent'],['다음 액션 · 일시','next']];
+  COLS = [['상담일','date'],['매장명','store'],['고객명','name'],['연락처','phone'],['다음 액션 · 일시','next'],['업종','biz'],['매장 구분','mode'],['안내한 상품 구성','plan'],['진행 상태','reg'],['상담자','agent']];
   GROUPS = [
     ['고객 기본정보', ['유입 경로','고객명','연락처','이메일','영문 성함','매장명','매장 주소','업종','판매 물품','매장 구분','네이버 ID']],
     ['사업자·심사', ['사업자번호','대형/개인/법인','단독/공동','개인정보 제3자 제공 동의','우동지 수신 동의']],
@@ -268,7 +277,7 @@ class Component extends DCLogic {
   ];
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=38'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=39'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me(); if (me.close) { location.replace('contract.html'); return; } this.setState({ lib, isAdmin: me.admin, agent: me.admin && me.name ? me.name : '' }, () => this.load());
       lib.listUsers().then(users => this.setState({ users })).catch(() => {});
@@ -297,6 +306,7 @@ class Component extends DCLogic {
     const isReg = d => !!String(d[REG] || '').trim();
     const isCall = d => d['상태'] === '재연락 예정' || d['상담 결과'] === '상담 연기' || d['상담 결과'] === '상담 불가';
     const SO = d => lib ? lib.statusOf(d) : { key: 'docs', label: '—', cls: '' };
+    const NX = d => { const n = lib && lib.nextInfo ? lib.nextInfo(d['다음 액션 · 일시']) : { has: !!V(d, '다음 액션 · 일시'), cls: 'text', main: V(d, '다음 액션 · 일시'), rel: '' }; const k = SO(d).key; return n.has && (k === 'drop' || k === 'done') ? Object.assign({}, n, { cls: 'off', rel: '' }) : n; };
     const CM = d => lib && lib.commOf ? lib.commOf(d) : { short: '', label: '', cls: '', canMiss: false, canUndo: false };
     const commBusy = !!this.state.commBusy;
     const agents = [...new Set(items.map(it => V(it.data, '상담자')).filter(Boolean))].sort();
@@ -319,9 +329,9 @@ class Component extends DCLogic {
     const rows = list.map(it => { const d = it.data, ri = regInfo(d); return {
       cls: it.row === selRow ? 'on' : '', open: () => this.setState({ selRow: it.row }),
       date: V(d, '상담일').slice(5), store: V(d, '매장명') || '(매장명 없음)', name: V(d, '고객명'), comm: CM(d).short, commCls: CM(d).cls, commTitle: CM(d).label, phone: V(d, '연락처'), biz: V(d, '업종'), mode: V(d, '매장 구분') || '—',
-      plan: V(d, '안내한 상품 구성') + (V(d, '월 이용요금') ? ' · ' + V(d, '월 이용요금') + '원' : ''), status: V(d, '상태') || '—', regTag: ri.tag, regCls: ri.cls, agent: V(d, '상담자'), next: V(d, '다음 액션 · 일시')
+      plan: V(d, '안내한 상품 구성') + (V(d, '월 이용요금') ? ' · ' + V(d, '월 이용요금') + '원' : ''), status: V(d, '상태') || '—', regTag: ri.tag, regCls: ri.cls, agent: V(d, '상담자'), next: V(d, '다음 액션 · 일시'), nxHas: NX(d).has, nxNone: !NX(d).has, nxCls: NX(d).cls, nxMain: NX(d).main, nxRel: NX(d).rel
     }; });
-    const cols = this.COLS.map(([k]) => ({ label: k, cls: sortKey === k ? 'sorted' : '', arr: sortKey === k ? (sortDir > 0 ? '▲' : '▼') : '', sort: () => this.setState(sortKey === k ? { sortDir: -sortDir } : { sortKey: k, sortDir: k === '상담일' ? -1 : 1 }) }));
+    const cols = this.COLS.map(([k]) => ({ label: k === '다음 액션 · 일시' ? '다음 연락' : k, cls: sortKey === k ? 'sorted' : '', arr: sortKey === k ? (sortDir > 0 ? '▲' : '▼') : '', sort: () => this.setState(sortKey === k ? { sortDir: -sortDir } : { sortKey: k, sortDir: k === '상담일' ? -1 : 1 }) }));
     const rec = items.find(it => it.row === selRow) || null;
     let sel = {}, groups = [];
     if (rec) {
@@ -381,6 +391,12 @@ class Component extends DCLogic {
         if (!selRec || !draft || !lib) return;
         const patch = {}; Object.keys(draft).forEach(k => { if (String(draft[k] || '') !== String(selRec.data[k] || '')) patch[k] = draft[k]; });
         if (!Object.keys(patch).length) { this.setState({ editing: false, draft: null }); return; }
+        // 다음 연락 일정은 날짜(필수) + 오전/오후 · 시 · 분(선택)까지만 — 그 밖의 글은 메모로 옮겨 저장
+        if (patch['다음 액션 · 일시'] != null && String(patch['다음 액션 · 일시']).trim() && lib.whenTidy) {
+          const t = lib.whenTidy(Object.assign({}, selRec.data, patch));
+          if (t && t.kind === 'nodate') { this.toast('다음 연락은 날짜부터 적어주세요 — 예: 2026-11-20 오후 2시'); return; }
+          if (t) Object.assign(patch, t.patch);
+        }
         this.setState({ saving: true });
         try { await lib.updateCells(selRec.row, patch); this.toast(Object.keys(patch).length + '개 항목을 저장했어요'); this.setState({ editing: false, draft: null, saving: false }); await this.load(); }
         catch (e) { this.setState({ saving: false }); this.toast('저장 실패: ' + e.message); }

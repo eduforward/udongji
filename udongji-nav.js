@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v115 · 2026-11-17 11:47';
+  const VERSION = 'v116 · 2026-11-17 13:02';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 116, d: '2026-11-17', t: '13:02', c: ['다음 연락 일정을 "날짜(필수) + 오전/오후 · 시 · 분(선택)"으로 통일했어요 — 재연락 저장 창과 일정 수정 창이 날짜 선택 + 시간 선택으로 바뀌었고, 일정 칸에 함께 적던 글은 메모로 옮겨져요', '관리자 화면에 "일정 정리" 탭이 생겼어요 — 기존 일정에 붙어 있던 뒷내용을 표로 확인한 뒤 한 번에 메모로 옮길 수 있어요', '다음 연락 일정이 눈에 잘 보이게 바뀌었어요 — 상담 업무의 재연락 고객 목록은 버튼 왼쪽의 큰 칸에, 고객 목록은 연락처 바로 옆 칸에 날짜와 "오늘 · 내일 · N일 후 · N일 지남"이 색으로 표시돼요'] },
     { v: 115, d: '2026-11-17', t: '11:47', c: ['상담 업무의 재연락 고객 목록과 계약 업무 고객 목록에도 이름 앞에 소통 상태 배지(신규 · 부1~부3 · 연1~ · 무)가 보여요 — 고객 목록과 같은 표시'] },
     { v: 114, d: '2026-11-16', t: '20:55', c: ['재연락 고객 목록에서 고객 줄을 눌러도 더는 상담 화면으로 넘어가지 않아요 — "이어서 상담" 버튼을 눌러야 불러와요'] },
     { v: 113, d: '2026-11-16', t: '20:51', c: ['재연락 고객 목록의 메모 버튼을 누르면 이제 메모를 읽기만 하는 창이 먼저 떠요 — 고치려면 창 안의 "수정"을 누르면 돼요'] },
@@ -92,7 +93,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 115;
+  const PAGE_V = 116;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -190,7 +191,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=38';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=39';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (!role) { showUnregistered(m.userEmail(), m, href(PAGES[0])); return; } if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
@@ -247,7 +248,7 @@
       $('q').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); this.ask($('q').value); } };
       $('q').oninput = e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(120, e.target.scrollHeight) + 'px'; };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') this.classList.remove('open'); });
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=38';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=39';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; }).catch(() => { this.hidden = true; });
     }
     save() { try { sessionStorage.setItem('udongji-place-ai', JSON.stringify(this.msgs.slice(-20))); } catch (e) {} }
@@ -317,7 +318,7 @@
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.leads = null; this.busy = ''; this.ev = ''; this.err = '';
       root.innerHTML = `<style>${leadsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">신규문의 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
       root.getElementById('head').onclick = () => { if (!this.leads || !this.leads.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=38';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=39';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; await this.load(); this._iv = setInterval(() => this.load(), 60000); this._on = () => this.load(); window.addEventListener('focus', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); }
@@ -351,7 +352,18 @@
   // 재연락 고객 가로 배너 <udongji-recalls> — 상담 업무 상단. 항목 클릭 → 'udongji-recall-pick' 이벤트(같은 페이지 폼에 불러오기), 페이지가 안 받으면 ?id= 로 이동
   const recallsCss = leadsCss + `
     .card.has { border-color: #E9A23B; } .has .dot { background: #E9A23B; box-shadow: 0 0 0 4px #FBF1DF; } .msg b { color: #B8791A; }
-    .row { cursor: default; }
+    .row { cursor: default; grid-template-columns: minmax(0,1fr) auto auto; }
+    .nx { display: grid; gap: 2px; width: 236px; box-sizing: border-box; padding: 8px 12px; border-radius: 10px; background: #F6F8FC; border: 1px solid #E4E8F0; }
+    .nx .l { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 700; color: #58627A; }
+    .nx .d { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.3; color: #171C2B; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nx .d small { font-size: 12.5px; font-weight: 700; color: #58627A; margin-left: 5px; }
+    .nx .d.txt { font-size: 13.5px; font-weight: 700; }
+    .nx .r { font-size: 12px; font-weight: 800; color: #58627A; padding: 1px 7px; border-radius: 999px; background: #fff; border: 1px solid #E4E8F0; white-space: nowrap; }
+    .nx.due { background: #FDECEE; border-color: #F6C3C9; } .nx.due .r { color: #fff; background: #D1343F; border-color: #D1343F; }
+    .nx.today { background: #FBF1DF; border-color: #F0D9A6; } .nx.today .r { color: #fff; background: #B7770F; border-color: #B7770F; }
+    .nx.soon { background: #EEF1FE; border-color: #D6DDFC; } .nx.soon .r { color: #2E48D6; border-color: #D6DDFC; }
+    .nx.none { border-style: dashed; background: #fff; } .nx.none .d { font-size: 13.5px; font-weight: 700; color: #58627A; }
+    @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .nx { grid-column: 1 / -1; grid-row: 2; width: auto; } }
     .cb { display: inline-grid; place-items: center; vertical-align: middle; margin-right: 8px; min-width: 28px; height: 28px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .cb.new { background: #3D5AF1; color: #fff; } .cb.miss { background: #E4E8F0; color: #58627A; } .cb.talk { background: #171C2B; color: #fff; } .cb.none { background: #fff; color: #58627A; box-shadow: inset 0 0 0 1.5px #C5CBD8; }
     .when { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #F6F8FC; color: #58627A; }
@@ -368,6 +380,9 @@
     .pop .calw { position: relative; flex: 0 0 44px; }
     .pop .calb { width: 100%; height: 100%; min-height: 40px; display: grid; place-items: center; border: 1px solid #E4E8F0; border-radius: 9px; background: #fff; color: #58627A; cursor: pointer; } .pop .calb:hover { background: #F6F8FC; color: #171C2B; } .pop .calb svg { width: 18px; height: 18px; }
     .pop .calw input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+    .pop .wrow select { flex: 1 1 0; min-width: 0; font: inherit; font-size: 14px; padding: 9px 8px; border: 1px solid #E4E8F0; border-radius: 9px; background: #fff; color: #171C2B; } .pop .wrow select:disabled { background: #F6F8FC; color: #8C95A8; }
+    .pop label .opt { font-weight: 500; }
+    .pop .mv { font-size: 12.5px; line-height: 1.5; color: #58627A; background: #F6F8FC; border-radius: 8px; padding: 7px 10px; margin-top: 8px; }
     .pop .pv { padding: 6px 0 0; color: #1E9E66; font-weight: 600; font-size: 13px; min-height: 20px; }
     .pop .er { font-size: 12.5px; color: #D93A4A; font-weight: 600; margin-top: 6px; }
     .pop textarea { display: block; width: 100%; box-sizing: border-box; min-height: 110px; resize: vertical; font: inherit; font-size: 14px; line-height: 1.5; padding: 9px 11px; border: 1px solid #E4E8F0; border-radius: 9px; background: #fff; color: #171C2B; }
@@ -375,34 +390,12 @@
     .pop .brow { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 16px; }
     .pop .brow .btn { justify-content: center; min-width: 104px; height: 38px; padding: 0 14px; }
   `;
-  // 자연어 일정 → { date:'YYYY-MM-DD', rest:'남은 텍스트(시간 등)' } / null — 상담 업무 재연락 창의 "다음 연락"과 같은 규칙
-  const whenYmd = dt => { const p = n => String(n).padStart(2, '0'); return dt.getFullYear() + '-' + p(dt.getMonth() + 1) + '-' + p(dt.getDate()); };
-  const whenAddD = n => { const t = new Date(); t.setHours(0, 0, 0, 0); t.setDate(t.getDate() + n); return t; };
-  const WHEN_DOW = ['일', '월', '화', '수', '목', '금', '토'];
-  const whenFmt = (d, note) => d ? d + ' (' + WHEN_DOW[new Date(d).getDay()] + ')' + (note ? ' ' + note : '') : '';
-  const whenParse = s0 => {
-    let s = String(s0 || '').trim(); if (!s) return null; const t0 = whenAddD(0); let d = null; const take = re => { const m = s.match(re); if (m) s = (s.slice(0, m.index) + ' ' + s.slice(m.index + m[0].length)).trim(); return m; };
-    let m;
-    if ((m = take(/(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})\s*일?/))) d = new Date(+m[1], +m[2] - 1, +m[3]);
-    else if ((m = take(/(\d{1,2})\s*[\/.월]\s*(\d{1,2})\s*일?/))) { d = new Date(t0.getFullYear(), +m[1] - 1, +m[2]); if (d < whenAddD(-30)) d.setFullYear(d.getFullYear() + 1); }
-    else if (take(/오늘/)) d = whenAddD(0);
-    else if (take(/내일\s*모레|모레/)) d = whenAddD(2);
-    else if (take(/내일/)) d = whenAddD(1);
-    else if ((m = take(/(\d+)\s*일\s*(뒤|후|있다가)/))) d = whenAddD(+m[1]);
-    else if ((m = take(/(\d+)\s*주\s*(뒤|후)/))) d = whenAddD(7 * +m[1]);
-    else if ((m = take(/(이번\s*주|다음\s*주|다다음\s*주|담주|다담주)\s*([월화수목금토일])(요일)?/))) { const dow = '일월화수목금토'.indexOf(m[2]); const wk = /다다음|다담/.test(m[1]) ? 2 : /다음|담/.test(m[1]) ? 1 : 0; const mon = whenAddD(-((t0.getDay() + 6) % 7)); d = new Date(mon); d.setDate(mon.getDate() + wk * 7 + (dow === 0 ? 6 : dow - 1)); if (wk === 0 && d <= t0) d.setDate(d.getDate() + 7); }
-    else if ((m = take(/(다음\s*달|담달|내달|이번\s*달)\s*(초|중순|말)?/))) { const nm = /다음|담|내/.test(m[1]) ? 1 : 0; const y = t0.getFullYear(), mo = t0.getMonth() + nm; d = m[2] === '말' ? new Date(y, mo + 1, 0) : m[2] === '중순' ? new Date(y, mo, 15) : new Date(y, mo, 1); if (!nm && d <= t0) d = new Date(y, mo, Math.max(t0.getDate() + 1, d.getDate())); }
-    else if ((m = take(/다음\s*주|담주/))) d = whenAddD(7);
-    else if ((m = take(/(월|화|수|목|금|토|일)요일/))) { const dow = '일월화수목금토'.indexOf(m[1]); const diff = (dow - t0.getDay() + 7) % 7 || 7; d = whenAddD(diff); }
-    if (!d || isNaN(d)) return null;
-    return { date: whenYmd(d), rest: s.replace(/\s+/g, ' ').replace(/^[에,\s]+/, '').replace(/^\([일월화수목금토]\)\s*/, '').trim() };
-  };
   class URecalls extends HTMLElement {
     connectedCallback() {
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.items = null; this.filter = ''; this.err = '';
       root.innerHTML = `<style>${recallsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">재연락 고객 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div><div id="pop"></div>`;
       root.getElementById('head').onclick = () => { if (!this.items || !this.items.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=38';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=39';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; this.me = me; await this.load(); this._iv = setInterval(() => this.load(), 120000); this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('udongji-lead-assigned', this._on); window.addEventListener('udongji-record-saved', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); window.removeEventListener('udongji-lead-assigned', this._on); window.removeEventListener('udongji-record-saved', this._on); }
@@ -424,7 +417,7 @@
         const t0 = new Date(); t0.setHours(0, 0, 0, 0);
         this.items = items.filter(it => isRecall(it.data)).filter(it => !me.name || V(it.data, '상담자') === me.name || (me.admin && !V(it.data, '상담자'))).map(it => {
           const d = it.data, dt = this.parseWhen(d['다음 액션 · 일시']); const days = dt ? Math.round((new Date(dt).setHours(0, 0, 0, 0) - t0) / 864e5) : null;
-          return { it, days, comm: this.lib.commOf ? this.lib.commOf(d) : null, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d), fresh: d['상태'] === '신규배정' };
+          return { it, days, nx: this.lib.nextInfo ? this.lib.nextInfo(d['다음 액션 · 일시']) : null, comm: this.lib.commOf ? this.lib.commOf(d) : null, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d), fresh: d['상태'] === '신규배정' };
         }).sort((a, b) => (a.days === null ? 9e9 : a.days) - (b.days === null ? 9e9 : b.days));
         this.err = '';
       } catch (e) { this.err = e.message || String(e); if (!this.items) this.items = []; }
@@ -440,8 +433,12 @@
       const V = this.filter ? L.filter(x => this.filter === 'due' ? (x.days === null || x.days <= 0) : this.filter === 'fresh' ? x.fresh : (x.days !== null && x.days <= 2)) : L;
       const cnt = { '': n, fresh: nFresh, due: L.filter(x => x.days === null || x.days <= 0).length, soon: L.filter(x => x.days !== null && x.days <= 2).length };
       const flt = `<div class="flt"><span>기간</span>${[['', '전체'], ['fresh', '신규배정'], ['due', '오늘까지'], ['soon', '2일 후까지']].map(([k, l]) => `<button type="button" data-f="${k}" class="${this.filter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
+      const nx = x => { const n = x.nx || { has: !!x.when, cls: 'text', raw: x.when || '' };
+        if (!n.has) return `<div class="nx none"><span class="l">다음 연락</span><span class="d">일정 없음</span></div>`;
+        if (n.cls === 'text') return `<div class="nx" title="${esc(n.raw)}"><span class="l">다음 연락</span><span class="d txt">${esc(n.raw)}</span></div>`;
+        return `<div class="nx ${n.cls}" title="${esc(n.raw)}"><span class="l">다음 연락<span class="r">${esc(n.rel)}</span></span><span class="d">${esc(n.md)}${n.rest ? `<small>${esc(n.rest)}</small>` : ''}</span></div>`; };
       const tag = x => x.days === null ? `<span class="when">${x.when ? esc(x.when) : '일정 없음'}</span>` : x.days < 0 ? `<span class="when due">${-x.days}일 지남</span>` : x.days === 0 ? `<span class="when today">오늘</span>` : `<span class="when ${x.days <= 2 ? 'soon' : ''}">${x.days}일 후</span>`;
-      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${x.comm ? `<span class="cb ${x.comm.cls}" title="${esc(x.comm.label)}">${esc(x.comm.short)}</span>` : ''}${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn cal" data-memo="${i}" aria-label="메모 수정" title="메모 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"></path><path d="M14 20v-5h5"></path><path d="M8 9h8"></path><path d="M8 13h4"></path></svg></button><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${x.comm ? `<span class="cb ${x.comm.cls}" title="${esc(x.comm.label)}">${esc(x.comm.short)}</span>` : ''}${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div>${nx(x)}<div class="acts"><button type="button" class="btn cal" data-memo="${i}" aria-label="메모 수정" title="메모 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"></path><path d="M14 20v-5h5"></path><path d="M8 9h8"></path><path d="M8 13h4"></path></svg></button><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
       list.querySelectorAll('[data-cal]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openWhen(V[+b.dataset.cal]); }; });
       list.querySelectorAll('[data-memo]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openMemo(V[+b.dataset.memo]); }; });
       list.querySelectorAll('[data-f]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.filter = b.dataset.f; this.paint(); }; });
@@ -479,33 +476,42 @@
       try { await this.lib.updateCells(m.x.it.id, { '특이사항': m.text.trim() }); this.closeMemo(); await this.load(); }
       catch (e) { m.busy = false; m.err = '저장 실패: ' + (e.message || e); this.paintMemo(); }
     }
+    // 다음 연락 일정만 고치는 창 — 날짜는 필수, 오전/오후 · 시 · 분은 선택. 날짜·시간 외의 글은 일정 칸에 두지 않는다
     openWhen(x) {
-      const cur = String(x.it.data['다음 액션 · 일시'] || '').trim(), r = whenParse(cur);
-      this.w = { x, free: r ? r.date + (r.rest ? ' ' + r.rest : '') : cur, date: r ? r.date : '', rest: r ? r.rest : '', err: '', busy: false };
+      const L = this.lib, r = L.whenSplit(x.it.data['다음 액션 · 일시']), t = L.whenTidy(x.it.data);
+      this.w = { x, date: r.ok ? r.date : '', ap: r.ampm, h: r.h, mi: r.mi ? String(+r.mi) : '', left: t ? t.moved : '', err: '', busy: false };
       this.paintWhen(true);
     }
     closeWhen() { this.w = null; this.root.getElementById('pop').innerHTML = ''; }
     paintWhen(build) {
-      const pop = this.root.getElementById('pop'), w = this.w, $ = id => this.root.getElementById(id); if (!w) { pop.innerHTML = ''; return; }
+      const pop = this.root.getElementById('pop'), w = this.w, L = this.lib, $ = id => this.root.getElementById(id); if (!w) { pop.innerHTML = ''; return; }
       if (build) {
-        pop.innerHTML = `<div class="scrim" id="wScrim"></div><div class="pop" role="dialog" aria-modal="true" aria-labelledby="wT"><h3 id="wT">다음 연락 일정 수정</h3><p>${esc(w.x.name)} — 일정만 바꿔요. 재연락·연락 횟수에는 들어가지 않아요.</p><label for="wFree">다음 연락 <b>*</b></label><div class="wrow"><input type="text" id="wFree" placeholder="예: 내일 오후 2시 / 다음주 월요일 / 9월 20일 / 3일 뒤 / 다음달 초"><span class="calw"><button type="button" class="calb" id="wCal" aria-label="캘린더에서 날짜 고르기" title="캘린더에서 날짜 고르기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><input type="date" id="wDate" tabindex="-1" aria-hidden="true"></span></div><div class="er" id="wErr" hidden></div><div class="pv" id="wPv"></div><div class="brow"><button type="button" class="btn" id="wNo">취소</button><button type="button" class="btn primary" id="wOk">일정 저장</button></div></div>`;
-        $('wFree').value = w.free; $('wDate').value = w.date;
+        const mins = ['0', '10', '20', '30', '40', '50']; if (w.mi && !mins.includes(w.mi)) { mins.push(w.mi); mins.sort((a, b) => a - b); }
+        const hs = Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}시</option>`).join(''), ms = mins.map(v => `<option value="${v}">${String(v).padStart(2, '0')}분</option>`).join('');
+        pop.innerHTML = `<div class="scrim" id="wScrim"></div><div class="pop" role="dialog" aria-modal="true" aria-labelledby="wT"><h3 id="wT">다음 연락 일정 수정</h3><p>${esc(w.x.name)} — 일정만 바꿔요. 재연락·연락 횟수에는 들어가지 않아요.</p><label for="wDate">날짜 <b>*</b></label><div class="wrow"><input type="date" id="wDate"></div><label for="wAp">시간 <span class="opt">(선택)</span></label><div class="wrow"><select id="wAp" aria-label="오전/오후"><option value="">오전/오후</option><option value="오전">오전</option><option value="오후">오후</option></select><select id="wH" aria-label="시"><option value="">시</option>${hs}</select><select id="wM" aria-label="분"><option value="">분</option>${ms}</select></div><div class="er" id="wErr" hidden></div><div class="pv" id="wPv"></div><div class="mv" id="wMv" hidden></div><div class="brow"><button type="button" class="btn" id="wNo">취소</button><button type="button" class="btn primary" id="wOk">일정 저장</button></div></div>`;
+        $('wDate').value = w.date;
         $('wScrim').onclick = () => this.closeWhen(); $('wNo').onclick = () => this.closeWhen(); $('wOk').onclick = () => this.saveWhen();
-        $('wFree').oninput = e => { const txt = e.target.value, r = whenParse(txt); w.free = txt; if (r) { w.date = r.date; w.rest = r.rest; w.err = ''; } else { w.date = ''; w.rest = ''; w.err = txt.trim() ? '날짜를 인식하지 못했어요 — 예: 내일, 모레, 다음주 화요일, 9/20, 2주 뒤, 다음달 중순' : ''; } $('wDate').value = w.date; this.paintWhen(); };
-        $('wDate').onchange = e => { const dv = e.target.value; w.date = dv; w.err = ''; w.free = dv ? dv + (w.rest ? ' ' + w.rest : '') : ''; $('wFree').value = w.free; this.paintWhen(); };
-        $('wCal').onclick = () => { const el = $('wDate'); try { if (el.showPicker) el.showPicker(); else { el.focus(); el.click(); } } catch (e) { try { el.focus(); } catch (e2) {} } };
-        $('wFree').onkeydown = e => { if (e.key === 'Enter') this.saveWhen(); else if (e.key === 'Escape') this.closeWhen(); };
-        setTimeout(() => { try { $('wFree').focus(); } catch (e) {} }, 0);
+        $('wDate').onchange = e => { w.date = e.target.value; w.err = ''; this.paintWhen(); };
+        $('wDate').onclick = e => { try { if (e.target.showPicker) e.target.showPicker(); } catch (er) {} };
+        $('wAp').onchange = e => { w.ap = e.target.value; if (!w.ap) { w.h = ''; w.mi = ''; } w.err = ''; this.paintWhen(); };
+        $('wH').onchange = e => { w.h = e.target.value; if (!w.h) w.mi = ''; else if (!w.ap) w.ap = +w.h >= 7 && +w.h <= 11 ? '오전' : '오후'; w.err = ''; this.paintWhen(); };
+        $('wM').onchange = e => { w.mi = e.target.value; w.err = ''; this.paintWhen(); };
+        ['wDate', 'wAp', 'wH', 'wM'].forEach(id => { $(id).onkeydown = e => { if (e.key === 'Escape') this.closeWhen(); }; });
+        setTimeout(() => { try { $('wDate').focus(); } catch (e) {} }, 0);
       }
-      $('wPv').textContent = w.date ? '→ ' + whenFmt(w.date, w.rest) : '';
+      $('wAp').value = w.ap; $('wH').value = w.h; $('wM').value = w.mi; $('wM').disabled = !w.h;
+      const canon = L.whenJoin(w.date, w.ap, w.h, w.mi);
+      $('wPv').textContent = canon ? '→ ' + canon : '';
+      $('wMv').hidden = !w.left; $('wMv').textContent = w.left ? '기존 일정 칸에 함께 적혀 있던 "' + w.left + '" 은(는) 저장하면 메모로 옮겨져요.' : '';
       $('wErr').hidden = !w.err; $('wErr').textContent = w.err;
       $('wOk').disabled = !!w.busy; $('wOk').textContent = w.busy ? '저장 중…' : '일정 저장';
     }
     async saveWhen() {
-      const w = this.w; if (!w || w.busy) return;
-      if (!w.date) { w.err = '다음 연락 날짜를 고르거나 직접 입력하세요.'; this.paintWhen(); return; }
+      const w = this.w, L = this.lib; if (!w || w.busy) return;
+      const canon = L.whenJoin(w.date, w.ap, w.h, w.mi);
+      if (!canon) { w.err = '다음 연락 날짜를 선택하세요.'; this.paintWhen(); return; }
       w.busy = true; this.paintWhen();
-      try { await this.lib.updateCells(w.x.it.id, { '다음 액션 · 일시': whenFmt(w.date, w.rest) }); this.closeWhen(); await this.load(); }
+      try { await L.updateCells(w.x.it.id, L.whenPatch(w.x.it.data, canon)); this.closeWhen(); await this.load(); }
       catch (e) { w.busy = false; w.err = '저장 실패: ' + (e.message || e); this.paintWhen(); }
     }
   }

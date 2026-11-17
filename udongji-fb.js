@@ -96,6 +96,77 @@ export function statusOf(d) {
   if (has(STAGE_COLS.docs)) return { key: 'info', label: '기본정보진행', cls: 'blue' };
   return { key: 'docs', label: '수취자료진행', cls: 'blue' };
 }
+// ── 다음 연락 일정 형식 (통일): 'YYYY-MM-DD (요일)' 까지 필수 + ' 오전|오후' + ' N시' + ' M분' 은 선택. 그 밖의 글은 일정 칸에 두지 않고 메모(특이사항)로 옮긴다 ──
+export const WHEN_COL = '다음 액션 · 일시', MEMO_COL = '특이사항', WHEN_OLD_COL = '일정 정리 전';
+const whenP = n => String(n).padStart(2, '0');
+// 날짜(YYYY-MM-DD) + 오전/오후 + 시 + 분 → 저장 문자열. 날짜가 없으면 ''. 시는 오전/오후가 있어야, 분은 시가 있어야 붙는다.
+export function whenJoin(date, ampm, h, mi) {
+  const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(date || '').trim()); if (!m) return '';
+  const dt = new Date(+m[1], +m[2] - 1, +m[3]); if (isNaN(dt) || dt.getMonth() !== +m[2] - 1) return '';
+  let s = dt.getFullYear() + '-' + whenP(dt.getMonth() + 1) + '-' + whenP(dt.getDate()) + ' (' + '일월화수목금토'[dt.getDay()] + ')';
+  const H = parseInt(h, 10), M = parseInt(mi, 10);
+  if (ampm === '오전' || ampm === '오후') { s += ' ' + ampm; if (H >= 1 && H <= 12) { s += ' ' + H + '시'; if (M >= 1 && M <= 59) s += ' ' + M + '분'; } }
+  return s;
+}
+// 일정 문자열 → { ok(날짜 인식), date, ampm, h, mi, time, rest(날짜·시간 외 글), canon(통일 형식), clean(이미 통일 형식) }. base: 연도 없는 날짜의 기준일(없으면 오늘)
+export function whenSplit(s, base) {
+  const raw = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  const o = { raw, has: !!raw, ok: false, date: '', ampm: '', h: '', mi: '', time: '', rest: '', canon: '', clean: !raw, dt: null };
+  if (!raw) return o;
+  let dt = null, at = -1, len = 0;
+  let m = /(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})\s*일?/.exec(raw);
+  if (m) { dt = new Date(+m[1], +m[2] - 1, +m[3]); if (dt.getMonth() !== +m[2] - 1 || dt.getDate() !== +m[3]) dt = null; at = m.index; len = m[0].length; }
+  else if ((m = /(^|[^\d.])(\d{1,2})\s*[\/.월]\s*(\d{1,2})(?![\d%])\s*일?/.exec(raw))) {
+    const ref = base instanceof Date && !isNaN(base) ? base : new Date(), mo = +m[2], dd = +m[3];
+    dt = new Date(ref.getFullYear(), mo - 1, dd);
+    if (dt.getMonth() !== mo - 1 || dt.getDate() !== dd) dt = null; else if (dt < new Date(ref.getTime() - 30 * 864e5)) dt.setFullYear(dt.getFullYear() + 1);
+    at = m.index + m[1].length; len = m[0].length - m[1].length;
+  }
+  if (!dt || isNaN(dt)) { o.rest = raw; return o; }
+  const pre = raw.slice(0, at).trim(), suf = raw.slice(at + len).trim().replace(/^(\([일월화수목금토](요일)?\)|[일월화수목금토]요일)\s*/, '').replace(/^[,·]\s*/, '');
+  let ampm = '', h = '', mi = '', left = suf;
+  const t = /^(오전|오후|아침|새벽|낮|저녁|밤)?\s*(\d{1,2})\s*(?:시(?!간)\s*(?:(\d{1,2})\s*분|(반))?|:\s*(\d{2}))(?!\d)/.exec(suf);
+  if (t) {
+    let n = +t[2]; const mm = t[4] ? 30 : +(t[3] || t[5] || 0), w = t[1] || '';
+    if (n <= 24 && mm <= 59) {
+      if (n > 12 && n < 24) ampm = '오후'; else if (n === 0 || n === 24) ampm = '오전';
+      else if (/오전|아침|새벽/.test(w)) ampm = '오전'; else if (/오후|낮|저녁/.test(w)) ampm = '오후'; else if (w === '밤') ampm = n === 12 || n < 6 ? '오전' : '오후';
+      else ampm = n === 12 || n <= 6 ? '오후' : '오전';   // 오전/오후가 없으면 업무 시간으로 추정: 7~11시 오전, 12~6시 오후
+      if (n > 12) n -= 12; if (n === 0) n = 12;
+      h = String(n); mi = mm ? String(mm) : ''; left = suf.slice(t[0].length);
+      if (/^\s*([~\-–—]|이후|이전|전후|까지|부터|사이|전에|넘어)/.test(left)) { left = suf; }   // "2시~3시", "10시 이후" 처럼 뜻이 달라지는 말은 통째로 메모로
+      else left = left.replace(/^(쯤|경|즈음|정도|께)(?=$|[\s,.·)])/, '').replace(/^에(?=$|\s)/, '').replace(/^[\s,.·]+/, '');
+    }
+  } else { const a = /^(오전|오후)\s*(?:중|에|쯤)?$/.exec(suf); if (a) { ampm = a[1]; left = ''; } }
+  let rest = [pre, left.trim()].filter(Boolean).join(' ').trim(); const pm = /^\(([^()]*)\)$/.exec(rest); if (pm) rest = pm[1].trim();
+  o.ok = true; o.dt = dt; o.date = dt.getFullYear() + '-' + whenP(dt.getMonth() + 1) + '-' + whenP(dt.getDate());
+  o.ampm = ampm; o.h = h; o.mi = mi; o.rest = rest; o.canon = whenJoin(o.date, ampm, h, mi); o.time = o.canon.replace(/^[^)]*\)\s*/, ''); o.clean = o.canon === raw;
+  return o;
+}
+// 고객 한 명의 일정을 통일 형식으로 정리할 때 바뀌는 내용 → null(이미 통일 형식) / { kind: 'format'(형식만) | 'move'(뒷내용을 메모로) | 'dup'(뒷내용이 이미 메모에 있어 지우기만) | 'nodate'(날짜를 알 수 없어 전체를 메모로, 일정은 비움), from, to, moved, patch }
+export function whenTidy(d) {
+  d = d || {}; const raw = String(d[WHEN_COL] || '').replace(/\s+/g, ' ').trim(); if (!raw) return null;
+  const bm = /(\d{4})[-./](\d{1,2})[-./](\d{1,2})/.exec(String(d['상담일'] || '')), base = bm ? new Date(+bm[1], +bm[2] - 1, +bm[3]) : null;
+  const w = whenSplit(raw, base); if (w.clean) return null;
+  const memo0 = String(d[MEMO_COL] || '').trim(); let moved = w.rest;
+  if (moved && (memo0.includes(moved) || (/^홈페이지 신청/.test(moved) && /홈페이지 상담신청/.test(memo0)))) moved = '';   // 이미 메모에 있는 내용은 다시 붙이지 않는다
+  const patch = { [WHEN_COL]: w.canon }; if (moved) patch[MEMO_COL] = (memo0 ? memo0 + ' / ' : '') + '[일정 메모] ' + moved;
+  return { kind: !w.ok ? 'nodate' : moved ? 'move' : w.rest ? 'dup' : 'format', from: raw, to: w.canon, moved, patch };
+}
+// 일정을 새 값(canon)으로 저장할 때 쓰는 변경 내용 — 기존 일정 칸에 남아 있던 날짜·시간 외 글은 메모로 함께 옮긴다
+export function whenPatch(d, canon) { const t = whenTidy(d), patch = { [WHEN_COL]: canon }; if (t && t.patch[MEMO_COL] != null) patch[MEMO_COL] = t.patch[MEMO_COL]; return patch; }
+// ── 다음 연락 일정 표시용: 날짜 · 시간 · 남은 일수 · 강조 등급(due 지남 / today 오늘 / soon 2일 이내 / later / text 날짜 인식 불가 / none 없음) ──
+export function nextInfo(s) {
+  const w = whenSplit(s);
+  if (!w.has) return { has: false, raw: '', date: '', md: '', time: '', rest: '', main: '', days: null, rel: '', cls: 'none' };
+  if (!w.ok) return { has: true, raw: w.raw, date: '', md: '', time: '', rest: '', main: w.raw, days: null, rel: '', cls: 'text' };
+  const y = new Date().getFullYear(), t0 = new Date(); t0.setHours(0, 0, 0, 0); const d0 = new Date(w.dt); d0.setHours(0, 0, 0, 0);
+  const days = Math.round((d0 - t0) / 864e5);
+  const md = (d0.getFullYear() !== y ? d0.getFullYear() + '.' : '') + (d0.getMonth() + 1) + '.' + whenP(d0.getDate()) + ' (' + '일월화수목금토'[d0.getDay()] + ')';
+  const rel = days < 0 ? (-days) + '일 지남' : days === 0 ? '오늘' : days === 1 ? '내일' : days + '일 후';
+  const rest = [w.time, w.rest].filter(Boolean).join(' ');
+  return { has: true, raw: w.raw, date: w.date, md, time: w.time, rest, main: md + (rest ? ' ' + rest : ''), days, rel, cls: days < 0 ? 'due' : days === 0 ? 'today' : days <= 2 ? 'soon' : 'later' };
+}
 // ── 소통 상태 (이름 옆 배지): 신규 → 부1·부2·부3(부재중, 신규 고객이 전화를 안 받음) → 연1·연2…(연락, 계속 카운트) ──
 export const MISS_COL = '부재중 횟수', TALK_COL = '연락 횟수', COMM_LOG_COL = '소통 이력', MISS_MAX = 3;
 const commCnt = (d, k) => { const n = parseInt(String((d || {})[k] || '').replace(/\D/g, ''), 10); return n > 0 ? n : 0; };
@@ -366,7 +437,7 @@ export async function assignLead(lead) {
   await init(); need(); const { fs } = _mods; const m = await me(); if (!m.name) throw new Error('계정에 이름이 등록돼 있어야 배정할 수 있어요 (관리자에게 요청)');
   const t = new Date(); const p = n => String(n).padStart(2, '0'); const when = t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate());
   const note = '홈페이지 상담신청' + (lead.method ? ' · ' + lead.method + ' 선호' : '') + (lead.event ? ' · 체험단 ' + lead.event : '') + (lead.submittedAt ? ' (' + new Date(lead.submittedAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 접수)' : '');
-  const cid = await appendRecord({ '고객명': lead.name, '연락처': fmtPhone(lead.phone), '유입 경로': 'Chat-In', '상담일': when, '상태': '신규배정', '다음 액션 · 일시': when + ' (홈페이지 신청 · ' + (lead.method || '연락') + ')', '특이사항': note });
+  const cid = await appendRecord({ '고객명': lead.name, '연락처': fmtPhone(lead.phone), '유입 경로': 'Chat-In', '상담일': when, '상태': '신규배정', '다음 액션 · 일시': whenJoin(when), '특이사항': note });
   await fs.setDoc(fs.doc(_db, 'leads', lead.id), { status: 'assigned', assignedTo: userEmail(), assignedName: m.name, assignedAt: new Date().toISOString(), customerId: cid }, { merge: true });
   return cid;
 }
