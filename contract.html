@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=114"></script>
+  <script src="./udongji-nav.js?v=115"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -37,6 +37,9 @@
     .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; } .btn.primary:hover { background: var(--blue-d); }
     .btn.ok { background: var(--green); border-color: var(--green); color: #fff; }
     .btn.danger { color: var(--red); } .btn.danger:hover { background: var(--red-2); }
+    .storew { display: flex; align-items: center; gap: 10px; }
+    .cmb { display: inline-grid; place-items: center; flex: 0 0 auto; min-width: 28px; height: 28px; padding: 0 6px; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .cmb.new { background: var(--blue); color: #fff; } .cmb.miss { background: #E4E8F0; color: #58627A; } .cmb.talk { background: #171C2B; color: #fff; } .cmb.none { background: #fff; color: #58627A; box-shadow: inset 0 0 0 1.5px #C5CBD8; }
     .btn:disabled { opacity: .5; cursor: default; }
     .cnt { font-size: 12.5px; color: var(--text-3); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .cnt.err { color: var(--red); font-weight: 600; }
@@ -171,7 +174,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="114"></udongji-nav>
+<udongji-nav current="contract" page-v="115"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -194,7 +197,7 @@
       <tbody>
         <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
           <tr class="{{ r.cls }}" onClick="{{ r.open }}">
-            <td class="store"><b>{{ r.store }}</b><small>{{ r.who }}</small></td>
+            <td class="store"><div class="storew"><span class="cmb {{ r.commCls }}" title="{{ r.commTitle }}">{{ r.comm }}</span><div><b>{{ r.store }}</b><small>{{ r.who }}</small></div></div></td>
             <td><span class="pill blue">{{ r.mode }}</span></td>
             <td class="dim">{{ r.date }}</td>
             <td class="dim">{{ r.agent }}</td>
@@ -457,9 +460,10 @@ class Component extends DCLogic {
       const prev = STAGES[STAGES.findIndex(s => s.key === k) - 1];
       return prev && stageDone(d, prev.key) ? { cls: 'next', t: '대기' } : { cls: 'wait', t: '—' };
     };
+    const CMB = d => lib && lib.commOf ? lib.commOf(d) : { short: '', cls: '', label: '' };
     const rows = list.map(it => { const d = it.data, c = STAGES.map(s => cell(d, s.key)); return {
       cls: (it.row === selRow ? 'on ' : '') + (stageDone(d, 'install') ? 'done' : ''), open: () => { const firstOpen = STAGES.find(s => !stageDone(d, s.key)); clearTimeout(this._memoT); this.setState({ selRow: it.row, memo: d[lib.PROGRESS_NOTE_COL] || '', memoDirty: false, memoSavedAt: '', pfDraft: {}, seq: 0, copied: {}, photoSel: {}, tab: firstOpen ? (meInfo.close && (firstOpen.key === 'docs' || firstOpen.key === 'info') ? 'handoff' : firstOpen.key) : 'install' }); },
-      store: V(d, '매장명') || '(매장명 없음)', who: [V(d, '고객명'), V(d, '연락처')].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '—', date: V(d, '상담일').slice(5), agent: V(d, '상담자'), memo: V(d, lib ? lib.PROGRESS_NOTE_COL : '진행 메모'),
+      store: V(d, '매장명') || '(매장명 없음)', comm: CMB(d).short, commCls: CMB(d).cls, commTitle: CMB(d).label, who: [V(d, '고객명'), V(d, '연락처')].filter(Boolean).join(' · '), mode: V(d, '매장 구분') || '—', date: V(d, '상담일').slice(5), agent: V(d, '상담자'), memo: V(d, lib ? lib.PROGRESS_NOTE_COL : '진행 메모'),
       s0: c[0] ? c[0].cls : '', s0t: c[0] ? c[0].t : '', s1: c[1] ? c[1].cls : '', s1t: c[1] ? c[1].t : '', s2: c[2] ? c[2].cls : '', s2t: c[2] ? c[2].t : '', s3: c[3] ? c[3].cls : '', s3t: c[3] ? c[3].t : '', s4: c[4] ? c[4].cls : '', s4t: c[4] ? c[4].t : ''
     }; });
     const rec = items.find(it => it.row === selRow) || null;

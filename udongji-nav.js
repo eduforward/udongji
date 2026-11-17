@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v114 · 2026-11-16 20:55';
+  const VERSION = 'v115 · 2026-11-17 11:47';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 115, d: '2026-11-17', t: '11:47', c: ['상담 업무의 재연락 고객 목록과 계약 업무 고객 목록에도 이름 앞에 소통 상태 배지(신규 · 부1~부3 · 연1~ · 무)가 보여요 — 고객 목록과 같은 표시'] },
     { v: 114, d: '2026-11-16', t: '20:55', c: ['재연락 고객 목록에서 고객 줄을 눌러도 더는 상담 화면으로 넘어가지 않아요 — "이어서 상담" 버튼을 눌러야 불러와요'] },
     { v: 113, d: '2026-11-16', t: '20:51', c: ['재연락 고객 목록의 메모 버튼을 누르면 이제 메모를 읽기만 하는 창이 먼저 떠요 — 고치려면 창 안의 "수정"을 누르면 돼요'] },
     { v: 112, d: '2026-11-16', t: '20:43', c: ['고객 목록과 계약 업무의 고객 상세에 "고객 포기" 버튼 추가 — 포기 이유를 고르면 바로 포기 처리돼요 (상담 업무의 고객 포기와 같은 방식)'] },
@@ -91,7 +92,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 114;
+  const PAGE_V = 115;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -351,6 +352,8 @@
   const recallsCss = leadsCss + `
     .card.has { border-color: #E9A23B; } .has .dot { background: #E9A23B; box-shadow: 0 0 0 4px #FBF1DF; } .msg b { color: #B8791A; }
     .row { cursor: default; }
+    .cb { display: inline-grid; place-items: center; vertical-align: middle; margin-right: 8px; min-width: 28px; height: 28px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .cb.new { background: #3D5AF1; color: #fff; } .cb.miss { background: #E4E8F0; color: #58627A; } .cb.talk { background: #171C2B; color: #fff; } .cb.none { background: #fff; color: #58627A; box-shadow: inset 0 0 0 1.5px #C5CBD8; }
     .when { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #F6F8FC; color: #58627A; }
     .when.due { background: #FDECEE; color: #D93A4A; } .when.today { background: #FBF1DF; color: #B8791A; } .when.soon { background: #EEF1FE; color: #2E48D6; }
     .h { color: #8C95A8; font-size: 12px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 720px; }
@@ -421,7 +424,7 @@
         const t0 = new Date(); t0.setHours(0, 0, 0, 0);
         this.items = items.filter(it => isRecall(it.data)).filter(it => !me.name || V(it.data, '상담자') === me.name || (me.admin && !V(it.data, '상담자'))).map(it => {
           const d = it.data, dt = this.parseWhen(d['다음 액션 · 일시']); const days = dt ? Math.round((new Date(dt).setHours(0, 0, 0, 0) - t0) / 864e5) : null;
-          return { it, days, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d), fresh: d['상태'] === '신규배정' };
+          return { it, days, comm: this.lib.commOf ? this.lib.commOf(d) : null, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d), fresh: d['상태'] === '신규배정' };
         }).sort((a, b) => (a.days === null ? 9e9 : a.days) - (b.days === null ? 9e9 : b.days));
         this.err = '';
       } catch (e) { this.err = e.message || String(e); if (!this.items) this.items = []; }
@@ -438,7 +441,7 @@
       const cnt = { '': n, fresh: nFresh, due: L.filter(x => x.days === null || x.days <= 0).length, soon: L.filter(x => x.days !== null && x.days <= 2).length };
       const flt = `<div class="flt"><span>기간</span>${[['', '전체'], ['fresh', '신규배정'], ['due', '오늘까지'], ['soon', '2일 후까지']].map(([k, l]) => `<button type="button" data-f="${k}" class="${this.filter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>`;
       const tag = x => x.days === null ? `<span class="when">${x.when ? esc(x.when) : '일정 없음'}</span>` : x.days < 0 ? `<span class="when due">${-x.days}일 지남</span>` : x.days === 0 ? `<span class="when today">오늘</span>` : `<span class="when ${x.days <= 2 ? 'soon' : ''}">${x.days}일 후</span>`;
-      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn cal" data-memo="${i}" aria-label="메모 수정" title="메모 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"></path><path d="M14 20v-5h5"></path><path d="M8 9h8"></path><path d="M8 13h4"></path></svg></button><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      list.innerHTML = flt + (V.length ? '' : '<div class="empty">해당하는 고객이 없어요</div>') + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n">${x.comm ? `<span class="cb ${x.comm.cls}" title="${esc(x.comm.label)}">${esc(x.comm.short)}</span>` : ''}${esc(x.name)} <span class="pill ${x.fresh ? '' : x.post ? 'any' : ''}" style="margin-left:6px;vertical-align:2px${x.fresh ? ';background:#2E48D6;color:#fff' : ''}">${x.fresh ? '신규배정 · 아직 연락 전' : x.post ? '상담 연기' : '재연락'}</span></div><div class="m">${esc(x.meta)}${tag(x)}${x.when && x.days !== null ? `<span class="t">약속 ${esc(x.when)}</span>` : ''}</div>${x.hist ? `<div class="h">${esc(x.hist)}</div>` : ''}</div><div class="acts"><button type="button" class="btn cal" data-memo="${i}" aria-label="메모 수정" title="메모 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"></path><path d="M14 20v-5h5"></path><path d="M8 9h8"></path><path d="M8 13h4"></path></svg></button><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
       list.querySelectorAll('[data-cal]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openWhen(V[+b.dataset.cal]); }; });
       list.querySelectorAll('[data-memo]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openMemo(V[+b.dataset.memo]); }; });
       list.querySelectorAll('[data-f]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.filter = b.dataset.f; this.paint(); }; });
