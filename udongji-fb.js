@@ -165,7 +165,8 @@ export function nextInfo(s) {
   const md = (d0.getFullYear() !== y ? d0.getFullYear() + '.' : '') + (d0.getMonth() + 1) + '.' + whenP(d0.getDate()) + ' (' + '일월화수목금토'[d0.getDay()] + ')';
   const rel = days < 0 ? (-days) + '일 지남' : days === 0 ? '오늘' : days === 1 ? '내일' : days + '일 후';
   const rest = [w.time, w.rest].filter(Boolean).join(' ');
-  return { has: true, raw: w.raw, date: w.date, md, time: w.time, rest, main: md + (rest ? ' ' + rest : ''), days, rel, cls: days < 0 ? 'due' : days === 0 ? 'today' : days <= 2 ? 'soon' : 'later' };
+  const mins = w.h ? ((+w.h % 12) + (w.ampm === '오후' ? 12 : 0)) * 60 + (+w.mi || 0) : w.ampm === '오전' ? 719 : w.ampm === '오후' ? 1439 : null;   // 같은 날 정렬용 — 시간 없는 '오전'은 오전 끝, '오후'는 하루 끝
+  return { has: true, raw: w.raw, date: w.date, md, time: w.time, left: w.rest, mins, rest, main: md + (rest ? ' ' + rest : ''), days, rel, cls: days < 0 ? 'due' : days === 0 ? 'today' : days <= 2 ? 'soon' : 'later' };
 }
 // ── 소통 상태 (이름 옆 배지): 신규 → 부1·부2·부3(부재중, 신규 고객이 전화를 안 받음) → 연1·연2…(연락, 계속 카운트) ──
 export const MISS_COL = '부재중 횟수', TALK_COL = '연락 횟수', COMM_LOG_COL = '소통 이력', MISS_MAX = 3;

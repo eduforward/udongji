@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=116"></script>
+  <script src="./udongji-nav.js?v=117"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -94,7 +94,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="admin" page-v="116"></udongji-nav>
+<udongji-nav current="admin" page-v="117"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><span class="mark">!</span><div><b>{{ myRoleLabel }}</b><small>{{ email }}</small></div></div>
@@ -196,8 +196,8 @@
   <sc-if value="{{ isTidy }}" hint-placeholder-val="{{ false }}">
   <div class="card">
     <div class="gs-head"><h3>다음 연락 일정 형식 정리</h3><span class="status">{{ tidyStatus }}</span></div>
-    <p class="hint">다음 연락 일정은 <b>날짜(필수) + 오전/오후 · 시 · 분(선택)</b>까지만 남겨요. 그 뒤에 적혀 있던 글은 메모(특이사항) 끝에 <b>[일정 메모]</b>로 옮기고 일정 칸에서는 지웁니다. 아래 표에서 바뀌는 내용을 먼저 확인한 뒤 실행하세요. 원래 적혀 있던 값은 고객마다 "일정 정리 전" 항목에 그대로 남겨 둡니다.</p>
-    <div class="frm" style="align-items:center"><label style="display:flex;align-items:center;gap:8px;font-size:13.5px"><input type="checkbox" checked="{{ tidySkip }}" onChange="{{ onTidySkip }}">날짜를 알 수 없는 {{ tidyNoDateN }}건은 그대로 두기</label><button type="button" class="btn primary" onClick="{{ runTidy }}" disabled="{{ tidyOff }}">{{ tidyBtn }}</button></div>
+    <p class="hint">다음 연락 일정은 <b>날짜(필수) + 오전/오후 · 시 · 분(선택)</b>까지만 남겨요. 그 뒤에 적혀 있던 글은 메모(특이사항) 끝에 <b>[일정 메모]</b>로 옮기고 일정 칸에서는 지웁니다. 날짜 없이 글만 적혀 있던 일정은 글 전체를 메모로 옮기고 일정은 비웁니다. 아래 표에서 바뀌는 내용을 먼저 확인한 뒤 실행하세요. 원래 적혀 있던 값은 고객마다 "일정 정리 전" 항목에 그대로 남겨 둡니다.</p>
+    <div class="frm" style="align-items:center"><button type="button" class="btn primary" onClick="{{ runTidy }}" disabled="{{ tidyOff }}">{{ tidyBtn }}</button></div>
     <div class="msg {{ msgCls }}">{{ msg }}</div>
   </div>
   <div class="tw">
@@ -217,10 +217,10 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { lib: null, myRole: '', newUserRole: 'consult', tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : location.hash === '#ai' ? 'ai' : location.hash === '#slack' ? 'sl' : location.hash === '#tidy' ? 'tidy' : 'users', tidySkip: true, tidyBusy: false, tidyDone: 0, tidyAll: 0, slCfg: {}, slUrl: '', aiCfg: {}, aiLog: [], aiKey: '', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
+  state = { lib: null, myRole: '', newUserRole: 'consult', tab: location.hash === '#log' ? 'log' : location.hash === '#newsletter' ? 'nl' : location.hash === '#ai' ? 'ai' : location.hash === '#slack' ? 'sl' : location.hash === '#tidy' ? 'tidy' : 'users', tidySkip: false, tidyBusy: false, tidyDone: 0, tidyAll: 0, slCfg: {}, slUrl: '', aiCfg: {}, aiLog: [], aiKey: '', nlCfg: {}, nlLog: [], nlUrl: '', nlSecret: '', nlEnabled: true, logs: [], admins: [], users: [], records: [], loading: true, err: '', query: '', ok: false, denied: false, email: '', toast: '', toastOn: false, busy: false, msg: '', msgCls: '', newUser: '', newUserName: '', newAdmin: '' };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=39'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=40'); await lib.init();
       if (location.hash === '#hours') { location.replace('hours.html'); return; }
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const email = lib.userEmail(); const myRole = await lib.roleOf(email); const ok = lib.isAdminRole(myRole);
@@ -274,7 +274,7 @@ class Component extends DCLogic {
     const tidyOf = list => (lib && lib.whenTidy ? list : []).map(r => ({ r, t: lib.whenTidy(r.data) })).filter(x => x.t);
     const tidyList = tidyOf(records), tidyNoDateN = tidyList.filter(x => x.t.kind === 'nodate').length;
     const tidyTargets = list => list.filter(x => !(tidySkip && x.t.kind === 'nodate'));
-    const tidyN = tidyTargets(tidyList).length, TK = { format: '형식만 맞춤', move: '뒷내용 → 메모', dup: '뒷내용 지움 (메모에 이미 있음)', nodate: '날짜 없음' };
+    const tidyN = tidyTargets(tidyList).length, TK = { format: '형식만 맞춤', move: '뒷내용 → 메모', dup: '뒷내용 지움 (메모에 이미 있음)', nodate: '날짜 없음 → 전체를 메모로' };
     const tidyRows = tidyList.map(x => ({ name: (x.r.data['매장명'] || x.r.data['고객명'] || '(이름 없음)') + (x.r.data['매장명'] && x.r.data['고객명'] ? ' · ' + x.r.data['고객명'] : ''), agent: x.r.data['상담자'] || '—', kind: TK[x.t.kind] + (tidySkip && x.t.kind === 'nodate' ? ' (그대로 둠)' : ''), from: x.t.from, to: tidySkip && x.t.kind === 'nodate' ? '—' : (x.t.to || '(일정 비움)'), moved: tidySkip && x.t.kind === 'nodate' ? '' : (x.t.moved || '—') }));
     const runTidy = async () => {
       if (!lib || this.state.tidyBusy) return;
