@@ -14,7 +14,7 @@ export function val(d, k) { const v = String((d || {})[k] || '').replace(/[\t\r\
 
 export function buildPayn(d) {
   const v = k => val(d, k), isNew = v('매장 구분') === '신규 오픈', r = v('상담 결과');
-  if (r && r !== '상담 진행') return ['[' + r + '] ' + (v('매장명') || v('고객명')), '· 대표 / 연락처 : ' + v('고객명') + ' / ' + v('연락처'), '· 상태 : ' + v('상태'), (r === '상담 연기' || r === '상담 불가') ? '· 다음 연락 : ' + v('다음 액션 · 일시') : '· 메모 : ' + v('특이사항')].join('\n');
+  if (r && r !== '상담 진행') return ['[' + r + '] ' + (v('매장명') || v('고객명')), '· 대표 / 연락처 : ' + v('고객명') + ' / ' + v('연락처'), '· 상태 : ' + v('상태'), (r === '상담 연기' || r === '상담 불가') ? '· 다음 연락 : ' + (whenShow(v('다음 액션 · 일시')) || '—') : '· 메모 : ' + v('특이사항')].join('\n');
   const L = [];
   L.push('[' + (isNew ? '신규 매장' : '기존 운영 매장') + ' 상담 접수] ' + v('매장명') + (v('매장 주소') ? ' (' + v('매장 주소') + ')' : ''));
   L.push('· 대표 / 연락처 : ' + v('고객명') + ' / ' + v('연락처'));
@@ -43,7 +43,7 @@ export function buildSMS(d) {
   const head = '[우동지] ' + name + ', 우동지 상담사 ' + agent + '입니다.', tail = '\n\n궁금한 점은 이 번호로 카카오톡 메시지 주시면 바로 답변드리겠습니다.\n감사합니다.';
   const r = v('상담 결과');
   if (r === '상담 거부') return { kind: '상담 거부 · 마무리 인사', text: head + '\n오늘 시간 내주셔서 감사합니다.\n이후 네이버 플레이스나 결제 관련 도움이 필요하시면 언제든 이 번호로 연락 주시기 바랍니다.' + tail };
-  if (r === '상담 연기' || r === '상담 불가' || v('상태') === '재연락 예정') { const when = v('다음 액션 · 일시') || '○월 ○일'; return { kind: '재연락 안내', text: head + '\n오늘 통화 감사합니다. 말씀해 주신 대로 ' + when + '에 다시 연락드리겠습니다.\n그 전에 준비되시면 미리 보내주셔도 됩니다.' + tail }; }
+  if (r === '상담 연기' || r === '상담 불가' || v('상태') === '재연락 예정') { const when = whenShow(v('다음 액션 · 일시')) || '○월 ○일'; return { kind: '재연락 안내', text: head + '\n오늘 통화 감사합니다. 말씀해 주신 대로 ' + when + '에 다시 연락드리겠습니다.\n그 전에 준비되시면 미리 보내주셔도 됩니다.' + tail }; }
   const isNew = v('매장 구분') === '신규 오픈', corp = v('대형/개인/법인') === '법인', joint = v('단독/공동') === '공동';
   const food = /음식|식당|카페|주점|치킨|피자|분식|베이커리|제과|호프|술/.test(v('업종'));
   const docs = ['1. 사업자등록증 (최근 발급본, 가리는 곳 없이)', '2. 대표님 신분증 (주민등록증 또는 운전면허증 — 여권 불가)', '3. 정산받으실 통장 사본 (모바일 캡처 가능' + (corp ? ', 예금주 = 법인명' : '') + ')'];
@@ -155,18 +155,20 @@ export function whenTidy(d) {
 }
 // 일정을 새 값(canon)으로 저장할 때 쓰는 변경 내용 — 기존 일정 칸에 남아 있던 날짜·시간 외 글은 메모로 함께 옮긴다
 export function whenPatch(d, canon) { const t = whenTidy(d), patch = { [WHEN_COL]: canon }; if (t && t.patch[MEMO_COL] != null) patch[MEMO_COL] = t.patch[MEMO_COL]; return patch; }
+// 화면·문자·요약에 내보낼 일정 글: 날짜 + 시간까지만 (날짜를 알 수 없으면 '')
+export function whenShow(s) { return whenSplit(s).canon; }
 // ── 다음 연락 일정 표시용: 날짜 · 시간 · 남은 일수 · 강조 등급(due 지남 / today 오늘 / soon 2일 이내 / later / text 날짜 인식 불가 / none 없음) ──
 export function nextInfo(s) {
   const w = whenSplit(s);
   if (!w.has) return { has: false, raw: '', date: '', md: '', time: '', rest: '', main: '', days: null, rel: '', cls: 'none' };
-  if (!w.ok) return { has: true, raw: w.raw, date: '', md: '', time: '', rest: '', main: w.raw, days: null, rel: '', cls: 'text' };
+  if (!w.ok) return { has: false, raw: '', date: '', md: '', time: '', rest: '', main: '', days: null, rel: '', cls: 'none' };   // 날짜 없이 글만 적혀 있으면 일정 없음(—)으로 보여 준다
   const y = new Date().getFullYear(), t0 = new Date(); t0.setHours(0, 0, 0, 0); const d0 = new Date(w.dt); d0.setHours(0, 0, 0, 0);
   const days = Math.round((d0 - t0) / 864e5);
-  const md = (d0.getFullYear() !== y ? d0.getFullYear() + '.' : '') + (d0.getMonth() + 1) + '.' + whenP(d0.getDate()) + ' (' + '일월화수목금토'[d0.getDay()] + ')';
+  const md = (d0.getFullYear() !== y ? d0.getFullYear() + '년 ' : '') + (d0.getMonth() + 1) + '월 ' + d0.getDate() + '일 (' + '일월화수목금토'[d0.getDay()] + ')';
   const rel = days < 0 ? (-days) + '일 지남' : days === 0 ? '오늘' : days === 1 ? '내일' : days + '일 후';
-  const rest = [w.time, w.rest].filter(Boolean).join(' ');
+  const rest = w.time;   // 표시는 날짜 + 시간까지만 — 일정 칸에 남아 있는 다른 글은 내보내지 않는다
   const mins = w.h ? ((+w.h % 12) + (w.ampm === '오후' ? 12 : 0)) * 60 + (+w.mi || 0) : w.ampm === '오전' ? 719 : w.ampm === '오후' ? 1439 : null;   // 같은 날 정렬용 — 시간 없는 '오전'은 오전 끝, '오후'는 하루 끝
-  return { has: true, raw: w.raw, date: w.date, md, time: w.time, left: w.rest, mins, rest, main: md + (rest ? ' ' + rest : ''), days, rel, cls: days < 0 ? 'due' : days === 0 ? 'today' : days <= 2 ? 'soon' : 'later' };
+  return { has: true, raw: w.canon, date: w.date, md, time: w.time, left: '', mins, rest, main: md + (rest ? ' ' + rest : ''), days, rel, cls: days < 0 ? 'due' : days === 0 ? 'today' : days <= 2 ? 'soon' : 'later' };
 }
 // ── 소통 상태 (이름 옆 배지): 신규 → 부1·부2·부3(부재중, 신규 고객이 전화를 안 받음) → 연1·연2…(연락, 계속 카운트) ──
 export const MISS_COL = '부재중 횟수', TALK_COL = '연락 횟수', COMM_LOG_COL = '소통 이력', MISS_MAX = 3;
