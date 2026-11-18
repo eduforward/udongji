@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v120 · 2026-11-17 14:05';
+  const VERSION = 'v121 · 2026-11-18 12:30';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 121, d: '2026-11-18', t: '12:30', c: ['재연락 목록에서 고객마다 아래에 메모가 바로 보여요 (한 줄 — 전체는 메모 버튼)', '재연락으로 저장할 때 적는 메모는 기존 메모의 앞에 붙어요 — 최신 내용이 먼저 보여요', '재연락 목록 맨 왼쪽에 상담일이 보이고, 매장명 · 고객명 · 연락처 · 메모로 검색할 수 있어요', '소통 배지(신규 · 부1 · 연1 · 무)를 작게 줄여 이름 바로 앞에 붙였어요'] },
     { v: 120, d: '2026-11-17', t: '14:05', c: ['고객 목록의 "매장 구분" 칸을 "단계" 칸으로 바꿨어요 — 그 고객이 지금 상담 · 수취자료 · 기본정보 · 페이앤 이관 · 전자서명 · 커넥트 배송 · 완료 중 어디인지 보여요'] },
     { v: 119, d: '2026-11-17', t: '13:54', c: ['재연락 목록의 고객 칸이 한 줄로 얇아졌어요 — 고객명 · 매장명 옆에 연락처가 크게 보이고, 상태 알약(상담 연기 · 신규배정)과 이름 아래 메모 줄, "다음 연락" 글자를 뺐어요 (메모는 메모 버튼으로 확인)', '신규 · 부1 · 연1 · 무 배지 크기를 모두 같게 맞췄어요 — 옆 글자가 같은 자리에서 시작해요'] },
     { v: 118, d: '2026-11-17', t: '13:36', c: ['다음 연락은 어디서나 "11월 17일 (화) 오후 4시 30분"처럼 날짜·요일·시간까지만 보여요 — 일정 칸에 같이 적혀 있던 다른 글은 목록 · 상세 · 안내 문자 · 일일 보고에 나오지 않아요', '재연락 목록의 기간 필터(신규배정 · 오늘까지 · 2일 후까지)를 없애고, 원하는 날짜를 골라 보거나 시간 오름차순 · 내림차순으로 정렬할 수 있어요'] },
@@ -97,7 +98,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 120;
+  const PAGE_V = 121;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -299,11 +300,14 @@
     .open .list { display: block; }
     .row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px 14px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #EEF1F6; }
     .row:last-child { border-bottom: 0; }
-    .row .n { font-weight: 800; font-size: 15px; display: grid; grid-template-columns: 42px minmax(0, 300px) auto; justify-content: start; align-items: center; column-gap: 8px; }
-    .row .n .bs { display: flex; } .row .n .bs .cb { margin-right: 0; }
+    .row .n .dt { font-size: 13px; font-weight: 500; color: #8C95A8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .flt input[type=search] { font: inherit; font-size: 12.5px; padding: 5px 10px; border: 1px solid #E4E8F0; border-radius: 8px; background: #fff; color: #171C2B; width: 240px; max-width: 100%; }
+    .row .n { font-weight: 800; font-size: 15px; display: grid; grid-template-columns: 44px minmax(0, 330px) auto; justify-content: start; align-items: center; column-gap: 8px; }
+    .row .n .who .cb { vertical-align: 2px; }
     .row .n .who { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row .n .mid { font-style: normal; color: #8C95A8; margin: 0 7px; }
     .row .n .st { font-weight: 700; }
+    .row .mo { margin: 3px 0 0 52px; font-size: 13px; line-height: 1.45; color: #58627A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row .n .ph { font-size: 15.5px; font-weight: 700; color: #171C2B; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .row .m { color: #58627A; font-size: 13px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
     .row .m .ph { font-weight: 700; color: #171C2B; font-variant-numeric: tabular-nums; }
@@ -376,7 +380,7 @@
     .nx.soon { background: #EEF1FE; border-color: #D6DDFC; } .nx.soon .r { color: #2E48D6; border-color: #D6DDFC; }
     .nx.none { border-style: dashed; background: #fff; } .nx.none .d { font-size: 13.5px; font-weight: 700; color: #58627A; }
     @media (max-width: 720px) { .row { grid-template-columns: minmax(0,1fr) auto; } .nx { grid-column: 1 / -1; grid-row: 2; width: auto; } }
-    .cb { display: inline-grid; place-items: center; vertical-align: middle; margin-right: 8px; width: 38px; min-width: 38px; height: 28px; padding: 0; box-sizing: border-box; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .cb { display: inline-grid; place-items: center; vertical-align: middle; margin-right: 6px; width: 32px; min-width: 32px; height: 20px; padding: 0; box-sizing: border-box; border-radius: 999px; font-size: 10.5px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .cb.new { background: #3D5AF1; color: #fff; } .cb.miss { background: #E4E8F0; color: #58627A; } .cb.talk { background: #171C2B; color: #fff; } .cb.none { background: #fff; color: #58627A; box-shadow: inset 0 0 0 1.5px #C5CBD8; }
     .when { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #F6F8FC; color: #58627A; }
     .when.due { background: #FDECEE; color: #D93A4A; } .when.today { background: #FBF1DF; color: #B8791A; } .when.soon { background: #EEF1FE; color: #2E48D6; }
@@ -429,7 +433,7 @@
         const t0 = new Date(); t0.setHours(0, 0, 0, 0);
         this.items = items.filter(it => isRecall(it.data)).filter(it => !me.name || V(it.data, '상담자') === me.name || (me.admin && !V(it.data, '상담자'))).map(it => {
           const d = it.data, dt = this.parseWhen(d['다음 액션 · 일시']); const days = dt ? Math.round((new Date(dt).setHours(0, 0, 0, 0) - t0) / 864e5) : null;
-          return { it, days, nx: this.lib.nextInfo ? this.lib.nextInfo(d['다음 액션 · 일시']) : null, comm: this.lib.commOf ? this.lib.commOf(d) : null, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', who: V(d, '고객명'), store: V(d, '매장명'), phone: V(d, '연락처'), meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d), fresh: d['상태'] === '신규배정' };
+          return { it, days, nx: this.lib.nextInfo ? this.lib.nextInfo(d['다음 액션 · 일시']) : null, comm: this.lib.commOf ? this.lib.commOf(d) : null, name: V(d, '매장명') || V(d, '고객명') || '(이름 없음)', who: V(d, '고객명'), store: V(d, '매장명'), phone: V(d, '연락처'), memo: V(d, '특이사항'), date: V(d, '상담일').slice(5), hay: (['매장명', '고객명', '연락처', '사업자번호', '업종', '매장 주소', '특이사항'].map(k => V(d, k)).join(' ') + ' ' + V(d, '연락처').replace(/\D/g, '')).toLowerCase(), meta: [V(d, '고객명'), V(d, '연락처'), V(d, '매장 구분')].filter(Boolean).join(' · '), when: V(d, '다음 액션 · 일시'), hist: [V(d, '특이사항'), (V(d, '재연락 이력') || '').split('\n').filter(Boolean).slice(-1)[0]].filter(Boolean).join(' · '), post: isPost(d), fresh: d['상태'] === '신규배정' };
         }).sort((a, b) => ((a.days === null ? 9e9 : a.days) - (b.days === null ? 9e9 : b.days)) || ((a.nx && a.nx.mins != null ? a.nx.mins : 1440) - (b.nx && b.nx.mins != null ? b.nx.mins : 1440)));   // 날짜 순 → 같은 날은 시간 순(시간 없는 일정은 그날 맨 뒤)
         this.err = '';
       } catch (e) { this.err = e.message || String(e); if (!this.items) this.items = []; }
@@ -444,18 +448,24 @@
       else { msg.className = 'msg'; msg.innerHTML = `재연락 고객이 <b>${n}명</b> 있습니다` + (nFresh ? ` <span class="pill" style="margin-left:6px">신규배정 ${nFresh}</span>` : '') + (nDue ? ` <span class="when due" style="margin-left:6px">오늘까지 ${nDue}</span>` : ''); sub.textContent = this.open ? '"이어서 상담"을 누르면 아래 상담 화면에 바로 불러와요' : '눌러서 목록 보기'; }
       // 날짜 선택(그 날짜에 연락할 고객만) + 시간 오름차순/내림차순 정렬. 일정이 없는 고객은 늘 맨 뒤
       const fd = this.fdate || '', desc = !!this.desc, key = x => x.nx && x.nx.has && x.nx.date ? x.nx.date + ' ' + String(x.nx.mins != null ? x.nx.mins : 1440).padStart(4, '0') : null;
-      const V = (fd ? L.filter(x => x.nx && x.nx.date === fd) : L).slice().sort((a, b) => { const ka = key(a), kb = key(b); if (ka === null || kb === null) return (ka === null) - (kb === null); return (ka < kb ? -1 : ka > kb ? 1 : 0) * (desc ? -1 : 1); });
-      const flt = `<div class="flt"><span>날짜</span><input type="date" id="fDate" class="${fd ? 'on' : ''}" value="${esc(fd)}" aria-label="연락할 날짜 선택"><button type="button" data-all class="${fd ? '' : 'on'}">전체 ${n}</button><i class="sep"></i><span>시간 정렬</span><button type="button" data-s="asc" class="${desc ? '' : 'on'}" title="빠른 일정부터">오름차순 ▲</button><button type="button" data-s="desc" class="${desc ? 'on' : ''}" title="늦은 일정부터">내림차순 ▼</button></div>`;
+      const q = (this.q || '').trim().toLowerCase();
+      const V = L.filter(x => (!fd || (x.nx && x.nx.date === fd)) && (!q || (x.hay || '').includes(q))).slice().sort((a, b) => { const ka = key(a), kb = key(b); if (ka === null || kb === null) return (ka === null) - (kb === null); return (ka < kb ? -1 : ka > kb ? 1 : 0) * (desc ? -1 : 1); });
+      const flt = `<div class="flt"><input type="search" id="fQ" placeholder="매장명 · 고객명 · 연락처 · 메모 검색" aria-label="재연락 고객 검색"><i class="sep"></i><span>날짜</span><input type="date" id="fDate" class="${fd ? 'on' : ''}" value="${esc(fd)}" aria-label="연락할 날짜 선택"><button type="button" data-all class="${fd ? '' : 'on'}">전체 ${n}</button><i class="sep"></i><span>시간 정렬</span><button type="button" data-s="asc" class="${desc ? '' : 'on'}" title="빠른 일정부터">오름차순 ▲</button><button type="button" data-s="desc" class="${desc ? 'on' : ''}" title="늦은 일정부터">내림차순 ▼</button></div>`;
       const nx = x => { const n = x.nx || { has: !!x.when, cls: 'text', raw: x.when || '' };
         if (!n.has) return `<div class="nx none"><span class="d">—</span></div>`;
         if (n.cls === 'text') return `<div class="nx" title="${esc(n.raw)}"><span class="d txt">${esc(n.raw)}</span></div>`;
         return `<div class="nx ${n.cls}" title="${esc(n.raw)}"><span class="d">${esc(n.md)}${n.time ? `<em>${esc(n.time)}</em>` : ''}</span><span class="r">${esc(n.rel)}</span></div>`; };
       const tag = x => x.days === null ? `<span class="when">${x.when ? esc(x.when) : '일정 없음'}</span>` : x.days < 0 ? `<span class="when due">${-x.days}일 지남</span>` : x.days === 0 ? `<span class="when today">오늘</span>` : `<span class="when ${x.days <= 2 ? 'soon' : ''}">${x.days}일 후</span>`;
-      list.innerHTML = flt + (V.length ? '' : `<div class="empty">${fd ? '그 날짜에 연락할 고객이 없어요' : '해당하는 고객이 없어요'}</div>`) + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n"><span class="bs">${x.comm ? `<span class="cb ${x.comm.cls}" title="${esc(x.comm.label)}">${esc(x.comm.short)}</span>` : ''}</span><span class="who" title="${esc([x.who, x.store].filter(Boolean).join(' · '))}"><span class="nm">${esc(x.who || x.store || '(이름 없음)')}</span>${x.who && x.store ? `<i class="mid">·</i><span class="st">${esc(x.store)}</span>` : ''}</span><span class="ph">${esc(x.phone || '')}</span></div></div>${nx(x)}<div class="acts"><button type="button" class="btn cal" data-memo="${i}" aria-label="메모 수정" title="메모 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"></path><path d="M14 20v-5h5"></path><path d="M8 9h8"></path><path d="M8 13h4"></path></svg></button><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
+      // 검색 칸에 글자를 치는 도중에 목록이 다시 그려져도 입력(한글 조합)이 끊기지 않게, 필터 줄은 처음 한 번만 만들고 이후에는 상태만 바꾼다
+      if (!list.querySelector('.flt')) { list.innerHTML = flt + '<div id="rows"></div>'; list.querySelector('#fQ').value = this.q || ''; }
+      else { const fi = list.querySelector('#fDate'); if (fi.value !== fd) fi.value = fd; fi.classList.toggle('on', !!fd); list.querySelector('[data-s=asc]').classList.toggle('on', !desc); list.querySelector('[data-s=desc]').classList.toggle('on', desc); }
+      { const al = list.querySelector('[data-all]'); al.classList.toggle('on', !fd && !q); al.textContent = '전체 ' + n; }
+      list.querySelector('#rows').innerHTML = (V.length ? '' : `<div class="empty">${q ? '검색 결과가 없어요' : fd ? '그 날짜에 연락할 고객이 없어요' : '해당하는 고객이 없어요'}</div>`) + V.map((x, i) => `<div class="row" data-i="${i}"><div><div class="n"><span class="dt">${esc(x.date)}</span><span class="who" title="${esc([x.who, x.store].filter(Boolean).join(' · '))}">${x.comm ? `<span class="cb ${x.comm.cls}" title="${esc(x.comm.label)}">${esc(x.comm.short)}</span>` : ''}<span class="nm">${esc(x.who || x.store || '(이름 없음)')}</span>${x.who && x.store ? `<i class="mid">·</i><span class="st">${esc(x.store)}</span>` : ''}</span><span class="ph">${esc(x.phone || '')}</span></div>${x.memo ? `<div class="mo" title="${esc(x.memo)}">${esc(x.memo)}</div>` : ''}</div>${nx(x)}<div class="acts"><button type="button" class="btn cal" data-memo="${i}" aria-label="메모 수정" title="메모 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"></path><path d="M14 20v-5h5"></path><path d="M8 9h8"></path><path d="M8 13h4"></path></svg></button><button type="button" class="btn cal" data-cal="${i}" aria-label="다음 연락 일정 수정" title="다음 연락 일정 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg></button><button type="button" class="btn primary">이어서 상담 →</button></div></div>`).join('');
       list.querySelectorAll('[data-cal]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openWhen(V[+b.dataset.cal]); }; });
       list.querySelectorAll('[data-memo]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.openMemo(V[+b.dataset.memo]); }; });
       { const fi = list.querySelector('#fDate'); if (fi) { fi.onchange = e => { this.fdate = e.target.value || ''; this.paint(); }; fi.onclick = e => { e.stopPropagation(); try { if (e.target.showPicker) e.target.showPicker(); } catch (er) {} }; } }
-      list.querySelectorAll('[data-all]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.fdate = ''; this.paint(); }; });
+      list.querySelectorAll('[data-all]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.fdate = ''; this.q = ''; const qi = list.querySelector('#fQ'); if (qi) qi.value = ''; this.paint(); }; });
+      { const qi = list.querySelector('#fQ'); if (qi) { qi.oninput = e => { this.q = e.target.value; this.paint(); }; qi.onclick = e => e.stopPropagation(); } }
       list.querySelectorAll('[data-s]').forEach(b => { b.onclick = e => { e.stopPropagation(); this.desc = b.dataset.s === 'desc'; this.paint(); }; });
       list.querySelectorAll('.row').forEach(row => { const go = row.querySelector('.btn.primary'); if (go) go.onclick = () => { const x = V[+row.dataset.i]; const ev = new CustomEvent('udongji-recall-pick', { detail: { item: x.it }, cancelable: true }); const handled = !window.dispatchEvent(ev); if (!handled) location.href = (this.getAttribute('consult') || '우동지 상담 스크립트.dc.html') + '?id=' + encodeURIComponent(x.it.id); else { this.open = false; this.paint(); } }; });
     }
