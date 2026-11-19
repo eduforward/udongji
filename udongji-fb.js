@@ -280,7 +280,9 @@ export const PAYN_FIELDS = [
 ];
 export function paynCase(d) { const v = k => val(d, k); return { corp: v('대형/개인/법인') === '법인', joint: v('단독/공동') === '공동', isNew: v('매장 구분') === '신규 오픈', known: !!(v('대형/개인/법인') && v('단독/공동') && v('매장 구분')) }; }
 // 페이앤 채널톡 접수 워크플로 — 8케이스별 링크 (신규/기존 × 개인/법인 × 단독/공동)
-export const PAYN_LINKS = { 'new|person|single': '862322', 'new|person|joint': '862319', 'new|corp|single': '862306', 'new|corp|joint': '862304', 'old|person|single': '862331', 'old|person|joint': '862329', 'old|corp|single': '862310', 'old|corp|joint': '862308' };
+export const PAYN_LINKS = { 'new|person|single': '832215', 'new|person|joint': '832214', 'new|corp|single': '832211', 'new|corp|joint': '832219', 'old|person|single': '832218', 'old|person|joint': '832216', 'old|corp|single': '832213', 'old|corp|joint': '832212' };
+// 폐기된 예전 접수 링크 번호 → 새 번호 (고객 기록에 예전 번호가 저장돼 있어도 내보낼 때는 새 번호로)
+export const PAYN_OLD_LINKS = { '862322': '832215', '862319': '832214', '862306': '832211', '862304': '832219', '862331': '832218', '862329': '832216', '862310': '832213', '862308': '832212' };
 export function paynLink(d) { const c = paynCase(d); if (!c.known) return null; const no = PAYN_LINKS[(c.isNew ? 'new' : 'old') + '|' + (c.corp ? 'corp' : 'person') + '|' + (c.joint ? 'joint' : 'single')]; return no ? { no, url: 'https://payn.channel.io/workflows/' + no, label: (c.isNew ? '신규' : '기존') + ' · ' + (c.corp ? '법인' : '개인') + ' · ' + (c.joint ? '공동대표' : '단독') } : null; }
 // 고객 이메일: 상담 열(이메일) 우선, 없으면 계약 업무 페이앤 양식에 입력한 이메일
 export function custEmail(d) { return val(d, '이메일') || val(d, PAYN_PREFIX + '가맹점 대표자 이메일'); }
@@ -590,4 +592,5 @@ export async function rejectTransfer(t) { await init(); need(); const { fs } = _
 export async function cancelTransfer(t) { await init(); need(); const { fs } = _mods; await fs.deleteDoc(fs.doc(_db, 'transfers', t.id)); }
 
 // ── 시트 내보내기 (엑셀/시트에 붙일 TSV 전체) ──
-export function buildExportTSV(items) { const header = FULL_HEADER().concat([DOC_CHECK_COL, ...Object.values(STAGE_COLS), PROGRESS_NOTE_COL]); return [header.join('\t')].concat(items.map(it => header.map(h => val(it.data, h).replace(/\t/g, ' ')).join('\t'))).join('\n'); }
+export function buildExportTSV(items) { const header = FULL_HEADER().concat([DOC_CHECK_COL, ...Object.values(STAGE_COLS), PROGRESS_NOTE_COL]); const cell = (d, h) => { if (h !== '페이앤 접수 링크') return val(d, h); const lk = paynLink(d), s = val(d, h); return lk ? lk.no : (PAYN_OLD_LINKS[s] || s); };   // 접수 링크는 지금 유형에 맞는 새 번호로
+  return [header.join('\t')].concat(items.map(it => header.map(h => cell(it.data, h).replace(/\t/g, ' ')).join('\t'))).join('\n'); }
