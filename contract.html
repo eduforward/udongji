@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=122"></script>
+  <script src="./udongji-nav.js?v=123"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -174,7 +174,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="122"></udongji-nav>
+<udongji-nav current="contract" page-v="123"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -216,7 +216,7 @@
 
   <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><div class="scrim" onClick="{{ close }}"></div></sc-if>
   <aside class="drawer {{ drawerCls }}">
-    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div><div style="margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="casebtn" onClick="{{ toggleCase }}" title="고객 유형 변경 — 서류 목록·접수 링크·기본정보가 이 유형을 따라가요">{{ sel.caseLabel }} <small>{{ caseBtnHint }}</small></button><button type="button" class="btn danger" style="padding:3px 10px;font-size:12px;border-radius:999px" onClick="{{ openDrop }}">고객 포기</button></div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
+    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div><div style="margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="casebtn" onClick="{{ toggleCase }}" title="고객 유형 변경 — 서류 목록·접수 링크·기본정보가 이 유형을 따라가요">{{ sel.caseLabel }} <small>{{ caseBtnHint }}</small></button><span class="pill {{ sel.largeCls }}" style="font-size:12px;padding:4px 10px" title="상담 때 확인한 연매출 3억 구분">{{ sel.largeLabel }}</span><button type="button" class="btn danger" style="padding:3px 10px;font-size:12px;border-radius:999px" onClick="{{ openDrop }}">고객 포기</button></div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
     <sc-if value="{{ caseOpen }}" hint-placeholder-val="{{ false }}">
     <div class="casebox">
       <h4>고객 유형 변경</h4>
@@ -517,6 +517,7 @@ class Component extends DCLogic {
       }; }) }));
       sel = { store: label, hasHist: !!(V(d, '특이사항') || V(d, '재연락 이력')), histMemo: V(d, '특이사항'), histLines: String(d['재연락 이력'] || '').split('\n').filter(Boolean).reverse(), sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '매장 구분'), V(d, '업종')].filter(Boolean).join(' · '),
         caseLabel: [cs.isNew ? '신규' : V(d, '매장 구분') ? '기존' : '신규/기존 ?', cs.corp ? '법인' : V(d, '대형/개인/법인') ? '개인' : '개인/법인 ?', cs.joint ? '공동대표' : V(d, '단독/공동') ? '단독' : '단독/공동 ?'].join(' · '),
+        largeLabel: V(d, '연매출 3억') === '3억 이상' ? '연매출 3억 이상' : V(d, '연매출 3억') === '3억 미만' ? '연매출 3억 미만' : V(d, '연매출 3억') === '모름' ? '연매출 3억 모름' : '연매출 3억 ?', largeCls: V(d, '연매출 3억') === '3억 이상' ? 'amber' : '',
         pfFilled, pfTotal: active.length, pfMissCls: pfMiss.length ? 'miss' : 'ok', pfMissTxt: pfMiss.length ? '미입력·오류 ' + pfMiss.length + '칸 (' + pfMiss.slice(0, 3).map(f => f.label).join(', ') + (pfMiss.length > 3 ? ' …' : '') + ')' : '전부 입력됨',
         pfDirty: dirtyKeys.length > 0, pfDirtyN: dirtyKeys.length, pfSaveOff: !dirtyKeys.length || busy, pfSaveLabel: busy ? '저장 중…' : dirtyKeys.length ? '저장 (' + dirtyKeys.length + '칸)' : '저장됨',
         docGot: mustN - miss, docTotal: mustN, photoN,
