@@ -400,7 +400,8 @@ export async function readAll(opts) {
 }
 export const FULL_HEADER = () => COLS.map(c => c.name).concat([ID_COL, REG_COL]).concat(PAYN_FIELDS.filter(f => !f.ro).map(f => PAYN_PREFIX + f.label));
 function cleanIn(d) { const o = {}; Object.keys(d || {}).forEach(k => { if (k[0] !== '_' && k !== ID_COL) o[k] = d[k] == null ? '' : String(d[k]); }); return o; }
-export async function findRowById(id) { await init(); need(); const { fs } = _mods; const s = await fs.getDoc(fs.doc(_db, COL, id)); return s.exists() ? id : null; }
+// 아직 없는 문서를 읽으면 상담원 계정은 읽기 규칙이 거부한다(permission-denied). 방금 새로 만든 id(isNew)일 때만 '없음'으로 본다 — 권한 없는 남의 고객 문서를 없는 것으로 보고 덮어쓰지 않도록
+export async function findRowById(id, isNew) { await init(); need(); const { fs } = _mods; try { const s = await fs.getDoc(fs.doc(_db, COL, id)); return s.exists() ? id : null; } catch (e) { if (isNew && e && e.code === 'permission-denied') return null; throw e; } }
 export async function appendRecord(d, id) {
   await init(); need(); const { fs } = _mods; const now = new Date().toISOString();
   const nm = await myName(); if (nm) d = Object.assign({}, d, { '상담자': nm });
