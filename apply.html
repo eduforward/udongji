@@ -194,6 +194,22 @@
   .up .acts{flex:none;display:flex;flex-direction:column;gap:6px}
   .up .acts .btn-up{padding:8px 14px}
   .up .tx .fn{display:block}
+  .ups>.up{min-width:0}
+  .up .ic img[data-zoom],.cmp img{cursor:zoom-in}
+  .cmp{display:flex;align-items:center;gap:6px;margin-top:7px;font-size:11.5px;color:var(--muted)}
+  .cmp .mini{position:relative;width:46px;height:46px;border-radius:8px;background:var(--bg);overflow:hidden;display:grid;place-items:center;flex:none;border:1px solid var(--line)}
+  .cmp .mini::after{content:attr(data-l);position:absolute;left:0;right:0;bottom:0;background:rgba(18,40,29,.72);color:#fff;font-size:9.5px;font-weight:700;text-align:center;line-height:15px}
+  .cmp .mini.new::after{background:var(--green)}
+  .cmp .mini.new{border:1.5px solid var(--green)}
+  .cmp .mini img{width:100%;height:100%;object-fit:cover}
+  .up .undo{text-align:left}
+  .cmp .mini i{font-style:normal;font-size:10px;font-weight:700;color:var(--muted)}
+  .cmp .arr{color:var(--green);font-weight:800;margin:0 2px}
+  .zoom{position:fixed;inset:0;background:rgba(18,40,29,.94);z-index:60;display:none;place-items:center;padding:20px;cursor:zoom-out}
+  .zoom.on{display:grid}
+  .zoom figure{margin:0;text-align:center}
+  .zoom img{max-width:min(92vw,520px);max-height:72vh;min-width:220px;border-radius:12px;background:#fff}
+  .zoom figcaption{color:#fff;font-size:13.5px;margin-top:12px;line-height:1.5}
   .up .undo{border:0;background:none;padding:0;margin-top:3px;font-size:12.5px;color:var(--muted);text-decoration:underline;cursor:pointer}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .overlay{position:fixed;inset:0;background:rgba(18,40,29,.72);z-index:50;display:none;place-items:center;padding:20px}
@@ -267,7 +283,7 @@
 <div class="card edithead" id="editHead">
   <b class="eh">✓ 접수가 완료된 상태예요</b>
   <p class="when" id="editWhen"></p>
-  <p>보내주신 정보와 사진은 그대로 보관돼 있어요. <b>바꾸거나 더 올릴 것만</b> 고친 뒤 맨 아래 <b>수정 내용 제출하기</b>를 눌러 주세요. 손대지 않은 항목은 그대로 유지돼요.</p>
+  <p>보내주신 정보와 사진은 그대로 보관돼 있어요. <b>바꿀 것만</b> 고친 뒤 맨 아래 <b>수정 내용 제출하기</b>를 눌러 주세요. 손대지 않은 항목은 그대로 유지돼요. 올리신 사진은 눌러서 크게 볼 수 있어요.</p>
 </div>
 
 <section class="step on" data-step="0">
@@ -354,6 +370,12 @@
     <div class="field" data-f="store">
       <label class="l" for="store">매장명 <span class="opt">(사업자등록증 상호)</span></label>
       <input class="inp" id="store" name="매장명" autocomplete="organization" placeholder="예: 우동지 커피">
+    </div>
+    <div class="field" data-f="bizno">
+      <label class="l" for="bizno">사업자등록번호 <span class="req">*</span></label>
+      <input class="inp" id="bizno" name="사업자번호" inputmode="numeric" autocomplete="off" placeholder="'-' 없이 숫자 10자리" maxlength="12">
+      <div class="hint">사업자등록증 맨 위에 적힌 등록번호 10자리예요.</div>
+      <div class="err">사업자등록번호 10자리를 입력해 주세요.</div>
     </div>
     <div class="field" data-f="phone">
       <label class="l" for="phone">1. 대표자 연락처 <span class="req">*</span></label>
@@ -475,7 +497,7 @@
     <div class="agree">
       <div class="h"><input type="checkbox" class="ag" name="개인정보 수집·이용 동의" value="O" data-req="1" data-k="수집이용"><span class="t"><em>[필수]</em>개인정보 수집·이용 동의</span><button type="button" class="more">보기</button></div>
       <div class="body"><table>
-        <tr><th>수집 항목</th><td>대표자 성함·연락처·이메일, 네이버 ID, 매장명, 연 매출 구간, 자동이체 계좌 정보(은행·계좌번호·예금주명·관계·연락처·생년월일), 제출 서류 및 매장 사진</td></tr>
+        <tr><th>수집 항목</th><td>대표자 성함·연락처·이메일, 네이버 ID, 매장명, 사업자등록번호, 연 매출 구간, 자동이체 계좌 정보(은행·계좌번호·예금주명·관계·연락처·생년월일), 제출 서류 및 매장 사진</td></tr>
         <tr><th>이용 목적</th><td>네이버페이 커넥트 가맹점 등록 신청, 자동이체 등록, 커넥트 기기 배송 및 설치 안내</td></tr>
         <tr><th>보유 기간</th><td>가맹 등록 완료 후 계약 종료 시까지 (관계 법령에 따라 보관이 필요한 경우 해당 기간)</td></tr>
       </table><p style="margin:8px 0 0">동의를 거부할 수 있으나, 거부 시 가맹 등록 접수가 불가합니다.</p></div>
@@ -514,7 +536,7 @@
       <li>등록이 끝난 커넥트 기기가 설치 가이드와 함께 배송돼요.</li>
     </ol>
   </div>
-  <p style="font-size:13px">이 화면은 닫으셔도 괜찮아요.<br>나중에 사진을 더 올리거나 바꿀 내용이 생기면, 받으신 링크로 다시 들어와 필요한 것만 고칠 수 있어요.</p>
+  <p style="font-size:13px">이 화면은 닫으셔도 괜찮아요.<br>나중에 사진이나 정보를 바꿔야 하면, 받으신 링크로 다시 들어와 필요한 것만 고칠 수 있어요.</p>
 </section>
 
 <footer>
@@ -535,6 +557,8 @@
     </div>
   </div>
 </div>
+
+<div class="zoom" id="zoom" role="dialog" aria-label="사진 크게 보기"><figure><img alt=""><figcaption></figcaption></figure></div>
 
 <div class="overlay" id="ov"><div class="ov">
   <div class="spin"></div>
@@ -559,11 +583,16 @@ function demoInfo(kind){
   else docs.push(D('photo_out','간판 포함 매장 외관','사업자등록증 상 상호명이 보이도록',{single:true}), D('photo_entry','실내가 보이는 입구','출입문을 열어 내부가 보이도록',{single:true}), D('photo_in','매장 내부 전체','매장 내부 전체가 나오도록',{single:true}), D('photo_biz','업종 확인','판매상품 · 테이블 · 계산대 · 메뉴판 등',{single:true}));
   const base = { ok:true, name: corp ? '홍길동' : '김우동', store: corp ? '(주)우동지푸드' : '우동지 커피', type:{ isNew:false, corp, joint:corp, sign: corp ? '없음' : '있음' }, revenue:'', color:'', docs, got:{}, submittedAt:'' };
   if (kind !== 'edit') return base;
-  return Object.assign(base, { revenue:'3억 미만', color:'블랙', submittedAt:'2026-11-27', receipt:'UDJ-미리보기', got:{ biz:1, idcard:1, bank:2, photo_out:1, photo_entry:1, photo_in:1, photo_biz:1 },
-    saved:{ '고객명':'김우동', '매장명':'우동지 커피', '연락처':'010-••••-5678', '이메일':'ud••••@naver.com', '네이버 ID':'ud••••', '자동이체 은행명':'신한은행', '자동이체 계좌번호':'110••••••789', '자동이체 예금주명':'김••', '예금주와의 관계':'본인', '자동이체 예금주 연락처':'010-••••-5678', '자동이체 예금주 생년월일':'85••••', '법인등록번호':'', '공동 대표자 성함/연락처':'' } });
+  return Object.assign(base, { revenue:'3억 미만', color:'블랙', bizno:'1234567890', submittedAt:'2026-11-27', receipt:'UDJ-미리보기', got:{ biz:1, idcard:1, bank:1, photo_out:1, photo_entry:1, photo_in:1, photo_biz:1 }, thumbs:['biz','idcard','bank','photo_out','photo_entry','photo_in','photo_biz'],
+    saved:{ '고객명':'김우동', '매장명':'우동지 커피', '사업자번호':'1234567890', '연락처':'010-••••-5678', '이메일':'ud••••@naver.com', '네이버 ID':'ud••••', '자동이체 은행명':'신한은행', '자동이체 계좌번호':'110••••••789', '자동이체 예금주명':'김••', '예금주와의 관계':'본인', '자동이체 예금주 연락처':'010-••••-5678', '자동이체 예금주 생년월일':'85••••', '법인등록번호':'', '공동 대표자 성함/연락처':'' } });
 }
 let INFO = null, DOCS = [], PHOTOS = [], EDIT = false, BASE = {};
-const files = {}, modes = {};
+const files = {}, BOOT = Date.now();
+/* 이미 올린 사진 미리보기: 서버는 확인용 작은 그림만 돌려준다 (신분증·통장 원본은 링크로 다시 내려받을 수 없다) */
+const DEMO_THUMB = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="240" height="170"><rect width="240" height="170" fill="#DDE7E1"/><rect x="28" y="30" width="184" height="110" rx="8" fill="#fff"/><text x="120" y="92" font-size="17" text-anchor="middle" fill="#5b6b63" font-family="sans-serif">예시 사진</text></svg>');
+const hasThumb = id => !!(INFO && Array.isArray(INFO.thumbs) && INFO.thumbs.includes(id));
+const thumbURL = id => DEMO ? DEMO_THUMB : API + '?op=thumb&c=' + enc(CODE) + '&doc=' + enc(id) + '&t=' + BOOT;
+const CHECK_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#0B8A5C" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const form = $('#f');
@@ -587,6 +616,7 @@ function setup(){
   const t = INFO.type || {};
   if (INFO.name){ $('#name').value = INFO.name; $('#who').hidden = false; $('#whoText').textContent = INFO.name + ' 대표님 전용 접수 페이지' + (INFO.store ? ' · ' + INFO.store : ''); }
   if (INFO.store) $('#store').value = INFO.store;
+  if (INFO.bizno) $('#bizno').value = INFO.bizno;
   $('#kind').hidden = false; $('#kind').textContent = [t.isNew ? '신규 오픈 매장' : '기존 운영 매장', t.corp ? '법인사업자' : '개인사업자', t.joint ? '공동대표' : '단독대표'].join(' · ') + ' 기준으로 필요한 서류를 안내드려요';
   $('#fCorp').hidden = !t.corp; $('#fJoint').hidden = !t.joint;
   [['연매출 3억', INFO.revenue], ['기기 색상', INFO.color]].forEach(([n, v]) => { if (v) $$('input[name="' + n + '"]').forEach(r => { r.checked = r.value === v; }); });
@@ -601,19 +631,19 @@ function setup(){
   go(0, true);
 }
 /* ---------- 수정 화면 (이미 접수한 고객) ---------- */
-const EDIT_NAMES = ['고객명','매장명','연락처','이메일','네이버 ID','법인등록번호','공동 대표자 성함/연락처','자동이체 은행명','자동이체 계좌번호','자동이체 예금주명','예금주와의 관계','자동이체 예금주 연락처','자동이체 예금주 생년월일','기기 색상'];
-const RULE_NAME = { name:'고객명', phone:'연락처', email:'이메일', naverId:'네이버 ID', corpno:'법인등록번호', jointWho:'공동 대표자 성함/연락처', bank:'자동이체 은행명', acct:'자동이체 계좌번호', rel:'예금주와의 관계', holder:'자동이체 예금주명', holderPhone:'자동이체 예금주 연락처', holderBirth:'자동이체 예금주 생년월일', color:'기기 색상' };
+const EDIT_NAMES = ['고객명','매장명','사업자번호','연락처','이메일','네이버 ID','법인등록번호','공동 대표자 성함/연락처','자동이체 은행명','자동이체 계좌번호','자동이체 예금주명','예금주와의 관계','자동이체 예금주 연락처','자동이체 예금주 생년월일','기기 색상'];
+const RULE_NAME = { name:'고객명', bizno:'사업자번호', phone:'연락처', email:'이메일', naverId:'네이버 ID', corpno:'법인등록번호', jointWho:'공동 대표자 성함/연락처', bank:'자동이체 은행명', acct:'자동이체 계좌번호', rel:'예금주와의 관계', holder:'자동이체 예금주명', holderPhone:'자동이체 예금주 연락처', holderBirth:'자동이체 예금주 생년월일', color:'기기 색상' };
 function setupEdit(){
   EDIT = true; const sv = INFO.saved;
   form.classList.add('edit'); $('.stepper').hidden = true; $('#prevBtn').hidden = true; $('#noPermitWrap').hidden = true;
-  $('.hero p').textContent = '접수하신 내용이 그대로 보관돼 있어요. 바꿀 항목만 고치거나 사진을 더 올려 주세요.';
+  $('.hero p').textContent = '접수하신 내용이 그대로 보관돼 있어요. 바꿀 항목이나 사진만 고쳐 주세요.';
   $('#editWhen').textContent = INFO.submittedAt + ' 접수' + (INFO.receipt ? ' · 접수번호 ' + INFO.receipt : '');
   const info = $('.step[data-step="1"]'); info.classList.add('shut');
   info.querySelector('.sec-desc').textContent = '바꿀 항목만 새로 적어 주세요. 비워 둔 항목은 지금 등록된 내용 그대로 유지돼요.';
   $('#editOpen').addEventListener('click', () => { const shut = info.classList.toggle('shut'); $('#editOpen span').textContent = shut ? '입력한 정보 수정하기' : '정보 수정 접기'; });
   /* 가려서 받은 값은 칸에 넣지 않고 '현재: …' 로만 보여준다 — 새로 적은 칸만 바뀐다 */
   [['#phone','연락처'],['#email','이메일'],['#naverId','네이버 ID'],['#corpno','법인등록번호'],['#jointWho','공동 대표자 성함/연락처'],['#acct','자동이체 계좌번호'],['#holder','자동이체 예금주명'],['#holderPhone','자동이체 예금주 연락처'],['#holderBirth','자동이체 예금주 생년월일']].forEach(([q, k]) => { const el = $(q); el.value = ''; if (sv[k]) el.placeholder = '현재: ' + sv[k]; });
-  if (sv['고객명']) $('#name').value = sv['고객명']; if (sv['매장명']) $('#store').value = sv['매장명'];
+  if (sv['고객명']) $('#name').value = sv['고객명']; if (sv['매장명']) $('#store').value = sv['매장명']; if (sv['사업자번호']) $('#bizno').value = sv['사업자번호'];
   const b = $('#bank'); b.value = sv['자동이체 은행명'] || ''; if (!b.value && sv['자동이체 은행명']) b.options[0].textContent = '현재: ' + sv['자동이체 은행명'];
   $$('input[name="예금주와의 관계"]').forEach(r => { r.checked = r.value === sv['예금주와의 관계']; });
   EDIT_NAMES.forEach(n => { BASE[n] = val(n); });
@@ -630,17 +660,17 @@ function checkEdit(show){
 
 /* ---------- 업로드 카드 ---------- */
 function upCard(item, i, multi){
-  const id = 'u_' + item.id, had = gotN(item.id), both = had && multi && !item.single;
+  const id = 'u_' + item.id, had = gotN(item.id), th = had && hasThumb(item.id);
   const el = document.createElement('div');
   el.className = 'up' + (had ? ' ok' : ''); el.dataset.key = item.id;
   el.innerHTML = `
-    <div class="ic">${had ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#0B8A5C" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : placeholderIcon(item)}</div>
+    <div class="ic">${th ? `<img alt="접수된 ${esc(item.name)}" src="${thumbURL(item.id)}" data-zoom="접수된 사진">` : had ? CHECK_SVG : placeholderIcon(item)}</div>
     <div class="tx"><b><span class="no">${i+1}</span>${esc(item.name)}${item.optional?' <span class="opt">(해당 시)</span>':''}</b>
-      <small class="d">${had ? '<span class="fn">✓ 이미 접수됐어요 (' + had + '개)</span>' : esc(item.hint || '')}</small></div>
-    ${both ? '<div class="acts"><button type="button" class="btn-up" data-m="add">추가</button><button type="button" class="btn-up" data-m="replace">바꾸기</button></div>' : `<label class="btn-up" for="${id}">${had ? '바꾸기' : '촬영·첨부'}</label>`}
+      <small class="d">${had ? '<span class="fn">✓ 이미 접수됐어요 (' + had + '개)' + '</span>' : esc(item.hint || '')}</small></div>
+    <label class="btn-up" for="${id}">${had ? '바꾸기' : '촬영·첨부'}</label>
     <input type="file" id="${id}" accept="image/*,.pdf,.heic,.heif" ${multi && !item.single ? 'multiple' : ''}>`;
   el._args = [item, i, multi];
-  el.querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => { modes[item.id] = b.dataset.m; el.querySelector('input').click(); }));
+  const im = el.querySelector('.ic img'); if (im) im.addEventListener('error', () => { el.querySelector('.ic').innerHTML = CHECK_SVG; });
   el.querySelector('input').addEventListener('change', e => onFiles(item, el, e.target));
   return el;
 }
@@ -652,23 +682,45 @@ function placeholderIcon(item){
 async function onFiles(item, el, input){
   let list = [...(input.files||[])]; input.value = '';
   if (!list.length) return;
-  const had = gotN(item.id), add = !!el.querySelector('.acts') && modes[item.id] === 'add';
-  if (!add) modes[item.id] = 'replace';
-  if (add && had + list.length > 5){ toast(had >= 5 ? '이 서류는 이미 5개가 보관돼 있어요. 바꾸기로 올려 주세요.' : `이 서류는 5개까지 보관돼요. ${5 - had}개까지만 추가하거나 바꾸기로 올려 주세요.`); return; }
+  const had = gotN(item.id);   // 이미 접수된 서류는 새로 고른 파일로 통째로 바뀐다 (추가 없음)
   if (list.length > 5){ list = list.slice(0,5); toast('한 서류에 파일은 5개까지 올릴 수 있어요. 앞의 5개만 담았어요.'); }
   const tooBig = list.find(f => f.size > CONFIG.MAX_FILE_MB*1024*1024);
   if (tooBig){ toast(`파일이 너무 커요 (최대 ${CONFIG.MAX_FILE_MB}MB). 다시 찍어서 올려 주세요.`); return; }
   const out = []; for (const f of list) out.push(await shrink(f));
   files[item.id] = out;
-  const f0 = out[0], ic = el.querySelector('.ic');
-  if (f0.type.startsWith('image/') && !/heic|heif/i.test(f0.type)) ic.innerHTML = `<img alt="" src="${URL.createObjectURL(f0)}">`;
-  else ic.innerHTML = `<span class="pdf">${/pdf/i.test(f0.type)?'PDF':'FILE'}</span>`;
+  const f0 = out[0], ic = el.querySelector('.ic'), isImg = f0.type.startsWith('image/') && !/heic|heif/i.test(f0.type), url = isImg ? URL.createObjectURL(f0) : '', kind = /pdf/i.test(f0.type) ? 'PDF' : 'FILE';
+  ic.innerHTML = isImg ? `<img alt="" src="${url}" data-zoom="새로 올릴 사진">` : `<span class="pdf">${kind}</span>`;
   if (out.length>1) ic.insertAdjacentHTML('beforeend', `<span class="cnt">+${out.length-1}</span>`);
-  el.querySelector('.d').innerHTML = `<span class="fn">✓ ${had ? (add ? '추가로 올려요 · ' : '기존 것과 바꿔요 · ') : ''}${out.length>1? out.length+'개 파일' : esc(f0.name)}</span>`;
-  if (!el.querySelector('.acts')) el.querySelector('.btn-up').textContent = '다시 올리기';
-  if (had && !el.querySelector('.undo')){ const u = document.createElement('button'); u.type = 'button'; u.className = 'undo'; u.textContent = '선택 취소 (기존 것 그대로 두기)'; u.addEventListener('click', () => { delete files[item.id]; delete modes[item.id]; el.replaceWith(upCard(...el._args)); updateBtn(); }); el.querySelector('.tx').appendChild(u); }
+  el.querySelector('.d').innerHTML = `<span class="fn">✓ ${had ? '기존 것과 바꿔요 · ' : ''}${out.length>1? out.length+'개 파일' : esc(f0.name)}</span>`;
+  el.querySelector('.btn-up').textContent = '다시 올리기';
+  const tx = el.querySelector('.tx'), oldCmp = tx.querySelector('.cmp'); if (oldCmp) oldCmp.remove();
+  if (had){
+    /* 기존에 낸 사진과 새로 고른 사진을 나란히 보여준다 */
+    const c = document.createElement('div'); c.className = 'cmp';
+    c.innerHTML = `<span class="mini" data-l="기존">${hasThumb(item.id) ? `<img alt="기존 사진" src="${thumbURL(item.id)}" data-zoom="기존 사진">` : '<i>사진</i>'}</span><span class="arr">→</span><span class="mini new" data-l="새 사진">${isImg ? `<img alt="새 사진" src="${url}" data-zoom="새로 올릴 사진">` : '<i>' + kind + '</i>'}</span>`;
+    const oi = c.querySelector('.mini:not(.new) img'); if (oi) oi.addEventListener('error', () => { oi.parentNode.innerHTML = '<i>사진</i>'; });
+    tx.insertBefore(c, tx.querySelector('.undo'));
+    if (!tx.querySelector('.undo')){ const u = document.createElement('button'); u.type = 'button'; u.className = 'undo'; u.textContent = '선택 취소 (기존 유지)'; u.addEventListener('click', () => { delete files[item.id]; el.replaceWith(upCard(...el._args)); updateBtn(); }); tx.appendChild(u); }
+  }
   el.classList.add('ok'); el.classList.remove('bad');
   hideMsg(); updateBtn();
+}
+/* 사진 크게 보기 */
+document.addEventListener('click', e => {
+  const im = e.target.closest ? e.target.closest('img[data-zoom]') : null, z = $('#zoom');
+  if (im){ e.preventDefault(); z.querySelector('img').src = im.src; z.querySelector('figcaption').textContent = im.dataset.zoom + (im.src.startsWith('blob:') ? '' : ' — 확인용 작은 미리보기라 흐리게 보여요') + ' · 화면을 누르면 닫혀요'; z.classList.add('on'); return; }
+  if (z.classList.contains('on')) z.classList.remove('on');
+});
+/* 서버에 남길 확인용 미리보기: 긴 변 240px 짜리 작은 JPG (원본 대신 이것만 다시 보여준다) */
+async function makeThumb(file){
+  if (!/^image\//i.test(file.type || '')) return null;
+  try{
+    const bmp = await createImageBitmap(file), k = Math.min(1, 240 / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(bmp.width*k)); c.height = Math.max(1, Math.round(bmp.height*k));
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const b = await new Promise(r => c.toBlob(r, 'image/jpeg', .7));
+    return b && b.size <= 60*1024 ? b : null;
+  }catch(e){ return null; }
 }
 async function shrink(file){
   if (!CONFIG.IMAGE_MAX_PX || !/^image\/(jpeg|png|webp)$/i.test(file.type)) return file;
@@ -688,6 +740,8 @@ $('#noPermit').addEventListener('change', e => { const card = $('#docs .up[data-
 function fmtPhone(v){ const d = v.replace(/\D/g,'').slice(0,11); if (d.length < 4) return d; if (d.length < 8) return d.slice(0,3)+'-'+d.slice(3); return d.slice(0,3)+'-'+d.slice(3,d.length-4)+'-'+d.slice(-4); }
 ['#phone','#holderPhone'].forEach(s => $(s).addEventListener('input', e => { e.target.value = fmtPhone(e.target.value); }));
 ['#acct','#corpno'].forEach(s => $(s).addEventListener('input', e => { e.target.value = e.target.value.replace(/[^\d]/g,''); }));
+$('#bizno').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g,'').slice(0,10); });
+const fmtBiz = v => String(v || '').replace(/^(\d{3})(\d{2})(\d{5})$/, '$1-$2-$3');
 $('#holderBirth').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g,'').slice(0,6); });
 $('#naverId').addEventListener('input', e => { e.target.value = e.target.value.replace(/@.*$/,'').trim(); });
 function syncSelf(){
@@ -718,6 +772,7 @@ function val(name){
 function setErr(key, bad){ const box = $(`[data-f="${key}"]`); if (!box) return; box.classList.toggle('has-err', bad); const inp = box.querySelector('.inp'); if (inp) inp.classList.toggle('bad', bad); }
 const RULES = [
   ['name', () => val('고객명').length >= 2],
+  ['bizno', () => /^\d{10}$/.test(val('사업자번호'))],
   ['phone', () => /^01\d-\d{3,4}-\d{4}$/.test(val('연락처'))],
   ['email', () => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val('이메일'))],
   ['naverId', () => /^[a-z0-9_\-\.]{3,30}$/i.test(val('네이버 ID'))],
@@ -788,6 +843,7 @@ function thumbs(list){
   return '<div class="thumbs">' + list.map(it => {
     if (skipLicense(it)) return `<span title="${esc(it.name)}" style="color:var(--muted)">해당<br>없음</span>`;
     const f = files[it.id] && files[it.id][0];
+    if (!f && gotN(it.id) && hasThumb(it.id)) return `<span title="${esc(it.name)}" style="background-image:url('${thumbURL(it.id)}')"></span>`;
     if (!f) return gotN(it.id) ? `<span title="${esc(it.name)}" style="color:var(--green)">접수<br>완료</span>` : `<span title="${esc(it.name)}" style="color:var(--muted)">${it.optional ? '선택' : '없음'}</span>`;
     if (f.type.startsWith('image/') && !/heic|heif/i.test(f.type)) return `<span title="${esc(it.name)}" style="background-image:url('${URL.createObjectURL(f)}')"></span>`;
     return `<span title="${esc(it.name)}">${/pdf/i.test(f.type)?'PDF':'FILE'}</span>`;
@@ -799,7 +855,7 @@ function renderReview(){
     <div class="grp"><div class="gh"><b>필수 안내</b><button type="button" data-go="0">수정</button></div>
       <dl>${r('연 매출', val('연매출 3억'))}${r('월 이용료', val('연매출 3억')==='3억 미만'?'0원':'제품 구성에 따라 별도 안내')}${r('계약 기간','3년 (안내 확인 완료)')}</dl></div>
     <div class="grp"><div class="gh"><b>대표자 · 가맹 정보</b><button type="button" data-go="1">수정</button></div>
-      <dl>${r('대표자', val('고객명'))}${r('매장명', val('매장명'))}${r('연락처', val('연락처'))}${r('이메일', val('이메일'))}${r('네이버 ID', val('네이버 ID'))}${t.corp ? r('법인등록번호', mask(val('법인등록번호'),6,0)) : ''}${t.joint ? r('공동 대표자', val('공동 대표자 성함/연락처')) : ''}${r('커넥트 기기 색상', val('기기 색상'))}</dl></div>
+      <dl>${r('대표자', val('고객명'))}${r('매장명', val('매장명'))}${r('사업자등록번호', fmtBiz(val('사업자번호')))}${r('연락처', val('연락처'))}${r('이메일', val('이메일'))}${r('네이버 ID', val('네이버 ID'))}${t.corp ? r('법인등록번호', mask(val('법인등록번호'),6,0)) : ''}${t.joint ? r('공동 대표자', val('공동 대표자 성함/연락처')) : ''}${r('커넥트 기기 색상', val('기기 색상'))}</dl></div>
     <div class="grp"><div class="gh"><b>자동이체</b><button type="button" data-go="1">수정</button></div>
       <dl>${r('은행', val('자동이체 은행명'))}${r('계좌번호', mask(val('자동이체 계좌번호'),3,3))}${r('예금주', val('자동이체 예금주명') + ' (' + val('예금주와의 관계') + ')')}${r('예금주 연락처', val('자동이체 예금주 연락처'))}${r('생년월일', mask(val('자동이체 예금주 생년월일'),2,0))}</dl></div>
     <div class="grp"><div class="gh"><b>서류 ${DOCS.length}종</b><button type="button" data-go="2">수정</button></div>${thumbs(DOCS)}</div>
@@ -815,7 +871,7 @@ $$('.agree .more').forEach(b => b.addEventListener('click', () => { const a = b.
 
 /* ---------- 제출 ---------- */
 function collect(){
-  const names = ['고객명','매장명','연락처','이메일','네이버 ID','법인등록번호','공동 대표자 성함/연락처','자동이체 은행명','자동이체 계좌번호','자동이체 예금주명','예금주와의 관계','자동이체 예금주 연락처','자동이체 예금주 생년월일','기기 색상','연매출 3억'];
+  const names = ['고객명','매장명','사업자번호','연락처','이메일','네이버 ID','법인등록번호','공동 대표자 성함/연락처','자동이체 은행명','자동이체 계좌번호','자동이체 예금주명','예금주와의 관계','자동이체 예금주 연락처','자동이체 예금주 생년월일','기기 색상','연매출 3억'];
   const o = {}; names.forEach(n => o[n] = val(n));
   o['영업신고증 해당없음'] = $('#noPermit').checked;
   o['동의'] = {}; $$('.ag').forEach(c => { o['동의'][c.dataset.k] = c.checked; });
@@ -824,9 +880,9 @@ function collect(){
 }
 function setProg(p){ $('#ovBar').style.width = Math.round(p*100) + '%'; }
 const post = async (url, type, body) => { const r = await fetch(url, { method:'POST', headers:{ 'Content-Type': type }, body }); const j = await r.json().catch(() => ({})); if (!r.ok || !j.ok) throw new Error(j.error || '전송에 실패했어요.'); return j; };
-/* 파일 전송: 이미 올라간 파일은 다시 보내지 않는다(재시도 때 중복 방지). '추가'로 고른 서류는 기존 파일을 지우지 않는다 */
+/* 파일 전송: 이미 올라간 파일은 다시 보내지 않는다(재시도 때 중복 방지). 서류마다 첫 파일은 기존 것을 바꾸고, 확인용 미리보기를 함께 남긴다 */
 function fileJobs(){ const jobs = []; for (const it of DOCS.concat(PHOTOS)){ if (!EDIT && skipLicense(it)) continue; (files[it.id] || []).forEach((f, i) => jobs.push({ it, f, first: i === 0 })); } return jobs; }
-async function sendFiles(jobs){ let done = 0; for (const j of jobs){ if (!j.f._sent){ await post(API + '?op=file&c=' + enc(CODE) + '&doc=' + enc(j.it.id) + (j.first && modes[j.it.id] !== 'add' ? '&replace=1' : ''), j.f.type || 'application/octet-stream', j.f); j.f._sent = true; } setProg(++done / (jobs.length + 1)); } }
+async function sendFiles(jobs){ let done = 0; for (const j of jobs){ if (!j.f._sent){ await post(API + '?op=file&c=' + enc(CODE) + '&doc=' + enc(j.it.id) + (j.first ? '&replace=1' : ''), j.f.type || 'application/octet-stream', j.f); j.f._sent = true; if (j.first){ try{ const th = await makeThumb(j.f); if (th) await post(API + '?op=thumb&c=' + enc(CODE) + '&doc=' + enc(j.it.id), 'image/jpeg', th); }catch(e){} } } setProg(++done / (jobs.length + 1)); } }
 function finish(receipt, title, line){
   $('#ov').classList.remove('on');
   form.hidden = true; $('#dock').hidden = true; $('.stepper').hidden = true;
@@ -845,7 +901,7 @@ async function submitEdit(){
   $('#ov').classList.add('on'); setProg(0);
   try{
     let receipt = INFO.receipt || '';
-    if (DEMO){ console.info('[미리보기] 전송될 수정 내용', fields, jobs.map(j => j.it.id + ' (' + (modes[j.it.id] === 'add' ? '추가' : '바꾸기') + '): ' + j.f.name)); for (let i=1;i<=20;i++){ await new Promise(r => setTimeout(r, 50)); setProg(i/20); } }
+    if (DEMO){ console.info('[미리보기] 전송될 수정 내용', fields, jobs.map(j => j.it.id + ' (바꾸기): ' + j.f.name)); for (let i=1;i<=20;i++){ await new Promise(r => setTimeout(r, 50)); setProg(i/20); } }
     else { await sendFiles(jobs); receipt = (await post(API + '?op=update&c=' + enc(CODE), 'text/plain', JSON.stringify({ fields, docs }))).receipt || receipt; setProg(1); }
     finish(receipt, '수정 내용이 접수됐어요', `${val('고객명') || INFO.name || ''} 대표님, 보내주신 내용으로 바꿔 두었어요. 담당자가 확인할게요.`);
   }catch(err){ sendFail(err); }
