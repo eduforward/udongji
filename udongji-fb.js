@@ -58,7 +58,7 @@ export function buildSMS(d) {
   if (isNew && !corp && !v('영문 성함')) extra.push('성함 영문 표기 (여권 기준)');
   if (!link && !v('이메일')) extra.push('이메일 주소');
   let body = head + '\n오늘 통화 감사합니다. 안내드린 대로 ' + (link ? '아래 대표님 전용 접수 페이지에서 서류와 가맹 정보를 직접 올려 주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 5~7분이면 되고, 입력하신 내용은 암호화되어 전송됩니다.\n\n▶ 전용 접수 페이지\n' + link + '\n\n미리 준비해 주실 서류 (휴대폰으로 촬영한 사진으로 충분합니다)\n' : '아래 서류를 이 번호로 카카오톡 또는 문자로 보내주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 촬영한 사진으로 충분합니다.\n\n') + docs.join('\n');
-  if (link) body += '\n\n제출 후에도 같은 링크로 다시 들어오시면 사진을 더 올리거나 바꿀 내용만 고치실 수 있습니다. 페이지 이용이 어려우시면 이 번호로 카카오톡으로 보내주셔도 됩니다.';
+  if (link) body += '\n\n제출 후에도 같은 링크로 다시 들어오시면 사진이나 정보를 바꾸실 수 있습니다. 페이지 이용이 어려우시면 이 번호로 카카오톡으로 보내주셔도 됩니다.';
   if (extra.length) body += '\n\n함께 알려주세요:\n- ' + extra.join('\n- ');
   const summary = [];
   if (v('안내한 상품 구성')) summary.push('구성: ' + v('안내한 상품 구성') + (v('월 이용요금') ? ' / 월 ' + v('월 이용요금') + '원' : ''));
@@ -423,9 +423,9 @@ export async function updateRecord(id, d) {
 export async function updateCells(id, obj) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, COL, id), Object.assign(cleanIn(obj), { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true }); }
 export async function setCell(id, k, v) { return updateCells(id, { [k]: v }); }
 // 가맹 접수 셀프 페이지: 고객별 전용 링크. 접수 코드는 고객 문서에 저장하고, 접수 서버(Cloud Run apply)가 이 코드로 고객을 찾는다. 링크에는 코드만 넣고 이름·연락처는 넣지 않는다
-export const APPLY_URL = 'https://eduforward.github.io/udongji/apply.html';
+export const APPLY_URL = 'https://udongji.co.kr/apply';   // 아임웹 '가맹 접수' 페이지(메뉴 숨김) — 그 안에 접수 폼(apply.html)이 들어 있다
 export const APPLY_TOKEN_COL = '접수 코드';
-export const APPLY_OPEN = false;   // 접수 페이지를 udongji.co.kr 로 옮긴 뒤 true 로 바꾼다 — 그때부터 상담 안내 문자·멘트가 접수 링크 안내로 나온다
+export const APPLY_OPEN = true;   // 상담 안내 문자·멘트를 접수 링크 안내로 (false 로 바꾸면 예전 카톡 수취 안내로 돌아간다)
 export function applyLinkOf(d) { const t = String((d && d[APPLY_TOKEN_COL]) || '').trim(); return /^[A-Za-z0-9_-]{20,64}$/.test(t) ? APPLY_URL + '?c=' + t : ''; }
 export function newApplyToken() { const a = new Uint8Array(18); crypto.getRandomValues(a); return btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 export async function ensureApplyLink(id, d) { let t = String((d && d[APPLY_TOKEN_COL]) || '').trim(); if (!/^[A-Za-z0-9_-]{20,64}$/.test(t)) { t = newApplyToken(); await updateCells(id, { [APPLY_TOKEN_COL]: t }); if (d) d[APPLY_TOKEN_COL] = t; } return APPLY_URL + '?c=' + t; }
