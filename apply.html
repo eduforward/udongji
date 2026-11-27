@@ -521,7 +521,7 @@
 <script>
 /* 접수 서버 주소. 고객은 담당자가 보낸 전용 링크(?c=접수코드)로만 들어온다.
    ?demo=1(개인·단독) / ?demo=corp(법인·공동·간판 없음) 은 미리보기 — 아무것도 전송·저장하지 않는다. */
-const CONFIG = { ENDPOINT: '', MAX_FILE_MB: 20, IMAGE_MAX_PX: 2400 };
+const CONFIG = { ENDPOINT: 'https://apply-794429903467.asia-northeast3.run.app/', MAX_FILE_MB: 20, IMAGE_MAX_PX: 2400 };
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 const qs = new URLSearchParams(location.search), CODE = qs.get('c') || '', DEMO = qs.get('demo') || '', API = qs.get('api') && /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(qs.get('api')) ? qs.get('api') : CONFIG.ENDPOINT;
 const enc = encodeURIComponent;

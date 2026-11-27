@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=126"></script>
+  <script src="./udongji-nav.js?v=127"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -177,7 +177,7 @@
     .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </helmet>
-<udongji-nav current="contract" page-v="126"></udongji-nav>
+<udongji-nav current="contract" page-v="127"></udongji-nav>
 <div class="page">
   <div class="bar">
     <div class="brand"><div class="mark">우</div><div><b>{{ pageTitle }}</b><small>{{ pageSub }}</small></div></div>
@@ -219,7 +219,7 @@
 
   <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><div class="scrim" onClick="{{ close }}"></div></sc-if>
   <aside class="drawer {{ drawerCls }}">
-    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div><div style="margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="casebtn" onClick="{{ toggleCase }}" title="고객 유형 변경 — 서류 목록·접수 링크·기본정보가 이 유형을 따라가요">{{ sel.caseLabel }} <small>{{ caseBtnHint }}</small></button><button type="button" class="casebtn lg {{ sel.largeCls }}" onClick="{{ toggleLarge }}" title="연매출 3억 구분 변경">{{ sel.largeLabel }} <small>{{ lgHint }}</small></button><button type="button" class="btn danger" style="padding:3px 10px;font-size:12px;border-radius:999px" onClick="{{ openDrop }}">고객 포기</button></div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
+    <div class="dh"><div><h2>{{ sel.store }}</h2><div class="sub">{{ sel.sub }}</div><div style="margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="casebtn" onClick="{{ toggleCase }}" title="고객 유형 변경 — 서류 목록·접수 링크·기본정보가 이 유형을 따라가요">{{ sel.caseLabel }} <small>{{ caseBtnHint }}</small></button><button type="button" class="casebtn lg {{ sel.largeCls }}" onClick="{{ toggleLarge }}" title="연매출 3억 구분 변경">{{ sel.largeLabel }} <small>{{ lgHint }}</small></button><button type="button" class="btn" style="padding:3px 10px;font-size:12px;border-radius:999px" onClick="{{ copyApplyLink }}" title="고객에게 카카오톡으로 보낼 전용 접수 링크를 복사해요">접수 링크 복사</button><sc-if value="{{ sel.selfDone }}" hint-placeholder-val="{{ false }}"><span class="pill ok" style="font-size:12px;padding:4px 10px" title="고객이 접수 페이지에서 직접 제출했어요">{{ sel.selfLabel }}</span></sc-if><button type="button" class="btn danger" style="padding:3px 10px;font-size:12px;border-radius:999px" onClick="{{ openDrop }}">고객 포기</button></div></div><button type="button" class="x" onClick="{{ close }}" aria-label="닫기">×</button></div>
     <sc-if value="{{ lgOpen }}" hint-placeholder-val="{{ false }}">
     <div class="casebox lg">
       <h4>연매출 3억 구분 변경</h4>
@@ -393,7 +393,7 @@ class Component extends DCLogic {
   state = { lib: null, items: [], loading: true, err: '', query: '', filter: 'active', selRow: null, memo: '', toast: '', toastOn: false, busy: false, pfDraft: {}, seq: 0, copied: {}, tab: 'docs', scope: 'mine', me: null };
   async componentDidMount() {
     try {
-      const lib = await import('./udongji-fb.js?v=43'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=44'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const me = await lib.me();
       this.setState({ lib, me }, () => this.load(true));
@@ -529,6 +529,7 @@ class Component extends DCLogic {
       }; }) }));
       sel = { store: label, hasHist: !!(V(d, '특이사항') || V(d, '재연락 이력')), histMemo: V(d, '특이사항'), histLines: String(d['재연락 이력'] || '').split('\n').filter(Boolean).reverse(), sub: [V(d, '고객명') ? V(d, '고객명') + ' 대표' : '', V(d, '연락처'), V(d, '매장 구분'), V(d, '업종')].filter(Boolean).join(' · '),
         caseLabel: [cs.isNew ? '신규' : V(d, '매장 구분') ? '기존' : '신규/기존 ?', cs.corp ? '법인' : V(d, '대형/개인/법인') ? '개인' : '개인/법인 ?', cs.joint ? '공동대표' : V(d, '단독/공동') ? '단독' : '단독/공동 ?'].join(' · '),
+        selfDone: !!V(d, '셀프 접수일'), selfLabel: '셀프 접수 ' + V(d, '셀프 접수일').slice(5),
         largeLabel: V(d, '연매출 3억') === '3억 이상' ? '연매출 3억 이상' : V(d, '연매출 3억') === '3억 미만' ? '연매출 3억 미만' : V(d, '연매출 3억') === '모름' ? '연매출 3억 모름' : '연매출 3억 ?', largeCls: V(d, '연매출 3억') === '3억 이상' ? 'amber' : '',
         pfFilled, pfTotal: active.length, pfMissCls: pfMiss.length ? 'miss' : 'ok', pfMissTxt: pfMiss.length ? '미입력·오류 ' + pfMiss.length + '칸 (' + pfMiss.slice(0, 3).map(f => f.label).join(', ') + (pfMiss.length > 3 ? ' …' : '') + ')' : '전부 입력됨',
         pfDirty: dirtyKeys.length > 0, pfDirtyN: dirtyKeys.length, pfSaveOff: !dirtyKeys.length || busy, pfSaveLabel: busy ? '저장 중…' : dirtyKeys.length ? '저장 (' + dirtyKeys.length + '칸)' : '저장됨',
@@ -636,6 +637,7 @@ class Component extends DCLogic {
       toastCls: 'toast' + (toastOn ? ' on' : ''), toastMsg: toast,
       caseOpen: !!this.state.caseOpen && !!rec, caseBtnHint: this.state.caseOpen ? '' : '변경',
       lgOpen: !!rec && this.state.lgFor === rec.row, lgHint: rec && this.state.lgFor === rec.row ? '' : '변경',
+      copyApplyLink: async () => { if (!rec || !lib || !lib.ensureApplyLink) return; if (!lib.paynCase(rec.data).known) { this.toast('먼저 고객 유형(신규/기존 · 개인/법인 · 단독/공동)을 정해 주세요'); return; } try { const url = await lib.ensureApplyLink(rec.row, rec.data); this.copy(url, '접수 링크'); } catch (e) { this.toast('링크 만들기 실패: ' + e.message); } },
       toggleLarge: () => { if (!rec) return; this.setState({ lgFor: this.state.lgFor === rec.row ? null : rec.row, lgDraft: V(rec.data, '연매출 3억'), caseOpen: false }); },
       le: (() => { const c = this.state.lgDraft || '', cur = rec ? V(rec.data, '연매출 3억') : ''; const set = v => () => this.setState({ lgDraft: v }); return { underCls: c === '3억 미만' ? 'on' : '', overCls: c === '3억 이상' ? 'on' : '', unkCls: c === '모름' ? 'on' : '', setUnder: set('3억 미만'), setOver: set('3억 이상'), setUnk: set('모름'), saveOff: !c || c === cur || busy, saveLabel: busy ? '저장 중…' : !c ? '하나 고르세요' : c !== cur ? '저장' : '변경 없음' }; })(),
       saveLarge: async () => { if (!rec || !lib) return; const c = this.state.lgDraft || '', d = rec.data, cur = V(d, '연매출 3억'); if (!c || c === cur) return; this.setState({ busy: true });

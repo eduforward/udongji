@@ -420,6 +420,11 @@ export async function updateRecord(id, d) {
 }
 export async function updateCells(id, obj) { await init(); need(); const { fs } = _mods; await fs.setDoc(fs.doc(_db, COL, id), Object.assign(cleanIn(obj), { _updatedAt: new Date().toISOString(), _updatedBy: userEmail() }), { merge: true }); }
 export async function setCell(id, k, v) { return updateCells(id, { [k]: v }); }
+// 가맹 접수 셀프 페이지: 고객별 전용 링크. 접수 코드는 고객 문서에 저장하고, 접수 서버(Cloud Run apply)가 이 코드로 고객을 찾는다. 링크에는 코드만 넣고 이름·연락처는 넣지 않는다
+export const APPLY_URL = 'https://eduforward.github.io/udongji/apply.html';
+export const APPLY_TOKEN_COL = '접수 코드';
+export function newApplyToken() { const a = new Uint8Array(18); crypto.getRandomValues(a); return btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+export async function ensureApplyLink(id, d) { let t = String((d && d[APPLY_TOKEN_COL]) || '').trim(); if (!/^[A-Za-z0-9_-]{20,64}$/.test(t)) { t = newApplyToken(); await updateCells(id, { [APPLY_TOKEN_COL]: t }); if (d) d[APPLY_TOKEN_COL] = t; } return APPLY_URL + '?c=' + t; }
 // 삭제: 원본을 deleted/{id}에 그대로 보관(누가·언제·사유) 후 customers에서 제거. 첨부 파일은 복구를 위해 남긴다.
 export async function whoAmI() { const nm = await myName().catch(() => ''); return nm ? nm + '(' + userEmail() + ')' : userEmail(); }
 export async function deleteRow(id, reason) {
