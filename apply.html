@@ -195,6 +195,10 @@
   .up .acts .btn-up{padding:8px 14px}
   .up .tx .fn{display:block}
   .ups>.up{min-width:0}
+  .pinbox{display:flex;gap:8px;max-width:300px;margin:18px auto 0}
+  .pinbox .inp{text-align:center;font-size:22px;letter-spacing:.3em;font-weight:700;min-width:0}
+  .pinbox .btn.pri{flex:none;width:92px;height:auto}
+  .pinerr{color:var(--red) !important;font-size:13.5px;margin-top:12px !important}
   .up .ic img[data-zoom],.cmp img{cursor:zoom-in}
   .cmp{display:flex;align-items:center;gap:6px;margin-top:7px;font-size:11.5px;color:var(--muted)}
   .cmp .mini{position:relative;width:46px;height:46px;border-radius:8px;background:var(--bg);overflow:hidden;display:grid;place-items:center;flex:none;border:1px solid var(--line)}
@@ -276,6 +280,15 @@
   <h2>전용 링크로 접속해 주세요</h2>
   <p id="blockMsg">이 페이지는 담당자가 카카오톡으로 보내드린 전용 링크로만 열 수 있어요.</p>
   <p style="font-size:13px;margin-top:10px">링크를 받지 못하셨다면 상담하신 담당자에게 말씀해 주세요.</p>
+</section>
+
+<section id="pinView" class="fin" hidden>
+  <div class="big"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="#0B8A5C"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#0B8A5C" stroke-width="2.4"/></svg></div>
+  <h2>본인 확인</h2>
+  <p>상담 때 알려주신 <b>휴대폰 번호 뒷 4자리</b>를 입력해 주세요.</p>
+  <div class="pinbox"><input class="inp" id="pin" type="tel" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="0000" aria-label="휴대폰 번호 뒷 4자리"><button type="button" class="btn pri" id="pinBtn">확인</button></div>
+  <p class="pinerr" id="pinErr" hidden></p>
+  <p style="font-size:13px;margin-top:12px">다른 사람이 링크를 열어도 대표님 정보가 보이지 않도록 한 번 확인해요.</p>
 </section>
 
 <form id="f" novalidate autocomplete="on" hidden>
@@ -575,6 +588,10 @@ const CONFIG = { ENDPOINT: 'https://apply-794429903467.asia-northeast3.run.app/'
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 const qs = new URLSearchParams(location.search), CODE = qs.get('c') || '', DEMO = qs.get('demo') || '', API = qs.get('api') && /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(qs.get('api')) ? qs.get('api') : CONFIG.ENDPOINT;
 const enc = encodeURIComponent;
+/* 본인 확인: 상담 때 받은 휴대폰 번호 뒷 4자리. 맞아야 서버가 내용을 준다. 새로고침 때 다시 묻지 않도록 이 탭에만 기억한다 */
+const PIN_KEY = 'udj_apply_pin_' + CODE;
+let PIN = ''; try { PIN = (!DEMO && CODE && sessionStorage.getItem(PIN_KEY)) || ''; } catch (e) {}
+const api = (op, extra) => API + '?op=' + op + '&c=' + enc(CODE) + (PIN ? '&p=' + enc(PIN) : '') + (extra || '');
 const D = (id, name, hint, o) => Object.assign({ id, name, hint, group: /^photo_/.test(id) ? 'photo' : 'doc' }, o || {});
 function demoInfo(kind){
   const corp = kind === 'corp';
@@ -591,7 +608,7 @@ const files = {}, BOOT = Date.now();
 /* 이미 올린 사진 미리보기: 서버는 확인용 작은 그림만 돌려준다 (신분증·통장 원본은 링크로 다시 내려받을 수 없다) */
 const DEMO_THUMB = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="240" height="170"><rect width="240" height="170" fill="#DDE7E1"/><rect x="28" y="30" width="184" height="110" rx="8" fill="#fff"/><text x="120" y="92" font-size="17" text-anchor="middle" fill="#5b6b63" font-family="sans-serif">예시 사진</text></svg>');
 const hasThumb = id => !!(INFO && Array.isArray(INFO.thumbs) && INFO.thumbs.includes(id));
-const thumbURL = id => DEMO ? DEMO_THUMB : API + '?op=thumb&c=' + enc(CODE) + '&doc=' + enc(id) + '&t=' + BOOT;
+const thumbURL = id => DEMO ? DEMO_THUMB : api('thumb', '&doc=' + enc(id) + '&t=' + BOOT);
 const CHECK_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#0B8A5C" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -604,11 +621,31 @@ function block(msg){ $('#blockView').hidden = false; if (msg) $('#blockMsg').tex
 async function boot(){
   try{
     if (DEMO) INFO = demoInfo(DEMO);
-    else if (CODE && API){ const r = await fetch(API + '?op=info&c=' + enc(CODE)); const j = await r.json().catch(() => ({})); if (!j.ok) return block(j.error); INFO = j; }
+    else if (CODE && API){ const r = await fetch(api('info')); const j = await r.json().catch(() => ({})); if (j.needPin) return askPin(j); if (!j.ok) return block(j.error); INFO = j; }
     else return block(CODE ? '접수 페이지를 준비하고 있어요. 잠시 후 다시 접속해 주세요.' : '');
   }catch(e){ return block('연결에 실패했어요. 인터넷 연결을 확인하고 다시 접속해 주세요.'); }
   setup();
 }
+function askPin(j){
+  PIN = ''; try { sessionStorage.removeItem(PIN_KEY); } catch (e) {}
+  $('#pinView').hidden = false; form.hidden = true; $('#dock').hidden = true; $('.stepper').hidden = true;
+  const err = $('#pinErr'); err.hidden = !(j && j.locked); if (j && j.locked) err.textContent = j.error || '';
+}
+async function tryPin(){
+  const err = $('#pinErr'), v = $('#pin').value.replace(/\D/g, '');
+  if (v.length !== 4){ err.textContent = '숫자 4자리를 입력해 주세요.'; err.hidden = false; return; }
+  $('#pinBtn').disabled = true; PIN = v;
+  try{
+    const r = await fetch(api('info')); const j = await r.json().catch(() => ({}));
+    if (j.ok){ try { sessionStorage.setItem(PIN_KEY, PIN); } catch (e) {} $('#pinView').hidden = true; $('.stepper').hidden = false; INFO = j; setup(); return; }
+    PIN = ''; if (!j.needPin){ $('#pinView').hidden = true; return block(j.error); }
+    err.textContent = j.error || '확인하지 못했어요. 다시 입력해 주세요.'; err.hidden = false; $('#pin').value = '';
+  }catch(e){ PIN = ''; err.textContent = '연결에 실패했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.'; err.hidden = false; }
+  finally{ $('#pinBtn').disabled = false; }
+}
+$('#pinBtn').addEventListener('click', tryPin);
+$('#pin').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); });
+$('#pin').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); tryPin(); } });
 function setup(){
   if (DEMO) $('#demoBar').hidden = false;
   form.hidden = false; $('#dock').hidden = false;
@@ -882,7 +919,7 @@ function setProg(p){ $('#ovBar').style.width = Math.round(p*100) + '%'; }
 const post = async (url, type, body) => { const r = await fetch(url, { method:'POST', headers:{ 'Content-Type': type }, body }); const j = await r.json().catch(() => ({})); if (!r.ok || !j.ok) throw new Error(j.error || '전송에 실패했어요.'); return j; };
 /* 파일 전송: 이미 올라간 파일은 다시 보내지 않는다(재시도 때 중복 방지). 서류마다 첫 파일은 기존 것을 바꾸고, 확인용 미리보기를 함께 남긴다 */
 function fileJobs(){ const jobs = []; for (const it of DOCS.concat(PHOTOS)){ if (!EDIT && skipLicense(it)) continue; (files[it.id] || []).forEach((f, i) => jobs.push({ it, f, first: i === 0 })); } return jobs; }
-async function sendFiles(jobs){ let done = 0; for (const j of jobs){ if (!j.f._sent){ await post(API + '?op=file&c=' + enc(CODE) + '&doc=' + enc(j.it.id) + (j.first ? '&replace=1' : ''), j.f.type || 'application/octet-stream', j.f); j.f._sent = true; if (j.first){ try{ const th = await makeThumb(j.f); if (th) await post(API + '?op=thumb&c=' + enc(CODE) + '&doc=' + enc(j.it.id), 'image/jpeg', th); }catch(e){} } } setProg(++done / (jobs.length + 1)); } }
+async function sendFiles(jobs){ let done = 0; for (const j of jobs){ if (!j.f._sent){ await post(api('file', '&doc=' + enc(j.it.id) + (j.first ? '&replace=1' : '')), j.f.type || 'application/octet-stream', j.f); j.f._sent = true; if (j.first){ try{ const th = await makeThumb(j.f); if (th) await post(api('thumb', '&doc=' + enc(j.it.id)), 'image/jpeg', th); }catch(e){} } } setProg(++done / (jobs.length + 1)); } }
 function finish(receipt, title, line){
   $('#ov').classList.remove('on');
   form.hidden = true; $('#dock').hidden = true; $('.stepper').hidden = true;
@@ -902,7 +939,7 @@ async function submitEdit(){
   try{
     let receipt = INFO.receipt || '';
     if (DEMO){ console.info('[미리보기] 전송될 수정 내용', fields, jobs.map(j => j.it.id + ' (바꾸기): ' + j.f.name)); for (let i=1;i<=20;i++){ await new Promise(r => setTimeout(r, 50)); setProg(i/20); } }
-    else { await sendFiles(jobs); receipt = (await post(API + '?op=update&c=' + enc(CODE), 'text/plain', JSON.stringify({ fields, docs }))).receipt || receipt; setProg(1); }
+    else { await sendFiles(jobs); receipt = (await post(api('update'), 'text/plain', JSON.stringify({ fields, docs }))).receipt || receipt; setProg(1); }
     finish(receipt, '수정 내용이 접수됐어요', `${val('고객명') || INFO.name || ''} 대표님, 보내주신 내용으로 바꿔 두었어요. 담당자가 확인할게요.`);
   }catch(err){ sendFail(err); }
 }
@@ -915,7 +952,7 @@ async function submit(){
     if (DEMO){ console.info('[미리보기] 전송될 내용', data, jobs.map(j => j.it.id + ': ' + j.f.name)); for (let i=1;i<=20;i++){ await new Promise(r => setTimeout(r, 50)); setProg(i/20); } }
     else {
       await sendFiles(jobs);
-      receipt = (await post(API + '?op=submit&c=' + enc(CODE), 'text/plain', JSON.stringify(data))).receipt; setProg(1);
+      receipt = (await post(api('submit'), 'text/plain', JSON.stringify(data))).receipt; setProg(1);
     }
     finish(receipt, '', `${data['고객명']} 대표님, 소중한 정보 보내주셔서 감사합니다.`);
   }catch(err){ sendFail(err); }
