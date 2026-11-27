@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=127"></script>
+  <script src="./udongji-nav.js?v=128"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --amber-3:#F0DDB0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -194,7 +194,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="127"></udongji-nav>
+<udongji-nav current="consult" page-v="128"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -322,12 +322,13 @@
     </section>
 
     <section class="step" id="s6" data-screen-label="6 서류">
-      <div class="step-h"><div class="no">6</div><div class="t">서류 안내 — 우리가 접수<small>유형에 따라 목록이 자동으로 바뀌어요. 점주에게 페이앤 링크를 보내지 않고 카톡으로 받아서 우리가 올립니다.</small></div></div>
-      <div class="say"><span class="who">상담사</span>서류는 카톡으로 저한테 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 걸로 충분해요. 통화 끝나고 목록 문자로 보내드릴게요.</div>
+      <div class="step-h"><div class="no">6</div><div class="t">서류 안내 — 우리가 접수<small>{{ docHint }}</small></div></div>
+      <div class="say"><span class="who">상담사</span>{{ say6 }}</div>
       <ul class="doclist">
         <sc-for list="{{ docs }}" as="d" hint-placeholder-count="4"><li class="{{ d.cls }}"><span class="n">{{ d.no }}</span><div>{{ d.t }}<small>{{ d.s }}</small></div></li></sc-for>
       </ul>
       <div class="info" hidden="{{ hideCorpNote }}"><b>법인: 통장 예금주 = 사업자등록증 상호 완전 일치</b> — "주식회사 ○○" vs "(주)○○" 표기까지 같아야 함.</div>
+      <p class="note" hidden="{{ hideLinkNote }}">접수 링크는 "계약 업무로" 저장하면 작성 완료 화면의 안내 문자에 들어 있어요. 링크 이용이 어려운 고객은 예전처럼 카톡으로 받아도 됩니다.</p>
       <p class="note">영업신고증·인허가증(학원 등)은 페이앤이 채널톡에서 추가 요청하면 그때 받음.</p>
       <p class="note">개인정보 제3자 제공 동의 단계는 삭제(페이앤: 불필요). 접수 후 전자계약서는 모두싸인 알림톡(카톡)으로 발송. 공동대표는 두 분 모두 서명.</p>
     </section>
@@ -341,7 +342,7 @@
 
     <section class="step" id="s8" data-screen-label="8 마무리">
       <div class="step-h"><div class="no">8</div><div class="t">마무리 — 복창 후 상태 결정<small>진행할 고객이면 "계약 업무로". 권장 항목이 비어 있어도 넘길 수 있고, 빠진 값은 계약 업무 기본정보에서 채워요.</small></div></div>
-      <div class="say"><span class="who">상담사</span>정리할게요. <b>{{ summary }}</b> 서류 사진 보내주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.</div>
+      <div class="say"><span class="who">상담사</span>정리할게요. <b>{{ summary }}</b> {{ say8 }}</div>
       <div class="fgrid">
         <span class="rec opt {{ f.netReq }}">페이앤 인터넷 상담 요청 <span class="seg"><button class="{{ on.netReq.yes }}" onClick="{{ pick.netReq.yes }}">요청</button></span></span>
         <span class="rec opt {{ f.memo }}">메모 <input class="wide" value="{{ v.memo }}" onInput="{{ set.memo }}" placeholder="특이사항"></span>
@@ -415,7 +416,7 @@ class Component extends DCLogic {
   async componentDidMount() {
     this._onScroll = () => { const on = window.scrollY > 400; if (on !== this.state.showTop) this.setState({ showTop: on }); }; window.addEventListener('scroll', this._onScroll, { passive: true });
     try {
-      const lib = await import('./udongji-fb.js?v=44'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=45'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const meR = await lib.me().catch(() => ({})); if (meR.close) { location.replace('contract.html'); return; }
       const agent = await lib.myName().catch(() => '');
@@ -495,18 +496,21 @@ class Component extends DCLogic {
     const ctx = this._ctx; const data = this.toRecord(v, ctx.L, ctx, kind, extra || {});
     const id = v._id || 'r' + Date.now().toString(36);
     this.setState({ saving: true });
-    let ok = true, err = '';
+    let ok = true, err = '', tok = '';
+    // 계약 업무로 넘기는 고객은 전용 접수 링크용 코드를 함께 저장한다 (이미 있으면 그대로 쓴다)
+    const needTok = kind === 'go' && !!lib.APPLY_OPEN && !!lib.newApplyToken, tokOk = t => /^[A-Za-z0-9_-]{20,64}$/.test(t);
     try {
       const row = await lib.findRowById(id, !v._id);
       if (row) {
         const cur = (await lib.readAll()).items.find(x => x.id === id); const old = cur ? cur.data : {};
+        if (needTok) { const t0 = String(old[lib.APPLY_TOKEN_COL] || '').trim(); tok = tokOk(t0) ? t0 : lib.newApplyToken(); if (tok !== t0) data[lib.APPLY_TOKEN_COL] = tok; }
         if (this.applyComm(data, old, extra) === false) return;
         if (data._addRecall) { data['재연락 이력'] = (old['재연락 이력'] ? old['재연락 이력'] + '\n' : '') + data['재연락 이력']; data['재연락 횟수'] = String((parseInt(old['재연락 횟수'] || '0', 10) || 0) + 1); }
         delete data._addRecall; await lib.updateRecord(row, data);
-      } else { if (this.applyComm(data, {}, extra) === false) return; delete data._addRecall; await lib.appendRecord(data, id); }
+      } else { if (this.applyComm(data, {}, extra) === false) return; delete data._addRecall; if (needTok) { tok = lib.newApplyToken(); data[lib.APPLY_TOKEN_COL] = tok; } await lib.appendRecord(data, id); }
     } catch (e) { ok = false; err = e.message || String(e); delete data._addRecall; }
     if (ok) try { window.dispatchEvent(new CustomEvent('udongji-record-saved', { detail: { id } })); } catch (e) {}
-    const sms = kind === 'go' ? ctx.sms : kind === 'recall' ? ctx.smsRecall(extra.when) : ctx.smsDrop;
+    const sms = kind === 'go' ? ctx.sms.replace(ctx.LINK_MARK, tok ? lib.APPLY_URL + '?c=' + tok : '(계약 업무 → 고객 상세의 "접수 링크 복사"로 링크를 붙여 주세요)') : kind === 'recall' ? ctx.smsRecall(extra.when) : ctx.smsDrop;
     try { localStorage.setItem('udongji-last-done', JSON.stringify({ id, data, sms, savedAt: new Date().toISOString(), synced: ok, err, isNew: !v._id })); } catch (e) {}
     localStorage.removeItem(this.KEY);
     location.href = 'done.html';
@@ -556,14 +560,15 @@ class Component extends DCLogic {
     const head = `[우동지] ${name}, 우동지 상담사 ${agent}입니다.\n`, tail = `\n\n궁금한 점은 이 번호로 카카오톡 메시지 주시면 바로 답변드리겠습니다.\n감사합니다.`;
     const summary = [L.bundle, L.color && L.color + ' 색상', v.bundle && '월 0원', v.bundle && installLabel].filter(Boolean).join(', ') || '(구성 선택 후 표시)';
     const docLine = d => `${d.no}. ${d.t.replace(/^(법인|공동대표): /, '$1 서류: ')}\n   ${d.m}`;
-    let sms = head + `오늘 통화 감사합니다. 아래 서류를 이 번호로 카카오톡 또는 문자로 보내주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 촬영한 사진으로 충분합니다.\n\n` + docs.map(docLine).join('\n');
+    const LINK_MARK = '(저장하면 고객 전용 접수 링크가 여기에 들어가요)', useLink = !!(this.state.lib && this.state.lib.APPLY_OPEN);   // 접수 링크 안내는 스위치(APPLY_OPEN)가 켜진 뒤부터
+    let sms = head + (!useLink ? `오늘 통화 감사합니다. 아래 서류를 이 번호로 카카오톡 또는 문자로 보내주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 촬영한 사진으로 충분합니다.\n\n` + docs.map(docLine).join('\n') : `오늘 통화 감사합니다. 아래 대표님 전용 접수 페이지에서 서류와 가맹 정보를 직접 올려 주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 5~7분이면 되고, 입력하신 내용은 암호화되어 전송됩니다.\n\n▶ 전용 접수 페이지\n${LINK_MARK}\n\n미리 준비해 주실 서류 (휴대폰으로 촬영한 사진으로 충분합니다)\n` + docs.map(docLine).join('\n') + `\n\n제출 후에도 같은 링크로 다시 들어오시면 사진을 더 올리거나 바꿀 내용만 고치실 수 있습니다. 페이지 이용이 어려우시면 이 번호로 카카오톡으로 보내주셔도 됩니다.`);
     if (v.bundle) sms += `\n\n오늘 안내드린 내용\n- 구성: ${L.bundle} / 월 0원${L.color ? '\n- 색상: ' + L.color : ''}\n- 설치: ${installLabel}${v.lan === 'no' ? '\n- 카드단말기를 놓을 자리까지 랜선을 준비해 주시기 바랍니다 (연장선은 다이소·온라인에서 몇 천 원입니다).' : v.lan === 'unknown' ? '\n- 카드단말기를 놓을 자리까지 랜선이 나와 있는지 확인 부탁드립니다 (없으면 연장선을 준비해 주시면 됩니다).' : ''}${v.wifi === 'no' ? '\n- 커넥트는 와이파이 연결이 필요합니다. 공유기 와이파이를 켜 두시거나 인터넷 업체에 요청해 주시기 바랍니다.' : v.wifi === 'unknown' ? '\n- 매장에서 와이파이 사용이 가능한지 확인 부탁드립니다 (커넥트 연결용).' : ''}`;
     if (v.large === 'over') sms += `\n\n※ 연매출 3억 원 이상 매장은 규정상 중고(거의 새것) 단말기로 월 990원에 제공됩니다. 새 제품을 원하시면 월 6,600원입니다.`;
     sms += `\n\n서류 접수 후 페이앤에서 전자계약서가 카카오톡(알림톡)으로 발송되며, 서명하시면 접수가 완료됩니다.${isJoint ? ' 공동대표님도 함께 서명하셔야 합니다.' : ''}` + tail;
     const smsRecall = when => head + `오늘 통화 감사합니다. ${when ? when + '에' : '말씀해 주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증이 발급되면 바로 진행하겠습니다.' : ''} 그 전에 준비되시면 미리 보내주셔도 됩니다.` + tail;
     const smsDrop = head + `오늘 시간 내주셔서 감사합니다. 이후 네이버 플레이스나 결제 관련 도움이 필요하시면 언제든 이 번호로 연락 주시기 바랍니다.\n감사합니다.`;
     const form = `[커넥트 접수] 딜러사: 에듀포워드(우동지) / 담당: ${agent}${L.channel ? ' / ' + L.channel : ''}\n접수 링크: ${linkNo}\n유형: ${typeLabel}${L.large ? ' / ' + L.large : ''}\n\n고객명: ${v.name || '-'}\n연락처: ${v.phone || '-'}\n매장명: ${v.store || '-'}\n업종: ${bizLabel} / 판매: ${v.category || '-'}\n네이버 ID: ${v.naver || '-'}\n${isNew ? '오픈 예정일: ' + (v.openDate || '-') + '\n' : ''}현재 포스: ${L.pos || '-'}${isExisting ? ' / 약정 ' + (L.term || '모름') : ''}\n랜선: ${L.lan || '-'} / 와이파이: ${L.wifi || '-'}\n\n구성: ${L.bundle || '-'} / 색상: ${L.color || '-'}\n설치: ${installLabel}${needSite ? ' (포스 연동)' : ''}\n포스기·영수증 프린터·키오스크: 해당 없음\n${v.netReq ? '\n※ 인터넷 신규 상담 요청 — 연락처로 연락 부탁드립니다.\n' : ''}${v.memo ? '\n메모: ' + v.memo : ''}\n\n서류: 카톡 수취 후 링크에 업로드 예정`;
-    this._ctx = { L, typed, linkNo, sms, smsRecall, smsDrop, emailFinal, catLabel };
+    this._ctx = { L, typed, linkNo, sms, LINK_MARK, smsRecall, smsDrop, emailFinal, catLabel };
     const copy = t => () => navigator.clipboard && navigator.clipboard.writeText(t);
     const typedAll = !!(v.mode && v.entity && v.owners);
     const ready = !!this.state.lib && !this.state.saving && !!(v.name && v.phone) && typedAll;
@@ -614,7 +619,7 @@ class Component extends DCLogic {
       aiQuick: this.AI_QUICK.map(([label, text]) => ({ label, ask: () => this.aiAsk(text) })),
       aiOnQ: e => this.setAI({ q: e.target.value }), aiSend: e => { e.preventDefault(); this.aiAsk(ai.q); }, aiKey: e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); this.aiAsk(ai.q); } },
       aiClear: () => this.setAI({ msgs: [], q: '' }), aiLogRef: el => { this._aiLog = el; },
-      v, set, pick, on, f, L, docs, summary, sms, form, linkNo, typeLabel, installLabel, agentName: agent, greetName: (v.name || '').trim() ? v.name.trim() + '님' : '○○○님', greetLead, greetAsk, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
+      v, set, pick, on, f, L, docs, summary, sms, form, docHint: useLink ? '유형에 따라 목록이 자동으로 바뀌어요. 통화 후 우동지 전용 접수 링크를 카톡으로 보내면 고객이 직접 올리고, 계약 업무에 자동으로 들어와요. (페이앤 링크는 점주에게 보내지 않습니다)' : '유형에 따라 목록이 자동으로 바뀌어요. 점주에게 페이앤 링크를 보내지 않고 카톡으로 받아서 우리가 올립니다.', say6: useLink ? '서류는 통화 끝나고 카톡으로 대표님 전용 접수 링크를 보내드릴게요. 거기서 휴대폰으로 찍어서 바로 올려 주시면 제가 접수까지 넣어드려요. 5분 정도면 끝나요.' : '서류는 카톡으로 저한테 보내주시면 제가 접수까지 넣어드릴게요. 휴대폰으로 찍으신 걸로 충분해요. 통화 끝나고 목록 문자로 보내드릴게요.', say8: useLink ? '보내드리는 링크에서 서류 올려 주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.' : '서류 사진 보내주시면 제가 접수 넣고, 전자계약서 카톡 가면 문자 드릴게요.', hideLinkNote: !useLink, linkNo, typeLabel, installLabel, agentName: agent, greetName: (v.name || '').trim() ? v.name.trim() + '님' : '○○○님', greetLead, greetAsk, catLabel, mapHref: 'https://map.naver.com/p/search/' + encodeURIComponent((v.store || '').trim() || '네이버 지도'),
       connCls: conn === 'ok' ? '' : 'off', connTxt: conn === 'ok' ? '● 연결됨 · ' + (this.state.lib ? this.state.lib.userEmail() : '') : conn === 'off' ? '연결 안 됨 — 홈에서 로그인' : '연결 중…',
       hidePrev: !v._prev, prevTxt: v._prev ? `이전 ${v._prev.상담일 || ''} ${v._prev.결과 || ''}${v._prev.일시 ? ' (약속 ' + v._prev.일시 + ')' : ''}` : '',
       prevOpen: this.state.prevOpen !== false, prevBtn: this.state.prevOpen !== false ? '접기' : '메모 보기', togglePrev: () => this.setState({ prevOpen: this.state.prevOpen === false }),

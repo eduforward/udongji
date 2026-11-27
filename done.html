@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=127"></script>
+  <script src="./udongji-nav.js?v=128"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --red:#D93A4A; --red-2:#FDECEE; --amber:#B7791F; --amber-2:#FFF5E0; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --r:16px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -54,7 +54,7 @@
     .blank { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 60px 24px; text-align: center; color: var(--text-3); }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="127"></udongji-nav>
+<udongji-nav current="consult" page-v="128"></udongji-nav>
 <div class="wrap">
   <sc-if value="{{ hasRec }}" hint-placeholder-val="{{ true }}">
     <div class="hero">
@@ -90,7 +90,7 @@ class Component extends DCLogic {
   async componentDidMount() {
     let rec = null; try { rec = JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) {}
     if (!rec) { this.setState({ rec: null }); return; }
-    let lib = null; try { lib = await import('./udongji-fb.js?v=44'); await lib.init(); } catch (e) {}
+    let lib = null; try { lib = await import('./udongji-fb.js?v=45'); await lib.init(); } catch (e) {}
     const sms = rec.sms || (lib ? lib.buildSMS(rec.data).text : '');
     this.setState({ lib, rec, sms, sync: rec.synced ? 'ok' : 'wait', err: rec.err || '' });
     if (lib && !rec.synced) this.retry(lib, rec);
@@ -122,7 +122,7 @@ class Component extends DCLogic {
       hasRec: true, noRec: false,
       ckCls: sync === 'ok' ? 'ok' : sync === 'bad' ? 'bad' : 'wait', ckIcon: sync === 'ok' ? '✓' : sync === 'bad' ? '!' : '…',
       title: sync === 'ok' ? '상담 기록이 저장됐어요' : sync === 'bad' ? '저장에 실패했어요' : '저장하는 중…',
-      sub: sync === 'ok' ? '고객 목록에 들어갔어요. 아래 안내 문자를 고객에게 보내고 다음 상담으로 넘어가세요. 값을 고쳐야 하면 고객 목록에서 수정하세요.' : sync === 'bad' ? err + ' — 이 페이지를 새로고침하면 다시 저장을 시도합니다.' : '잠시만요.',
+      sub: sync === 'ok' ? (/apply\.html\?c=/.test(sms) ? '고객 목록에 들어갔어요. 아래 안내 문자에 고객 전용 접수 링크가 들어 있어요 — 카카오톡으로 보내고 다음 상담으로 넘어가세요. 값을 고쳐야 하면 고객 목록에서 수정하세요.' : '고객 목록에 들어갔어요. 아래 안내 문자를 고객에게 보내고 다음 상담으로 넘어가세요. 값을 고쳐야 하면 고객 목록에서 수정하세요.') : sync === 'bad' ? err + ' — 이 페이지를 새로고침하면 다시 저장을 시도합니다.' : '잠시만요.',
       subCls: sync === 'bad' ? 'bad' : '',
       store: V('매장명') || '(매장명 없음)', who: (V('고객명') || '고객') + ' · ' + V('연락처'), mode: V('매장 구분') || res, agent: V('상담자') || '—',
       statusTag: V('상태') || res, statusCls: go ? (V('상태') === '재연락 예정' ? 'amber' : 'ok') : '',
