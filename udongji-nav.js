@@ -1,8 +1,9 @@
 // 우동지 공용 상단 내비 <udongji-nav current="consult">
 (function () {
-  const VERSION = 'v129 · 2026-11-27 18:23';
+  const VERSION = 'v130 · 2026-11-27 18:28';
   // 배포 이력 — 새 배포마다 맨 앞에 한 줄 추가 (t = 푸시 시각, 한국시간)
   const HISTORY = [
+    { v: 130, d: '2026-11-27', t: '18:28', c: ['연 매출 3억 이상 안내를 접수 페이지와 같게 맞췄어요 — "중고 단말기 월 990원 / 새 제품 6,600원" 문구를 없애고 "제품 구성에 따라 월 이용료 발생, 정확한 금액은 구성 확인 후 따로 안내"로 바뀌었어요 (상담 스크립트 멘트, 고객 안내 문자, 계약 업무·사용법 안내)', '3억 이상 고객은 안내 문자·복창 멘트에 "월 0원" 대신 "월 이용료 별도 안내"로 나와요'] },
     { v: 129, d: '2026-11-27', t: '18:23', c: ['접수 링크 주소가 udongji.co.kr/apply 로 바뀌었어요 — 이제 실제 고객에게 보내도 됩니다 (예전에 만든 링크도 계속 열려요)', '상담을 "계약 업무로" 저장하면 작성 완료 화면의 안내 문자에 고객 전용 접수 링크가 자동으로 들어가요 — 카카오톡으로 그대로 보내면 고객이 서류와 정보를 직접 올려요. 상담 스크립트 6·8번 멘트도 링크 안내로 바뀌었어요', '고객 목록·계약 업무의 "안내 문자 복사"도 접수 링크가 있는 고객은 링크 안내 문구로 나와요. 링크 이용이 어려운 고객은 예전처럼 카톡으로 받아도 됩니다'] },
     { v: 128, d: '2026-11-27', t: '17:45', c: ['접수 페이지: 제출한 고객이 같은 링크로 다시 들어오면 처음부터 다시 하지 않고, 바꿀 항목만 고치거나 사진만 추가할 수 있어요', '상담 안내 문자에 고객 전용 접수 링크가 자동으로 들어가는 기능을 준비해 뒀어요 — 접수 페이지 주소를 udongji.co.kr 로 옮긴 뒤에 켭니다. 그 전까지 안내 문자와 상담 멘트는 예전 그대로이고, 접수 링크는 테스트 고객에게만 써 주세요'] },
     { v: 127, d: '2026-11-27', t: '13:22', c: ['계약 업무 고객 상세 맨 위에 "접수 링크 복사" 버튼이 생겼어요 — 고객 전용 가맹 접수 페이지 링크가 복사되니 카카오톡으로 보내면 돼요 (고객 유형에 맞는 서류만 안내돼요)', '고객이 접수 페이지에서 제출하면 서류·자동이체 정보가 계약 업무에 자동으로 들어오고, 상세 맨 위에 "셀프 접수" 표시가 붙어요'] },
@@ -106,7 +107,7 @@
     { v: 29, d: '2026-09-08', c: ['상담자 이름은 계정에 등록된 이름으로 고정 (본인 수정 불가, 서버 검증)', '삭제 시 원본 보관 → 관리자 삭제 로그에서 복구', '네비 z-index 수정 — 서랍·모달이 네비 위로'] }
   ];
   // 페이지 캠시 방지: 각 페이지가 <udongji-nav page-v="N">으로 자기 버전을 알리고, 네바가 기대하는 버전과 다르면 한 번 강제 새로고침
-  const PAGE_V = 129;
+  const PAGE_V = 130;
   const PAGES = [
     { key: 'home', label: '홈', file: '우동지 홈.dc.html', dep: 'index.html' },
     { key: 'consult', label: '상담 업무', file: '우동지 상담 스크립트.dc.html', dep: 'consult.html' },
@@ -204,7 +205,7 @@
       root.getElementById('hx').onclick = closeH; hb.onclick = e => { if (e.target === hb) closeH(); };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeH(); });
       const who = root.getElementById('who'), out = root.getElementById('out'), adm = root.getElementById('adm');
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=46';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=47';
       import(lib).then(async m => { await m.init(); if (m.isSignedIn()) { who.textContent = m.userEmail(); out.hidden = false; out.onclick = async () => { await m.signOut(); location.href = href(PAGES[0]); }; const role = await m.roleOf(m.userEmail()); if (!role) { showUnregistered(m.userEmail(), m, href(PAGES[0])); return; } if (role === 'admin' || role === 'super') { adm.hidden = false; root.querySelectorAll('[data-admin]').forEach(a => { a.hidden = false; }); } if (role === 'close') { root.querySelectorAll('nav a').forEach(a => { const h = a.getAttribute('href') || ''; if (/consult|recall|customers|kpi|상담 스크립트|재연락|고객 목록|KPI/.test(decodeURIComponent(h))) a.remove(); if (/contract|계약 업무/.test(decodeURIComponent(h))) a.lastChild.textContent = '마감 업무'; }); } } }).catch(() => {});
     }
   }
@@ -261,7 +262,7 @@
       $('q').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); this.ask($('q').value); } };
       $('q').oninput = e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(120, e.target.scrollHeight) + 'px'; };
       document.addEventListener('keydown', e => { if (e.key === 'Escape') this.classList.remove('open'); });
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=46';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=47';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; }).catch(() => { this.hidden = true; });
     }
     save() { try { sessionStorage.setItem('udongji-place-ai', JSON.stringify(this.msgs.slice(-20))); } catch (e) {} }
@@ -341,7 +342,7 @@
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.leads = null; this.busy = ''; this.ev = ''; this.err = '';
       root.innerHTML = `<style>${leadsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">신규문의 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div>`;
       root.getElementById('head').onclick = () => { if (!this.leads || !this.leads.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=46';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=47';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; await this.load(); this._iv = setInterval(() => this.load(), 60000); this._on = () => this.load(); window.addEventListener('focus', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); }
@@ -426,7 +427,7 @@
       const root = this.attachShadow({ mode: 'open' }); this.root = root; this.open = false; this.items = null; this.filter = ''; this.err = '';
       root.innerHTML = `<style>${recallsCss}</style><div class="card" id="card"><button type="button" class="head" id="head"><span class="dot"></span><span class="msg" id="msg">재연락 고객 확인 중…</span><span class="sub" id="sub"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="list" id="list"></div></div><div id="pop"></div>`;
       root.getElementById('head').onclick = () => { if (!this.items || !this.items.length) return; this.open = !this.open; this.paint(); };
-      const lib = this.getAttribute('lib') || './udongji-fb.js?v=46';
+      const lib = this.getAttribute('lib') || './udongji-fb.js?v=47';
       import(lib).then(async m => { await m.init(); if (!m.isSignedIn()) { this.hidden = true; return; } const me = await m.me(); if (me.close) { this.hidden = true; return; } this.lib = m; this.me = me; await this.load(); this._iv = setInterval(() => this.load(), 120000); this._on = () => this.load(); window.addEventListener('focus', this._on); window.addEventListener('udongji-lead-assigned', this._on); window.addEventListener('udongji-record-saved', this._on); }).catch(() => { this.hidden = true; });
     }
     disconnectedCallback() { clearInterval(this._iv); window.removeEventListener('focus', this._on); window.removeEventListener('udongji-lead-assigned', this._on); window.removeEventListener('udongji-record-saved', this._on); }

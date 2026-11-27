@@ -12,7 +12,7 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="./udongji-nav.js?v=129"></script>
+  <script src="./udongji-nav.js?v=130"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#F2F4F8; --card:#fff; --card-2:#F6F8FC; --line:#E4E8F0; --line-2:#EEF1F6; --text:#171C2B; --text-2:#58627A; --text-3:#8C95A8; --blue:#3D5AF1; --blue-d:#2E48D6; --blue-2:#EEF1FE; --blue-3:#D6DDFC; --green:#1E9E66; --green-2:#E5F6EE; --green-3:#BFE6D2; --red:#D93A4A; --red-2:#FDECEE; --red-3:#F5BDC4; --amber:#B7791F; --amber-2:#FFF5E0; --amber-3:#F0DDB0; --purple:#7C3AED; --purple-2:#F1EAFE; --shadow:0 1px 2px rgba(20,27,45,.04),0 6px 20px rgba(20,27,45,.05); --shadow-lg:0 8px 30px rgba(20,27,45,.16); --r:14px; --r-s:9px; --r-xs:7px; --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
@@ -194,7 +194,7 @@
     .ai .foot button { font: inherit; font-size: 11px; border: 0; background: none; color: var(--text-3); cursor: pointer; text-decoration: underline; padding: 0; }
   </style>
 </helmet>
-<udongji-nav current="consult" page-v="129"></udongji-nav>
+<udongji-nav current="consult" page-v="130"></udongji-nav>
 <div class="page-top"><udongji-leads></udongji-leads><udongji-recalls consult="consult.html"></udongji-recalls></div>
 <div class="page">
   <nav class="toc" aria-label="단계">
@@ -269,7 +269,7 @@
       <div class="say"><span class="who">상담사</span><span class="q">"개인사업자세요, 법인이세요?"</span> <span class="rec must {{ f.entity }}">사업자 형태 <span class="seg"><button class="{{ on.entity.person }}" onClick="{{ pick.entity.person }}">개인</button><button class="{{ on.entity.corp }}" onClick="{{ pick.entity.corp }}">법인</button></span></span></div>
       <div class="say"><span class="who">상담사</span><span class="q">"대표님 혼자 명의세요, 공동대표 계세요?"</span> <span class="rec must {{ f.owners }}">대표 구성 <span class="seg"><button class="{{ on.owners.single }}" onClick="{{ pick.owners.single }}">단독</button><button class="{{ on.owners.joint }}" onClick="{{ pick.owners.joint }}">공동대표</button></span></span></div>
       <div class="say"><span class="who">상담사</span><span class="q">"연매출이 3억 넘으세요? 조건이 조금 달라져서 여쭤봐요."</span> <span class="rec req {{ f.large }}">연매출 3억 <span class="seg"><button class="{{ on.large.under }}" onClick="{{ pick.large.under }}">3억 미만</button><button class="{{ on.large.over }}" onClick="{{ pick.large.over }}">3억 이상</button><button class="{{ on.large.unknown }}" onClick="{{ pick.large.unknown }}">모름</button></span></span></div>
-      <div class="warn" hidden="{{ hideLarge }}"><b>3억 이상 → 중고 단말기 990원 고지 필수.</b> "대형 가맹점은 리베이트 규정 때문에 커넥트·단말기가 <b>중고(거의 새것)</b>로 월 990원에 나가요. 새 제품 원하시면 월 6,600원이에요." 미고지 시 박스 받고 철회하는 사례 있음. 모름이면 페이앤이 사업자번호로 판별해 채널톡으로 알려줌.</div>
+      <div class="warn" hidden="{{ hideLarge }}"><b>3억 이상 → 월 이용료 발생 고지 필수.</b> "연 매출 3억 이상 매장은 제품 구성에 따라 월 이용료가 발생해요. 구성 확인 후 정확한 금액을 따로 안내드릴게요." 미고지 시 박스 받고 철회하는 사례 있음. 모름이면 페이앤이 사업자번호로 판별해 채널톡으로 알려줌.</div>
       <p class="note">확정된 유형은 상단 배지와 오른쪽 패널에 표시. 페이앤 접수창은 계약 업무 → 페이앤 이관 탭에서 유형에 맞게 자동으로 열려요.</p>
     </section>
 
@@ -416,7 +416,7 @@ class Component extends DCLogic {
   async componentDidMount() {
     this._onScroll = () => { const on = window.scrollY > 400; if (on !== this.state.showTop) this.setState({ showTop: on }); }; window.addEventListener('scroll', this._onScroll, { passive: true });
     try {
-      const lib = await import('./udongji-fb.js?v=46'); await lib.init();
+      const lib = await import('./udongji-fb.js?v=47'); await lib.init();
       if (!lib.isSignedIn()) { location.replace('index.html#login'); return; }
       const meR = await lib.me().catch(() => ({})); if (meR.close) { location.replace('contract.html'); return; }
       const agent = await lib.myName().catch(() => '');
@@ -468,7 +468,7 @@ class Component extends DCLogic {
       '사업자등록증 발급': v.reg === 'done' ? '발급 완료' : v.reg === 'pending' ? '발급 예정' : '', '오픈 예정일': v.openDate || '',
       '현재 포스': L.pos || '', '약정 잔여 개월': L.term || '', '포스 연동': v.link === 'yes' ? '필요' : v.link === 'no' ? '불필요' : '',
       '와이파이 가능': v.wifi === 'yes' ? 'O' : v.wifi === 'no' ? 'X' : v.wifi === 'unknown' ? '모름' : '', '인터넷 회선(랜선) 보유': v.lan === 'yes' ? 'O' : v.lan === 'unknown' ? '모름' : v.lan ? 'X' : '', '랜선 직접 준비 안내': (v.lan === 'no' || v.lan === 'unknown') ? 'O' : v.lan ? 'X' : '', '인터넷 변경/신규 필요': v.lan === 'nonet' ? '필요' : v.lan ? '불필요' : '', '인터넷 상담 요청 일정': v.netReq ? '페이앤 인터넷 상담 요청' : '',
-      '안내한 상품 구성': L.bundle || '', '월 이용요금': v.bundle ? '0' : '', '기기 색상': L.color || '', '설치 방식': v.bundle ? ((v.bundle === 'pos' || v.bundle === 'printer') ? '현장 설치' : '자가 설치') : '',
+      '안내한 상품 구성': L.bundle || '', '월 이용요금': v.bundle && v.large !== 'over' ? '0' : '', '기기 색상': L.color || '', '설치 방식': v.bundle ? ((v.bundle === 'pos' || v.bundle === 'printer') ? '현장 설치' : '자가 설치') : '',
       '네이버 ID': v.naver || '', '이메일': ctx.emailFinal || '', '우동지 수신 동의': 'O', '특이사항': v.memo || '',
       '상담 결과': kind === 'go' ? '상담 진행' : kind === 'recall' ? '상담 연기' : '상담 거부', '상태': kind === 'go' ? '상담 중' : kind === 'recall' ? '재연락 예정' : '종료',
       '다음 액션 · 일시': kind === 'recall' ? extra.when : '', '포기 이유': kind === 'drop' ? extra.reason : ''
@@ -558,12 +558,13 @@ class Component extends DCLogic {
     docs.forEach((d, i) => { d.no = i + 1; d.cls = d.cls || ''; });
     const name = v.name ? v.name + ' 대표님' : '대표님';
     const head = `[우동지] ${name}, 우동지 상담사 ${agent}입니다.\n`, tail = `\n\n궁금한 점은 이 번호로 카카오톡 메시지 주시면 바로 답변드리겠습니다.\n감사합니다.`;
-    const summary = [L.bundle, L.color && L.color + ' 색상', v.bundle && '월 0원', v.bundle && installLabel].filter(Boolean).join(', ') || '(구성 선택 후 표시)';
+    const feeTxt = v.large === 'over' ? '월 이용료 별도 안내' : '월 0원';   // 3억 이상은 구성에 따라 이용료가 생긴다 (접수 페이지 안내와 같게)
+    const summary = [L.bundle, L.color && L.color + ' 색상', v.bundle && feeTxt, v.bundle && installLabel].filter(Boolean).join(', ') || '(구성 선택 후 표시)';
     const docLine = d => `${d.no}. ${d.t.replace(/^(법인|공동대표): /, '$1 서류: ')}\n   ${d.m}`;
     const LINK_MARK = '(저장하면 고객 전용 접수 링크가 여기에 들어가요)', useLink = !!(this.state.lib && this.state.lib.APPLY_OPEN);   // 접수 링크 안내는 스위치(APPLY_OPEN)가 켜진 뒤부터
     let sms = head + (!useLink ? `오늘 통화 감사합니다. 아래 서류를 이 번호로 카카오톡 또는 문자로 보내주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 촬영한 사진으로 충분합니다.\n\n` + docs.map(docLine).join('\n') : `오늘 통화 감사합니다. 아래 대표님 전용 접수 페이지에서 서류와 가맹 정보를 직접 올려 주시면 제가 접수까지 진행하겠습니다. 휴대폰으로 5~7분이면 되고, 입력하신 내용은 암호화되어 전송됩니다.\n\n▶ 전용 접수 페이지\n${LINK_MARK}\n\n미리 준비해 주실 서류 (휴대폰으로 촬영한 사진으로 충분합니다)\n` + docs.map(docLine).join('\n') + `\n\n제출 후에도 같은 링크로 다시 들어오시면 사진이나 정보를 바꾸실 수 있습니다. 페이지 이용이 어려우시면 이 번호로 카카오톡으로 보내주셔도 됩니다.`);
-    if (v.bundle) sms += `\n\n오늘 안내드린 내용\n- 구성: ${L.bundle} / 월 0원${L.color ? '\n- 색상: ' + L.color : ''}\n- 설치: ${installLabel}${v.lan === 'no' ? '\n- 카드단말기를 놓을 자리까지 랜선을 준비해 주시기 바랍니다 (연장선은 다이소·온라인에서 몇 천 원입니다).' : v.lan === 'unknown' ? '\n- 카드단말기를 놓을 자리까지 랜선이 나와 있는지 확인 부탁드립니다 (없으면 연장선을 준비해 주시면 됩니다).' : ''}${v.wifi === 'no' ? '\n- 커넥트는 와이파이 연결이 필요합니다. 공유기 와이파이를 켜 두시거나 인터넷 업체에 요청해 주시기 바랍니다.' : v.wifi === 'unknown' ? '\n- 매장에서 와이파이 사용이 가능한지 확인 부탁드립니다 (커넥트 연결용).' : ''}`;
-    if (v.large === 'over') sms += `\n\n※ 연매출 3억 원 이상 매장은 규정상 중고(거의 새것) 단말기로 월 990원에 제공됩니다. 새 제품을 원하시면 월 6,600원입니다.`;
+    if (v.bundle) sms += `\n\n오늘 안내드린 내용\n- 구성: ${L.bundle} / ${feeTxt}${L.color ? '\n- 색상: ' + L.color : ''}\n- 설치: ${installLabel}${v.lan === 'no' ? '\n- 카드단말기를 놓을 자리까지 랜선을 준비해 주시기 바랍니다 (연장선은 다이소·온라인에서 몇 천 원입니다).' : v.lan === 'unknown' ? '\n- 카드단말기를 놓을 자리까지 랜선이 나와 있는지 확인 부탁드립니다 (없으면 연장선을 준비해 주시면 됩니다).' : ''}${v.wifi === 'no' ? '\n- 커넥트는 와이파이 연결이 필요합니다. 공유기 와이파이를 켜 두시거나 인터넷 업체에 요청해 주시기 바랍니다.' : v.wifi === 'unknown' ? '\n- 매장에서 와이파이 사용이 가능한지 확인 부탁드립니다 (커넥트 연결용).' : ''}`;
+    if (v.large === 'over') sms += `\n\n※ 연 매출 3억 원 이상 매장은 제품 구성에 따라 월 이용료가 발생합니다. 정확한 금액은 구성 확인 후 따로 안내드리겠습니다.`;
     sms += `\n\n서류 접수 후 페이앤에서 전자계약서가 카카오톡(알림톡)으로 발송되며, 서명하시면 접수가 완료됩니다.${isJoint ? ' 공동대표님도 함께 서명하셔야 합니다.' : ''}` + tail;
     const smsRecall = when => head + `오늘 통화 감사합니다. ${when ? when + '에' : '말씀해 주신 시기에'} 다시 연락드리겠습니다.${noReg ? ' 사업자등록증이 발급되면 바로 진행하겠습니다.' : ''} 그 전에 준비되시면 미리 보내주셔도 됩니다.` + tail;
     const smsDrop = head + `오늘 시간 내주셔서 감사합니다. 이후 네이버 플레이스나 결제 관련 도움이 필요하시면 언제든 이 번호로 연락 주시기 바랍니다.\n감사합니다.`;
