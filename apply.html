@@ -177,6 +177,24 @@
   .dock .msg.on{display:block}
   .step{display:none;animation:fade .25s ease}
   .step.on{display:block}
+  .edithead,.editopen{display:none}
+  form.edit:not([hidden]){display:flex;flex-direction:column}
+  form.edit .edithead{display:block;order:0;border-color:var(--green);background:#FAFEFB}
+  .edithead b.eh{display:block;font-size:17px;color:var(--green);letter-spacing:-.02em}
+  .edithead p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+  .edithead p.when{color:var(--ink);font-weight:700;font-size:13.5px}
+  form.edit .step{display:none;animation:none;margin-top:8px}
+  form.edit .step[data-step="2"]{display:block;order:1}
+  form.edit .step[data-step="3"]{display:block;order:2}
+  form.edit .step[data-step="1"]{display:block;order:3}
+  form.edit .sec-title .num,form.edit .req{display:none}
+  form.edit .editopen{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:800;font-size:15px;cursor:pointer;margin-bottom:14px}
+  form.edit .step.shut .card{display:none}
+  form.edit .step:not(.shut) .editopen svg{transform:rotate(180deg)}
+  .up .acts{flex:none;display:flex;flex-direction:column;gap:6px}
+  .up .acts .btn-up{padding:8px 14px}
+  .up .tx .fn{display:block}
+  .up .undo{border:0;background:none;padding:0;margin-top:3px;font-size:12.5px;color:var(--muted);text-decoration:underline;cursor:pointer}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .overlay{position:fixed;inset:0;background:rgba(18,40,29,.72);z-index:50;display:none;place-items:center;padding:20px}
   .overlay.on{display:grid}
@@ -245,6 +263,12 @@
 </section>
 
 <form id="f" novalidate autocomplete="on" hidden>
+
+<div class="card edithead" id="editHead">
+  <b class="eh">✓ 접수가 완료된 상태예요</b>
+  <p class="when" id="editWhen"></p>
+  <p>보내주신 정보와 사진은 그대로 보관돼 있어요. <b>바꾸거나 더 올릴 것만</b> 고친 뒤 맨 아래 <b>수정 내용 제출하기</b>를 눌러 주세요. 손대지 않은 항목은 그대로 유지돼요.</p>
+</div>
 
 <section class="step on" data-step="0">
   <div class="sec-title"><span class="num">STEP 1</span><h2>꼭 확인해 주세요</h2></div>
@@ -319,6 +343,7 @@
 <section class="step" data-step="1">
   <div class="sec-title"><span class="num">STEP 2</span><h2>가맹점 등록 정보</h2></div>
   <p class="sec-desc">네이버 커넥트 가맹점 등록과 자동이체 등록에 쓰여요.</p>
+  <button type="button" class="editopen" id="editOpen"><span>입력한 정보 수정하기</span><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="card">
     <div class="sub">대표자 정보</div>
     <div class="field" data-f="name">
@@ -489,7 +514,7 @@
       <li>등록이 끝난 커넥트 기기가 설치 가이드와 함께 배송돼요.</li>
     </ol>
   </div>
-  <p style="font-size:13px">이 화면은 닫으셔도 괜찮아요.</p>
+  <p style="font-size:13px">이 화면은 닫으셔도 괜찮아요.<br>나중에 사진을 더 올리거나 바꿀 내용이 생기면, 받으신 링크로 다시 들어와 필요한 것만 고칠 수 있어요.</p>
 </section>
 
 <footer>
@@ -520,7 +545,8 @@
 
 <script>
 /* 접수 서버 주소. 고객은 담당자가 보낸 전용 링크(?c=접수코드)로만 들어온다.
-   ?demo=1(개인·단독) / ?demo=corp(법인·공동·간판 없음) 은 미리보기 — 아무것도 전송·저장하지 않는다. */
+   ?demo=1(개인·단독) / ?demo=corp(법인·공동·간판 없음) / ?demo=edit(접수 후 다시 들어온 수정 화면) 은 미리보기 — 아무것도 전송·저장하지 않는다.
+   이미 접수한 고객(서버가 saved 를 돌려줌)은 수정 화면으로 들어간다: 필수 안내·동의는 다시 받지 않고, 바꾼 칸과 새로 올린 파일만 보낸다. */
 const CONFIG = { ENDPOINT: 'https://apply-794429903467.asia-northeast3.run.app/', MAX_FILE_MB: 20, IMAGE_MAX_PX: 2400 };
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 const qs = new URLSearchParams(location.search), CODE = qs.get('c') || '', DEMO = qs.get('demo') || '', API = qs.get('api') && /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(qs.get('api')) ? qs.get('api') : CONFIG.ENDPOINT;
@@ -531,10 +557,13 @@ function demoInfo(kind){
   const docs = [D('biz','사업자등록증','최근 발급본, 가리는 부분 없이 전체가 나오게'), D('idcard','대표자 신분증','주민등록증 또는 운전면허증 (여권 불가) · 신분증 전체가 선명하게'), D('bank','통장 사본 (정산 계좌)', corp ? '법인 명의 통장만 가능 · 은행·계좌번호·예금주가 보이게' : '은행·계좌번호·예금주가 보이는 첫 장 · 모바일 캡처 가능'), D('license','영업신고증 / 인허가증','음식점·카페·미용·학원 등 인허가 업종만 해당',{optional:true})];
   if (corp) docs.push(D('photo_bldg','매장 외관','매장 외관 전체가 나오게',{single:true}), D('photo_entry','실내가 보이는 입구','출입문을 열어 내부가 보이도록',{single:true}), D('photo_addr','도로명주소 표지판','건물 도로명주소 표지판이 또렷하게',{single:true}), D('photo_in','매장 내부 전체','매장 내부 전체가 나오도록',{single:true}), D('photo_biz','업종 확인','판매상품 · 테이블 · 계산대 · 메뉴판 등',{single:true}), D('lease','임대차계약서','도로명주소 표지판을 찍을 수 없는 경우에만',{optional:true}), D('corp_reg','법인등기부등본','3개월 이내 발급본'), D('corp_seal','법인 인감증명서','3개월 이내 발급본'), D('corp_share','주주명부',''), D('corp_owner','법인 소유지배자 확인서','서식은 담당자가 카카오톡으로 보내드려요. 작성 후 올려 주세요',{optional:true}), D('joint_poa','공동대표자 가맹점 가입 동의 및 위임장','서식은 담당자가 카카오톡으로 보내드려요. 작성 후 올려 주세요',{optional:true}), D('joint_acct','공동대표자 결제계좌 이용 신청 동의서','서식은 담당자가 카카오톡으로 보내드려요',{optional:true}), D('joint_id','공동대표자 신분증','주민등록증 또는 운전면허증 · 전체가 선명하게'));
   else docs.push(D('photo_out','간판 포함 매장 외관','사업자등록증 상 상호명이 보이도록',{single:true}), D('photo_entry','실내가 보이는 입구','출입문을 열어 내부가 보이도록',{single:true}), D('photo_in','매장 내부 전체','매장 내부 전체가 나오도록',{single:true}), D('photo_biz','업종 확인','판매상품 · 테이블 · 계산대 · 메뉴판 등',{single:true}));
-  return { ok:true, name: corp ? '홍길동' : '김우동', store: corp ? '(주)우동지푸드' : '우동지 커피', type:{ isNew:false, corp, joint:corp, sign: corp ? '없음' : '있음' }, revenue:'', color:'', docs, got:{}, submittedAt:'' };
+  const base = { ok:true, name: corp ? '홍길동' : '김우동', store: corp ? '(주)우동지푸드' : '우동지 커피', type:{ isNew:false, corp, joint:corp, sign: corp ? '없음' : '있음' }, revenue:'', color:'', docs, got:{}, submittedAt:'' };
+  if (kind !== 'edit') return base;
+  return Object.assign(base, { revenue:'3억 미만', color:'블랙', submittedAt:'2026-11-27', receipt:'UDJ-미리보기', got:{ biz:1, idcard:1, bank:2, photo_out:1, photo_entry:1, photo_in:1, photo_biz:1 },
+    saved:{ '고객명':'김우동', '매장명':'우동지 커피', '연락처':'010-••••-5678', '이메일':'ud••••@naver.com', '네이버 ID':'ud••••', '자동이체 은행명':'신한은행', '자동이체 계좌번호':'110••••••789', '자동이체 예금주명':'김••', '예금주와의 관계':'본인', '자동이체 예금주 연락처':'010-••••-5678', '자동이체 예금주 생년월일':'85••••', '법인등록번호':'', '공동 대표자 성함/연락처':'' } });
 }
-let INFO = null, DOCS = [], PHOTOS = [];
-const files = {};
+let INFO = null, DOCS = [], PHOTOS = [], EDIT = false, BASE = {};
+const files = {}, modes = {};
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const form = $('#f');
@@ -567,21 +596,51 @@ function setup(){
   $('#noPermitWrap').hidden = !DOCS.some(x => x.id === 'license');
   DOCS.forEach((d,i) => $('#docs').appendChild(upCard(d,i,true)));
   PHOTOS.forEach((d,i) => $('#photos').appendChild(upCard(d,i,false)));
+  if (INFO.submittedAt && INFO.saved) return setupEdit();
   if (INFO.submittedAt) toast('이미 ' + INFO.submittedAt + '에 접수하셨어요. 바꿀 내용만 다시 제출하셔도 돼요.');
   go(0, true);
+}
+/* ---------- 수정 화면 (이미 접수한 고객) ---------- */
+const EDIT_NAMES = ['고객명','매장명','연락처','이메일','네이버 ID','법인등록번호','공동 대표자 성함/연락처','자동이체 은행명','자동이체 계좌번호','자동이체 예금주명','예금주와의 관계','자동이체 예금주 연락처','자동이체 예금주 생년월일','기기 색상'];
+const RULE_NAME = { name:'고객명', phone:'연락처', email:'이메일', naverId:'네이버 ID', corpno:'법인등록번호', jointWho:'공동 대표자 성함/연락처', bank:'자동이체 은행명', acct:'자동이체 계좌번호', rel:'예금주와의 관계', holder:'자동이체 예금주명', holderPhone:'자동이체 예금주 연락처', holderBirth:'자동이체 예금주 생년월일', color:'기기 색상' };
+function setupEdit(){
+  EDIT = true; const sv = INFO.saved;
+  form.classList.add('edit'); $('.stepper').hidden = true; $('#prevBtn').hidden = true; $('#noPermitWrap').hidden = true;
+  $('.hero p').textContent = '접수하신 내용이 그대로 보관돼 있어요. 바꿀 항목만 고치거나 사진을 더 올려 주세요.';
+  $('#editWhen').textContent = INFO.submittedAt + ' 접수' + (INFO.receipt ? ' · 접수번호 ' + INFO.receipt : '');
+  const info = $('.step[data-step="1"]'); info.classList.add('shut');
+  info.querySelector('.sec-desc').textContent = '바꿀 항목만 새로 적어 주세요. 비워 둔 항목은 지금 등록된 내용 그대로 유지돼요.';
+  $('#editOpen').addEventListener('click', () => { const shut = info.classList.toggle('shut'); $('#editOpen span').textContent = shut ? '입력한 정보 수정하기' : '정보 수정 접기'; });
+  /* 가려서 받은 값은 칸에 넣지 않고 '현재: …' 로만 보여준다 — 새로 적은 칸만 바뀐다 */
+  [['#phone','연락처'],['#email','이메일'],['#naverId','네이버 ID'],['#corpno','법인등록번호'],['#jointWho','공동 대표자 성함/연락처'],['#acct','자동이체 계좌번호'],['#holder','자동이체 예금주명'],['#holderPhone','자동이체 예금주 연락처'],['#holderBirth','자동이체 예금주 생년월일']].forEach(([q, k]) => { const el = $(q); el.value = ''; if (sv[k]) el.placeholder = '현재: ' + sv[k]; });
+  if (sv['고객명']) $('#name').value = sv['고객명']; if (sv['매장명']) $('#store').value = sv['매장명'];
+  const b = $('#bank'); b.value = sv['자동이체 은행명'] || ''; if (!b.value && sv['자동이체 은행명']) b.options[0].textContent = '현재: ' + sv['자동이체 은행명'];
+  $$('input[name="예금주와의 관계"]').forEach(r => { r.checked = r.value === sv['예금주와의 관계']; });
+  EDIT_NAMES.forEach(n => { BASE[n] = val(n); });
+  updateBtn();
+}
+function changes(){ const o = {}; EDIT_NAMES.forEach(n => { const v = val(n); if (v && v !== (BASE[n] || '')) o[n] = v; }); return o; }
+const changedDocs = () => Object.keys(files).filter(k => files[k] && files[k].length);
+function checkEdit(show){
+  let ok = true, first = null;
+  for (const [k, fn] of RULES){ const good = !val(RULE_NAME[k]) || fn(); if (show) setErr(k, !good); if (!good){ ok = false; if (!first) first = $(`[data-f="${k}"]`); } }
+  if (!ok && show && first){ const info = $('.step[data-step="1"]'); if (info.classList.contains('shut')) $('#editOpen').click(); first.scrollIntoView({ behavior:'smooth', block:'center' }); }
+  return ok;
 }
 
 /* ---------- 업로드 카드 ---------- */
 function upCard(item, i, multi){
-  const id = 'u_' + item.id, had = gotN(item.id);
+  const id = 'u_' + item.id, had = gotN(item.id), both = had && multi && !item.single;
   const el = document.createElement('div');
   el.className = 'up' + (had ? ' ok' : ''); el.dataset.key = item.id;
   el.innerHTML = `
     <div class="ic">${had ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#0B8A5C" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : placeholderIcon(item)}</div>
     <div class="tx"><b><span class="no">${i+1}</span>${esc(item.name)}${item.optional?' <span class="opt">(해당 시)</span>':''}</b>
       <small class="d">${had ? '<span class="fn">✓ 이미 접수됐어요 (' + had + '개)</span>' : esc(item.hint || '')}</small></div>
-    <label class="btn-up" for="${id}">${had ? '다시 올리기' : '촬영·첨부'}</label>
+    ${both ? '<div class="acts"><button type="button" class="btn-up" data-m="add">추가</button><button type="button" class="btn-up" data-m="replace">바꾸기</button></div>' : `<label class="btn-up" for="${id}">${had ? '바꾸기' : '촬영·첨부'}</label>`}
     <input type="file" id="${id}" accept="image/*,.pdf,.heic,.heif" ${multi && !item.single ? 'multiple' : ''}>`;
+  el._args = [item, i, multi];
+  el.querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => { modes[item.id] = b.dataset.m; el.querySelector('input').click(); }));
   el.querySelector('input').addEventListener('change', e => onFiles(item, el, e.target));
   return el;
 }
@@ -593,6 +652,9 @@ function placeholderIcon(item){
 async function onFiles(item, el, input){
   let list = [...(input.files||[])]; input.value = '';
   if (!list.length) return;
+  const had = gotN(item.id), add = !!el.querySelector('.acts') && modes[item.id] === 'add';
+  if (!add) modes[item.id] = 'replace';
+  if (add && had + list.length > 5){ toast(had >= 5 ? '이 서류는 이미 5개가 보관돼 있어요. 바꾸기로 올려 주세요.' : `이 서류는 5개까지 보관돼요. ${5 - had}개까지만 추가하거나 바꾸기로 올려 주세요.`); return; }
   if (list.length > 5){ list = list.slice(0,5); toast('한 서류에 파일은 5개까지 올릴 수 있어요. 앞의 5개만 담았어요.'); }
   const tooBig = list.find(f => f.size > CONFIG.MAX_FILE_MB*1024*1024);
   if (tooBig){ toast(`파일이 너무 커요 (최대 ${CONFIG.MAX_FILE_MB}MB). 다시 찍어서 올려 주세요.`); return; }
@@ -602,10 +664,11 @@ async function onFiles(item, el, input){
   if (f0.type.startsWith('image/') && !/heic|heif/i.test(f0.type)) ic.innerHTML = `<img alt="" src="${URL.createObjectURL(f0)}">`;
   else ic.innerHTML = `<span class="pdf">${/pdf/i.test(f0.type)?'PDF':'FILE'}</span>`;
   if (out.length>1) ic.insertAdjacentHTML('beforeend', `<span class="cnt">+${out.length-1}</span>`);
-  el.querySelector('.d').innerHTML = `<span class="fn">✓ ${out.length>1? out.length+'개 파일' : esc(f0.name)}</span>`;
-  el.querySelector('.btn-up').textContent = '다시 올리기';
+  el.querySelector('.d').innerHTML = `<span class="fn">✓ ${had ? (add ? '추가로 올려요 · ' : '기존 것과 바꿔요 · ') : ''}${out.length>1? out.length+'개 파일' : esc(f0.name)}</span>`;
+  if (!el.querySelector('.acts')) el.querySelector('.btn-up').textContent = '다시 올리기';
+  if (had && !el.querySelector('.undo')){ const u = document.createElement('button'); u.type = 'button'; u.className = 'undo'; u.textContent = '선택 취소 (기존 것 그대로 두기)'; u.addEventListener('click', () => { delete files[item.id]; delete modes[item.id]; el.replaceWith(upCard(...el._args)); updateBtn(); }); el.querySelector('.tx').appendChild(u); }
   el.classList.add('ok'); el.classList.remove('bad');
-  hideMsg();
+  hideMsg(); updateBtn();
 }
 async function shrink(file){
   if (!CONFIG.IMAGE_MAX_PX || !/^image\/(jpeg|png|webp)$/i.test(file.type)) return file;
@@ -636,7 +699,7 @@ $$('input[name="예금주와의 관계"]').forEach(r => r.addEventListener('chan
 ['#name','#phone'].forEach(s => $(s).addEventListener('input', () => { if (val('예금주와의 관계')==='본인') syncSelf(); }));
 /* 예전 임시 저장 값은 지운다 (민감정보를 기기에 남기지 않는다) */
 try{ Object.keys(localStorage).filter(k => k.startsWith('udongji_apply_draft_')).forEach(k => localStorage.removeItem(k)); }catch(e){}
-function resetBank(){ const b = $('#bank'); if (b){ b.value = ''; $('#bankwarn').classList.remove('on'); } }
+function resetBank(){ const b = $('#bank'); if (b){ b.value = EDIT ? (BASE['자동이체 은행명'] || '') : ''; $('#bankwarn').classList.remove('on'); } }
 resetBank(); window.addEventListener('pageshow', resetBank);
 
 $$('.more-btn').forEach(b => b.addEventListener('click', () => { const n = b.closest('.notice'); const o = n.classList.toggle('open'); b.setAttribute('aria-expanded', o); b.firstChild.textContent = o ? '접기' : '자세히 보기'; }));
@@ -688,7 +751,7 @@ function checkStep(s, show){
   if (!ok && show && first) first.scrollIntoView({ behavior:'smooth', block:'center' });
   return ok;
 }
-const ruleOf = e => { const box = e.target.closest('[data-f]'); if (!box) return; const r = RULES.find(x => x[0]===box.dataset.f); if (r && r[1]() && box.classList.contains('has-err')) setErr(box.dataset.f, false); };
+const ruleOf = e => { const box = e.target.closest('[data-f]'); if (!box) return; const r = RULES.find(x => x[0]===box.dataset.f); if (r && (r[1]() || (EDIT && !val(RULE_NAME[r[0]]))) && box.classList.contains('has-err')) setErr(box.dataset.f, false); };
 form.addEventListener('input', e => { ruleOf(e); updateBtn(); });
 form.addEventListener('change', e => { ruleOf(e); updateBtn(); });
 
@@ -704,11 +767,18 @@ function go(n, initial){
   hideMsg(); updateBtn();
   if (!initial) window.scrollTo({ top: document.querySelector('.stepper').offsetTop, behavior:'smooth' });
 }
-function updateBtn(){ $('#nextBtn').disabled = step === LAST && !checkStep(LAST, false); }
+function updateBtn(){
+  const btn = $('#nextBtn');
+  if (EDIT){ const n = Object.keys(changes()).length + changedDocs().length; btn.disabled = !n; btn.textContent = n ? '수정 내용 제출하기 (' + n + '건)' : '바꿀 내용을 입력하거나 사진을 올려 주세요'; btn.style.fontSize = n ? '' : '14.5px'; return; }
+  btn.disabled = step === LAST && !checkStep(LAST, false);
+}
 function showMsg(t){ const m = $('#dockMsg'); m.textContent = t; m.classList.add('on'); }
 function hideMsg(){ $('#dockMsg').classList.remove('on'); }
 let toastT; function toast(t){ showMsg(t); clearTimeout(toastT); toastT = setTimeout(hideMsg, 4500); }
-$('#nextBtn').addEventListener('click', () => { if (!checkStep(step, true)){ showMsg(MSGS[step]); return; } if (step < LAST) go(step+1); else submit(); });
+$('#nextBtn').addEventListener('click', () => {
+  if (EDIT){ if (!checkEdit(true)){ showMsg('빨간색으로 표시된 항목을 확인해 주세요.'); return; } hideMsg(); return submitEdit(); }
+  if (!checkStep(step, true)){ showMsg(MSGS[step]); return; } if (step < LAST) go(step+1); else submit();
+});
 $('#prevBtn').addEventListener('click', () => go(Math.max(0, step-1)));
 
 /* ---------- 최종 확인 ---------- */
@@ -754,27 +824,45 @@ function collect(){
 }
 function setProg(p){ $('#ovBar').style.width = Math.round(p*100) + '%'; }
 const post = async (url, type, body) => { const r = await fetch(url, { method:'POST', headers:{ 'Content-Type': type }, body }); const j = await r.json().catch(() => ({})); if (!r.ok || !j.ok) throw new Error(j.error || '전송에 실패했어요.'); return j; };
-async function submit(){
-  if (!checkStep(LAST, true)) return;
-  const data = collect(), jobs = [];
-  for (const it of DOCS.concat(PHOTOS)){ if (skipLicense(it)) continue; (files[it.id] || []).forEach((f, i) => jobs.push({ it, f, first: i === 0 })); }
+/* 파일 전송: 이미 올라간 파일은 다시 보내지 않는다(재시도 때 중복 방지). '추가'로 고른 서류는 기존 파일을 지우지 않는다 */
+function fileJobs(){ const jobs = []; for (const it of DOCS.concat(PHOTOS)){ if (!EDIT && skipLicense(it)) continue; (files[it.id] || []).forEach((f, i) => jobs.push({ it, f, first: i === 0 })); } return jobs; }
+async function sendFiles(jobs){ let done = 0; for (const j of jobs){ if (!j.f._sent){ await post(API + '?op=file&c=' + enc(CODE) + '&doc=' + enc(j.it.id) + (j.first && modes[j.it.id] !== 'add' ? '&replace=1' : ''), j.f.type || 'application/octet-stream', j.f); j.f._sent = true; } setProg(++done / (jobs.length + 1)); } }
+function finish(receipt, title, line){
+  $('#ov').classList.remove('on');
+  form.hidden = true; $('#dock').hidden = true; $('.stepper').hidden = true;
+  $('#doneView').hidden = false; $('#rcptNo').textContent = receipt || '-';
+  if (title){ $('#doneView h2').textContent = title; $('#doneView .next').hidden = true; }
+  $('#doneName').textContent = line;
+  $('#doneView').scrollIntoView({ block:'start' });
+}
+function sendFail(err){
+  $('#ov').classList.remove('on');
+  showMsg((err && err.message && !/Failed to fetch|NetworkError|Load failed/i.test(err.message) ? err.message + ' ' : '전송에 실패했어요. 인터넷 연결을 확인하고 다시 눌러 주세요. ') + '계속 안 되면 카카오톡으로 알려 주세요.');
+}
+async function submitEdit(){
+  const fields = changes(), docs = changedDocs(), jobs = fileJobs();
+  if (!Object.keys(fields).length && !docs.length) return;
   $('#ov').classList.add('on'); setProg(0);
   try{
-    let receipt = 'UDJ-미리보기', done = 0;
+    let receipt = INFO.receipt || '';
+    if (DEMO){ console.info('[미리보기] 전송될 수정 내용', fields, jobs.map(j => j.it.id + ' (' + (modes[j.it.id] === 'add' ? '추가' : '바꾸기') + '): ' + j.f.name)); for (let i=1;i<=20;i++){ await new Promise(r => setTimeout(r, 50)); setProg(i/20); } }
+    else { await sendFiles(jobs); receipt = (await post(API + '?op=update&c=' + enc(CODE), 'text/plain', JSON.stringify({ fields, docs }))).receipt || receipt; setProg(1); }
+    finish(receipt, '수정 내용이 접수됐어요', `${val('고객명') || INFO.name || ''} 대표님, 보내주신 내용으로 바꿔 두었어요. 담당자가 확인할게요.`);
+  }catch(err){ sendFail(err); }
+}
+async function submit(){
+  if (!checkStep(LAST, true)) return;
+  const data = collect(), jobs = fileJobs();
+  $('#ov').classList.add('on'); setProg(0);
+  try{
+    let receipt = 'UDJ-미리보기';
     if (DEMO){ console.info('[미리보기] 전송될 내용', data, jobs.map(j => j.it.id + ': ' + j.f.name)); for (let i=1;i<=20;i++){ await new Promise(r => setTimeout(r, 50)); setProg(i/20); } }
     else {
-      for (const j of jobs){ await post(API + '?op=file&c=' + enc(CODE) + '&doc=' + enc(j.it.id) + (j.first ? '&replace=1' : ''), j.f.type || 'application/octet-stream', j.f); setProg(++done / (jobs.length + 1)); }
+      await sendFiles(jobs);
       receipt = (await post(API + '?op=submit&c=' + enc(CODE), 'text/plain', JSON.stringify(data))).receipt; setProg(1);
     }
-    $('#ov').classList.remove('on');
-    form.hidden = true; $('#dock').hidden = true; $('.stepper').hidden = true;
-    $('#doneView').hidden = false; $('#rcptNo').textContent = receipt;
-    $('#doneName').textContent = `${data['고객명']} 대표님, 소중한 정보 보내주셔서 감사합니다.`;
-    window.scrollTo({ top: 0 });
-  }catch(err){
-    $('#ov').classList.remove('on');
-    showMsg((err && err.message && !/Failed to fetch|NetworkError|Load failed/i.test(err.message) ? err.message + ' ' : '전송에 실패했어요. 인터넷 연결을 확인하고 다시 눌러 주세요. ') + '계속 안 되면 카카오톡으로 알려 주세요.');
-  }
+    finish(receipt, '', `${data['고객명']} 대표님, 소중한 정보 보내주셔서 감사합니다.`);
+  }catch(err){ sendFail(err); }
 }
 boot();
 </script>
