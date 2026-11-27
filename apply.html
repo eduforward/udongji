@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>네이버페이 커넥트 가맹 접수 | 우동지</title>
+<meta name="description" content="네이버페이 커넥트 가맹 등록에 필요한 서류와 정보를 안전하게 접수합니다.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:type" content="website">
+<meta property="og:title" content="네이버페이 커넥트 가맹 접수 | 우동지">
+<meta property="og:description" content="대표님 전용 접수 페이지입니다. 서류와 정보를 한 번에 안전하게 제출해 주세요.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root{--ink:#12281D;--ink2:#1d3a2b;--green:#0B8A5C;--naver:#03C75A;--accent:#FFC533;--bg:#F3F5F4;--card:#fff;--line:#E3E8E5;--muted:#6B7570;--text:#1B1F1D;--red:#D93A4A;--redbg:#FFF1F2;--okbg:#E9F7EF;--warnbg:#FFF8E1;--r:16px}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.55;letter-spacing:-.01em}
+  button,input,select,textarea{font:inherit;color:inherit}
+  a{color:var(--green)}
+  [hidden]{display:none !important}
+  .wrap{max-width:680px;margin:0 auto;padding:0 16px}
+  .secbar{background:var(--ink);color:#cfe9db;font-size:12.5px}
+  .secbar .wrap{display:flex;align-items:center;gap:8px;padding-top:8px;padding-bottom:8px}
+  .secbar svg{flex:none}
+  .secbar b{color:#fff;font-weight:600}
+  header.top{background:linear-gradient(160deg,var(--ink) 0%,var(--ink2) 100%);color:#fff;padding:22px 0 30px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em}
+  .brand .logo{width:34px;height:34px;border-radius:10px;background:#fff;display:grid;place-items:center}
+  .brand small{display:block;font-weight:500;font-size:12px;color:#9fc4b1;letter-spacing:0}
+  .hero h1{font-size:25px;line-height:1.3;margin:22px 0 8px;letter-spacing:-.03em}
+  .hero h1 .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;background:var(--naver);color:#fff;font-size:15px;font-weight:900;vertical-align:3px;margin-right:6px}
+  .hero p{margin:0;color:#cfe0d6;font-size:14.5px}
+  .who{margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 14px;font-size:13.5px}
+  .who .dot{width:8px;height:8px;border-radius:50%;background:var(--naver);box-shadow:0 0 0 3px rgba(3,199,90,.25)}
+  .kind{display:block;margin-top:8px;font-size:12.5px;color:#9fc4b1}
+  .demo{background:#FFC533;color:#3a2c00;font-size:12.5px;font-weight:700;text-align:center;padding:6px 10px}
+  .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+  .trust div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 10px;font-size:12px;color:#cfe0d6;display:flex;gap:7px;align-items:flex-start}
+  .trust b{display:block;color:#fff;font-size:12.5px;font-weight:600}
+  .stepper{position:sticky;top:0;z-index:20;background:rgba(243,245,244,.92);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+  .stepper .wrap{padding-top:12px;padding-bottom:12px}
+  .steps{display:flex;gap:6px}
+  .steps .s{flex:1;min-width:0}
+  .steps .bar{height:5px;border-radius:9px;background:#dfe5e1;overflow:hidden}
+  .steps .bar i{display:block;height:100%;width:0;background:var(--green);transition:width .35s}
+  .steps .s.done .bar i,.steps .s.on .bar i{width:100%}
+  .steps .s.on .bar i{background:var(--naver)}
+  .steps .lb{font-size:11.5px;color:var(--muted);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .steps .s.on .lb{color:var(--ink);font-weight:700}
+  .steps .s.done .lb{color:var(--green)}
+  main{padding:18px 0 140px}
+  .card{background:var(--card);border-radius:var(--r);border:1px solid var(--line);padding:22px 20px;margin-bottom:14px;box-shadow:0 1px 2px rgba(18,40,29,.03)}
+  .sec-title{display:flex;align-items:baseline;gap:10px;margin:4px 2px 14px}
+  .sec-title .num{font-size:12px;font-weight:800;color:var(--green);background:var(--okbg);border-radius:6px;padding:2px 7px}
+  .sec-title h2{margin:0;font-size:20px;letter-spacing:-.03em}
+  .sec-desc{margin:-6px 2px 16px;color:var(--muted);font-size:14px}
+  .notice{border:1.5px solid var(--line);border-radius:14px;padding:18px 18px 14px;margin-bottom:12px;background:#fff;transition:border-color .2s,background .2s}
+  .notice.ok{border-color:var(--green);background:#FAFEFB}
+  .notice .tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--red);background:var(--redbg);border-radius:6px;padding:2px 7px;margin-bottom:8px}
+  .notice h3{margin:0 0 10px;font-size:16.5px;letter-spacing:-.02em}
+  .notice p,.notice li{font-size:14.5px;color:#2b322e;margin:0 0 8px}
+  .notice ul{margin:0 0 8px;padding-left:18px}
+  .notice .sum{margin:0 0 4px;padding-left:18px}
+  .notice .sum li{margin-bottom:4px}
+  .more-btn{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:6px 0;margin-top:2px;color:var(--green);font-weight:700;font-size:13.5px;cursor:pointer}
+  .more-btn svg{transition:transform .2s}
+  .notice.open .more-btn svg{transform:rotate(180deg)}
+  .notice .detail{display:none;background:var(--bg);border-radius:12px;padding:14px 14px 6px;margin:6px 0 2px}
+  .notice.open .detail{display:block;animation:fade .2s ease}
+  .notice .detail p,.notice .detail li{font-size:13.5px;color:#3a423e}
+  .newbiz{display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:13px;color:#2b322e;background:var(--okbg);border-radius:10px;padding:10px 12px}
+  .feebox{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 12px}
+  .feebox div{border-radius:12px;background:var(--bg);padding:12px;text-align:center}
+  .feebox small{display:block;color:var(--muted);font-size:12.5px}
+  .feebox b{font-size:19px;letter-spacing:-.02em}
+  .feebox .free b{color:var(--green)}
+  .check{display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px 14px;border-radius:12px;background:var(--bg);cursor:pointer;user-select:none;font-weight:600;font-size:14.5px}
+  .check input{position:absolute;opacity:0;pointer-events:none}
+  .check .box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid #b9c4be;background:#fff;display:grid;place-items:center;transition:.15s}
+  .check .box svg{opacity:0;transition:.15s}
+  .check input:checked + .box{background:var(--green);border-color:var(--green)}
+  .check input:checked + .box svg{opacity:1}
+  .check input:focus-visible + .box{outline:3px solid rgba(3,199,90,.35);outline-offset:2px}
+  .chips{display:grid;gap:8px}
+  .chips.c2{grid-template-columns:1fr 1fr}
+  .chips.c3{grid-template-columns:repeat(3,1fr)}
+  .chip{position:relative}
+  .chip input{position:absolute;opacity:0;pointer-events:none}
+  .chip span{display:block;text-align:center;border:1.5px solid var(--line);border-radius:12px;padding:12px 8px;font-weight:600;font-size:14.5px;cursor:pointer;background:#fff;transition:.15s}
+  .chip span small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:2px}
+  .chip input:checked + span{border-color:var(--green);background:var(--okbg);color:var(--ink)}
+  .chip input:focus-visible + span{outline:3px solid rgba(3,199,90,.35);outline-offset:2px}
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  .field label.l{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14.5px;margin-bottom:7px}
+  .req{color:var(--red);font-weight:800}
+  .opt{color:var(--muted);font-weight:500;font-size:12.5px}
+  .inp{width:100%;height:50px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;background:#fff;font-size:16px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+  select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%236B7570' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+  .inp:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(11,138,92,.12)}
+  .inp.bad{border-color:var(--red);box-shadow:0 0 0 4px rgba(217,58,74,.08)}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .err{font-size:12.5px;color:var(--red);margin-top:6px;display:none}
+  .bankwarn{display:none;gap:8px;align-items:flex-start;margin-top:10px;font-size:13px;line-height:1.5;color:#7a4a00;background:#FFF6E0;border:1px solid #F3D9A4;border-radius:10px;padding:10px 12px}
+  .bankwarn.on{display:flex}
+  .field.has-err .err{display:block}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .sub{font-size:13px;font-weight:800;color:var(--green);margin:22px 0 12px;display:flex;align-items:center;gap:8px}
+  .sub:after{content:"";flex:1;height:1px;background:var(--line)}
+  .sub:first-child{margin-top:0}
+  .lockline{display:flex;gap:8px;align-items:flex-start;background:var(--bg);border-radius:12px;padding:11px 13px;font-size:12.5px;color:#4a544f;margin-bottom:16px}
+  .colors{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .color{position:relative}
+  .color input{position:absolute;opacity:0;pointer-events:none}
+  .color .c{border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;background:#fff;transition:.15s}
+  .color .sw{width:40px;height:52px;border-radius:9px;flex:none;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .color .sw:after{content:"";position:absolute;left:9px;right:9px;top:12px;height:20px;border-radius:4px;background:#2a2f2c}
+  .color .sw.w{background:#f7f7f5}
+  .color .sw.b{background:#26292b}
+  .color .sw.b:after{background:#111}
+  .color b{font-size:15px}
+  .color input:checked + .c{border-color:var(--green);background:var(--okbg)}
+  .ups{display:grid;gap:10px}
+  .up{border:1.5px dashed #c8d2cc;border-radius:14px;background:#fff;padding:14px;display:flex;gap:14px;align-items:center;transition:.15s;position:relative}
+  .up.ok{border-style:solid;border-color:var(--green);background:#FAFEFB}
+  .up.bad{border-color:var(--red);background:var(--redbg)}
+  .up .ic{flex:none;width:58px;height:58px;border-radius:12px;background:var(--bg);display:grid;place-items:center;overflow:hidden;position:relative}
+  .up .ic img{width:100%;height:100%;object-fit:cover}
+  .up .ic .pdf{font-size:12px;font-weight:800;color:var(--red)}
+  .up .ic .cnt{position:absolute;right:3px;bottom:3px;background:rgba(18,40,29,.85);color:#fff;font-size:10.5px;font-weight:700;border-radius:6px;padding:0 5px}
+  .up .tx{flex:1;min-width:0}
+  .up .tx b{display:block;font-size:15px}
+  .up .tx small{display:block;color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:2px}
+  .up .tx .fn{color:var(--green);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .up .btn-up{flex:none;border:0;border-radius:10px;background:var(--ink);color:#fff;font-weight:700;font-size:13.5px;padding:10px 14px;cursor:pointer}
+  .up.ok .btn-up{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+  .up input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  .up .no{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;background:var(--okbg);color:var(--green);font-size:11.5px;font-weight:800;margin-right:6px;vertical-align:1px}
+  .skip{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:2px 2px 0;cursor:pointer}
+  .skip input{accent-color:var(--green);width:16px;height:16px}
+  .agree-all{display:flex;align-items:center;gap:10px;padding:16px;border-radius:14px;border:1.5px solid var(--line);font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px}
+  .agree-all.on{border-color:var(--green);background:var(--okbg)}
+  .agree{border-bottom:1px solid var(--line)}
+  .agree:last-child{border-bottom:0}
+  .agree .h{display:flex;align-items:center;gap:10px;padding:13px 2px;cursor:pointer}
+  .agree .h .t{flex:1;font-size:14.5px;font-weight:600}
+  .agree .h .t em{font-style:normal;color:var(--red);font-weight:700;margin-right:4px}
+  .agree .h .t em.o{color:var(--muted)}
+  .agree .more{border:0;background:none;color:var(--muted);font-size:12.5px;text-decoration:underline;cursor:pointer;padding:4px}
+  .agree .body{display:none;font-size:12.5px;color:#4a544f;background:var(--bg);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+  .agree.open .body{display:block}
+  .agree table{width:100%;border-collapse:collapse}
+  .agree th,.agree td{text-align:left;vertical-align:top;padding:5px 4px;border-bottom:1px solid #e3e8e5}
+  .agree th{width:76px;color:var(--ink);font-weight:700}
+  .agree input[type=checkbox]{accent-color:var(--green);width:20px;height:20px;flex:none}
+  .review dl{display:grid;grid-template-columns:120px 1fr;gap:8px 12px;margin:0;font-size:14px}
+  .review dt{color:var(--muted)}
+  .review dd{margin:0;font-weight:600;word-break:break-all}
+  .review .grp{padding:14px 0;border-bottom:1px solid var(--line)}
+  .review .grp:first-child{padding-top:0}
+  .review .grp:last-child{border-bottom:0;padding-bottom:0}
+  .review .gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .review .gh b{font-size:14.5px}
+  .review .gh button{border:0;background:none;color:var(--green);font-weight:700;font-size:13px;cursor:pointer}
+  .thumbs{display:flex;gap:6px;flex-wrap:wrap}
+  .thumbs span{width:46px;height:46px;border-radius:9px;background:var(--bg) center/cover;display:grid;place-items:center;font-size:10px;font-weight:800;color:var(--red);text-align:center;line-height:1.2}
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:12px 0 calc(12px + env(safe-area-inset-bottom))}
+  .btn{height:54px;border-radius:14px;border:0;font-weight:800;font-size:16.5px;cursor:pointer;transition:transform .05s,opacity .15s}
+  .btn:active{transform:scale(.99)}
+  .btn.pri{flex:1;background:var(--green);color:#fff}
+  .btn.pri:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sec{flex:none;width:96px;background:var(--bg);color:var(--ink)}
+  .dock .msg{font-size:12.5px;color:var(--red);text-align:center;margin:0 0 8px;display:none}
+  .dock .msg.on{display:block}
+  .step{display:none;animation:fade .25s ease}
+  .step.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .overlay{position:fixed;inset:0;background:rgba(18,40,29,.72);z-index:50;display:none;place-items:center;padding:20px}
+  .overlay.on{display:grid}
+  .ov{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:380px;text-align:center}
+  .ov h3{margin:14px 0 6px;font-size:19px}
+  .ov p{margin:0;color:var(--muted);font-size:14px}
+  .prog{height:8px;border-radius:9px;background:var(--bg);overflow:hidden;margin-top:18px}
+  .prog i{display:block;height:100%;width:0;background:var(--naver);transition:width .2s}
+  .spin{width:44px;height:44px;border-radius:50%;border:4px solid var(--okbg);border-top-color:var(--green);margin:0 auto;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .fin{text-align:center;padding:40px 4px 10px}
+  .fin .big{width:76px;height:76px;border-radius:50%;background:var(--okbg);display:grid;place-items:center;margin:0 auto 18px}
+  .fin h2{margin:0 0 8px;font-size:23px;letter-spacing:-.03em}
+  .fin p{color:var(--muted);margin:0 0 4px}
+  .rcpt{display:inline-block;margin:18px 0 8px;background:var(--bg);border-radius:12px;padding:12px 18px;font-size:14px}
+  .rcpt b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:16px;letter-spacing:.04em;color:var(--ink)}
+  .next{text-align:left;margin-top:22px}
+  .next li{margin-bottom:8px;font-size:14.5px}
+  footer{color:#8a948f;font-size:12px;padding:10px 0 30px;text-align:center;line-height:1.7}
+  footer b{color:#5f6964}
+  @media (max-width:420px){.hero h1{font-size:22px}.trust div{flex-direction:column;gap:5px;padding:10px 9px}.trust div span{font-size:11px}.review dl{grid-template-columns:100px 1fr}.chip span{padding:11px 4px;font-size:14px}}
+</style>
+</head>
+<body>
+<div class="demo" id="demoBar" hidden>미리보기 화면입니다 — 실제로 전송되거나 저장되지 않아요</div>
+<div class="secbar"><div class="wrap">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="#03C75A"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#03C75A" stroke-width="2.4"/></svg>
+  <span><b>보안 연결(HTTPS)</b> · 모든 정보는 암호화되어 전송돼요</span>
+</div></div>
+
+<header class="top"><div class="wrap">
+  <div class="brand">
+    <div class="logo"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><path d="M10 23s8-8.2 8-13.5A8 8 0 0 0 2 9.5C2 14.8 10 23 10 23z" fill="#0B8A5C"/><circle cx="10" cy="9.5" r="3.2" fill="#fff"/></svg></div>
+    <div>우동지<small>우리동네지도마케팅</small></div>
+  </div>
+  <div class="hero">
+    <h1><span class="n">N</span>네이버페이 커넥트<br>가맹 등록 접수</h1>
+    <p>가맹 등록에 필요한 서류와 정보를 이 페이지에서 한 번에 제출해 주세요. 약 5~7분이면 끝나요.</p>
+    <div class="who" id="who" hidden><span class="dot"></span><span id="whoText"></span></div>
+    <span class="kind" id="kind" hidden></span>
+    <div class="trust">
+      <div><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 3.5v6c0 5-3.4 9.3-8 10.5-4.6-1.2-8-5.5-8-10.5v-6L12 2z" fill="#03C75A"/><path d="M8.5 12l2.4 2.4 4.6-4.8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>암호화 전송</b>HTTPS 보안 연결</span></div>
+      <div><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="#03C75A"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#03C75A" stroke-width="2.4"/></svg><span><b>목적 외 사용 금지</b>가맹 등록 용도로만 사용</span></div>
+      <div><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#03C75A"/><path d="M12 7v5l3 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span><b>담당자 직접 확인</b>접수 후 순서대로 연락</span></div>
+    </div>
+  </div>
+</div></header>
+
+<nav class="stepper" aria-label="진행 단계"><div class="wrap">
+  <div class="steps" id="steps">
+    <div class="s"><div class="bar"><i></i></div><div class="lb">1 필수 안내</div></div>
+    <div class="s"><div class="bar"><i></i></div><div class="lb">2 가맹 정보</div></div>
+    <div class="s"><div class="bar"><i></i></div><div class="lb">3 서류</div></div>
+    <div class="s"><div class="bar"><i></i></div><div class="lb">4 매장 사진</div></div>
+    <div class="s"><div class="bar"><i></i></div><div class="lb">5 확인·제출</div></div>
+  </div>
+</div></nav>
+
+<main><div class="wrap">
+
+<section id="blockView" class="fin" hidden>
+  <div class="big"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="#0B8A5C"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#0B8A5C" stroke-width="2.4"/></svg></div>
+  <h2>전용 링크로 접속해 주세요</h2>
+  <p id="blockMsg">이 페이지는 담당자가 카카오톡으로 보내드린 전용 링크로만 열 수 있어요.</p>
+  <p style="font-size:13px;margin-top:10px">링크를 받지 못하셨다면 상담하신 담당자에게 말씀해 주세요.</p>
+</section>
+
+<form id="f" novalidate autocomplete="on" hidden>
+
+<section class="step on" data-step="0">
+  <div class="sec-title"><span class="num">STEP 1</span><h2>꼭 확인해 주세요</h2></div>
+  <p class="sec-desc">가맹 전에 알아두셔야 할 3가지예요. 자세한 내용은 '자세히 보기'를 눌러 확인해 주세요.</p>
+
+  <div class="notice" data-notice>
+    <span class="tag">필수 고지 1</span>
+    <h3>연 매출에 따른 월 이용료</h3>
+    <div class="feebox">
+      <div class="free"><small>연 매출 3억 미만</small><b>0원</b><small>이용료 없음</small></div>
+      <div><small>연 매출 3억 이상</small><b>구성별 상이</b><small>제품 구성에 따라 비용 발생</small></div>
+    </div>
+    <div class="field" style="margin:4px 0 0" data-f="revenue">
+      <label class="l">우리 매장 연 매출은? <span class="req">*</span></label>
+      <div class="chips c2">
+        <label class="chip"><input type="radio" name="연매출 3억" value="3억 미만"><span>3억 미만<small>월 0원</small></span></label>
+        <label class="chip"><input type="radio" name="연매출 3억" value="3억 이상"><span>3억 이상<small>구성별 비용 발생</small></span></label>
+      </div>
+      <div class="newbiz">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="10" fill="#0B8A5C"/><path d="M12 7.5v.5M12 11v5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span><b>오픈 1년 미만 신규 매장</b>은 연 매출 기준이 없어서 <b>3억 미만</b>으로 선택하시면 돼요.</span>
+      </div>
+      <div class="err">연 매출 구간을 선택해 주세요.</div>
+    </div>
+    <button type="button" class="more-btn" aria-expanded="false">자세히 보기<svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="detail">
+      <p>연 매출 정보가 필요합니다. 연 매출이 3억 미만인지 이상인지에 따라서 월 이용료가 발생할 수 있습니다.</p>
+      <ul>
+        <li>3억 미만이라면 이용료 없음 (0원)</li>
+        <li>3억 이상이라면 제품 구성에 따라 월 이용료가 발생합니다 (여신금융협회 매출 관련 법). 구성 확인 후 담당자가 정확한 금액을 따로 안내드려요.</li>
+        <li>오픈 1년 미만 신규 매장은 연 매출 확인이 불가하므로 3억 미만으로 적용됩니다.</li>
+      </ul>
+    </div>
+    <label class="check"><input type="checkbox" name="고지1_이용료" value="확인"><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>월 이용료 안내를 확인했습니다</label>
+  </div>
+
+  <div class="notice" data-notice>
+    <span class="tag">필수 고지 2</span>
+    <h3>계약 기간 3년 · 위약금 조건</h3>
+    <ul class="sum">
+      <li>계약 기간 내 임의 해지 시 위약금이 발생해요.</li>
+      <li><b>첫 달 결제 10건 이상, 이후 월 1건 이상</b>만 유지하면 위약금 걱정은 사실상 없어요.</li>
+    </ul>
+    <button type="button" class="more-btn" aria-expanded="false">자세히 보기<svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="detail">
+      <p>계약 기간은 3년이며 계약 기간 내 임의 해지 시 위약금이 발생합니다.<br>(3년 안에 폐업 시에는 커넥트 기기는 수거되며 별도의 위약금은 발생하지 않습니다.)</p>
+      <p>다만 3억 미만 매장은 3년 동안 무료이기 때문에 아래 최소 조건만 충족하시고 3년 유지하시면 되기 때문에 사실상 위약금 발생하는 일은 없다고 생각하시면 됩니다.</p>
+      <ul>
+        <li>위약금 규정: 첫 달 결제 10건 이상, 그 이후 월 결제 1건 이상이 이루어지면 됩니다.</li>
+        <li>첫 달 결제 10건이 불안하시면 지인 카드나 가족 카드로 1,000원씩 10번 결제하셔도 무관합니다.</li>
+      </ul>
+    </div>
+    <label class="check"><input type="checkbox" name="고지2_계약위약금" value="확인"><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>계약 기간·위약금 조건을 확인했습니다</label>
+  </div>
+
+  <div class="notice" data-notice>
+    <span class="tag">필수 고지 3</span>
+    <h3>배송 · 직접 설치 · 네이버 커넥트 연결</h3>
+    <ul class="sum">
+      <li>등록이 끝난 커넥트 기기가 배송되고, 설치 가이드를 보고 직접 설치해요.</li>
+      <li>네이버 커넥트는 <b>와이파이 + 전원 콘센트</b>만 있으면 연결돼요.</li>
+    </ul>
+    <button type="button" class="more-btn" aria-expanded="false">자세히 보기<svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="detail">
+      <p>커넥트 기기는 다 등록이 돼서 배송되며, 설치는 직접 진행하실 수 있도록 설치 안내 가이드가 나갑니다.</p>
+      <ul><li><b>네이버 커넥트:</b> 와이파이 + 전원 콘센트 필요</li></ul>
+    </div>
+    <label class="check"><input type="checkbox" name="고지3_설치구성" value="확인"><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>네이버 커넥트 설치 환경을 확인했습니다</label>
+  </div>
+</section>
+
+<section class="step" data-step="1">
+  <div class="sec-title"><span class="num">STEP 2</span><h2>가맹점 등록 정보</h2></div>
+  <p class="sec-desc">네이버 커넥트 가맹점 등록과 자동이체 등록에 쓰여요.</p>
+  <div class="card">
+    <div class="sub">대표자 정보</div>
+    <div class="field" data-f="name">
+      <label class="l" for="name">대표자 성함 <span class="req">*</span></label>
+      <input class="inp" id="name" name="고객명" autocomplete="name" placeholder="홍길동">
+      <div class="err">대표자 성함을 입력해 주세요.</div>
+    </div>
+    <div class="field" data-f="store">
+      <label class="l" for="store">매장명 <span class="opt">(사업자등록증 상호)</span></label>
+      <input class="inp" id="store" name="매장명" autocomplete="organization" placeholder="예: 우동지 커피">
+    </div>
+    <div class="field" data-f="phone">
+      <label class="l" for="phone">1. 대표자 연락처 <span class="req">*</span></label>
+      <input class="inp" id="phone" name="연락처" type="tel" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000" maxlength="13">
+      <div class="err">휴대폰 번호를 정확히 입력해 주세요.</div>
+    </div>
+    <div class="field" data-f="email">
+      <label class="l" for="email">2. 대표자 이메일 <span class="req">*</span></label>
+      <input class="inp" id="email" name="이메일" type="email" inputmode="email" autocomplete="email" placeholder="example@naver.com">
+      <div class="err">이메일 주소를 정확히 입력해 주세요.</div>
+    </div>
+    <div class="field" data-f="naverId">
+      <label class="l" for="naverId">3. 네이버 ID <span class="req">*</span></label>
+      <input class="inp" id="naverId" name="네이버 ID" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="@naver.com 앞부분만">
+      <div class="hint">스마트플레이스를 관리하는 네이버 아이디를 적어 주세요. 비밀번호는 절대 묻지 않아요.</div>
+      <div class="err">네이버 ID를 입력해 주세요.</div>
+    </div>
+    <div class="field" data-f="corpno" id="fCorp" hidden>
+      <label class="l" for="corpno">법인등록번호 <span class="req">*</span></label>
+      <input class="inp" id="corpno" name="법인등록번호" inputmode="numeric" autocomplete="off" placeholder="'-' 없이 숫자 13자리" maxlength="13">
+      <div class="hint">법인등기부등본에 적힌 13자리 번호예요.</div>
+      <div class="err">법인등록번호 13자리를 입력해 주세요.</div>
+    </div>
+    <div class="field" data-f="jointWho" id="fJoint" hidden>
+      <label class="l" for="jointWho">공동 대표자 성함 / 연락처 <span class="req">*</span></label>
+      <input class="inp" id="jointWho" name="공동 대표자 성함/연락처" autocomplete="off" placeholder="예: 홍길순 / 010-0000-0000">
+      <div class="err">공동 대표자 성함과 연락처를 입력해 주세요.</div>
+    </div>
+
+    <div class="sub">자동이체 정보</div>
+    <div class="lockline">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="#0B8A5C"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#0B8A5C" stroke-width="2.4"/></svg>
+      <span>계좌 정보는 카드 결제 후 정산되는 계좌를 말합니다. 네이버페이 커넥트 자동이체 등록에만 쓰이며, 지금 쓰시는 휴대폰·PC에는 저장되지 않아요.</span>
+    </div>
+    <div class="field" data-f="bank">
+      <label class="l" for="bank">4. 자동이체 은행명 <span class="req">*</span></label>
+      <select class="inp" id="bank" name="자동이체 은행명" autocomplete="off">
+        <option value="">은행 선택</option>
+        <option>KB국민은행</option><option>신한은행</option><option>우리은행</option><option>하나은행</option>
+        <option>NH농협은행</option><option>지역농협·축협</option><option>IBK기업은행</option><option>카카오뱅크</option>
+        <option>토스뱅크</option><option>케이뱅크</option><option>SC제일은행</option><option>한국씨티은행</option>
+        <option>새마을금고</option><option>신협</option><option>우체국</option><option>수협</option>
+        <option>부산은행</option><option>경남은행</option><option>iM뱅크(대구)</option><option>광주은행</option>
+        <option>전북은행</option><option>제주은행</option><option>KDB산업은행</option><option>저축은행</option><option>기타</option>
+      </select>
+      <div class="bankwarn" id="bankwarn" role="alert">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="10" fill="#E59A00"/><path d="M12 7v6.5M12 16.5v.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span><b id="bankwarnName">카카오뱅크</b>는 제로페이 연동이 안 돼요. 제로페이 가맹을 원하시면 카카오뱅크·토스뱅크·케이뱅크를 뺀 다른 은행 계좌로 선택해 주세요.</span>
+      </div>
+      <div class="err">은행을 선택해 주세요.</div>
+    </div>
+    <div class="field" data-f="acct">
+      <label class="l" for="acct">5. 자동이체 계좌번호 <span class="req">*</span></label>
+      <input class="inp" id="acct" name="자동이체 계좌번호" inputmode="numeric" autocomplete="off" placeholder="'-' 없이 숫자만" maxlength="20">
+      <div class="err">계좌번호를 숫자로 입력해 주세요.</div>
+    </div>
+    <div class="field" data-f="holder">
+      <label class="l" for="holder">6. 예금주명 <span class="req">*</span></label>
+      <input class="inp" id="holder" name="자동이체 예금주명" autocomplete="off" placeholder="통장에 적힌 예금주">
+      <div class="err">예금주명을 입력해 주세요.</div>
+    </div>
+    <div class="field" data-f="rel">
+      <label class="l">7. 예금주와의 관계 <span class="req">*</span></label>
+      <div class="chips c3">
+        <label class="chip"><input type="radio" name="예금주와의 관계" value="본인"><span>본인</span></label>
+        <label class="chip"><input type="radio" name="예금주와의 관계" value="배우자"><span>배우자</span></label>
+        <label class="chip"><input type="radio" name="예금주와의 관계" value="가족"><span>가족</span></label>
+        <label class="chip"><input type="radio" name="예금주와의 관계" value="법인"><span>법인 계좌</span></label>
+        <label class="chip"><input type="radio" name="예금주와의 관계" value="기타"><span>기타</span></label>
+      </div>
+      <div class="hint">본인을 고르면 예금주명·연락처가 대표자 정보로 자동 채워져요.</div>
+      <div class="err">예금주와의 관계를 선택해 주세요.</div>
+    </div>
+    <div class="row2">
+      <div class="field" data-f="holderPhone">
+        <label class="l" for="holderPhone">8. 예금주 연락처 <span class="req">*</span></label>
+        <input class="inp" id="holderPhone" name="자동이체 예금주 연락처" type="tel" inputmode="numeric" autocomplete="off" placeholder="010-0000-0000" maxlength="13">
+        <div class="err">연락처를 확인해 주세요.</div>
+      </div>
+      <div class="field" data-f="holderBirth">
+        <label class="l" for="holderBirth">9. 예금주 생년월일 <span class="req">*</span></label>
+        <input class="inp" id="holderBirth" name="자동이체 예금주 생년월일" inputmode="numeric" autocomplete="off" placeholder="예: 850315" maxlength="6">
+        <div class="hint" id="birthHint">숫자 6자리 (YYMMDD)</div>
+        <div class="err" id="birthErr">생년월일 6자리를 입력해 주세요.</div>
+      </div>
+    </div>
+
+    <div class="sub">커넥트 기기 색상</div>
+    <div class="field" data-f="color">
+      <label class="l">10. 커넥트 기기 색상 <span class="req">*</span></label>
+      <div class="colors">
+        <label class="color"><input type="radio" name="기기 색상" value="블랙"><span class="c"><span class="sw b"></span><b>블랙</b></span></label>
+        <label class="color"><input type="radio" name="기기 색상" value="화이트"><span class="c"><span class="sw w"></span><b>화이트</b></span></label>
+      </div>
+      <div class="err">색상을 선택해 주세요.</div>
+    </div>
+  </div>
+</section>
+
+<section class="step" data-step="2">
+  <div class="sec-title"><span class="num">STEP 3</span><h2 id="docsTitle">서류</h2></div>
+  <p class="sec-desc">휴대폰으로 찍은 사진이면 충분해요. 글자가 잘 보이게, 가리는 부분 없이 전체가 나오게 찍어 주세요.</p>
+  <div class="ups" id="docs"></div>
+  <label class="skip" id="noPermitWrap"><input type="checkbox" id="noPermit" name="영업신고증 해당없음" value="해당없음"> 우리 업종은 영업신고증·인허가증 대상이 아니에요</label>
+</section>
+
+<section class="step" data-step="3">
+  <div class="sec-title"><span class="num">STEP 4</span><h2 id="photosTitle">매장 사진</h2></div>
+  <p class="sec-desc">네이버 가맹 심사에서 실제 운영 중인 매장인지 확인하는 용도예요. 안내대로 찍으면 반려 없이 한 번에 통과돼요.</p>
+  <div class="ups" id="photos"></div>
+</section>
+
+<section class="step" data-step="4">
+  <div class="sec-title"><span class="num">STEP 5</span><h2>확인하고 제출하기</h2></div>
+  <p class="sec-desc">입력하신 내용을 마지막으로 확인해 주세요. 민감한 정보는 일부 가려서 보여드려요.</p>
+  <div class="card review" id="review"></div>
+  <div class="card">
+    <label class="agree-all" id="agreeAllWrap"><input type="checkbox" id="agreeAll" style="accent-color:var(--green);width:22px;height:22px"> 아래 내용에 모두 동의합니다</label>
+    <div class="agree">
+      <div class="h"><input type="checkbox" class="ag" name="개인정보 수집·이용 동의" value="O" data-req="1" data-k="수집이용"><span class="t"><em>[필수]</em>개인정보 수집·이용 동의</span><button type="button" class="more">보기</button></div>
+      <div class="body"><table>
+        <tr><th>수집 항목</th><td>대표자 성함·연락처·이메일, 네이버 ID, 매장명, 연 매출 구간, 자동이체 계좌 정보(은행·계좌번호·예금주명·관계·연락처·생년월일), 제출 서류 및 매장 사진</td></tr>
+        <tr><th>이용 목적</th><td>네이버페이 커넥트 가맹점 등록 신청, 자동이체 등록, 커넥트 기기 배송 및 설치 안내</td></tr>
+        <tr><th>보유 기간</th><td>가맹 등록 완료 후 계약 종료 시까지 (관계 법령에 따라 보관이 필요한 경우 해당 기간)</td></tr>
+      </table><p style="margin:8px 0 0">동의를 거부할 수 있으나, 거부 시 가맹 등록 접수가 불가합니다.</p></div>
+    </div>
+    <div class="agree">
+      <div class="h"><input type="checkbox" class="ag" name="개인정보 제3자 제공 동의" value="O" data-req="1" data-k="제3자제공"><span class="t"><em>[필수]</em>개인정보 제3자 제공 동의</span><button type="button" class="more">보기</button></div>
+      <div class="body"><table>
+        <tr><th>제공받는 자</th><td>네이버페이 및 가맹 등록·커넥트 기기 공급 업무 수행사(VAN사·카드사 포함)</td></tr>
+        <tr><th>제공 항목</th><td>위 수집 항목 중 가맹 등록 심사·자동이체 등록에 필요한 정보 및 서류</td></tr>
+        <tr><th>이용 목적</th><td>가맹점 심사 및 등록, 자동이체 등록, 커넥트 기기 개통·배송</td></tr>
+        <tr><th>보유 기간</th><td>제공받는 자의 개인정보 처리방침에 따름</td></tr>
+      </table><p style="margin:8px 0 0">동의를 거부할 수 있으나, 거부 시 가맹 등록 접수가 불가합니다.</p></div>
+    </div>
+    <div class="agree">
+      <div class="h"><input type="checkbox" class="ag" name="필수 고지 확인" value="O" data-req="1" data-k="필수고지"><span class="t"><em>[필수]</em>월 이용료·계약 기간(3년)·위약금 조건 확인</span><button type="button" class="more">보기</button></div>
+      <div class="body">STEP 1에서 안내드린 연 매출별 월 이용료(3억 미만 0원 / 3억 이상 제품 구성에 따라 비용 발생), 계약 기간 3년 및 임의 해지 시 위약금, 최소 결제 조건(첫 달 10건 이상, 이후 월 1건 이상), 네이버 커넥트 설치 환경(와이파이 + 전원 콘센트) 내용을 확인했습니다.</div>
+    </div>
+    <div class="agree">
+      <div class="h"><input type="checkbox" class="ag" name="우동지 수신 동의" value="O" data-k="마케팅"><span class="t"><em class="o">[선택]</em>매장 마케팅 팁 수신 동의</span><button type="button" class="more">보기</button></div>
+      <div class="body">카카오톡·문자로 네이버 플레이스 활용 팁을 보내드려요. 언제든 수신 거부할 수 있어요.</div>
+    </div>
+  </div>
+</section>
+</form>
+
+<section id="doneView" class="fin" hidden>
+  <div class="big"><svg width="38" height="38" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#0B8A5C" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <h2>접수가 완료됐어요</h2>
+  <p id="doneName">대표님, 소중한 정보 보내주셔서 감사합니다.</p>
+  <div class="rcpt">접수번호 <b id="rcptNo">-</b></div>
+  <div class="card next">
+    <b>다음 진행 순서</b>
+    <ol style="padding-left:18px;margin:10px 0 0">
+      <li>담당자가 서류와 사진을 확인해요. 보완이 필요하면 카카오톡으로 연락드려요.</li>
+      <li>네이버페이 가맹 심사와 커넥트 기기 등록이 진행돼요.</li>
+      <li>등록이 끝난 커넥트 기기가 설치 가이드와 함께 배송돼요.</li>
+    </ol>
+  </div>
+  <p style="font-size:13px">이 화면은 닫으셔도 괜찮아요.</p>
+</section>
+
+<footer>
+  <b>우동지 · 우리동네지도마케팅</b><br>
+  상호 주식회사 에듀포워드 · 대표 김석준 · 사업자등록번호 346-81-03445<br>
+  서울 강남구 강남대로152길 55 (신사동) 302호<br>
+  개인정보 보호책임자 김석준 · 문의 010-6773-7951 · contact@eduforward.kr<br>
+  © 우동지. 입력 정보는 HTTPS로 암호화되어 전송됩니다.
+</footer>
+</div></main>
+
+<div class="dock" id="dock" hidden>
+  <div class="wrap">
+    <p class="msg" id="dockMsg"></p>
+    <div style="display:flex;gap:10px">
+      <button type="button" class="btn sec" id="prevBtn" hidden>이전</button>
+      <button type="button" class="btn pri" id="nextBtn">확인했어요, 다음</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ov"><div class="ov">
+  <div class="spin"></div>
+  <h3>안전하게 전송 중이에요</h3>
+  <p id="ovTxt">서류와 사진을 암호화해서 보내고 있어요.<br>창을 닫지 말고 잠시만 기다려 주세요.</p>
+  <div class="prog"><i id="ovBar"></i></div>
+</div></div>
+
+<script>
+/* 접수 서버 주소. 고객은 담당자가 보낸 전용 링크(?c=접수코드)로만 들어온다.
+   ?demo=1(개인·단독) / ?demo=corp(법인·공동·간판 없음) 은 미리보기 — 아무것도 전송·저장하지 않는다. */
+const CONFIG = { ENDPOINT: '', MAX_FILE_MB: 20, IMAGE_MAX_PX: 2400 };
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+const qs = new URLSearchParams(location.search), CODE = qs.get('c') || '', DEMO = qs.get('demo') || '', API = qs.get('api') && /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(qs.get('api')) ? qs.get('api') : CONFIG.ENDPOINT;
+const enc = encodeURIComponent;
+const D = (id, name, hint, o) => Object.assign({ id, name, hint, group: /^photo_/.test(id) ? 'photo' : 'doc' }, o || {});
+function demoInfo(kind){
+  const corp = kind === 'corp';
+  const docs = [D('biz','사업자등록증','최근 발급본, 가리는 부분 없이 전체가 나오게'), D('idcard','대표자 신분증','주민등록증 또는 운전면허증 (여권 불가) · 신분증 전체가 선명하게'), D('bank','통장 사본 (정산 계좌)', corp ? '법인 명의 통장만 가능 · 은행·계좌번호·예금주가 보이게' : '은행·계좌번호·예금주가 보이는 첫 장 · 모바일 캡처 가능'), D('license','영업신고증 / 인허가증','음식점·카페·미용·학원 등 인허가 업종만 해당',{optional:true})];
+  if (corp) docs.push(D('photo_bldg','매장 외관','매장 외관 전체가 나오게',{single:true}), D('photo_entry','실내가 보이는 입구','출입문을 열어 내부가 보이도록',{single:true}), D('photo_addr','도로명주소 표지판','건물 도로명주소 표지판이 또렷하게',{single:true}), D('photo_in','매장 내부 전체','매장 내부 전체가 나오도록',{single:true}), D('photo_biz','업종 확인','판매상품 · 테이블 · 계산대 · 메뉴판 등',{single:true}), D('lease','임대차계약서','도로명주소 표지판을 찍을 수 없는 경우에만',{optional:true}), D('corp_reg','법인등기부등본','3개월 이내 발급본'), D('corp_seal','법인 인감증명서','3개월 이내 발급본'), D('corp_share','주주명부',''), D('corp_owner','법인 소유지배자 확인서','서식은 담당자가 카카오톡으로 보내드려요. 작성 후 올려 주세요',{optional:true}), D('joint_poa','공동대표자 가맹점 가입 동의 및 위임장','서식은 담당자가 카카오톡으로 보내드려요. 작성 후 올려 주세요',{optional:true}), D('joint_acct','공동대표자 결제계좌 이용 신청 동의서','서식은 담당자가 카카오톡으로 보내드려요',{optional:true}), D('joint_id','공동대표자 신분증','주민등록증 또는 운전면허증 · 전체가 선명하게'));
+  else docs.push(D('photo_out','간판 포함 매장 외관','사업자등록증 상 상호명이 보이도록',{single:true}), D('photo_entry','실내가 보이는 입구','출입문을 열어 내부가 보이도록',{single:true}), D('photo_in','매장 내부 전체','매장 내부 전체가 나오도록',{single:true}), D('photo_biz','업종 확인','판매상품 · 테이블 · 계산대 · 메뉴판 등',{single:true}));
+  return { ok:true, name: corp ? '홍길동' : '김우동', store: corp ? '(주)우동지푸드' : '우동지 커피', type:{ isNew:false, corp, joint:corp, sign: corp ? '없음' : '있음' }, revenue:'', color:'', docs, got:{}, submittedAt:'' };
+}
+let INFO = null, DOCS = [], PHOTOS = [];
+const files = {};
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const form = $('#f');
+let step = 0; const LAST = 4;
+const gotN = id => (INFO && INFO.got && INFO.got[id]) || 0;
+const skipLicense = it => it.id === 'license' && $('#noPermit').checked;
+
+function block(msg){ $('#blockView').hidden = false; if (msg) $('#blockMsg').textContent = msg; form.hidden = true; $('#dock').hidden = true; $('.stepper').hidden = true; }
+async function boot(){
+  try{
+    if (DEMO) INFO = demoInfo(DEMO);
+    else if (CODE && API){ const r = await fetch(API + '?op=info&c=' + enc(CODE)); const j = await r.json().catch(() => ({})); if (!j.ok) return block(j.error); INFO = j; }
+    else return block(CODE ? '접수 페이지를 준비하고 있어요. 잠시 후 다시 접속해 주세요.' : '');
+  }catch(e){ return block('연결에 실패했어요. 인터넷 연결을 확인하고 다시 접속해 주세요.'); }
+  setup();
+}
+function setup(){
+  if (DEMO) $('#demoBar').hidden = false;
+  form.hidden = false; $('#dock').hidden = false;
+  DOCS = INFO.docs.filter(x => x.group !== 'photo'); PHOTOS = INFO.docs.filter(x => x.group === 'photo');
+  const t = INFO.type || {};
+  if (INFO.name){ $('#name').value = INFO.name; $('#who').hidden = false; $('#whoText').textContent = INFO.name + ' 대표님 전용 접수 페이지' + (INFO.store ? ' · ' + INFO.store : ''); }
+  if (INFO.store) $('#store').value = INFO.store;
+  $('#kind').hidden = false; $('#kind').textContent = [t.isNew ? '신규 오픈 매장' : '기존 운영 매장', t.corp ? '법인사업자' : '개인사업자', t.joint ? '공동대표' : '단독대표'].join(' · ') + ' 기준으로 필요한 서류를 안내드려요';
+  $('#fCorp').hidden = !t.corp; $('#fJoint').hidden = !t.joint;
+  [['연매출 3억', INFO.revenue], ['기기 색상', INFO.color]].forEach(([n, v]) => { if (v) $$('input[name="' + n + '"]').forEach(r => { r.checked = r.value === v; }); });
+  const reqDocs = DOCS.filter(x => !x.optional).length;
+  $('#docsTitle').textContent = '서류 ' + reqDocs + '종' + (DOCS.length > reqDocs ? ' + 해당 시 ' + (DOCS.length - reqDocs) + '종' : '');
+  $('#photosTitle').textContent = '매장 사진 ' + PHOTOS.length + '장';
+  $('#noPermitWrap').hidden = !DOCS.some(x => x.id === 'license');
+  DOCS.forEach((d,i) => $('#docs').appendChild(upCard(d,i,true)));
+  PHOTOS.forEach((d,i) => $('#photos').appendChild(upCard(d,i,false)));
+  if (INFO.submittedAt) toast('이미 ' + INFO.submittedAt + '에 접수하셨어요. 바꿀 내용만 다시 제출하셔도 돼요.');
+  go(0, true);
+}
+
+/* ---------- 업로드 카드 ---------- */
+function upCard(item, i, multi){
+  const id = 'u_' + item.id, had = gotN(item.id);
+  const el = document.createElement('div');
+  el.className = 'up' + (had ? ' ok' : ''); el.dataset.key = item.id;
+  el.innerHTML = `
+    <div class="ic">${had ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#0B8A5C" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : placeholderIcon(item)}</div>
+    <div class="tx"><b><span class="no">${i+1}</span>${esc(item.name)}${item.optional?' <span class="opt">(해당 시)</span>':''}</b>
+      <small class="d">${had ? '<span class="fn">✓ 이미 접수됐어요 (' + had + '개)</span>' : esc(item.hint || '')}</small></div>
+    <label class="btn-up" for="${id}">${had ? '다시 올리기' : '촬영·첨부'}</label>
+    <input type="file" id="${id}" accept="image/*,.pdf,.heic,.heif" ${multi && !item.single ? 'multiple' : ''}>`;
+  el.querySelector('input').addEventListener('change', e => onFiles(item, el, e.target));
+  return el;
+}
+function placeholderIcon(item){
+  const camera = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 8h3l1.6-2.2h6.8L17 8h3v11H4V8z" stroke="#0B8A5C" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.4" r="3.4" stroke="#0B8A5C" stroke-width="1.8"/></svg>';
+  const doc = '<svg width="24" height="26" viewBox="0 0 24 24" fill="none"><path d="M6 3h8l4 4v14H6V3z" stroke="#0B8A5C" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 11h6M9 15h6" stroke="#0B8A5C" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  return item.group === 'photo' ? camera : doc;
+}
+async function onFiles(item, el, input){
+  let list = [...(input.files||[])]; input.value = '';
+  if (!list.length) return;
+  if (list.length > 5){ list = list.slice(0,5); toast('한 서류에 파일은 5개까지 올릴 수 있어요. 앞의 5개만 담았어요.'); }
+  const tooBig = list.find(f => f.size > CONFIG.MAX_FILE_MB*1024*1024);
+  if (tooBig){ toast(`파일이 너무 커요 (최대 ${CONFIG.MAX_FILE_MB}MB). 다시 찍어서 올려 주세요.`); return; }
+  const out = []; for (const f of list) out.push(await shrink(f));
+  files[item.id] = out;
+  const f0 = out[0], ic = el.querySelector('.ic');
+  if (f0.type.startsWith('image/') && !/heic|heif/i.test(f0.type)) ic.innerHTML = `<img alt="" src="${URL.createObjectURL(f0)}">`;
+  else ic.innerHTML = `<span class="pdf">${/pdf/i.test(f0.type)?'PDF':'FILE'}</span>`;
+  if (out.length>1) ic.insertAdjacentHTML('beforeend', `<span class="cnt">+${out.length-1}</span>`);
+  el.querySelector('.d').innerHTML = `<span class="fn">✓ ${out.length>1? out.length+'개 파일' : esc(f0.name)}</span>`;
+  el.querySelector('.btn-up').textContent = '다시 올리기';
+  el.classList.add('ok'); el.classList.remove('bad');
+  hideMsg();
+}
+async function shrink(file){
+  if (!CONFIG.IMAGE_MAX_PX || !/^image\/(jpeg|png|webp)$/i.test(file.type)) return file;
+  try{
+    const bmp = await createImageBitmap(file); const m = Math.max(bmp.width, bmp.height);
+    if (m <= CONFIG.IMAGE_MAX_PX) return file;
+    const s = CONFIG.IMAGE_MAX_PX / m, c = document.createElement('canvas');
+    c.width = Math.round(bmp.width*s); c.height = Math.round(bmp.height*s);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', .88));
+    return new File([blob], file.name.replace(/\.\w+$/,'') + '.jpg', { type:'image/jpeg' });
+  }catch(e){ return file; }
+}
+$('#noPermit').addEventListener('change', e => { const card = $('#docs .up[data-key="license"]'); if (!card) return; card.style.opacity = e.target.checked ? .45 : 1; card.classList.remove('bad'); });
+
+/* ---------- 입력 보조 ---------- */
+function fmtPhone(v){ const d = v.replace(/\D/g,'').slice(0,11); if (d.length < 4) return d; if (d.length < 8) return d.slice(0,3)+'-'+d.slice(3); return d.slice(0,3)+'-'+d.slice(3,d.length-4)+'-'+d.slice(-4); }
+['#phone','#holderPhone'].forEach(s => $(s).addEventListener('input', e => { e.target.value = fmtPhone(e.target.value); }));
+['#acct','#corpno'].forEach(s => $(s).addEventListener('input', e => { e.target.value = e.target.value.replace(/[^\d]/g,''); }));
+$('#holderBirth').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g,'').slice(0,6); });
+$('#naverId').addEventListener('input', e => { e.target.value = e.target.value.replace(/@.*$/,'').trim(); });
+function syncSelf(){
+  const rel = val('예금주와의 관계');
+  if (rel === '본인'){ $('#holder').value = $('#name').value; $('#holderPhone').value = $('#phone').value; }
+  $('#birthHint').textContent = rel === '법인' ? '법인 계좌는 담당자가 별도로 확인해요. 대표자 생년월일 6자리를 적어 주세요.' : '숫자 6자리 (YYMMDD)';
+}
+$$('input[name="예금주와의 관계"]').forEach(r => r.addEventListener('change', syncSelf));
+['#name','#phone'].forEach(s => $(s).addEventListener('input', () => { if (val('예금주와의 관계')==='본인') syncSelf(); }));
+/* 예전 임시 저장 값은 지운다 (민감정보를 기기에 남기지 않는다) */
+try{ Object.keys(localStorage).filter(k => k.startsWith('udongji_apply_draft_')).forEach(k => localStorage.removeItem(k)); }catch(e){}
+function resetBank(){ const b = $('#bank'); if (b){ b.value = ''; $('#bankwarn').classList.remove('on'); } }
+resetBank(); window.addEventListener('pageshow', resetBank);
+
+$$('.more-btn').forEach(b => b.addEventListener('click', () => { const n = b.closest('.notice'); const o = n.classList.toggle('open'); b.setAttribute('aria-expanded', o); b.firstChild.textContent = o ? '접기' : '자세히 보기'; }));
+$$('[data-notice] input[type=checkbox]').forEach(cb => cb.addEventListener('change', () => { cb.closest('[data-notice]').classList.toggle('ok', cb.checked); updateBtn(); }));
+const NO_ZP_BANKS = ['카카오뱅크','토스뱅크','케이뱅크'];
+$('#bank').addEventListener('change', e => { const b = e.target.value; const on = NO_ZP_BANKS.includes(b); $('#bankwarn').classList.toggle('on', on); if (on) $('#bankwarnName').textContent = b; });
+$$('input[name="연매출 3억"]').forEach(r => r.addEventListener('change', () => { $('[data-f="revenue"]').classList.remove('has-err'); updateBtn(); }));
+
+/* ---------- 검증 ---------- */
+function val(name){
+  const el = form.elements[name]; if (!el) return '';
+  if (el instanceof RadioNodeList){ const c = [...el].find(x => x.checked); return c ? c.value : ''; }
+  if (el.type === 'checkbox') return el.checked ? el.value : '';
+  return (el.value||'').trim();
+}
+function setErr(key, bad){ const box = $(`[data-f="${key}"]`); if (!box) return; box.classList.toggle('has-err', bad); const inp = box.querySelector('.inp'); if (inp) inp.classList.toggle('bad', bad); }
+const RULES = [
+  ['name', () => val('고객명').length >= 2],
+  ['phone', () => /^01\d-\d{3,4}-\d{4}$/.test(val('연락처'))],
+  ['email', () => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val('이메일'))],
+  ['naverId', () => /^[a-z0-9_\-\.]{3,30}$/i.test(val('네이버 ID'))],
+  ['corpno', () => !(INFO && INFO.type && INFO.type.corp) || /^\d{13}$/.test(val('법인등록번호'))],
+  ['jointWho', () => !(INFO && INFO.type && INFO.type.joint) || val('공동 대표자 성함/연락처').length >= 5],
+  ['bank', () => !!val('자동이체 은행명')],
+  ['acct', () => /^\d{8,20}$/.test(val('자동이체 계좌번호'))],
+  ['rel', () => !!val('예금주와의 관계')],
+  ['holder', () => val('자동이체 예금주명').length >= 2],
+  ['holderPhone', () => /^0\d{1,2}-\d{3,4}-\d{4}$/.test(val('자동이체 예금주 연락처'))],
+  ['holderBirth', () => { const v = val('자동이체 예금주 생년월일'); if (!/^\d{6}$/.test(v)) return false; const m=+v.slice(2,4), d=+v.slice(4,6); return m>=1&&m<=12&&d>=1&&d<=31; }],
+  ['color', () => !!val('기기 색상')],
+];
+function checkStep(s, show){
+  let ok = true, first = null;
+  if (s === 0){
+    const rev = !!val('연매출 3억'); if (show) $('[data-f="revenue"]').classList.toggle('has-err', !rev);
+    const allChecked = $$('[data-notice] input[type=checkbox]').every(c => c.checked); ok = rev && allChecked;
+    if (!ok && show) first = !rev ? $('[data-f="revenue"]') : $$('[data-notice]').find(n => !n.querySelector('input[type=checkbox]').checked);
+  }
+  if (s === 1){ for (const [k, fn] of RULES){ const good = fn(); if (show) setErr(k, !good); if (!good){ ok = false; if (!first) first = $(`[data-f="${k}"]`); } } }
+  if (s === 2 || s === 3){
+    for (const it of (s === 2 ? DOCS : PHOTOS)){
+      if (it.optional || skipLicense(it)) continue;
+      const good = (files[it.id] && files[it.id].length > 0) || gotN(it.id) > 0;
+      const card = $(`.up[data-key="${it.id}"]`); if (show) card.classList.toggle('bad', !good);
+      if (!good){ ok = false; if (!first) first = card; }
+    }
+  }
+  if (s === 4) ok = $$('.ag[data-req]').every(c => c.checked);
+  if (!ok && show && first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+  return ok;
+}
+const ruleOf = e => { const box = e.target.closest('[data-f]'); if (!box) return; const r = RULES.find(x => x[0]===box.dataset.f); if (r && r[1]() && box.classList.contains('has-err')) setErr(box.dataset.f, false); };
+form.addEventListener('input', e => { ruleOf(e); updateBtn(); });
+form.addEventListener('change', e => { ruleOf(e); updateBtn(); });
+
+/* ---------- 단계 이동 ---------- */
+const LABELS = ['확인했어요, 다음','다음','다음','다음','동의하고 제출하기'];
+const MSGS = ['연 매출을 선택하고 안내 3가지를 모두 확인해 주세요.','빨간색으로 표시된 항목을 확인해 주세요.','필요한 서류를 모두 첨부해 주세요.','매장 사진을 모두 첨부해 주세요.','필수 항목에 동의해 주세요.'];
+function go(n, initial){
+  step = n;
+  $$('.step').forEach(s => s.classList.toggle('on', +s.dataset.step === n));
+  $$('#steps .s').forEach((s,i) => { s.classList.toggle('on', i===n); s.classList.toggle('done', i<n); });
+  $('#prevBtn').hidden = n === 0; $('#nextBtn').textContent = LABELS[n];
+  if (n === LAST) renderReview();
+  hideMsg(); updateBtn();
+  if (!initial) window.scrollTo({ top: document.querySelector('.stepper').offsetTop, behavior:'smooth' });
+}
+function updateBtn(){ $('#nextBtn').disabled = step === LAST && !checkStep(LAST, false); }
+function showMsg(t){ const m = $('#dockMsg'); m.textContent = t; m.classList.add('on'); }
+function hideMsg(){ $('#dockMsg').classList.remove('on'); }
+let toastT; function toast(t){ showMsg(t); clearTimeout(toastT); toastT = setTimeout(hideMsg, 4500); }
+$('#nextBtn').addEventListener('click', () => { if (!checkStep(step, true)){ showMsg(MSGS[step]); return; } if (step < LAST) go(step+1); else submit(); });
+$('#prevBtn').addEventListener('click', () => go(Math.max(0, step-1)));
+
+/* ---------- 최종 확인 ---------- */
+function mask(v, a=3, b=2){ if (!v) return '-'; if (v.length <= a+b) return v; return v.slice(0,a) + '•'.repeat(Math.min(6, v.length-a-b)) + (b ? v.slice(-b) : ''); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function thumbs(list){
+  return '<div class="thumbs">' + list.map(it => {
+    if (skipLicense(it)) return `<span title="${esc(it.name)}" style="color:var(--muted)">해당<br>없음</span>`;
+    const f = files[it.id] && files[it.id][0];
+    if (!f) return gotN(it.id) ? `<span title="${esc(it.name)}" style="color:var(--green)">접수<br>완료</span>` : `<span title="${esc(it.name)}" style="color:var(--muted)">${it.optional ? '선택' : '없음'}</span>`;
+    if (f.type.startsWith('image/') && !/heic|heif/i.test(f.type)) return `<span title="${esc(it.name)}" style="background-image:url('${URL.createObjectURL(f)}')"></span>`;
+    return `<span title="${esc(it.name)}">${/pdf/i.test(f.type)?'PDF':'FILE'}</span>`;
+  }).join('') + '</div>';
+}
+function renderReview(){
+  const r = (k, v) => `<dt>${k}</dt><dd>${esc(v||'-')}</dd>`, t = INFO.type || {};
+  $('#review').innerHTML = `
+    <div class="grp"><div class="gh"><b>필수 안내</b><button type="button" data-go="0">수정</button></div>
+      <dl>${r('연 매출', val('연매출 3억'))}${r('월 이용료', val('연매출 3억')==='3억 미만'?'0원':'제품 구성에 따라 별도 안내')}${r('계약 기간','3년 (안내 확인 완료)')}</dl></div>
+    <div class="grp"><div class="gh"><b>대표자 · 가맹 정보</b><button type="button" data-go="1">수정</button></div>
+      <dl>${r('대표자', val('고객명'))}${r('매장명', val('매장명'))}${r('연락처', val('연락처'))}${r('이메일', val('이메일'))}${r('네이버 ID', val('네이버 ID'))}${t.corp ? r('법인등록번호', mask(val('법인등록번호'),6,0)) : ''}${t.joint ? r('공동 대표자', val('공동 대표자 성함/연락처')) : ''}${r('커넥트 기기 색상', val('기기 색상'))}</dl></div>
+    <div class="grp"><div class="gh"><b>자동이체</b><button type="button" data-go="1">수정</button></div>
+      <dl>${r('은행', val('자동이체 은행명'))}${r('계좌번호', mask(val('자동이체 계좌번호'),3,3))}${r('예금주', val('자동이체 예금주명') + ' (' + val('예금주와의 관계') + ')')}${r('예금주 연락처', val('자동이체 예금주 연락처'))}${r('생년월일', mask(val('자동이체 예금주 생년월일'),2,0))}</dl></div>
+    <div class="grp"><div class="gh"><b>서류 ${DOCS.length}종</b><button type="button" data-go="2">수정</button></div>${thumbs(DOCS)}</div>
+    <div class="grp"><div class="gh"><b>매장 사진 ${PHOTOS.length}장</b><button type="button" data-go="3">수정</button></div>${thumbs(PHOTOS)}</div>`;
+  $$('#review [data-go]').forEach(b => b.addEventListener('click', () => go(+b.dataset.go)));
+}
+
+/* ---------- 동의 ---------- */
+$('#agreeAll').addEventListener('change', e => { $$('.ag').forEach(c => c.checked = e.target.checked); syncAgree(); });
+$$('.ag').forEach(c => c.addEventListener('change', syncAgree));
+function syncAgree(){ const all = $$('.ag').every(c => c.checked); $('#agreeAll').checked = all; $('#agreeAllWrap').classList.toggle('on', all); updateBtn(); }
+$$('.agree .more').forEach(b => b.addEventListener('click', () => { const a = b.closest('.agree'); a.classList.toggle('open'); b.textContent = a.classList.contains('open') ? '닫기' : '보기'; }));
+
+/* ---------- 제출 ---------- */
+function collect(){
+  const names = ['고객명','매장명','연락처','이메일','네이버 ID','법인등록번호','공동 대표자 성함/연락처','자동이체 은행명','자동이체 계좌번호','자동이체 예금주명','예금주와의 관계','자동이체 예금주 연락처','자동이체 예금주 생년월일','기기 색상','연매출 3억'];
+  const o = {}; names.forEach(n => o[n] = val(n));
+  o['영업신고증 해당없음'] = $('#noPermit').checked;
+  o['동의'] = {}; $$('.ag').forEach(c => { o['동의'][c.dataset.k] = c.checked; });
+  o['고지'] = { 이용료: !!val('고지1_이용료'), 계약위약금: !!val('고지2_계약위약금'), 설치: !!val('고지3_설치구성') };
+  return o;
+}
+function setProg(p){ $('#ovBar').style.width = Math.round(p*100) + '%'; }
+const post = async (url, type, body) => { const r = await fetch(url, { method:'POST', headers:{ 'Content-Type': type }, body }); const j = await r.json().catch(() => ({})); if (!r.ok || !j.ok) throw new Error(j.error || '전송에 실패했어요.'); return j; };
+async function submit(){
+  if (!checkStep(LAST, true)) return;
+  const data = collect(), jobs = [];
+  for (const it of DOCS.concat(PHOTOS)){ if (skipLicense(it)) continue; (files[it.id] || []).forEach((f, i) => jobs.push({ it, f, first: i === 0 })); }
+  $('#ov').classList.add('on'); setProg(0);
+  try{
+    let receipt = 'UDJ-미리보기', done = 0;
+    if (DEMO){ console.info('[미리보기] 전송될 내용', data, jobs.map(j => j.it.id + ': ' + j.f.name)); for (let i=1;i<=20;i++){ await new Promise(r => setTimeout(r, 50)); setProg(i/20); } }
+    else {
+      for (const j of jobs){ await post(API + '?op=file&c=' + enc(CODE) + '&doc=' + enc(j.it.id) + (j.first ? '&replace=1' : ''), j.f.type || 'application/octet-stream', j.f); setProg(++done / (jobs.length + 1)); }
+      receipt = (await post(API + '?op=submit&c=' + enc(CODE), 'text/plain', JSON.stringify(data))).receipt; setProg(1);
+    }
+    $('#ov').classList.remove('on');
+    form.hidden = true; $('#dock').hidden = true; $('.stepper').hidden = true;
+    $('#doneView').hidden = false; $('#rcptNo').textContent = receipt;
+    $('#doneName').textContent = `${data['고객명']} 대표님, 소중한 정보 보내주셔서 감사합니다.`;
+    window.scrollTo({ top: 0 });
+  }catch(err){
+    $('#ov').classList.remove('on');
+    showMsg((err && err.message && !/Failed to fetch|NetworkError|Load failed/i.test(err.message) ? err.message + ' ' : '전송에 실패했어요. 인터넷 연결을 확인하고 다시 눌러 주세요. ') + '계속 안 되면 카카오톡으로 알려 주세요.');
+  }
+}
+boot();
+</script>
+</body>
+</html>
